@@ -1,0 +1,44 @@
+@startuml
+' -- bewusst minimal für breite Kompatibilität --
+hide footbox
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam wrapWidth 180
+
+actor "SPS (OPC UA)" as SPS
+participant ":PLCMonitor" as PLCM
+participant ":InventorySnapshotUtils" as InvU
+participant ":EventBus" as Bus
+participant ":CommandForceFactory" as CFF
+participant ":ICommandForce" as ICF
+participant ":FailureRecorder" as FR
+participant ":TimeBlogger" as TB
+participant ":AckLogger" as AL
+
+== Trigger ==
+SPS -> PLCM : DataChange TriggerD1|D3 = TRUE
+PLCM -> PLCM : ignore first notify / edge detect
+PLCM -> PLCM : post build-snapshot task
+PLCM -> InvU : buildInventorySnapshotNow("PLC")
+InvU --> PLCM : InventorySnapshot
+PLCM -> Bus : post evD1|evD3 (corr, snapshot)
+PLCM -> Bus : post evUnknownFM (corr)
+
+== Dispatch ==
+Bus -> FR : onEvent(evD1|evD3)
+Bus -> TB : onEvent(evD1|evD3)
+FR -> FR : set activeCorr(corr)
+Bus -> FR : onEvent(evUnknownFM)
+Bus -> TB : onEvent(evUnknownFM)
+
+== KG ingestion ==
+FR -> CFF : createForOp(KGIngestion, ..., Bus)
+CFF -> ICF : KGIngestionForce
+ICF -> Bus : post evIngestionPlanned (corr)
+Bus -> AL : onEvent(evIngestionPlanned)
+ICF -> Bus : post evIngestionDone (corr, rc)
+Bus -> AL : onEvent(evIngestionDone)
+Bus -> TB : onEvent(...)
+TB -> TB : finish(corr)
+
+@enduml

@@ -1,0 +1,128 @@
+@startuml CommandForceFactory1
+' ReactionManager – Focused class diagram (only directly related types & key deps)
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+' Füge das direkt ganz oben ein:
+'skinparam dpi 300                      
+' für PNG-Export (ignoriert bei SVG)
+skinparam defaultFontName Arial
+'skinparam defaultFontSize 16           
+' größerer Font = bessere Lesbarkeit
+skinparam nodesep 15                  
+' Knotenabstand
+'skinparam ranksep 35                   
+' Zeilenabstand
+'scale 1.6                              
+' zusätzliche Skalierung
+'hide empty members
+'left to right direction
+top to bottom direction
+allowmixing
+
+' ---- Runtime basics ----
+class PLCMonitor {
+  ...
+}
+class EventBus {
+  ...
+}
+
+interface ICommandForce {
+  {abstract} +execute(p: Plan): int
+}
+
+interface IWinnerFilter {
+  {abstract} +filter(winners: vector<string>, correlationId: string, processNameForAck: string): vector<string>
+}
+
+' ---- Factory ----
+class CommandForceFactory {
+  +createForOp(op: Operation, mon: PLCMonitor*, bus: EventBus&, oq: IOrderQueue* = nullptr): unique_ptr<ICommandForce>
+  +createWinnerFilter(mon: PLCMonitor&, bus: EventBus&, fetcher: function<string(const string&)>, defaultTimeoutMs: unsigned): unique_ptr<IWinnerFilter>
+  +createSystemReactionFilter(mon: PLCMonitor&, bus: EventBus&, fetcher: function<string(const string&)>, defaultTimeoutMs: unsigned): unique_ptr<IWinnerFilter>
+}
+
+artifact ".csv" <<file>> as OrdersCSV
+
+' ---- Forces (created by factory) ----
+class PLCCommandForce implements ICommandForce {
+  +execute(p: Plan): int
+  ...
+}
+class WriteCsvForce implements ICommandForce {
+  +execute(p: Plan): int
+  ...
+}
+class KGIngestionForce implements ICommandForce {
+  +execute(p: Plan): int
+  ...
+}
+'struct IOrderQueue
+struct KgIngestionParams {
+  +corr: string
+  +process: string
+  +summary: string
+  +snapshotWrapped: string
+  +resourceId: string
+}
+' ---- Plan / Operation ----
+struct Plan {
+  +correlationId: string
+  +resourceId: string
+  +ops: vector<Operation>
+}
+together {
+struct Operation {
+  +type: OpType
+  +inputs: UAValueMap
+  +expOuts: UAValueMap
+  +attach: any
+  +timeoutMs: int
+}
+enum OpType {
+  WriteBool, 
+  PulseBool, 
+  WriteInt32, 
+  CallMethod,
+  WaitMs, 
+  ReadCheck, 
+  BlockResource, 
+  RerouteOrders, 
+  UnblockResource,
+  KGIngestion, 
+  WriteCSV
+}
+}
+
+  '- ontology_path: str
+  '- ont_iri: str
+  '- class_prefix: str
+  '- op_prefix: str
+  '- dp_prefix: str
+  '- graph: rdflib.Graph
+  '- CL: rdflib.namespace.Namespace
+  '- OP: rdflib.namespace.Namespace
+  '- DP: rdflib.namespace.Namespace
+class KG_Interface <<Python>> {
+  ...
+  + __init__(): None
+  + getFailureModeParameters(interruptedSkill: str): str
+  + getMonitoringActionForFailureMode(FMIri: str): str
+  + getSystemreactionForFailureMode(FMIri: str): str
+  + ingestOccuredFailure(...): bool
+}
+
+
+' ---- Relations ----
+CommandForceFactory --> ICommandForce
+CommandForceFactory -- IWinnerFilter
+PLCCommandForce --> PLCMonitor : uses (mon)
+ICommandForce -- EventBus   : posts/acks (bus)
+KGIngestionForce --> KgIngestionParams
+WriteCsvForce --> OrdersCSV: <<uses>>
+Plan o-- Operation
+CommandForceFactory --> Plan
+KGIngestionForce --> KG_Interface
+ICommandForce --> Plan : p
+
+@enduml

@@ -1,0 +1,136 @@
+@startuml EventBus
+' ReactionManager – Focused class diagram (only directly related types & key deps)
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+' Füge das direkt ganz oben ein:
+'skinparam dpi 300                      
+' für PNG-Export (ignoriert bei SVG)
+skinparam defaultFontName Arial
+'skinparam defaultFontSize 16           
+' größerer Font = bessere Lesbarkeit
+skinparam nodesep 15                  
+' Knotenabstand
+'skinparam ranksep 35                   
+' Zeilenabstand
+'scale 1.6                              
+' zusätzliche Skalierung
+'hide empty members
+'left to right direction
+top to bottom direction
+
+' --------- Enum (Event.h)
+enum EventType {
+  evD2
+  evD1
+  evD3
+  evSRPlanned
+  evSRDone
+  evProcessFail
+  evMonActPlanned
+  evMonActDone
+  evKGResult
+  evKGTimeout
+  evIngestionPlanned
+  evIngestionDone
+  evMonActFinished
+  evSysReactFinished
+  evUnknownFM
+  evGotFM
+}
+
+' --------- Structs (Event.h)
+struct Event  {
+  +type: EventType
+  +ts: std::chrono::steady_clock::time_point
+  +payload: std::any
+}
+
+struct KGResultPayload  {
+  +correlationId: std::string
+  +rowsJson: std::string
+  +ok: bool
+}
+
+struct KGTimeoutPayload  {
+  +correlationId: std::string
+}
+
+struct PLCSnapshotPayload  {
+  +correlationId: std::string
+  +snapshotJson: std::string
+}
+
+' --------- Funktor/Hash (EventBus.h)
+struct EventTypeHash  {
+  +operator()(t: EventType): size_t
+}
+
+' --------- SubscriptionToken (EventBus.h)
+struct SubscriptionToken {
+  +type: EventType
+  +id: std::uint64_t
+  +operator bool(): bool
+}
+
+' --------- ReactiveObserver (Interface / Forward)
+abstract ReactiveObserver {
+  + {abstract} onEvent(ev: Event): void
+}
+
+' --------- Subscription (RAII-Handle; EventBus.h/.cpp)
+class Subscription {
+  +Subscription()
+  +Subscription(bus: EventBus*, tok: SubscriptionToken)
+  +Subscription(Subscription&&)
+  +operator=(Subscription&&): Subscription&
+  ~Subscription()
+  +token(): SubscriptionToken
+  +unsubscribe(): void
+  -swap(o: Subscription): void
+  -bus_: EventBus*
+  -tok_: SubscriptionToken
+}
+
+' --------- EventBus (EventBus.h/.cpp)
+class EventBus {
+  +EventBus()
+  +kMinPriority: int = 1
+  +kMaxPriority: int = 4
+  +subscribe(t: EventType, obs: std::shared_ptr<ReactiveObserver>, priority: int = 1): SubscriptionToken
+  +subscribe_scoped(t: EventType, obs: std::shared_ptr<ReactiveObserver>, priority: int = 1): Subscription
+  +unsubscribe(tok: SubscriptionToken): void
+  +post(ev: Event): void
+  +post_now(ev: Event): void
+  +process(maxEvents: size_t = 32): void
+  +clear_queue(): void
+  -dispatch_one(ev: Event): void
+  -sweep_dead(t: EventType): void
+  -mx_: std::mutex
+  -q_: std::deque<Event>
+  -listeners_: std::unordered_map<EventType, std::vector<EventBus::Entry>, EventTypeHash>
+  -nextId_: std::atomic<std::uint64_t> = 1
+}
+
+' Eingekapselter Listener-Eintrag
+struct "Entry"  {
+  +wp: std::weak_ptr<ReactiveObserver>
+  +id: std::uint64_t
+  +priority: int
+}
+
+' --------- Beziehungen
+EventBus "1" o-- "*" "Entry" : listeners_
+EventBus "1" *-- "*" Event : q_
+EventBus "1" o-- "*" EventTypeHash
+EventBus "1" --> "*" ReactiveObserver
+Subscription -- EventBus
+Subscription --> SubscriptionToken
+Event "1" o-- "1" KGResultPayload  : payload
+Event "1" o-- "1" KGTimeoutPayload: payload
+Event "1" o-- "1" PLCSnapshotPayload: payload
+
+note right of ReactiveObserver
+  onEvent wird vom EventBus beim Dispatch
+  in Anmelde-/Prioritätsreihenfolge aufgerufen.
+end note
+@enduml

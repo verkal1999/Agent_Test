@@ -1,0 +1,28 @@
+# Build-Verzeichnisse und Ausgabedateien
+/build/
+/out/
+*.exe
+*.dll
+*.so
+*.lib
+*.a
+*.o
+*.obj
+*.pdb
+
+# CMake-spezifische Cache-Dateien
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CTestTestfile.cmake
+Makefile
+
+# Visual Studio Code benutzerspezifische Einstellungen
+.vscode/
+
+# Visual Studio Projektdateien
+.vs/
+*.suo
+*.user
+*.sln.docstates
+build-server/

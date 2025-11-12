@@ -1,0 +1,41 @@
+{
+  "version": 5,
+  "cmakeMinimumRequired": { "major": 3, "minor": 20 },
+  "configurePresets": [
+    {
+      "name": "server-debug",
+      "displayName": "Server - VS2022 x64 (Debug, vcpkg)",
+      "generator": "Visual Studio 17 2022",
+      "architecture": { "value": "x64" },
+      "binaryDir": "${sourceDir}/../../build-server",
+      "toolchainFile": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake",
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "x64-windows"
+      }
+    },
+    {
+      "name": "server-release",
+      "inherits": "server-debug",
+      "displayName": "Server - VS2022 x64 (Release, vcpkg)",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "server-build-debug",
+      "displayName": "Build Server (Debug)",
+      "configurePreset": "server-debug",
+      "configuration": "Debug",
+      "targets": [ "ua_test_server_secure" ]
+    },
+    {
+      "name": "server-build-release",
+      "displayName": "Build Server (Release)",
+      "configurePreset": "server-release",
+      "configuration": "Release",
+      "targets": [ "ua_test_server_secure" ]
+    }
+  ]
+}

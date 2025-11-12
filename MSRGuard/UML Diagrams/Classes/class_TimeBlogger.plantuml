@@ -1,0 +1,128 @@
+@startuml TimeBlogger
+' ReactionManager – Focused class diagram (only directly related types & key deps)
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+' Füge das direkt ganz oben ein:
+'skinparam dpi 300                      
+' für PNG-Export (ignoriert bei SVG)
+skinparam defaultFontName Arial
+'skinparam defaultFontSize 16           
+' größerer Font = bessere Lesbarkeit
+'skinparam linetype polyline
+skinparam nodesep 5             
+' Knotenabstand
+skinparam ranksep 5         
+' Zeilenabstand
+scale 1.6                              
+' zusätzliche Skalierung
+'hide empty members
+left to right direction
+'top to bottom direction
+
+' ---- Observer base ----
+abstract ReactiveObserver {
+  {abstract} +onEvent(ev: Event)
+}
+
+' ---- Event system (minimal view) ----
+struct Event {
+  +type: EventType
+  +ts
+  +payload: any
+}
+enum EventType {
+  evSRPlanned, evSRDone,
+  evMonActPlanned, evMonActDone,
+  evProcessFail,
+  evIngestionPlanned, evIngestionDone
+}
+class EventBus {
+ ...
+}
+
+' ---- CSV params/types used by TimeBlogger ----
+struct CsvRow {
+  corrId: string
+  eventType: string
+  durationMs: long long
+  durSumMs: long long
+}
+struct WriteCsvParams {
+  outFile: string
+  rows: vector<CsvRow>
+  withHeader: bool
+}
+
+' ---- Plan / Operation (structs) ----
+enum OpType { 
+    WriteCSV,
+    ...
+    }
+struct Operation {
+  type: OpType
+  inputs: UAValueMap
+  expOuts: UAValueMap
+  attach: any
+  timeoutMs: int
+}
+struct Plan {
+  correlationId: string
+  resourceId: string
+  ops: vector<Operation>
+}
+Plan o-- Operation
+
+' ---- Factory for command execution ----
+class CommandForceFactory {
+  ...
+}
+
+' ---- TimeBlogger internals ----
+struct Timeline {
+  t0: Clock::time_point
+  lastTs: Clock::time_point
+  hasLast: bool
+  lastEventName: string
+  marks: unordered_map<string, Clock::time_point>
+  csvRows: vector<CsvRow>
+  sumMs: long long
+}
+
+class TimeBlogger <<enable_shared_from_this>> {
+  +using Clock = std::chrono::steady_clock
+  +using TimePoint = Clock::time_point
+  +using DurationMs = std::chrono::milliseconds
+
+  +TimeBlogger(bus: EventBus&)
+  +subscribeAll(): void
+  +onEvent(ev: Event): void
+
+  ' optionale manuelle Marken
+  +mark(corrId: string, label: string): void
+  +delta(corrId: string, fromLabel: string, toLabel: string, out: DurationMs&): bool
+  +finish(corrId: string): void
+
+  ..helpers..
+  -printAndCollect_(corr: string, evName: string, durMs: long long, sumMs: long long): void
+  {static} -extractCorrId_(ev: Event): string
+  {static} -toName_(t: EventType): const char*
+  -recordSegment_(tl: Timeline, from: string, to: string): void
+  -handleEvent_(ev: Event, corrId: string, evName: const char*): void
+
+  ..state..
+  -bus_: EventBus&
+  -mx_: mutex
+  -tlByCorr_: unordered_map<string, Timeline>
+}
+
+' ---- Relations ----
+TimeBlogger --|> ReactiveObserver
+EventBus -- ReactiveObserver
+TimeBlogger --> EventBus : bus_
+TimeBlogger *-- "unordered_map<corrId, Timeline>" Timeline : tlByCorr_
+Timeline *-- CsvRow : csvRows
+TimeBlogger *-- WriteCsvParams : finish() erzeugt Params
+TimeBlogger --> Plan : finish() baut Plan
+EventBus o-- Event : ev
+TimeBlogger --> CommandForceFactory : createForOp(op, /*mon*/nullptr, bus_)
+@enduml

@@ -1,0 +1,154 @@
+@startuml PLCMonitor
+' ReactionManager – Focused class diagram (only directly related types & key deps)
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+' Füge das direkt ganz oben ein:
+'skinparam dpi 300                      
+' für PNG-Export (ignoriert bei SVG)
+skinparam defaultFontName Arial
+'skinparam defaultFontSize 16           
+' größerer Font = bessere Lesbarkeit
+'skinparam linetype polyline
+skinparam nodesep 5             
+' Knotenabstand
+skinparam ranksep 5         
+' Zeilenabstand
+                             
+' zusätzliche Skalierung
+'hide empty members
+'left to right direction
+top to bottom direction
+
+
+' ================= Core =================
+class PLCMonitor {
+  +post(fn)
+  +processPosted(max=16)
+  -- Connection --
+  +connect(): bool
+  +disconnect(): void
+  +runIterate(timeoutMs=0): UA_StatusCode
+  +waitUntilActivated(timeoutMs=3000): bool
+  -- Calls & IO --
+  +callMethodTyped(objId, methId, inputs: UAValueMap, outputs: UAValueMap&, timeoutMs): bool
+  +callJob(objId, methId, x: int32, yOut: int32&, timeoutMs): bool
+  +readBoolAt(nodeId, ns, out&): bool
+  +readInt16At(nodeId, ns, out&): bool
+  +readFloatAt(nodeId, ns, out&): bool
+  +readDoubleAt(nodeId, ns, out&): bool
+  +readStringAt(nodeId, ns, out&): bool
+  +readAsString(nodeId, ns, outVal&, outType&): bool
+  +writeBool(nodeId, ns, value): bool
+  -- Subscriptions --
+  +subscribeInt16(nodeId, ns, samplingMs, queueSize, cb): bool
+  +subscribeBool(nodeId, ns, samplingMs, queueSize, cb): bool
+  +unsubscribe(): void
+  -- Inventory --
+  +dumpPlcInventory(out: vector<InventoryRow>&, filter="PLC"): bool
+  +printInventoryTable(rows)
+  -- Timers --
+  +postDelayed(delayMs, fn)
+  +processTimers()
+  -- Secure Test Server --
+  +connectToSecureTestServer(certDer, keyDer, endpoint): bool
+  +watchTriggerD2(samplingMs=0.0, queueSize=10): bool
+  -- Low-level --
+  +raw(): UA_Client*
+  ..static..
+  +dataChangeHandler(...)
+  +TestServerDefaults(certDer, keyDer, endpoint="opc.tcp://localhost:4840"): Options
+}
+
+' ================= Structs directly tied to PLCMonitor =================
+struct Options {
+  endpoint: string
+  username: string
+  password: string
+  certDerPath: string
+  keyDerPath: string
+  applicationUri: string
+  nsIndex: UA_UInt16 = 2
+}
+PLCMonitor *-- Options : opt_
+
+struct InventoryRow {
+  nodeClass: string  ' "Variable"|"Method"|"Object"
+  nodeId: string     ' e.g. ns=4;s=OPCUA.DiagnoseFinished
+  dtypeOrSig: string ' e.g. "Boolean" or "in:[Int32], out:[Int32]"
+}
+PLCMonitor ..> InventoryRow : dumpPlcInventory()
+
+struct UAValue <<typealias>> {
+   std::variant<std::monostate, bool, int16_t, int32_t, float, double, std::string>
+}
+struct UAValueMap <<typealias>> {
+   std::map<int, UAValue>
+}
+PLCMonitor ..> UAValueMap : callMethodTyped(...)
+UAValueMap *-- UAValue
+
+' ================= Snapshot structs (used with PLC state) =================
+struct NodeKey {
+  ns: uint16_t = 4
+  type: char  
+  id: string   
+}
+
+struct InventorySnapshot {
+  rows: vector<InventoryRow>
+  bools: unordered_map<NodeKey,bool>
+  strings: unordered_map<NodeKey,string>
+  int16s: unordered_map<NodeKey,int16_t>
+  floats: unordered_map<NodeKey,double>
+
+  
+}
+InventorySnapshot o-- InventoryRow
+InventorySnapshot *-- NodeKey
+
+struct DSnapshot {
+  correlationId: string
+  inv: InventorySnapshot
+}
+DSnapshot *-- InventorySnapshot
+
+
+
+' ================= Event bus (added on request) =================
+class EventBus {
+  +subscribe(t: EventType, obs: shared_ptr<ReactiveObserver>, priority: int = 1): SubscriptionToken
+  +subscribe_scoped(t: EventType, obs: shared_ptr<ReactiveObserver>, priority: int = 1): Subscription
+  +unsubscribe(tok: SubscriptionToken): void
+  +post(ev: Event): void
+  +post_now(ev: Event): void
+  +process(maxEvents: size_t = 32): void
+  +clear_queue(): void
+}
+' NOTE: PLCMonitor does not hold EventBus directly; events with PLC state are published by managers (e.g., ReactionManager). EventBus is included as requested.
+PLCMonitor ..> EventBus : (indirect via application main.cpp)
+
+struct Event {
+  type: EventType
+  ts: chrono::steady_clock::time_point
+  payload: std::any
+}
+EventBus *-- Event: ev
+' Event payload structs that can be carried in Event::payload
+struct PLCSnapshotPayload {
+  correlationId: string
+  snapshotJson: string
+}
+struct KGResultPayload {
+  correlationId: string
+  rowsJson: string
+  ok: bool
+}
+struct KGTimeoutPayload {
+  correlationId: string
+}
+Event o-- PLCSnapshotPayload
+Event o-- KGResultPayload
+Event o-- KGTimeoutPayload
+PLCSnapshotPayload *-- DSnapshot
+
+@enduml

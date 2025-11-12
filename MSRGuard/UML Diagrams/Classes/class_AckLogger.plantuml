@@ -1,0 +1,111 @@
+@startuml ReactionManager
+' ReactionManager – Focused class diagram (only directly related types & key deps)
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+' Füge das direkt ganz oben ein:
+'skinparam dpi 300                      
+' für PNG-Export (ignoriert bei SVG)
+skinparam defaultFontName Arial
+'skinparam defaultFontSize 16           
+' größerer Font = bessere Lesbarkeit
+skinparam nodesep 15                  
+' Knotenabstand
+'skinparam ranksep 35                   
+' Zeilenabstand
+'scale 1.6                              
+' zusätzliche Skalierung
+'hide empty members
+'left to right direction
+top to bottom direction
+' ---- Observer base ----
+abstract ReactiveObserver {
+  {abstract} +onEvent(ev: Event)
+}
+
+' ---- Event system (minimal view) ----
+struct Event {
+  +type: EventType
+  +ts
+  +payload: any
+}
+
+enum EventType {
+  evSRPlanned, 
+  evSRDone,
+  evMonActPlanned, 
+  evMonActDone,
+  evProcessFail,
+  evIngestionPlanned, 
+  evIngestionDone
+}
+
+class EventBus {
+  +subscribe(t: EventType, obs, priority): SubscriptionToken
+  +unsubscribe(tok: SubscriptionToken): void
+  +post(ev: Event): void
+  +post_now(ev: Event): void
+  +process(maxEvents=32): void
+}
+
+' ---- Ack payloads (from Acks.h) ----
+struct ReactionPlannedAck {
+  +correlationId: string
+  +resourceId: string
+  +summary: string
+}
+struct ReactionDoneAck {
+  +correlationId: string
+  +rc: int
+  +summary: string
+}
+struct ProcessFailAck {
+  +correlationId: string
+  +processName: string
+  +summary: string
+}
+struct IngestionPlannedAck {
+  +correlationId: string
+  +individualName: string
+  +process: string
+  +summary: string
+}
+struct IngestionDoneAck {
+  +correlationId: string
+  +rc: int
+  +message: string
+}
+
+' ---- AckLogger ----
+class AckLogger {
+  +onEvent(ev: Event): void
+}
+
+' ---- Relations ----
+AckLogger --|> ReactiveObserver
+EventBus -- ReactiveObserver : obs
+EventBus o-- Event : ev
+
+AckLogger ..> Event : reads ev.type, payload(any_cast)
+
+' Event payload mapping (any_cast targets)
+Event o-- ReactionPlannedAck
+Event o-- ReactionDoneAck
+Event o-- ProcessFailAck
+Event o-- IngestionPlannedAck
+Event o-- IngestionDoneAck
+
+' ---- Behavior note ----
+note right of AckLogger
+  Switch über ev.type:
+   - evSRPlanned / evMonActPlanned:
+       any_cast<ReactionPlannedAck*> und loggt corr, resourceId, summary
+   - evSRDone / evMonActDone:
+       any_cast<ReactionDoneAck*> und loggt corr, rc, summary
+   - evProcessFail:
+       any_cast<ProcessFailAck*> und loggt corr, processName, summary
+   - evIngestionPlanned:
+       any_cast<IngestionPlannedAck*> und loggt corr, individualName, process, summary
+   - evIngestionDone:
+       any_cast<IngestionDoneAck*> und loggt corr, rc, message
+end note
+@enduml

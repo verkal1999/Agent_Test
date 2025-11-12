@@ -1,0 +1,239 @@
+@startuml
+hide empty attributes
+skinparam classAttributeIconSize 0
+
+' ==== Basistypen / Events =====================================================
+enum EventType {
+  evD2; evD1; evD3;
+  evSRPlanned; evSRDone; evProcessFail;
+  evMonActPlanned; evMonActDone;
+  evKGResult; evKGTimeout;
+  evIngestionPlanned; evIngestionDone;
+  evMonActFinished; evSysReactFinished;
+  evUnknownFM; evGotFM
+}
+
+struct Event {
+  +type: EventType
+  +ts: std::chrono::steady_clock::time_point
+  +payload: std::any
+}
+
+struct KGResultPayload  {
+  +correlationId: std::string
+  +rowsJson: std::string
+  +ok: bool
+}
+struct KGTimeoutPayload  { 
+  +correlationId: std::string 
+  }
+struct PLCSnapshotPayload  {
+  +correlationId: std::string
+  +snapshotJson: std::string
+}
+
+' ==== Acks (Payload-Strukturen) ===============================================
+package "Acks" {
+  struct ReactionPlannedAck  {
+    +correlationId: std::string
+    +resourceId: std::string
+    +summary: std::string
+  }
+  struct ReactionDoneAck  {
+    +correlationId: std::string
+    +rc: int
+    +summary: std::string
+  }
+  struct ProcessFailAck  {
+    +correlationId: std::string
+    +processName: std::string
+    +summary: std::string
+  }
+  struct IngestionPlannedAck  {
+    +correlationId: std::string
+    +individualName: std::string
+    +process: std::string
+    +summary: std::string
+  }
+  struct IngestionDoneAck  {
+    +correlationId: std::string
+    +rc: int
+    +message: std::string
+  }
+  struct MonActFinishedAck  {
+    +correlationId: std::string
+    +skills: std::vector<std::string>
+  }
+  struct SysReactFinishedAck  {
+    +correlationId: std::string
+    +skills: std::vector<std::string>
+  }
+  struct UnknownFMAck  {
+    +correlationId: std::string
+    +processName: std::string
+    +summary: std::string
+  }
+  struct GotFMAck  {
+    +correlationId: std::string
+    +failureModeName: std::string
+  }
+  struct KGResultAck  {
+    +correlationId: std::string
+    +rowsJson: std::string
+    +ok: bool
+  }
+  struct KGTimeoutAck  { 
+    +correlationId: std::string 
+    }
+  struct DStateAck  {
+    +correlationId: std::string
+    +stateName: std::string
+    +summary: std::string
+  }
+}
+
+' ==== Observer-Schnittstelle ===================================================
+interface ReactiveObserver {
+  {abstract} +onEvent(ev: Event): void
+  +~ReactiveObserver()
+}
+
+' ==== EventBus & Subscription ==================================================
+class SubscriptionToken {
+  +type: EventType
+  +id: std::uint64_t
+  +operator bool(): explicit
+}
+
+class Subscription {
+  -bus_: EventBus*
+  -tok_: SubscriptionToken
+  +Subscription()
+  +Subscription(bus: EventBus*, tok: SubscriptionToken)
+  +Subscription(Subscription&&)
+  +operator=(Subscription&&): Subscription&
+  +~Subscription()
+  +token(): SubscriptionToken
+  +unsubscribe(): void
+}
+
+class EventBus {
+  + kMinPriority: int
+  +kMaxPriority: int
+  +EventBus()
+  +subscribe(t: EventType, obs: std::shared_ptr<ReactiveObserver>, priority: int = kMinPriority): SubscriptionToken
+  +subscribe_scoped(t: EventType, obs: std::shared_ptr<ReactiveObserver>, priority: int = kMinPriority): Subscription
+  +unsubscribe(tok: SubscriptionToken): void
+  +post(ev: Event): void
+  +post_now(ev: Event): void
+  +process(maxEvents: size_t = 32): void
+  +clear_queue(): void
+  -dispatch_one(ev: Event): void
+  -sweep_dead(t: EventType): void
+}
+
+SubscriptionToken <-- Subscription : token()
+EventBus "1" o-- "*" ReactiveObserver : listeners (weak_ptr)
+EventBus ..> Event : posts
+
+' ==== Konkrete Observer ========================================================
+class AckLogger {
+  +onEvent(ev: Event): void
+}
+ReactiveObserver <|.. AckLogger
+
+class TimeBlogger {
+  +TimeBlogger(bus: EventBus&)
+  +subscribeAll(): void
+  +onEvent(ev: Event): void
+  +mark(correlationId: std::string, label: std::string): void
+  +delta(correlationId: std::string, fromLabel: std::string, toLabel: std::string, out: DurationMs&): bool
+  +finish(correlationId: std::string): void
+  -printAndCollect_(corr: std::string, evName: std::string, durMs: long long, sumMs: long long): void
+  -recordSegment_(tl: Timeline&, from: std::string, to: std::string): void
+  -handleEvent_(ev: Event, corrId: std::string, evName: const char*): void
+  -extractCorrId_(ev: Event): std::string
+  -toName_(t: EventType): const char*
+}
+ReactiveObserver <|.. TimeBlogger
+TimeBlogger --> EventBus : bus_
+
+class ReactionManager {
+  enum LogLevel { Error, Warn, Info, Debug, Trace, Verbose }
+  +ReactionManager(mon: PLCMonitor&, bus: EventBus&)
+  +~ReactionManager()
+  +onEvent(ev: Event): void
+  +setLogLevel(lvl: LogLevel): void
+  +getLogLevel(): LogLevel
+  +isEnabled(lvl: LogLevel): bool
+  +normalizeKgResponse(rowsJson: std::string): std::vector<KgExpect>
+  +normalizeKgPotFM(rowsJson: std::string): std::vector<KgCandidate>
+  +compareAgainstCache(inv: InventorySnapshot, expects: std::vector<KgExpect>): ComparisonReport
+  +selectPotFMByChecks(inv: InventorySnapshot, cands: std::vector<KgCandidate>): std::vector<KgCandidate>
+  +buildPlanFromComparison(corr: std::string, rep: ComparisonReport): Plan
+  +createCommandForceForPlanAndAck(plan: Plan, checksOk: bool, processNameForFail: std::string): void
+  -logInventoryVariables(inv: InventorySnapshot): void
+  -getStringFromCache(inv: InventorySnapshot, ns: uint16_t, id: std::string): std::string
+  -getLastExecutedSkill(inv: InventorySnapshot): std::string
+  -fetchFailureModeParameters(skillName: std::string): std::string
+  -fetchMonitoringActionForFM(fmIri: std::string): std::string
+  -fetchSystemReactionForFM(fmIri: std::string): std::string
+  -makeCorrelationId(evName: const char*): std::string
+  -toCStr(lvl: LogLevel): const char*
+  -log(lvl: LogLevel): std::ostream&
+  -nullout(): std::ostream&
+}
+ReactiveObserver <|.. ReactionManager
+ReactionManager --> EventBus : bus_
+ReactionManager --> PLCMonitor : mon_
+ReactionManager ..> InventorySnapshot
+ReactionManager ..> Plan
+ReactionManager ..> CommandForce
+ReactionManager ..> CommandForceFactory
+ReactionManager ..> MonActionForce
+ReactionManager ..> SystemReactionForce
+
+class FailureRecorder {
+  +FailureRecorder(bus: EventBus&)
+  +subscribeAll(): void
+  +onEvent(ev: Event): void
+  -resetCorrUnlocked(corr: std::string): void
+  -snapshotToJson(inv: InventorySnapshot): json
+  -now_ts(): std::string
+  -wrapSnapshot(js: std::string): std::string
+  -findStringInSnap(snap: json, nodeId: const char*): std::string
+  -snapshotToJson_flat(inv: InventorySnapshot): json
+  +buildParams(corr: std::string, process: std::string, summary: std::string): std::shared_ptr<KgIngestionParams>
+  +startIngestionWith(prm: std::shared_ptr<KgIngestionParams>): void
+}
+ReactiveObserver <|.. FailureRecorder
+FailureRecorder --> EventBus : bus_
+FailureRecorder ..> InventorySnapshot
+FailureRecorder ..> KgIngestionParams
+
+' ==== Interaktionshinweise / Pattern ==========================================
+note top of EventBus
+  Subject im Observer-Pattern:
+  - subscribe()/unsubscribe()
+  - post()/post_now()/process()
+  verteilt Event -> Observer.onEvent()
+end note
+
+note right of AckLogger
+  Reagiert u.a. auf evSRPlanned, evSRDone,
+  evMonActPlanned, evMonActDone,
+  evIngestionPlanned, evIngestionDone
+  und schreibt einfache Logs.
+end note
+
+note bottom of ReactionManager
+  Nutzt makeCorrelationId(...) (siehe Correlation.h)
+  und postet Acks/Events über den EventBus.
+end note
+
+' ==== Utility-Hinweis ==========================================================
+class CorrelationUtil <<utility>> {
+  +makeCorrelationId(prefix: const char*): std::string
+}
+CorrelationUtil ..> ReactionManager : used by
+@enduml

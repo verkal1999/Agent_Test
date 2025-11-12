@@ -1,0 +1,41 @@
+@startuml
+interface ICommandForce { 
+    +execute(p: Plan): int 
+    }
+interface IWinnerFilter
+interface IOrderQueue
+
+class CommandForceFactory {
+  +create(k: Kind, mon: PLCMonitor, oq: IOrderQueue*): ICommandForce
+  +createForOp(op: Operation, mon: PLCMonitor*, bus: EventBus, oq: IOrderQueue*): ICommandForce
+  +createWinnerFilter(mon: PLCMonitor, bus: EventBus, fetch: Fetcher, defaultTimeoutMs: unsigned): IWinnerFilter
+  +createSystemReactionFilter(mon: PLCMonitor, bus: EventBus, fetch: Fetcher, defaultTimeoutMs: unsigned): IWinnerFilter
+}
+
+class CommandForce        { 
+    +execute(p: Plan): int 
+    }
+class KgIngestionForce    { 
+    +execute(p: Plan): int 
+    }
+class WriteCSVForce       { 
+    +execute(p: Plan): int 
+    }
+class MonitoringActionForce { 
+    +filter(winners: vector<string>, corr:string, processName:string): vector<string> 
+    }
+class SystemReactionForce   { 
+    +filter(winners: vector<string>, corr:string, processName:string): vector<string> 
+    }
+class PLCMonitor
+class EventBus
+
+CommandForceFactory --> ICommandForce
+CommandForceFactory ..> PLCMonitor
+CommandForceFactory ..> EventBus
+ICommandForce <|-- CommandForce
+ICommandForce <|-- KgIngestionForce
+ICommandForce <|-- WriteCSVForce
+IWinnerFilter <|-- MonitoringActionForce
+IWinnerFilter <|-- SystemReactionForce
+@enduml

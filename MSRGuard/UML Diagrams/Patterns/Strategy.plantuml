@@ -1,0 +1,20 @@
+@startuml
+class MonitoringActionForce {
+  -fetch_: Fetcher
+  +MonitoringActionForce(mon: PLCMonitor, bus: EventBus, fetch: Fetcher, defaultTimeoutMs: unsigned)
+  +filter(winners: vector<string>, corr:string, processName:string): vector<string>
+}
+
+class SystemReactionForce {
+  -fetch_: Fetcher
+  +SystemReactionForce(mon: PLCMonitor, bus: EventBus, fetch: Fetcher, defaultTimeoutMs: unsigned)
+  +filter(winners: vector<string>, corr:string, processName:string): vector<string>
+}
+
+class Fetcher <<interface>> { 
+    +operator()(fmIri:string): string 
+    }
+
+MonitoringActionForce --> Fetcher : uses
+SystemReactionForce   --> Fetcher : uses
+@enduml

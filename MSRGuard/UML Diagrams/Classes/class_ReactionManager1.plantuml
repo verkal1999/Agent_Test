@@ -1,0 +1,67 @@
+@startuml ReactionManager
+' ReactionManager – Focused class diagram (only directly related types & key deps)
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+' Füge das direkt ganz oben ein:
+'skinparam dpi 300                      
+' für PNG-Export (ignoriert bei SVG)
+skinparam defaultFontName Arial
+'skinparam defaultFontSize 16           
+' größerer Font = bessere Lesbarkeit
+'skinparam nodesep 40                   
+' Knotenabstand
+'skinparam ranksep 35                   
+' Zeilenabstand
+'scale 1.6                              
+' zusätzliche Skalierung
+'hide empty members
+left to right direction
+'top to bottom direction
+
+abstract ReactiveObserver {
+  {abstract} +onEvent(ev: Event)
+}
+
+class EventBus {
+  +subscribe(t: EventType, obs, priority): SubscriptionToken
+  +unsubscribe(tok: SubscriptionToken): void
+  +post(ev: Event): void
+  +post_now(ev: Event): void
+  +process(maxEvents=32): void
+}
+
+class PLCMonitor {
+  ...
+}
+class KG_Interface <<Python>> {
+  ...
+  +getFailureModeParameters(skillName: string): string
+  +getMonitoringActionForFM(fmIri: string): string
+  +getSystemReactionForFM(fmIri: string): string
+}
+
+class ReactionManager implements ReactiveObserver {
+  +ReactionManager(mon: PLCMonitor&, bus: EventBus&)
+  +onEvent(ev: Event): void
+  +buildPlanFromComparison(corr: string, rep: ComparisonReport): Plan
+  +createCommandForceForPlanAndAck(plan: Plan, checksOk: bool, processNameForFail: string): void
+  +fetchFailureModeParameters(skillName: string): string
+  +fetchMonitoringActionForFM(fmIri: string): string
+  +fetchSystemReactionForFM(fmIri: string): string
+}
+
+struct Plan { 
+  +ops: vector<Operation> 
+  }
+class CommandForceFactory { 
+  +create(...): unique_ptr<ICommandForce> 
+  }
+
+ReactionManager --> PLCMonitor : mon_
+ReactionManager --> EventBus : bus_
+ReactionManager --> KG_Interface : fetch...
+ReactionManager --> CommandForceFactory : create...
+ReactionManager --> Plan : build...
+EventBus -- ReactiveObserver : obs
+
+@enduml

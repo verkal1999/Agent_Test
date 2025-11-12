@@ -1,0 +1,101 @@
+@startuml ReactionManager2
+' ReactionManager – Focused class diagram (only directly related types & key deps)
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+' Füge das direkt ganz oben ein:
+'skinparam dpi 300                      
+' für PNG-Export (ignoriert bei SVG)
+skinparam defaultFontName Arial
+'skinparam defaultFontSize 16           
+' größerer Font = bessere Lesbarkeit
+skinparam nodesep 10                  
+' Knotenabstand
+'skinparam ranksep 35                   
+' Zeilenabstand
+scale 1.6                             
+' zusätzliche Skalierung
+'hide empty members
+'left to right direction
+top to bottom direction
+
+abstract ReactiveObserver {
+  {abstract} +onEvent(ev: Event)
+}
+class ReactionManager implements ReactiveObserver {
+  +ReactionManager(mon: PLCMonitor&, bus: EventBus&)
+  +onEvent(ev: Event): void
+  +buildPlanFromComparison(corr: string, rep: ComparisonReport): Plan
+  +createCommandForceForPlanAndAck(plan: Plan, checksOk: bool, processNameForFail: string): void
+  +fetchFailureModeParameters(skillName: string): string
+  +fetchMonitoringActionForFM(fmIri: string): string
+  +fetchSystemReactionForFM(fmIri: string): string
+}
+struct InventorySnapshot {
+    ...
+}
+struct KgExpect { 
+    +key: NodeKey 
+    +kind: KgValKind 
+    +expectedBool 
+    +expectedI16 
+    +expectedF64 
+    +expectedStr 
+    }
+struct ComparisonItem { 
+    +key: NodeKey 
+    +ok 
+    +detail 
+    }
+struct ComparisonReport { 
+    +allOk +items: vector<ComparisonItem> 
+    }
+struct KgCandidate { 
+    +potFM: string
+    +expects: vector<KgExpect> 
+}
+struct Plan
+enum KgValKind { 
+    Bool, Int16, 
+    Float64, String 
+    }
+struct Plan { 
+    +correlationId : corrId
+    +resourceId 
+    +ops: vector<Operation> 
+    +abortRequired +degradeAllowed 
+    }
+
+struct Operation {
+  +type: OpType
+  +nodeId: string
+  +ns: unsigned short
+  +callObjNodeId: string
+  +callMethNodeId: string
+  +callNsObj: unsigned short
+  +callNsMeth: unsigned short
+  +inputs: UAValueMap
+  +expOuts: UAValueMap
+  +arg: string
+  +timeoutMs: int
+  +attach: any
+}
+enum OpType {
+  WriteBool, PulseBool, WriteInt32,CallMethod, CallMonitoringActions, 
+  CallSystemReaction, WaitMs, ReadCheck, BlockResource, 
+  RerouteOrders, UnblockResource,KGIngestion, WriteCSV
+}
+class CommandForceFactory { 
+    ...
+    }
+
+ReactionManager --> Plan : buildPlanFromComparison()
+Plan o-- Operation
+ReactionManager --> CommandForceFactory : createCommandForceForPlanAndAck()
+
+ReactionManager o-- KgExpect
+ReactionManager o-- ComparisonItem
+ReactionManager o-- ComparisonReport
+ReactionManager o-- KgCandidate
+ReactionManager ..> InventorySnapshot : compareAgainstCache(), logInventoryVariables()
+
+@enduml

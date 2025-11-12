@@ -1,0 +1,53 @@
+@startuml
+' -- bewusst minimal für breite Kompatibilität --
+hide footbox
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam wrapWidth 180
+actor "SPS (OPC UA)" as SPS
+participant ":PLCMonitor" as PLCM
+participant ":InventorySnapshotUtils" as InvU
+participant ":EventBus" as Bus
+participant ":ReactionManager" as RM
+participant ":CommandForceFactory" as CFF
+participant ":ICommandForce" as ICF
+participant ":FailureRecorder" as FR
+participant ":TimeBlogger" as TB
+participant ":AckLogger" as AL
+
+== Trigger ==
+SPS -> PLCM : DataChange TriggerD2 = TRUE
+PLCM -> PLCM : post build-snapshot task
+PLCM -> InvU : buildInventorySnapshotNow("PLC")
+InvU --> PLCM : InventorySnapshot
+PLCM -> Bus : post evD2 (correlationId, snapshot)
+
+== Dispatch ==
+Bus -> RM : onEvent(evD2)
+Bus -> FR : onEvent(evD2)
+Bus -> TB : onEvent(evD2)
+
+== Plan & Execute ==
+RM -> RM : normalize / compare / buildPlan
+RM -> CFF : createCommandForceForPlanAndAck(plan)
+CFF -> ICF : createForOp(op, mon, bus)
+ICF -> Bus : post evSRPlanned (corr)
+Bus -> AL : onEvent(evSRPlanned)
+
+ICF -> ICF : execute(plan)
+ICF -> Bus : post evSRDone (rc) or evProcessFail
+Bus -> AL : onEvent(evSRDone / evProcessFail)
+Bus -> TB : onEvent(...)
+
+== KG ingestion ==
+Bus -> FR : onEvent(evSRDone / evProcessFail)
+FR -> CFF : createForOp(KGIngestion, ..., bus)
+CFF -> ICF : KGIngestionForce
+ICF -> Bus : post evIngestionPlanned (corr)
+Bus -> AL : onEvent(evIngestionPlanned)
+ICF -> Bus : post evIngestionDone (corr, rc)
+Bus -> AL : onEvent(evIngestionDone)
+Bus -> TB : onEvent(...)
+TB -> TB : finish(corr)
+
+@enduml

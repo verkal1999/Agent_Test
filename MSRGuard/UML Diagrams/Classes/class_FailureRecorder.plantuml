@@ -1,0 +1,126 @@
+@startuml FailureRecorder
+' ReactionManager – Focused class diagram (only directly related types & key deps)
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+' Füge das direkt ganz oben ein:
+'skinparam dpi 300                      
+' für PNG-Export (ignoriert bei SVG)
+skinparam defaultFontName Arial
+'skinparam defaultFontSize 16           
+' größerer Font = bessere Lesbarkeit
+skinparam nodesep 15                  
+' Knotenabstand
+skinparam ranksep 15                  
+' Zeilenabstand
+'scale 1.6                              
+' zusätzliche Skalierung
+'hide empty members
+left to right direction
+'top to bottom direction
+
+' ---- Observer base ----
+abstract ReactiveObserver {
+  {abstract} +onEvent(ev: Event)
+}
+
+' ---- Event system (minimal view) ----
+struct Event {
+  +type: EventType
+  +ts
+  +payload: any
+}
+class EventBus {
+  +subscribe(t: EventType, obs, priority): SubscriptionToken
+  +unsubscribe(tok: SubscriptionToken): void
+  +post(ev: Event): void
+  +post_now(ev: Event): void
+  +process(maxEvents=32): void
+}
+
+' ---- Runtime data used by FailureRecorder ----
+struct InventorySnapshot
+struct KgIngestionParams {
+  +corr: string
+  +process: string
+  +summary: string
+  +snapshotWrapped: string
+  +resourceId: string
+}
+
+' ---- Plan / Operation (structs) ----
+struct Plan {
+  +correlationId: string
+  +resourceId: string
+  +ops: vector<Operation>
+}
+
+together {
+struct Operation {
+  +type: OpType
+  +inputs: UAValueMap
+  +expOuts: UAValueMap
+  +attach: any
+  +timeoutMs: int
+}
+enum OpType { 
+    KGIngestion,
+    ...
+    }
+}
+' ---- Command layer ----
+class CommandForceFactory {
+    ...
+}
+
+' ---- FailureRecorder ----
+class FailureRecorder <<enable_shared_from_this>> {
+  +FailureRecorder(bus: EventBus&)
+  +subscribeAll(): void
+  +onEvent(ev: Event): void
+
+  -- Recorder-Cache je correlationId --
+  -mx_: mutex
+  -activeCorr_: unordered_set<string>
+  -snapshotJsonByCorr_: unordered_map<string,string>
+  -monReactsByCorr_: unordered_map<string, vector<string>>
+  -sysReactsByCorr_: unordered_map<string, vector<string>>
+  -ingestionStarted_: unordered_set<string>
+  -failureModeByCorr_: unordered_map<string,string>
+
+  -- Helpers & ingestion --
+  -resetCorrUnlocked(corr: string): void
+  -tryMarkIngestion(corr: string): bool
+  -buildParams(corr: string, process: string, summary: string)
+     : shared_ptr<KgIngestionParams>
+  -startIngestionWith(prm: shared_ptr<KgIngestionParams>): void
+
+  -- JSON & snapshot utils --
+  {static} -snapshotToJson(inv: InventorySnapshot): json
+  {static} -snapshotToJson_flat(inv: InventorySnapshot): json
+  {static} -wrapSnapshot(js: string): string
+  {static} -findStringInSnap(snap: json, nodeId: const char*): string
+  {static} -now_ts(): string
+
+  -- Bus reference --
+  -bus_: EventBus&
+}
+
+' ---- Key relations ----
+FailureRecorder --|> ReactiveObserver
+EventBus -- ReactiveObserver
+FailureRecorder --> EventBus : bus_
+EventBus o-- Event : ev
+EventBus o.. InventorySnapshot : payload
+
+' Use of inventory & params
+FailureRecorder ..> InventorySnapshot : snapshotToJson_flat(...)
+FailureRecorder *-- KgIngestionParams : buildParams(...), startIngestionWith(...)
+
+' Plan building inside startIngestionWith(...)
+FailureRecorder --> Plan : build p
+Plan o-- Operation
+
+' Factory & command execution
+FailureRecorder --> CommandForceFactory : createForOp(op, /*mon*/ nullptr, bus_)
+
+@enduml

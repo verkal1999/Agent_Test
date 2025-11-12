@@ -1,0 +1,17 @@
+@startuml
+class CommandForce { 
+    +execute(p: Plan): int 
+    }
+class PLCMonitor   { 
+    +post(task): void; 
+    +postDelayed(ms:int, task): void;
+     +writeBool(nodeId, ns, value): bool 
+     }
+struct Plan
+struct Operation
+enum OpType
+
+CommandForce --> Plan
+Plan "1" o-- "*" Operation
+CommandForce ..> PLCMonitor : uses (writeBool/post/postDelayed)
+@enduml

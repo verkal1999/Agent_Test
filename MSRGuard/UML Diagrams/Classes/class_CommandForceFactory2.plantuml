@@ -1,0 +1,87 @@
+@startuml CommandForceFactory2
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+' Füge das direkt ganz oben ein:
+'skinparam dpi 300                      
+' für PNG-Export (ignoriert bei SVG)
+skinparam defaultFontName Arial
+'skinparam defaultFontSize 16           
+' größerer Font = bessere Lesbarkeit
+skinparam nodesep 15                  
+' Knotenabstand
+skinparam ranksep 15                  
+' Zeilenabstand
+'scale 1.6                              
+' zusätzliche Skalierung
+'hide empty members
+'left to right direction
+top to bottom direction
+
+' ---- Event system (minimal) ----
+struct Event {
+  +type: EventType
+  +ts
+  +payload: any
+}
+class EventBus {
+    ...
+}
+
+' ---- ICommandForce / Factory ----
+interface ICommandForce {
+  +execute(p: Plan): int
+}
+class CommandForceFactory {
+  +createForOp(op: Operation, mon: PLCMonitor*, bus: EventBus&, oq: IOrderQueue* = nullptr): unique_ptr<ICommandForce>
+  +createWinnerFilter(mon: PLCMonitor&, bus: EventBus&, fetcher: function<string(const string&)>, defaultTimeoutMs: unsigned): unique_ptr<IWinnerFilter>
+  +createSystemReactionFilter(mon: PLCMonitor&, bus: EventBus&, fetcher: function<string(const string&)>, defaultTimeoutMs: unsigned): unique_ptr<IWinnerFilter>
+}
+
+class MonitoringActionForce implements IWinnerFilter {
+    +filter(winners: vector<string>, corr:string, processName:string): vector<string> 
+}
+class SystemReactionForce implements IWinnerFilter {
+    +filter(winners: vector<string>, corr:string, processName:string): vector<string> 
+}
+
+' ---- Filter interface ----
+interface IWinnerFilter {
+  {abstract} +filter(winners: vector<string>, correlationId: string, processNameForAck: string): vector<string>
+}
+
+
+' ---- Plan / Operation / Params ----
+struct Plan {
+  +correlationId: string
+  +resourceId: string
+  +ops: vector<Operation>
+}
+together {
+struct Operation {
+  +type: OpType
+  +inputs: UAValueMap
+  +expOuts: UAValueMap
+  +attach: any
+  +timeoutMs: int
+}
+enum OpType {
+  KGIngestion, 
+  WriteCSV, 
+  CallMethod, 
+  ...
+}
+}
+class PLCMonitor {
+    ...
+}
+
+' ---- Relations ----
+CommandForceFactory --> ICommandForce 
+CommandForceFactory -- IWinnerFilter
+CommandForceFactory --> EventBus : bus
+EventBus o- Event: ev
+Plan o-- Operation: ops
+CommandForceFactory -> PLCMonitor : mon
+CommandForceFactory --> Plan : p
+
+@enduml

@@ -1,0 +1,29 @@
+@startuml
+enum OpType { WriteBool; PulseBool; WriteInt32; WaitMs; ReadCheck; BlockResource; RerouteOrders; UnblockResource; KGIngestion; CallMethod; CallMonitoringActions; CallSystemReaction; WriteCSV }
+
+class Operation {
+  +type: OpType
+  +nodeId: string
+  +ns: int
+  +arg: string
+  +timeoutMs: int
+  +callObjNodeId: string
+  +callMethNodeId: string
+}
+
+class Plan {
+  +correlationId: string
+  +resourceId: string
+  +ops: vector<Operation>
+}
+
+class PlanJsonUtils {
+  +buildCallMethodPlanFromPayload(corr:string, payload:string, appendPulse:bool, resourceId:string): Plan
+}
+
+class CommandForce { +execute(p: Plan): int }
+
+Plan "1" o-- "*" Operation
+PlanJsonUtils --> Plan
+CommandForce --> Plan
+@enduml

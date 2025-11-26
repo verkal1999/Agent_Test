@@ -1,0 +1,3493 @@
+@prefix : <http://www.semanticweb.org/AgentProgramParams/> .
+@prefix ag: <http://www.semanticweb.org/AgentProgramParams/> .
+@prefix dp: <http://www.semanticweb.org/AgentProgramParams/dp_> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <http://www.semanticweb.org/AgentProgramParams/> .
+
+<http://www.semanticweb.org/AgentProgramParams/> rdf:type owl:Ontology .
+
+#################################################################
+#    Object Properties
+#################################################################
+
+###  http://www.semanticweb.org/AgentProgramParams/op_belongsToTask
+ag:op_belongsToTask rdf:type owl:ObjectProperty ;
+                    rdfs:domain ag:class_POU ;
+                    rdfs:range ag:class_Task .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_declaresVar
+ag:op_declaresVar rdf:type owl:ObjectProperty ;
+                  rdfs:domain ag:class_POU ;
+                  rdfs:range ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_hasInputVariable
+ag:op_hasInputVariable rdf:type owl:ObjectProperty ;
+                       rdfs:domain ag:class_Program ;
+                       rdfs:range ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_hasOutputVariable
+ag:op_hasOutputVariable rdf:type owl:ObjectProperty ;
+                        rdfs:domain ag:class_Program ;
+                        rdfs:range ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_isBoundToChannel
+ag:op_isBoundToChannel rdf:type owl:ObjectProperty ;
+                       rdfs:domain ag:class_Variable ;
+                       rdfs:range ag:class_IOChannel .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_isInstanceOf
+ag:op_isInstanceOf rdf:type owl:ObjectProperty ;
+                   rdfs:domain ag:class_FBInstance ;
+                   rdfs:range ag:class_POU .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_isMappedToVariable
+ag:op_isMappedToVariable rdf:type owl:ObjectProperty ;
+                         rdfs:domain ag:class_Variable ;
+                         rdfs:range ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_isSubProgramOf
+ag:op_isSubProgramOf rdf:type owl:ObjectProperty ;
+                     rdfs:domain ag:class_Program ;
+                     rdfs:range ag:class_Program .
+
+
+#################################################################
+#    Data properties
+#################################################################
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_bitOffset
+ag:dp_bitOffset rdf:type owl:DatatypeProperty ;
+                rdfs:domain ag:class_Variable ;
+                rdfs:range xsd:unsignedInt .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_byteOffset
+ag:dp_byteOffset rdf:type owl:DatatypeProperty ;
+                 rdfs:domain ag:class_Variable ;
+                 rdfs:range xsd:unsignedInt .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasDescription
+ag:dp_hasDescription rdf:type owl:DatatypeProperty ;
+                     rdfs:domain ag:class_Variable ;
+                     rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasHardwareAddress
+ag:dp_hasHardwareAddress rdf:type owl:DatatypeProperty ;
+                         rdfs:domain ag:class_Variable ;
+                         rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasVariableScope
+ag:dp_hasVariableScope rdf:type owl:DatatypeProperty ;
+                       rdfs:range [ rdf:type rdfs:Datatype ;
+                                    owl:oneOf [ rdf:type rdf:List ;
+                                                rdf:first "global" ;
+                                                rdf:rest [ rdf:type rdf:List ;
+                                                           rdf:first "input" ;
+                                                           rdf:rest [ rdf:type rdf:List ;
+                                                                      rdf:first "local" ;
+                                                                      rdf:rest [ rdf:type rdf:List ;
+                                                                                 rdf:first "output" ;
+                                                                                 rdf:rest rdf:nil
+                                                                               ]
+                                                                    ]
+                                                         ]
+                                              ]
+                                  ] .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasVariableType
+ag:dp_hasVariableType rdf:type owl:DatatypeProperty ;
+                      rdfs:domain ag:class_Variable ;
+                      rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_ioPath
+ag:dp_ioPath rdf:type owl:DatatypeProperty ;
+             rdfs:domain ag:class_Variable ;
+             rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_ioRawXml
+ag:dp_ioRawXml rdf:type owl:DatatypeProperty ;
+               rdfs:domain ag:class_Variable ;
+               rdfs:range rdf:XMLLiteral .
+
+
+#################################################################
+#    Classes
+#################################################################
+
+###  http://www.semanticweb.org/AgentProgramParams/class_FBInstance
+ag:class_FBInstance rdf:type owl:Class .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/class_GlobalVarList
+ag:class_GlobalVarList rdf:type owl:Class .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/class_IOChannel
+ag:class_IOChannel rdf:type owl:Class .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/class_IOTerminal
+ag:class_IOTerminal rdf:type owl:Class .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/class_PLCProject
+ag:class_PLCProject rdf:type owl:Class .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/class_POU
+ag:class_POU rdf:type owl:Class .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/class_Program
+ag:class_Program rdf:type owl:Class .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/class_Task
+ag:class_Task rdf:type owl:Class .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/class_Variable
+ag:class_Variable rdf:type owl:Class .
+
+
+#################################################################
+#    Individuals
+#################################################################
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_AutomaticColorDetection_nichtfertig
+ag:Program_AutomaticColorDetection_nichtfertig rdf:type owl:NamedIndividual ,
+                                                        ag:class_Program ;
+                                               ag:op_hasInputVariable ag:Var_ColorCode_1 ,
+                                                                      ag:Var_ColorCode_2 ,
+                                                                      ag:Var_ColorSensor ;
+                                               ag:op_hasOutputVariable ag:Var_Color_1 ,
+                                                                       ag:Var_Color_2 ,
+                                                                       ag:Var_Color_3 ;
+                                               ag:op_isSubProgramOf ag:Program_SST_CS_AS_ColorDetection .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_AxisControl_Encoder
+ag:Program_AxisControl_Encoder rdf:type owl:NamedIndividual ,
+                                        ag:class_Program ;
+                               ag:op_hasInputVariable ag:Var_DI01 ,
+                                                      ag:Var_DI02_EncoderStart01 ,
+                                                      ag:Var_DI03_EncoderTarget01 ,
+                                                      ag:Var_DI04_EncoderStart02 ,
+                                                      ag:Var_DI05_EncoderTarget02 ,
+                                                      ag:Var_Direction ,
+                                                      ag:Var_EmergencyStopSignal ,
+                                                      ag:Var_InitStateDrive_Input ,
+                                                      ag:Var_MethodCall ,
+                                                      ag:Var_OperatingMode ,
+                                                      ag:Var_TOF_Time_MotorControl ,
+                                                      ag:Var_TOF_Time_TouchSensorRelief ,
+                                                      ag:Var_TouchSensorRelief ;
+                               ag:op_hasOutputVariable ag:Var_DigitalOutputControl_01 ,
+                                                       ag:Var_DigitalOutputControl_02 ,
+                                                       ag:Var_ResetMethodCall ;
+                               ag:op_isSubProgramOf ag:Program_HRL_RGB_AS_HorizontalMoveEncoders ,
+                                                    ag:Program_HRL_RGB_AS_VerticalMoveEncoders ,
+                                                    ag:Program_VSG_AS_HorizontalMoveEncoder ,
+                                                    ag:Program_VSG_AS_RotationMoveEncoder ,
+                                                    ag:Program_VSG_AS_VerticalMoveEncoder .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_AxisControl_MultipleInputSensors
+ag:Program_AxisControl_MultipleInputSensors rdf:type owl:NamedIndividual ,
+                                                     ag:class_Program ;
+                                            ag:op_hasInputVariable ag:Var_DI01 ,
+                                                                   ag:Var_DI02 ,
+                                                                   ag:Var_Direction ,
+                                                                   ag:Var_EmergencyStopSignal ,
+                                                                   ag:Var_InitStateDrive_Input ,
+                                                                   ag:Var_MethodCall ,
+                                                                   ag:Var_OperatingMode ,
+                                                                   ag:Var_TOF_Time_MotorControl ,
+                                                                   ag:Var_TOF_Time_TouchSensorRelief ,
+                                                                   ag:Var_TouchSensorRelief ;
+                                            ag:op_hasOutputVariable ag:Var_DigitalOutputControl_01 ,
+                                                                    ag:Var_DigitalOutputControl_02 ,
+                                                                    ag:Var_InitStateDriveFinished ,
+                                                                    ag:Var_ResetMethodCall ;
+                                            ag:op_isSubProgramOf ag:Program_HRL_CB_AS_HorizontalMoveSensors ,
+                                                                 ag:Program_HRL_RGB_AS_HorizontalMoveSensors ,
+                                                                 ag:Program_HRL_RGB_InitialStateDrive ,
+                                                                 ag:Program_JobMethode_Schablone ,
+                                                                 ag:Program_MBS_CB_AS_HorizontalMove ,
+                                                                 ag:Program_MBS_DmPD_AS_RotationMove ,
+                                                                 ag:Program_MBS_DmPD_InitialStateDrive ,
+                                                                 ag:Program_MBS_MR01_AS_HorizontalMoveSensors ,
+                                                                 ag:Program_MBS_MR01_InitialStateDrive ,
+                                                                 ag:Program_MBS_VSG_AS_HorizontalMove ,
+                                                                 ag:Program_MBS_VSG_InitialStateDrive ,
+                                                                 ag:Program_SST_CB_AS_HorizontalMove ,
+                                                                 ag:Program_VSG_InitialStateDrive .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_CompressorControl
+ag:Program_CompressorControl rdf:type owl:NamedIndividual ,
+                                      ag:class_Program ;
+                             ag:op_hasInputVariable ag:Var_DI01 ,
+                                                    ag:Var_DI02 ,
+                                                    ag:Var_DI03_EncoderStart01 ,
+                                                    ag:Var_DI04_EncoderStart02 ,
+                                                    ag:Var_DI05_EncoderStart03 ,
+                                                    ag:Var_DI06_EncoderStart04 ,
+                                                    ag:Var_DI07_EncoderStart05 ,
+                                                    ag:Var_DI08_EncoderStart06 ,
+                                                    ag:Var_DI09_EncoderTarget01 ,
+                                                    ag:Var_DI10_EncoderTarget02 ,
+                                                    ag:Var_DI11_EncoderTarget03 ,
+                                                    ag:Var_DI12_EncoderTarget04 ,
+                                                    ag:Var_DI13_EncoderTarget05 ,
+                                                    ag:Var_DI14_EncoderTarget06 ,
+                                                    ag:Var_Destination ,
+                                                    ag:Var_EmergencyStopSignal ,
+                                                    ag:Var_InitStateDrive_Input ,
+                                                    ag:Var_MethodCall ,
+                                                    ag:Var_OperatingMode ,
+                                                    ag:Var_PowerOFF_SelfSet ,
+                                                    ag:Var_TON_Time_Compressor ,
+                                                    ag:Var_TON_Time_PowerOFFSelfSet ,
+                                                    ag:Var_TON_Time_Valve ;
+                             ag:op_hasOutputVariable ag:Var_DigitalOutputControl_01 ,
+                                                     ag:Var_DigitalOutputControl_02 ,
+                                                     ag:Var_ResetMethodCall ;
+                             ag:op_isSubProgramOf ag:Program_MBS_DmPD_AS_HorizontalMove ,
+                                                  ag:Program_MBS_VSG_AS_SuctionProcess ,
+                                                  ag:Program_MBS_VSG_AS_VerticalMove ,
+                                                  ag:Program_SST_PD_AS_HorizontalMove ,
+                                                  ag:Program_SST_PD_InitialStateDrive ,
+                                                  ag:Program_VSG_AS_CompressorControl .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_CuttingProcess
+ag:Program_CuttingProcess rdf:type owl:NamedIndividual ,
+                                   ag:class_Program ;
+                          ag:op_hasInputVariable ag:Var_DI01 ,
+                                                 ag:Var_EmergencyStopSignal ,
+                                                 ag:Var_InitStateDrive_Input ,
+                                                 ag:Var_MethodCall ,
+                                                 ag:Var_OperatingMode ,
+                                                 ag:Var_TOF_Time_CuttingTime ;
+                          ag:op_hasOutputVariable ag:Var_DigitalOutputControl_01 ,
+                                                  ag:Var_ResetMethodCall ;
+                          ag:op_isSubProgramOf ag:Program_MBS_MR02_AS_CuttingProcess ,
+                                               ag:Program_MBS_MR02_InitialStateDrive .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_FB_MyOpcUaMethod
+ag:Program_FB_MyOpcUaMethod rdf:type owl:NamedIndividual ,
+                                     ag:class_Program .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_HRL_CB_AS_HorizontalMoveSensors
+ag:Program_HRL_CB_AS_HorizontalMoveSensors rdf:type owl:NamedIndividual ,
+                                                    ag:class_Program ;
+                                           ag:op_hasInputVariable ag:Var_AutomaticMode ,
+                                                                  ag:Var_ESS ,
+                                                                  ag:Var_LightBarrierSensor_01 ,
+                                                                  ag:Var_LightBarrierSensor_02 ;
+                                           ag:op_hasOutputVariable ag:Var_DO_MovingConveyorBelt ;
+                                           ag:op_isSubProgramOf ag:Program_HRL_SkillSet .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_HRL_ControlOfOutputs
+ag:Program_HRL_ControlOfOutputs rdf:type owl:NamedIndividual ,
+                                         ag:class_Program ;
+                                ag:op_hasInputVariable ag:Var_A1 ,
+                                                       ag:Var_A2 ,
+                                                       ag:Var_A6 ,
+                                                       ag:Var_F1 ,
+                                                       ag:Var_F4 ,
+                                                       ag:Var_Init_RGB_Backwards ,
+                                                       ag:Var_Init_RGB_Forwards ,
+                                                       ag:Var_Init_RGB_HorizontalBackwards ,
+                                                       ag:Var_Init_RGB_HorizontalForwads ,
+                                                       ag:Var_Init_RGB_VertikalDown ,
+                                                       ag:Var_Init_RGB_VertikalUp ,
+                                                       ag:Var_RGB_Backwards01 ,
+                                                       ag:Var_RGB_Backwards02 ,
+                                                       ag:Var_RGB_Forwards01 ,
+                                                       ag:Var_RGB_Forwards02 ,
+                                                       ag:Var_RGB_HorizontalBackwards01 ,
+                                                       ag:Var_RGB_HorizontalBackwards02 ,
+                                                       ag:Var_RGB_HorizontalForwards01 ,
+                                                       ag:Var_RGB_VertikalDown01 ,
+                                                       ag:Var_RGB_VertikalDown02 ,
+                                                       ag:Var_RGB_VertikalUp01 ,
+                                                       ag:Var_RGB_VertikalUp02 ,
+                                                       ag:Var_Start ;
+                                ag:op_hasOutputVariable ag:Var_ConveyorBeltBackward ,
+                                                        ag:Var_ConveyorBeltForward ,
+                                                        ag:Var_Light_Q1 ,
+                                                        ag:Var_Light_Q2 ,
+                                                        ag:Var_Light_Q3 ,
+                                                        ag:Var_RGB_Backwards ,
+                                                        ag:Var_RGB_Forwards ,
+                                                        ag:Var_RGB_HorizontalBackward ,
+                                                        ag:Var_RGB_HorizontalForward ,
+                                                        ag:Var_RGB_VerticalDown ,
+                                                        ag:Var_RGB_VerticalUp ;
+                                ag:op_isSubProgramOf ag:Program_HRL_SkillSet .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_HRL_OperatingModes
+ag:Program_HRL_OperatingModes rdf:type owl:NamedIndividual ,
+                                       ag:class_Program ;
+                              ag:op_hasInputVariable ag:Var_Alt_abort ,
+                                                     ag:Var_Alt_found ,
+                                                     ag:Var_Cycle_finished ,
+                                                     ag:Var_Diag_finished ,
+                                                     ag:Var_Err_detected ,
+                                                     ag:Var_Reset ,
+                                                     ag:Var_Schalter ,
+                                                     ag:Var_Schrittkette_GS ,
+                                                     ag:Var_Start ,
+                                                     ag:Var_Stop ;
+                              ag:op_hasOutputVariable ag:Var_A1 ,
+                                                      ag:Var_A2 ,
+                                                      ag:Var_A5 ,
+                                                      ag:Var_A6 ,
+                                                      ag:Var_D1 ,
+                                                      ag:Var_D2 ,
+                                                      ag:Var_D3 ,
+                                                      ag:Var_F1 ,
+                                                      ag:Var_F4 ;
+                              ag:op_isSubProgramOf ag:Program_HRL_SkillSet .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_HRL_RGB_AS_HorizontalMoveEncoders
+ag:Program_HRL_RGB_AS_HorizontalMoveEncoders rdf:type owl:NamedIndividual ,
+                                                      ag:class_Program ;
+                                             ag:op_hasInputVariable ag:Var_AutomaticMode ,
+                                                                    ag:Var_ESS ,
+                                                                    ag:Var_EncoderStartPosition01 ,
+                                                                    ag:Var_EncoderStartPosition02 ,
+                                                                    ag:Var_TOF_Time_TSR ,
+                                                                    ag:Var_TouchSensor01 ;
+                                             ag:op_hasOutputVariable ag:Var_DO_MovingHorizontalRGB_01 ;
+                                             ag:op_isSubProgramOf ag:Program_HRL_SkillSet .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_HRL_RGB_AS_HorizontalMoveSensors
+ag:Program_HRL_RGB_AS_HorizontalMoveSensors rdf:type owl:NamedIndividual ,
+                                                     ag:class_Program ;
+                                            ag:op_hasInputVariable ag:Var_AutomaticMode ,
+                                                                   ag:Var_ESS ,
+                                                                   ag:Var_TOF_Time_TSR ,
+                                                                   ag:Var_TouchSensor01 ,
+                                                                   ag:Var_TouchSensor02 ;
+                                            ag:op_hasOutputVariable ag:Var_DO_MovingHorizontalRGB_01 ;
+                                            ag:op_isSubProgramOf ag:Program_HRL_SkillSet .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_HRL_RGB_AS_VerticalMoveEncoders
+ag:Program_HRL_RGB_AS_VerticalMoveEncoders rdf:type owl:NamedIndividual ,
+                                                    ag:class_Program ;
+                                           ag:op_hasInputVariable ag:Var_AutomaticMode ,
+                                                                  ag:Var_ESS ,
+                                                                  ag:Var_EncoderStartPosition01 ,
+                                                                  ag:Var_EncoderStartPosition02 ,
+                                                                  ag:Var_TOF_TSR_TIME ,
+                                                                  ag:Var_TouchSensor01 ;
+                                           ag:op_hasOutputVariable ag:Var_DO_MovingVerticalRGB_01 ;
+                                           ag:op_isSubProgramOf ag:Program_HRL_SkillSet .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_HRL_RGB_InitialStateDrive
+ag:Program_HRL_RGB_InitialStateDrive rdf:type owl:NamedIndividual ,
+                                              ag:class_Program ;
+                                     ag:op_hasInputVariable ag:Var_ESS ,
+                                                            ag:Var_InitDriveMode ,
+                                                            ag:Var_InputInitDriveMode ,
+                                                            ag:Var_MethodCall_InitDrive ,
+                                                            ag:Var_TOF_Time_TSR ,
+                                                            ag:Var_TouchSensor01_SRM ,
+                                                            ag:Var_TouchSensor02_RGB_vertical ,
+                                                            ag:Var_TouchSensor03_RGB_horizontal ;
+                                     ag:op_hasOutputVariable ag:Var_RGB_HorizontalBackwards ,
+                                                             ag:Var_RGB_VerticalUp ,
+                                                             ag:Var_SRM_MotorBackwards ;
+                                     ag:op_isSubProgramOf ag:Program_HRL_SkillSet .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_HRL_SkillSet
+ag:Program_HRL_SkillSet rdf:type owl:NamedIndividual ,
+                                 ag:class_Program ;
+                        ag:op_hasInputVariable ag:Var_ConfirmationButton ,
+                                               ag:Var_ResetButton ,
+                                               ag:Var_StartButton .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_HardeningProcess
+ag:Program_HardeningProcess rdf:type owl:NamedIndividual ,
+                                     ag:class_Program ;
+                            ag:op_hasInputVariable ag:Var_DI01 ,
+                                                   ag:Var_EmergencyStopSignal ,
+                                                   ag:Var_InitStateDrive_Input ,
+                                                   ag:Var_MethodCall ,
+                                                   ag:Var_OperatingMode ,
+                                                   ag:Var_TOF_Time_HardeningTime ;
+                            ag:op_hasOutputVariable ag:Var_DigitalOutputControl_01 ,
+                                                    ag:Var_ResetMethodCall ;
+                            ag:op_isSubProgramOf ag:Program_MBS_MR01_AS_HardeningProcess .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_JobMethode_Schablone
+ag:Program_JobMethode_Schablone rdf:type owl:NamedIndividual ,
+                                         ag:class_Program ;
+                                ag:op_hasInputVariable ag:Var_LightSensor_01 ,
+                                                       ag:Var_LightSensor_02 ,
+                                                       ag:Var_NotAusSignal ,
+                                                       ag:Var_TOF_Time_EndschalterEntlastung ,
+                                                       ag:Var_TOF_Time_Motoransteuerung ,
+                                                       ag:Var_TS_Endschalter_01 ,
+                                                       ag:Var_TS_Endschalter_02 ;
+                                ag:op_hasOutputVariable ag:Var_Motor_Ansteuerung01 .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_MBS_CB_AS_HorizontalMove
+ag:Program_MBS_CB_AS_HorizontalMove rdf:type owl:NamedIndividual ,
+                                             ag:class_Program ;
+                                    ag:op_hasInputVariable ag:Var_AutomaticMode ,
+                                                           ag:Var_ESS ,
+                                                           ag:Var_LightSensor_01 ,
+                                                           ag:Var_TOF_Time_MotorControl ,
+                                                           ag:Var_TouchSensor_01 ;
+                                    ag:op_hasOutputVariable ag:Var_DO_MovingHorizontalCB_01 ;
+                                    ag:op_isSubProgramOf ag:Program_MBS_SkillSet .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_MBS_ControlOfOutputs
+ag:Program_MBS_ControlOfOutputs rdf:type owl:NamedIndividual ,
+                                         ag:class_Program ;
+                                ag:op_hasInputVariable ag:Var_A1 ,
+                                                       ag:Var_A2 ,
+                                                       ag:Var_A6 ,
+                                                       ag:Var_CB_Forwards ,
+                                                       ag:Var_DmPD_Compressor ,
+                                                       ag:Var_DmPD_RotateCCW_CBtoMR02 ,
+                                                       ag:Var_DmPD_RotateCCW_CBtoVSG ,
+                                                       ag:Var_DmPD_RotateCCW_MR02toVSG ,
+                                                       ag:Var_DmPD_RotateCW_MR02toCB ,
+                                                       ag:Var_DmPD_RotateCW_VSGtoCB ,
+                                                       ag:Var_DmPD_RotateCW_VSGtoMR02 ,
+                                                       ag:Var_DmPD_Valve ,
+                                                       ag:Var_F1 ,
+                                                       ag:Var_F4 ,
+                                                       ag:Var_Init_DmPD_RotateCCW ,
+                                                       ag:Var_Init_DmPD_RotateCW ,
+                                                       ag:Var_Init_MR01_HorizontalBackwards ,
+                                                       ag:Var_Init_MR01_HorizontalForwards ,
+                                                       ag:Var_Init_MR02_CuttingProcess ,
+                                                       ag:Var_Init_VSG_HorizontalBackwards ,
+                                                       ag:Var_Init_VSG_HorizontalForwards ,
+                                                       ag:Var_MR01_Compressor ,
+                                                       ag:Var_MR01_HardeningProcess ,
+                                                       ag:Var_MR01_HoritzontalBackwards ,
+                                                       ag:Var_MR01_HorizontalForwards ,
+                                                       ag:Var_MR01_Valve ,
+                                                       ag:Var_MR02_CuttingProcess ,
+                                                       ag:Var_Start ,
+                                                       ag:Var_VSG_Compressor_SuctionToDmPD ,
+                                                       ag:Var_VSG_Compressor_SuctionToMR01 ,
+                                                       ag:Var_VSG_Compressor_VerticalDown ,
+                                                       ag:Var_VSG_HorizontalBackwards ,
+                                                       ag:Var_VSG_HorizontalForwards ,
+                                                       ag:Var_VSG_Valve_SuctionToDmPD ,
+                                                       ag:Var_VSG_Valve_SuctionToMR01 ,
+                                                       ag:Var_VSG_Valve_VerticalDown ;
+                                ag:op_hasOutputVariable ag:Var_CompressorON ,
+                                                        ag:Var_ConveyorBeltForward ,
+                                                        ag:Var_CuttingProcess_ON ,
+                                                        ag:Var_HardeningProcess ,
+                                                        ag:Var_Light_Q1 ,
+                                                        ag:Var_Light_Q2 ,
+                                                        ag:Var_Light_Q3 ,
+                                                        ag:Var_MoveVSGHorizontalBackwards ,
+                                                        ag:Var_MoveVSGHorizontalForwards ,
+                                                        ag:Var_RotateDmPD_CCW ,
+                                                        ag:Var_RotateDmPD_CW ,
+                                                        ag:Var_ValveDmPD_ON ,
+                                                        ag:Var_ValveMR01_ON ,
+                                                        ag:Var_ValveVSG_Suction_ON ,
+                                                        ag:Var_ValveVSG_VerticalDown_ON ,
+                                                        ag:Var_WorkpieceTableMoveHorizontalBackwards ,
+                                                        ag:Var_WorkpieceTableMoveHorizontalForwards ;
+                                ag:op_isSubProgramOf ag:Program_MBS_SkillSet .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_MBS_DmPD_AS_HorizontalMove
+ag:Program_MBS_DmPD_AS_HorizontalMove rdf:type owl:NamedIndividual ,
+                                               ag:class_Program ;
+                                      ag:op_hasInputVariable ag:Var_AutomaticMode ,
+                                                             ag:Var_ESS ,
+                                                             ag:Var_TON_PowerOnDelay_Compressor ,
+                                                             ag:Var_TON_PowerOnDelay_Valve ,
+                                                             ag:Var_TouchSensor_01 ;
+                                      ag:op_hasOutputVariable ag:Var_DO_ControlCompressorDmPD_01 ;
+                                      ag:op_isSubProgramOf ag:Program_MBS_SkillSet .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_MBS_DmPD_AS_RotationMove
+ag:Program_MBS_DmPD_AS_RotationMove rdf:type owl:NamedIndividual ,
+                                             ag:class_Program ;
+                                    ag:op_hasInputVariable ag:Var_AutomaticMode ,
+                                                           ag:Var_ESS ,
+                                                           ag:Var_TouchSensor_01 ,
+                                                           ag:Var_TouchSensor_02 ;
+                                    ag:op_hasOutputVariable ag:Var_DO_MovingRotationPmPD_01 ;
+                                    ag:op_isSubProgramOf ag:Program_MBS_SkillSet .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_MBS_DmPD_InitialStateDrive
+ag:Program_MBS_DmPD_InitialStateDrive rdf:type owl:NamedIndividual ,
+                                               ag:class_Program ;
+                                      ag:op_hasInputVariable ag:Var_DI01_CCW ,
+                                                             ag:Var_DI02_CCW ,
+                                                             ag:Var_DI02_CW ,
+                                                             ag:Var_ESS ,
+                                                             ag:Var_InitDriveMode ,
+                                                             ag:Var_InputInitialStateDrive ,
+                                                             ag:Var_MethodCall_InitDrive ;
+                                      ag:op_hasOutputVariable ag:Var_MotorControl_CCW ,
+                                                              ag:Var_MotorControl_CW ;
+                                      ag:op_isSubProgramOf ag:Program_MBS_SkillSet .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_MBS_MR01_AS_HardeningProcess
+ag:Program_MBS_MR01_AS_HardeningProcess rdf:type owl:NamedIndividual ,
+                                                 ag:class_Program ;
+                                        ag:op_hasInputVariable ag:Var_AutomaticMode ,
+                                                               ag:Var_ESS ,
+                                                               ag:Var_LightSensor_01 ;
+                                        ag:op_hasOutputVariable ag:Var_DO_HardeningProcessControlMR01 ;
+                                        ag:op_isSubProgramOf ag:Program_MBS_SkillSet .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_MBS_MR01_AS_HorizontalMoveSensors
+ag:Program_MBS_MR01_AS_HorizontalMoveSensors rdf:type owl:NamedIndividual ,
+                                                      ag:class_Program ;
+                                             ag:op_hasInputVariable ag:Var_AutomaticMode ,
+                                                                    ag:Var_ESS ,
+                                                                    ag:Var_TOF_Time_TSR ,
+                                                                    ag:Var_TouchSensor_01 ,
+                                                                    ag:Var_TouchSensor_02 ;
+                                             ag:op_hasOutputVariable ag:Var_DO_MovingHorizontalMR01_01 ;
+                                             ag:op_isSubProgramOf ag:Program_MBS_SkillSet .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_MBS_MR01_AS_SecuringProcess
+ag:Program_MBS_MR01_AS_SecuringProcess rdf:type owl:NamedIndividual ,
+                                                ag:class_Program ;
+                                       ag:op_hasInputVariable ag:Var_AutomaticMode ,
+                                                              ag:Var_ESS ,
+                                                              ag:Var_TouchSensor_01 ;
+                                       ag:op_hasOutputVariable ag:Var_DO_SecuringProcessCompressorMR01_01 ;
+                                       ag:op_isSubProgramOf ag:Program_MBS_SkillSet .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_MBS_MR01_InitialStateDrive
+ag:Program_MBS_MR01_InitialStateDrive rdf:type owl:NamedIndividual ,
+                                               ag:class_Program ;
+                                      ag:op_hasInputVariable ag:Var_ESS ,
+                                                             ag:Var_InitDriveMode ,
+                                                             ag:Var_InputInitStateDrive ,
+                                                             ag:Var_MethodCall_InitDrive ,
+                                                             ag:Var_TouchSensor01 ,
+                                                             ag:Var_TouchSensor02 ;
+                                      ag:op_hasOutputVariable ag:Var_MotorControlHorizontalBackwards ,
+                                                              ag:Var_MotorControlHorizontalForwards ;
+                                      ag:op_isSubProgramOf ag:Program_MBS_SkillSet .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_MBS_MR02_AS_CuttingProcess
+ag:Program_MBS_MR02_AS_CuttingProcess rdf:type owl:NamedIndividual ,
+                                               ag:class_Program ;
+                                      ag:op_hasInputVariable ag:Var_AutomaticMode ,
+                                                             ag:Var_ESS ,
+                                                             ag:Var_TouchSensor_01 ;
+                                      ag:op_hasOutputVariable ag:Var_DO_CuttingProcessControlMR02 ;
+                                      ag:op_isSubProgramOf ag:Program_MBS_SkillSet .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_MBS_MR02_InitialStateDrive
+ag:Program_MBS_MR02_InitialStateDrive rdf:type owl:NamedIndividual ,
+                                               ag:class_Program ;
+                                      ag:op_hasInputVariable ag:Var_ESS ,
+                                                             ag:Var_InitDriveMode ,
+                                                             ag:Var_InputInitialStateDrive ,
+                                                             ag:Var_MethodCall_InitDrive ,
+                                                             ag:Var_TOF_Time_InitCuttingTime ;
+                                      ag:op_hasOutputVariable ag:Var_CheckMR02MotorControl ;
+                                      ag:op_isSubProgramOf ag:Program_MBS_SkillSet .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_MBS_OperatingModes
+ag:Program_MBS_OperatingModes rdf:type owl:NamedIndividual ,
+                                       ag:class_Program ;
+                              ag:op_hasInputVariable ag:Var_Reset ,
+                                                     ag:Var_Schalter ,
+                                                     ag:Var_Schrittkette_GS ,
+                                                     ag:Var_Start ,
+                                                     ag:Var_Stop ;
+                              ag:op_hasOutputVariable ag:Var_A1 ,
+                                                      ag:Var_A2 ,
+                                                      ag:Var_A6 ,
+                                                      ag:Var_F1 ,
+                                                      ag:Var_F4 ;
+                              ag:op_isSubProgramOf ag:Program_MBS_SkillSet .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_MBS_SkillSet
+ag:Program_MBS_SkillSet rdf:type owl:NamedIndividual ,
+                                 ag:class_Program .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_MBS_VSG_AS_HorizontalMove
+ag:Program_MBS_VSG_AS_HorizontalMove rdf:type owl:NamedIndividual ,
+                                              ag:class_Program ;
+                                     ag:op_hasInputVariable ag:Var_AutomaticeMode ,
+                                                            ag:Var_ESS ,
+                                                            ag:Var_TOF_Time_TSR ,
+                                                            ag:Var_TouchSensor_01 ,
+                                                            ag:Var_TouchSensor_02 ;
+                                     ag:op_hasOutputVariable ag:Var_DO_HorizontalMoveVSG_01 ;
+                                     ag:op_isSubProgramOf ag:Program_MBS_SkillSet .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_MBS_VSG_AS_SuctionProcess
+ag:Program_MBS_VSG_AS_SuctionProcess rdf:type owl:NamedIndividual ,
+                                              ag:class_Program ;
+                                     ag:op_hasInputVariable ag:Var_AutomaticMode ,
+                                                            ag:Var_ESS ,
+                                                            ag:Var_TON_PowerOnDelay_Compressor ,
+                                                            ag:Var_TON_PowerOnDelay_Valve ,
+                                                            ag:Var_TouchSensor_01 ,
+                                                            ag:Var_TouchSensor_02 ;
+                                     ag:op_hasOutputVariable ag:Var_DO_ControlCompressorSuctionProcessVSG_01 ;
+                                     ag:op_isSubProgramOf ag:Program_MBS_SkillSet .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_MBS_VSG_AS_VerticalMove
+ag:Program_MBS_VSG_AS_VerticalMove rdf:type owl:NamedIndividual ,
+                                            ag:class_Program ;
+                                   ag:op_hasInputVariable ag:Var_AutomaticMode ,
+                                                          ag:Var_ESS ,
+                                                          ag:Var_TON_PowerOnDelay_Compressor ,
+                                                          ag:Var_TON_PowerOnDelay_Valve ,
+                                                          ag:Var_TouchSensor_01 ;
+                                   ag:op_hasOutputVariable ag:Var_DO_ControlCompressorVerticalMoveVSG_01 ;
+                                   ag:op_isSubProgramOf ag:Program_MBS_SkillSet .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_MBS_VSG_InitialStateDrive
+ag:Program_MBS_VSG_InitialStateDrive rdf:type owl:NamedIndividual ,
+                                              ag:class_Program ;
+                                     ag:op_hasInputVariable ag:Var_ESS ,
+                                                            ag:Var_InitDriveMode ,
+                                                            ag:Var_InputInitStateDrive ,
+                                                            ag:Var_MethodCall_InitDrive ,
+                                                            ag:Var_TOF_Time_TSR ,
+                                                            ag:Var_TouchSensor01 ;
+                                     ag:op_hasOutputVariable ag:Var_DO_HorizontalMoveInitDriveVSG_01 ;
+                                     ag:op_isSubProgramOf ag:Program_MBS_SkillSet .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_SST_CB_AS_HorizontalMove
+ag:Program_SST_CB_AS_HorizontalMove rdf:type owl:NamedIndividual ,
+                                             ag:class_Program ;
+                                    ag:op_hasInputVariable ag:Var_AutomaticMode ,
+                                                           ag:Var_ESS ,
+                                                           ag:Var_LightSensor_01 ,
+                                                           ag:Var_LightSensor_02 ,
+                                                           ag:Var_TOF_Time_Motoransteuerung ;
+                                    ag:op_hasOutputVariable ag:Var_DO_MovingConveyorBelt ;
+                                    ag:op_isSubProgramOf ag:Program_SST_SkillSet .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_SST_CS_AS_ColorDetection
+ag:Program_SST_CS_AS_ColorDetection rdf:type owl:NamedIndividual ,
+                                             ag:class_Program ;
+                                    ag:op_hasInputVariable ag:Var_Color_Sensor ;
+                                    ag:op_hasOutputVariable ag:Var_Color_White ;
+                                    ag:op_isSubProgramOf ag:Program_SST_SkillSet .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_SST_ControlOfOutputs
+ag:Program_SST_ControlOfOutputs rdf:type owl:NamedIndividual ,
+                                         ag:class_Program ;
+                                ag:op_hasInputVariable ag:Var_A1 ,
+                                                       ag:Var_A2 ,
+                                                       ag:Var_CB_MoveForwardTillEnd ,
+                                                       ag:Var_CB_MoveForwardToPD01 ,
+                                                       ag:Var_CB_MoveForwardToPD02 ,
+                                                       ag:Var_CB_MoveForwardToPD03 ,
+                                                       ag:Var_F1 ,
+                                                       ag:Var_F4 ,
+                                                       ag:Var_Init_PD01_Compressor ,
+                                                       ag:Var_Init_PD01_Valve ,
+                                                       ag:Var_Init_PD02_Compressor ,
+                                                       ag:Var_Init_PD02_Valve ,
+                                                       ag:Var_Init_PD03_Compressor ,
+                                                       ag:Var_Init_PD03_Valve ,
+                                                       ag:Var_PD01_Compressor ,
+                                                       ag:Var_PD01_Valve ,
+                                                       ag:Var_PD02_Compressor ,
+                                                       ag:Var_PD02_Valve ,
+                                                       ag:Var_PD03_Compressor ,
+                                                       ag:Var_PD03_Valve ,
+                                                       ag:Var_Start ;
+                                ag:op_hasOutputVariable ag:Var_CompressorON ,
+                                                        ag:Var_ConveyorBeltForward ,
+                                                        ag:Var_Light_Q1 ,
+                                                        ag:Var_Light_Q2 ,
+                                                        ag:Var_Light_Q3 ,
+                                                        ag:Var_ValvePD01_ON ,
+                                                        ag:Var_ValvePD02_ON ,
+                                                        ag:Var_ValvePD03_ON ;
+                                ag:op_isSubProgramOf ag:Program_SST_SkillSet .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_SST_OperatingModes
+ag:Program_SST_OperatingModes rdf:type owl:NamedIndividual ,
+                                       ag:class_Program ;
+                              ag:op_hasInputVariable ag:Var_Reset ,
+                                                     ag:Var_Schalter ,
+                                                     ag:Var_Schrittkette_GS ,
+                                                     ag:Var_Start ,
+                                                     ag:Var_Stop ;
+                              ag:op_hasOutputVariable ag:Var_A1 ,
+                                                      ag:Var_A2 ,
+                                                      ag:Var_A6 ,
+                                                      ag:Var_F1 ,
+                                                      ag:Var_F4 ;
+                              ag:op_isSubProgramOf ag:Program_SST_SkillSet .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_SST_PD_AS_HorizontalMove
+ag:Program_SST_PD_AS_HorizontalMove rdf:type owl:NamedIndividual ,
+                                             ag:class_Program ;
+                                    ag:op_hasInputVariable ag:Var_AutomaticMode ,
+                                                           ag:Var_ESS ,
+                                                           ag:Var_LightSensor_01 ,
+                                                           ag:Var_LightSensor_02 ,
+                                                           ag:Var_PowerOnDelay_Compressor ,
+                                                           ag:Var_PowerOnDelay_Valve ;
+                                    ag:op_hasOutputVariable ag:Var_DO_ControlCompressorPD_01 ;
+                                    ag:op_isSubProgramOf ag:Program_SST_SkillSet .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_SST_PD_InitialStateDrive
+ag:Program_SST_PD_InitialStateDrive rdf:type owl:NamedIndividual ,
+                                             ag:class_Program ;
+                                    ag:op_hasInputVariable ag:Var_ESS ,
+                                                           ag:Var_InputInitialStateDrive ,
+                                                           ag:Var_MethodCall_InitDrive ,
+                                                           ag:Var_TON_Time_PowerOFFSelfSet ;
+                                    ag:op_hasOutputVariable ag:Var_MotorControl_PD01_Compressor ,
+                                                            ag:Var_MotorControl_PD02_Compressor ,
+                                                            ag:Var_MotorControl_PD03_Compressor ;
+                                    ag:op_isSubProgramOf ag:Program_SST_SkillSet .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_SST_SkillSet
+ag:Program_SST_SkillSet rdf:type owl:NamedIndividual ,
+                                 ag:class_Program .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_SecuringWorkpiece
+ag:Program_SecuringWorkpiece rdf:type owl:NamedIndividual ,
+                                      ag:class_Program ;
+                             ag:op_hasInputVariable ag:Var_DI01 ,
+                                                    ag:Var_EmergencyStopSignal ,
+                                                    ag:Var_InitStateDrive_Input ,
+                                                    ag:Var_MethodCall ,
+                                                    ag:Var_OperatingMode ,
+                                                    ag:Var_TON_Time_Securing ,
+                                                    ag:Var_TON_Time_SecuringProcess ;
+                             ag:op_hasOutputVariable ag:Var_DigitalOutputControl_01 ,
+                                                     ag:Var_DigitalOutputControl_02 ,
+                                                     ag:Var_ResetMethodCall ;
+                             ag:op_isSubProgramOf ag:Program_MBS_MR01_AS_SecuringProcess .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_StampingProcess
+ag:Program_StampingProcess rdf:type owl:NamedIndividual ,
+                                    ag:class_Program ;
+                           ag:op_hasInputVariable ag:Var_DI01 ,
+                                                  ag:Var_EmergencyStopSignal ,
+                                                  ag:Var_InitStateDrive_Input ,
+                                                  ag:Var_MethodCall ,
+                                                  ag:Var_OperatingMode ,
+                                                  ag:Var_TOF_Time_StampingTime ;
+                           ag:op_hasOutputVariable ag:Var_DigitalOutputControl_01 ,
+                                                   ag:Var_ResetMethodCall .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_VSG_AS_CompressorControl
+ag:Program_VSG_AS_CompressorControl rdf:type owl:NamedIndividual ,
+                                             ag:class_Program ;
+                                    ag:op_hasInputVariable ag:Var_AutomaticMode ,
+                                                           ag:Var_ESS ,
+                                                           ag:Var_EncoderStartPosition01 ,
+                                                           ag:Var_EncoderStartPosition02 ,
+                                                           ag:Var_EncoderStartPosition03 ,
+                                                           ag:Var_EncoderStartPosition04 ,
+                                                           ag:Var_EncoderStartPosition05 ,
+                                                           ag:Var_EncoderStartPosition06 ;
+                                    ag:op_hasOutputVariable ag:Var_DO_CompressorVSG ;
+                                    ag:op_isSubProgramOf ag:Program_VSG_SkillSet .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_VSG_AS_HorizontalMoveEncoder
+ag:Program_VSG_AS_HorizontalMoveEncoder rdf:type owl:NamedIndividual ,
+                                                 ag:class_Program ;
+                                        ag:op_hasInputVariable ag:Var_AutomaticMode ,
+                                                               ag:Var_ESS ,
+                                                               ag:Var_EncoderStartPosition01 ,
+                                                               ag:Var_EncoderStartPosition02 ,
+                                                               ag:Var_TOF_Time_TSR ,
+                                                               ag:Var_TouchSensor01 ;
+                                        ag:op_hasOutputVariable ag:Var_DO_MovingHorizontalVSG_01 ;
+                                        ag:op_isSubProgramOf ag:Program_VSG_SkillSet .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_VSG_AS_RotationMoveEncoder
+ag:Program_VSG_AS_RotationMoveEncoder rdf:type owl:NamedIndividual ,
+                                               ag:class_Program ;
+                                      ag:op_hasInputVariable ag:Var_AutomaticMode ,
+                                                             ag:Var_ESS ,
+                                                             ag:Var_EncoderStartPosition01 ,
+                                                             ag:Var_EncoderStartPosition02 ,
+                                                             ag:Var_TOF_Time_TSR ,
+                                                             ag:Var_TouchSensor01 ;
+                                      ag:op_hasOutputVariable ag:Var_DO_MovingRotationVSG_01 ;
+                                      ag:op_isSubProgramOf ag:Program_VSG_SkillSet .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_VSG_AS_VerticalMoveEncoder
+ag:Program_VSG_AS_VerticalMoveEncoder rdf:type owl:NamedIndividual ,
+                                               ag:class_Program ;
+                                      ag:op_hasInputVariable ag:Var_AutomaticMode ,
+                                                             ag:Var_ESS ,
+                                                             ag:Var_EncoderStartPosition01 ,
+                                                             ag:Var_EncoderStartPosition02 ,
+                                                             ag:Var_TOF_Time_TSR ,
+                                                             ag:Var_TouchSensor01 ;
+                                      ag:op_hasOutputVariable ag:Var_DO_MovingVerticalVSG_01 ;
+                                      ag:op_isSubProgramOf ag:Program_VSG_SkillSet .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_VSG_ControlOfOutputs
+ag:Program_VSG_ControlOfOutputs rdf:type owl:NamedIndividual ,
+                                         ag:class_Program ;
+                                ag:op_hasInputVariable ag:Var_A1 ,
+                                                       ag:Var_A2 ,
+                                                       ag:Var_F1 ,
+                                                       ag:Var_F4 ,
+                                                       ag:Var_Init_VSG_HorizontalBackwards ,
+                                                       ag:Var_Init_VSG_HorizontalForwards ,
+                                                       ag:Var_Init_VSG_RotationCCW ,
+                                                       ag:Var_Init_VSG_RotationCW ,
+                                                       ag:Var_Init_VSG_VertikalDown ,
+                                                       ag:Var_Init_VSG_VertikalUp ,
+                                                       ag:Var_Start ,
+                                                       ag:Var_VSG_Compressor ,
+                                                       ag:Var_VSG_HorizontalBackwards01 ,
+                                                       ag:Var_VSG_HorizontalBackwards02 ,
+                                                       ag:Var_VSG_HorizontalForwards01 ,
+                                                       ag:Var_VSG_HorizontalForwards02 ,
+                                                       ag:Var_VSG_RotationCCW01 ,
+                                                       ag:Var_VSG_RotationCCW02 ,
+                                                       ag:Var_VSG_RotationCW01 ,
+                                                       ag:Var_VSG_RotationCW02 ,
+                                                       ag:Var_VSG_Valve ,
+                                                       ag:Var_VSG_VertikalDown01 ,
+                                                       ag:Var_VSG_VertikalDown02 ,
+                                                       ag:Var_VSG_VertikalUp01 ,
+                                                       ag:Var_VSG_VertikalUp02 ;
+                                ag:op_hasOutputVariable ag:Var_CompressorON ,
+                                                        ag:Var_Light_Q1 ,
+                                                        ag:Var_Light_Q2 ,
+                                                        ag:Var_Light_Q3 ,
+                                                        ag:Var_MoveHorizontalBackwards ,
+                                                        ag:Var_MoveHorizontalForwards ,
+                                                        ag:Var_MoveRotationCCW ,
+                                                        ag:Var_MoveRotationCW ,
+                                                        ag:Var_MoveVerticalDown ,
+                                                        ag:Var_MoveVerticalUp ,
+                                                        ag:Var_ValveON ;
+                                ag:op_isSubProgramOf ag:Program_VSG_SkillSet .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_VSG_InitialStateDrive
+ag:Program_VSG_InitialStateDrive rdf:type owl:NamedIndividual ,
+                                          ag:class_Program ;
+                                 ag:op_hasInputVariable ag:Var_ESS ,
+                                                        ag:Var_InitDriveMode ,
+                                                        ag:Var_InputInitDriveMode ,
+                                                        ag:Var_MethodCall_InitDrive ,
+                                                        ag:Var_TOF_Time_TSR ,
+                                                        ag:Var_TouchSensor01_Rotation ,
+                                                        ag:Var_TouchSensor02_Vertical ,
+                                                        ag:Var_TouchSensor03_horizontal ;
+                                 ag:op_hasOutputVariable ag:Var_VSG_Init_HorizontalForwards ,
+                                                         ag:Var_VSG_Init_RotateCW ,
+                                                         ag:Var_VSG_Init_VerticalUp ;
+                                 ag:op_isSubProgramOf ag:Program_VSG_SkillSet .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_VSG_OperatingModes
+ag:Program_VSG_OperatingModes rdf:type owl:NamedIndividual ,
+                                       ag:class_Program ;
+                              ag:op_hasInputVariable ag:Var_Reset ,
+                                                     ag:Var_Schalter ,
+                                                     ag:Var_Schrittkette_GS ,
+                                                     ag:Var_Start ,
+                                                     ag:Var_Stop ;
+                              ag:op_hasOutputVariable ag:Var_A1 ,
+                                                      ag:Var_A2 ,
+                                                      ag:Var_A6 ,
+                                                      ag:Var_F1 ,
+                                                      ag:Var_F4 ;
+                              ag:op_isSubProgramOf ag:Program_VSG_SkillSet .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_VSG_SkillSet
+ag:Program_VSG_SkillSet rdf:type owl:NamedIndividual ,
+                                 ag:class_Program .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_A1
+ag:Var_A1 rdf:type owl:NamedIndividual ,
+                   ag:class_Variable ;
+          ag:dp_hasHardwareAddress "Initialzustand" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_A2
+ag:Var_A2 rdf:type owl:NamedIndividual ,
+                   ag:class_Variable ;
+          ag:dp_hasHardwareAddress "Stillstand angefordert am Ende des Zyklus" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_A5
+ag:Var_A5 rdf:type owl:NamedIndividual ,
+                   ag:class_Variable ;
+          ag:dp_hasHardwareAddress "Vorbereitung zur Wiederaufnahme nach Störung" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_A6
+ag:Var_A6 rdf:type owl:NamedIndividual ,
+                   ag:class_Variable ;
+          ag:dp_hasHardwareAddress "Fahrt in den Initialzustand" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Alt_abort
+ag:Var_Alt_abort rdf:type owl:NamedIndividual ,
+                          ag:class_Variable ;
+                 ag:dp_hasHardwareAddress """für OPC UA freigeben
+ Read/Write""" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Alt_found
+ag:Var_Alt_found rdf:type owl:NamedIndividual ,
+                          ag:class_Variable ;
+                 ag:dp_hasHardwareAddress """für OPC UA freigeben
+ Read/Write""" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_AutomaticMode
+ag:Var_AutomaticMode rdf:type owl:NamedIndividual ,
+                              ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_AutomaticeMode
+ag:Var_AutomaticeMode rdf:type owl:NamedIndividual ,
+                               ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_CB_Forwards
+ag:Var_CB_Forwards rdf:type owl:NamedIndividual ,
+                            ag:class_Variable ;
+                   ag:dp_hasHardwareAddress "Output Control" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_CB_MoveForwardTillEnd
+ag:Var_CB_MoveForwardTillEnd rdf:type owl:NamedIndividual ,
+                                      ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_CB_MoveForwardToPD01
+ag:Var_CB_MoveForwardToPD01 rdf:type owl:NamedIndividual ,
+                                     ag:class_Variable ;
+                            ag:dp_hasHardwareAddress """Variablen zur Outputsteuerung aus anderen FBs
+Output-Variablen der Komponente ConveyorBelt""" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_CB_MoveForwardToPD02
+ag:Var_CB_MoveForwardToPD02 rdf:type owl:NamedIndividual ,
+                                     ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_CB_MoveForwardToPD03
+ag:Var_CB_MoveForwardToPD03 rdf:type owl:NamedIndividual ,
+                                     ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_CB_MoveForwards
+ag:Var_CB_MoveForwards rdf:type owl:NamedIndividual ;
+                       ag:dp_hasHardwareAddress "GVL_MBS.MBS_MOT_Foerderband_vorwaerts" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_CheckMR02MotorControl
+ag:Var_CheckMR02MotorControl rdf:type owl:NamedIndividual ,
+                                      ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_ColorCode1
+ag:Var_ColorCode1 rdf:type owl:NamedIndividual ;
+                  ag:dp_hasHardwareAddress "Farbcodes" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_ColorCode_1
+ag:Var_ColorCode_1 rdf:type owl:NamedIndividual ,
+                            ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_ColorCode_2
+ag:Var_ColorCode_2 rdf:type owl:NamedIndividual ,
+                            ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_ColorSensor
+ag:Var_ColorSensor rdf:type owl:NamedIndividual ,
+                            ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Color_1
+ag:Var_Color_1 rdf:type owl:NamedIndividual ,
+                        ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Color_2
+ag:Var_Color_2 rdf:type owl:NamedIndividual ,
+                        ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Color_3
+ag:Var_Color_3 rdf:type owl:NamedIndividual ,
+                        ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Color_Sensor
+ag:Var_Color_Sensor rdf:type owl:NamedIndividual ,
+                             ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Color_White
+ag:Var_Color_White rdf:type owl:NamedIndividual ,
+                            ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_CompressorON
+ag:Var_CompressorON rdf:type owl:NamedIndividual ,
+                             ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_ConfirmationButton
+ag:Var_ConfirmationButton rdf:type owl:NamedIndividual ,
+                                   ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_ConveyorBeltBackward
+ag:Var_ConveyorBeltBackward rdf:type owl:NamedIndividual ,
+                                     ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_ConveyorBeltForward
+ag:Var_ConveyorBeltForward rdf:type owl:NamedIndividual ,
+                                    ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_CuttingProcess_ON
+ag:Var_CuttingProcess_ON rdf:type owl:NamedIndividual ,
+                                  ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Cycle_finished
+ag:Var_Cycle_finished rdf:type owl:NamedIndividual ,
+                               ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_D1
+ag:Var_D1 rdf:type owl:NamedIndividual ,
+                   ag:class_Variable ;
+          ag:dp_hasHardwareAddress "Not-Aus" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_D2
+ag:Var_D2 rdf:type owl:NamedIndividual ,
+                   ag:class_Variable ;
+          ag:dp_hasHardwareAddress "Diagnose und Störbehandlung" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_D3
+ag:Var_D3 rdf:type owl:NamedIndividual ,
+                   ag:class_Variable ;
+          ag:dp_hasHardwareAddress "Produktion trotz Störung" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DI01
+ag:Var_DI01 rdf:type owl:NamedIndividual ,
+                     ag:class_Variable ;
+            ag:dp_hasHardwareAddress "Digitaler Input wie bspw. Lichtsensor oder Kontaktsensor" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DI01_CCW
+ag:Var_DI01_CCW rdf:type owl:NamedIndividual ,
+                         ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DI02
+ag:Var_DI02 rdf:type owl:NamedIndividual ,
+                     ag:class_Variable ;
+            ag:dp_hasHardwareAddress "Digitaler Input wie bspw. Lichtsensor oder Kontaktsensor" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DI02_CCW
+ag:Var_DI02_CCW rdf:type owl:NamedIndividual ,
+                         ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DI02_CW
+ag:Var_DI02_CW rdf:type owl:NamedIndividual ,
+                        ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DI02_EncoderStart01
+ag:Var_DI02_EncoderStart01 rdf:type owl:NamedIndividual ,
+                                    ag:class_Variable ;
+                           ag:dp_hasHardwareAddress "Digitaler Input Encoder Wert" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DI03_EncoderStart01
+ag:Var_DI03_EncoderStart01 rdf:type owl:NamedIndividual ,
+                                    ag:class_Variable ;
+                           ag:dp_hasHardwareAddress "Digitaler Input Encoder Wert" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DI03_EncoderTarget01
+ag:Var_DI03_EncoderTarget01 rdf:type owl:NamedIndividual ,
+                                     ag:class_Variable ;
+                            ag:dp_hasHardwareAddress "Digitaler Input Encoder Wert" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DI04_EncoderStart02
+ag:Var_DI04_EncoderStart02 rdf:type owl:NamedIndividual ,
+                                    ag:class_Variable ;
+                           ag:dp_hasHardwareAddress "Digitaler Input Encoder Wert" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DI05_EncoderStart03
+ag:Var_DI05_EncoderStart03 rdf:type owl:NamedIndividual ,
+                                    ag:class_Variable ;
+                           ag:dp_hasHardwareAddress "Digitaler Input Encoder Wert" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DI05_EncoderTarget02
+ag:Var_DI05_EncoderTarget02 rdf:type owl:NamedIndividual ,
+                                     ag:class_Variable ;
+                            ag:dp_hasHardwareAddress "Digitaler Input Encoder Wert" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DI06_EncoderStart04
+ag:Var_DI06_EncoderStart04 rdf:type owl:NamedIndividual ,
+                                    ag:class_Variable ;
+                           ag:dp_hasHardwareAddress "Digitaler Input Encoder Wert" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DI07_EncoderStart05
+ag:Var_DI07_EncoderStart05 rdf:type owl:NamedIndividual ,
+                                    ag:class_Variable ;
+                           ag:dp_hasHardwareAddress "Digitaler Input Encoder Wert" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DI08_EncoderStart06
+ag:Var_DI08_EncoderStart06 rdf:type owl:NamedIndividual ,
+                                    ag:class_Variable ;
+                           ag:dp_hasHardwareAddress "Digitaler Input Encoder Wert" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DI09_EncoderTarget01
+ag:Var_DI09_EncoderTarget01 rdf:type owl:NamedIndividual ,
+                                     ag:class_Variable ;
+                            ag:dp_hasHardwareAddress "Digitaler Input Encoder Wert" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DI10_EncoderTarget02
+ag:Var_DI10_EncoderTarget02 rdf:type owl:NamedIndividual ,
+                                     ag:class_Variable ;
+                            ag:dp_hasHardwareAddress "Digitaler Input Encoder Wert" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DI11_EncoderTarget03
+ag:Var_DI11_EncoderTarget03 rdf:type owl:NamedIndividual ,
+                                     ag:class_Variable ;
+                            ag:dp_hasHardwareAddress "Digitaler Input Encoder Wert" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DI12_EncoderTarget04
+ag:Var_DI12_EncoderTarget04 rdf:type owl:NamedIndividual ,
+                                     ag:class_Variable ;
+                            ag:dp_hasHardwareAddress "Digitaler Input Encoder Wert" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DI13_EncoderTarget05
+ag:Var_DI13_EncoderTarget05 rdf:type owl:NamedIndividual ,
+                                     ag:class_Variable ;
+                            ag:dp_hasHardwareAddress "Digitaler Input Encoder Wert" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DI14_EncoderTarget06
+ag:Var_DI14_EncoderTarget06 rdf:type owl:NamedIndividual ,
+                                     ag:class_Variable ;
+                            ag:dp_hasHardwareAddress "Digitaler Input Encoder Wert" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DO_CompressorVSG
+ag:Var_DO_CompressorVSG rdf:type owl:NamedIndividual ,
+                                 ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DO_ControlCompressorDmPD_01
+ag:Var_DO_ControlCompressorDmPD_01 rdf:type owl:NamedIndividual ,
+                                            ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DO_ControlCompressorPD_01
+ag:Var_DO_ControlCompressorPD_01 rdf:type owl:NamedIndividual ,
+                                          ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DO_ControlCompressorSuctionProcessVSG_01
+ag:Var_DO_ControlCompressorSuctionProcessVSG_01 rdf:type owl:NamedIndividual ,
+                                                         ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DO_ControlCompressorVerticalMoveVSG_01
+ag:Var_DO_ControlCompressorVerticalMoveVSG_01 rdf:type owl:NamedIndividual ,
+                                                       ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DO_CuttingProcessControlMR02
+ag:Var_DO_CuttingProcessControlMR02 rdf:type owl:NamedIndividual ,
+                                             ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DO_HardeningProcessControlMR01
+ag:Var_DO_HardeningProcessControlMR01 rdf:type owl:NamedIndividual ,
+                                               ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DO_HorizontalMoveInitDriveVSG_01
+ag:Var_DO_HorizontalMoveInitDriveVSG_01 rdf:type owl:NamedIndividual ,
+                                                 ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DO_HorizontalMoveVSG_01
+ag:Var_DO_HorizontalMoveVSG_01 rdf:type owl:NamedIndividual ,
+                                        ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DO_MovingConveyorBelt
+ag:Var_DO_MovingConveyorBelt rdf:type owl:NamedIndividual ,
+                                      ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DO_MovingHorizontalCB_01
+ag:Var_DO_MovingHorizontalCB_01 rdf:type owl:NamedIndividual ,
+                                         ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DO_MovingHorizontalMR01_01
+ag:Var_DO_MovingHorizontalMR01_01 rdf:type owl:NamedIndividual ,
+                                           ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DO_MovingHorizontalRGB_01
+ag:Var_DO_MovingHorizontalRGB_01 rdf:type owl:NamedIndividual ,
+                                          ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DO_MovingHorizontalVSG_01
+ag:Var_DO_MovingHorizontalVSG_01 rdf:type owl:NamedIndividual ,
+                                          ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DO_MovingRotationPmPD_01
+ag:Var_DO_MovingRotationPmPD_01 rdf:type owl:NamedIndividual ,
+                                         ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DO_MovingRotationVSG_01
+ag:Var_DO_MovingRotationVSG_01 rdf:type owl:NamedIndividual ,
+                                        ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DO_MovingVerticalRGB_01
+ag:Var_DO_MovingVerticalRGB_01 rdf:type owl:NamedIndividual ,
+                                        ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DO_MovingVerticalVSG_01
+ag:Var_DO_MovingVerticalVSG_01 rdf:type owl:NamedIndividual ,
+                                        ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DO_SecuringProcessCompressorMR01_01
+ag:Var_DO_SecuringProcessCompressorMR01_01 rdf:type owl:NamedIndividual ,
+                                                    ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Destination
+ag:Var_Destination rdf:type owl:NamedIndividual ,
+                            ag:class_Variable ;
+                   ag:dp_hasHardwareAddress "Variable zur Bestimmung der Bewegungsrichtung" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Diag_finished
+ag:Var_Diag_finished rdf:type owl:NamedIndividual ,
+                              ag:class_Variable ;
+                     ag:dp_hasHardwareAddress """für OPC UA freigeben
+ Read/Write""" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DigitalOutputControl_01
+ag:Var_DigitalOutputControl_01 rdf:type owl:NamedIndividual ,
+                                        ag:class_Variable ;
+                               ag:dp_hasHardwareAddress "Digitale Output Ansteuerung des Motor 1" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DigitalOutputControl_02
+ag:Var_DigitalOutputControl_02 rdf:type owl:NamedIndividual ,
+                                        ag:class_Variable ;
+                               ag:dp_hasHardwareAddress "Digitale Output Ansteuerung des Motor 2" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Direction
+ag:Var_Direction rdf:type owl:NamedIndividual ,
+                          ag:class_Variable ;
+                 ag:dp_hasHardwareAddress "Variable zur Bestimmung der Bewegungsrichtung" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DirectionHorizontal
+ag:Var_DirectionHorizontal rdf:type owl:NamedIndividual ;
+                           ag:dp_hasHardwareAddress "defines movement direction" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DmPD_Compressor
+ag:Var_DmPD_Compressor rdf:type owl:NamedIndividual ,
+                                ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DmPD_Compressor_HorizontalMove
+ag:Var_DmPD_Compressor_HorizontalMove rdf:type owl:NamedIndividual ;
+                                      ag:dp_hasHardwareAddress "GVL_MBS.MBS_Kompressor" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DmPD_RotateCCW_CBtoMR02
+ag:Var_DmPD_RotateCCW_CBtoMR02 rdf:type owl:NamedIndividual ,
+                                        ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DmPD_RotateCCW_CBtoVSG
+ag:Var_DmPD_RotateCCW_CBtoVSG rdf:type owl:NamedIndividual ,
+                                       ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DmPD_RotateCCW_MR02toVSG
+ag:Var_DmPD_RotateCCW_MR02toVSG rdf:type owl:NamedIndividual ,
+                                         ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DmPD_RotateCCWformCBtoMR02
+ag:Var_DmPD_RotateCCWformCBtoMR02 rdf:type owl:NamedIndividual ;
+                                  ag:dp_hasHardwareAddress "GVL_MBS.MBS_MOT_DK_CCW" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DmPD_RotateCCWformCBtoVSG
+ag:Var_DmPD_RotateCCWformCBtoVSG rdf:type owl:NamedIndividual ;
+                                 ag:dp_hasHardwareAddress "GVL_MBS.MBS_MOT_DK_CCW" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DmPD_RotateCCWformMR02toVSG
+ag:Var_DmPD_RotateCCWformMR02toVSG rdf:type owl:NamedIndividual ;
+                                   ag:dp_hasHardwareAddress "GVL_MBS.MBS_MOT_DK_CCW" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DmPD_RotateCW_MR02toCB
+ag:Var_DmPD_RotateCW_MR02toCB rdf:type owl:NamedIndividual ,
+                                       ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DmPD_RotateCW_VSGtoCB
+ag:Var_DmPD_RotateCW_VSGtoCB rdf:type owl:NamedIndividual ,
+                                      ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DmPD_RotateCW_VSGtoMR02
+ag:Var_DmPD_RotateCW_VSGtoMR02 rdf:type owl:NamedIndividual ,
+                                        ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DmPD_RotateCWformVSGtoMR02
+ag:Var_DmPD_RotateCWformVSGtoMR02 rdf:type owl:NamedIndividual ;
+                                  ag:dp_hasHardwareAddress "GVL_MBS.MBS_MOT_DK_CW" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DmPD_RotateCWfromMR02toCB
+ag:Var_DmPD_RotateCWfromMR02toCB rdf:type owl:NamedIndividual ;
+                                 ag:dp_hasHardwareAddress "GVL_MBS.MBS_MOT_DK_CW" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DmPD_RotateCWromVSGtoCB
+ag:Var_DmPD_RotateCWromVSGtoCB rdf:type owl:NamedIndividual ;
+                               ag:dp_hasHardwareAddress "GVL_MBS.MBS_MOT_DK_CW" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DmPD_Valve
+ag:Var_DmPD_Valve rdf:type owl:NamedIndividual ,
+                           ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_DmPD_Valve_HorizontalMove
+ag:Var_DmPD_Valve_HorizontalMove rdf:type owl:NamedIndividual ;
+                                 ag:dp_hasHardwareAddress "GVL_MBS.ControlValveHorizontalMove" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_ESS
+ag:Var_ESS rdf:type owl:NamedIndividual ,
+                    ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_EmergencyStopSignal
+ag:Var_EmergencyStopSignal rdf:type owl:NamedIndividual ,
+                                    ag:class_Variable ;
+                           ag:dp_hasHardwareAddress "Variable für Not-Signal" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_EncoderStartPosition01
+ag:Var_EncoderStartPosition01 rdf:type owl:NamedIndividual ,
+                                       ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_EncoderStartPosition02
+ag:Var_EncoderStartPosition02 rdf:type owl:NamedIndividual ,
+                                       ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_EncoderStartPosition03
+ag:Var_EncoderStartPosition03 rdf:type owl:NamedIndividual ,
+                                       ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_EncoderStartPosition04
+ag:Var_EncoderStartPosition04 rdf:type owl:NamedIndividual ,
+                                       ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_EncoderStartPosition05
+ag:Var_EncoderStartPosition05 rdf:type owl:NamedIndividual ,
+                                       ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_EncoderStartPosition06
+ag:Var_EncoderStartPosition06 rdf:type owl:NamedIndividual ,
+                                       ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Err_detected
+ag:Var_Err_detected rdf:type owl:NamedIndividual ,
+                             ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_F1
+ag:Var_F1 rdf:type owl:NamedIndividual ,
+                   ag:class_Variable ;
+          ag:dp_hasHardwareAddress "Normalbetrieb" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_F4
+ag:Var_F4 rdf:type owl:NamedIndividual ,
+                   ag:class_Variable ;
+          ag:dp_hasHardwareAddress "Handbetrieb" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_CB_HorizontalMove
+ag:Var_HRL_CB_HorizontalMove rdf:type owl:NamedIndividual ;
+                             ag:dp_hasHardwareAddress "FB Intatziation Variable" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_CB_backwards
+ag:Var_HRL_CB_backwards rdf:type owl:NamedIndividual ;
+                        ag:dp_hasHardwareAddress "GVL_HRL.HRL_MOT_Foerderband_rueckwaerts" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_CB_forwards
+ag:Var_HRL_CB_forwards rdf:type owl:NamedIndividual ;
+                       ag:dp_hasHardwareAddress "GVL_HRL.HRL_MOT_Foerderband_vorwaerts" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_ControlOfOutputs
+ag:Var_HRL_ControlOfOutputs rdf:type owl:NamedIndividual ;
+                            ag:dp_hasHardwareAddress "Organisation FBs" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_Enc_horizontal_I1
+ag:Var_HRL_Enc_horizontal_I1 rdf:type owl:NamedIndividual ;
+                             ag:dp_hasHardwareAddress "udiDI%41.0_A2_5" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_Enc_horizontal_I2
+ag:Var_HRL_Enc_horizontal_I2 rdf:type owl:NamedIndividual ;
+                             ag:dp_hasHardwareAddress "udiDI%47.0_A2_5" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_Enc_vertikal_I1
+ag:Var_HRL_Enc_vertikal_I1 rdf:type owl:NamedIndividual ;
+                           ag:dp_hasHardwareAddress "udiDI%53.0_A2_5" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_Enc_vertikal_I2
+ag:Var_HRL_Enc_vertikal_I2 rdf:type owl:NamedIndividual ;
+                           ag:dp_hasHardwareAddress "udiDI%59.0_A2_5" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_LS_aussen
+ag:Var_HRL_LS_aussen rdf:type owl:NamedIndividual ;
+                     ag:dp_hasHardwareAddress "xDI%136.2_A2_1" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_LS_innen
+ag:Var_HRL_LS_innen rdf:type owl:NamedIndividual ;
+                    ag:dp_hasHardwareAddress "xDI%136.1_A2_1" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_MOT_Ausleger_rueckwaerts
+ag:Var_HRL_MOT_Ausleger_rueckwaerts rdf:type owl:NamedIndividual ;
+                                    ag:dp_hasHardwareAddress "xDO%111.7_A2_4" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_MOT_Ausleger_vorwaerts
+ag:Var_HRL_MOT_Ausleger_vorwaerts rdf:type owl:NamedIndividual ;
+                                  ag:dp_hasHardwareAddress "xDO%111.6_A2_4" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_MOT_Foerderband_rueckwaerts
+ag:Var_HRL_MOT_Foerderband_rueckwaerts rdf:type owl:NamedIndividual ;
+                                       ag:dp_hasHardwareAddress "xDO%111.1_A2_2" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_MOT_Foerderband_vorwaerts
+ag:Var_HRL_MOT_Foerderband_vorwaerts rdf:type owl:NamedIndividual ;
+                                     ag:dp_hasHardwareAddress "xDO%111.0_A2_2" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_MOT_horizontal_zum_Foerderband
+ag:Var_HRL_MOT_horizontal_zum_Foerderband rdf:type owl:NamedIndividual ;
+                                          ag:dp_hasHardwareAddress "xDO%111.3_A2_4" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_MOT_horizontal_zum_Regal
+ag:Var_HRL_MOT_horizontal_zum_Regal rdf:type owl:NamedIndividual ;
+                                    ag:dp_hasHardwareAddress "xDO%111.2_A2_4" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_MOT_vertikal_hoch
+ag:Var_HRL_MOT_vertikal_hoch rdf:type owl:NamedIndividual ;
+                             ag:dp_hasHardwareAddress "xDO%111.5_A2_4" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_MOT_vertikal_runter
+ag:Var_HRL_MOT_vertikal_runter rdf:type owl:NamedIndividual ;
+                               ag:dp_hasHardwareAddress "xDO%111.4_A2_4" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_RGB_Backwards01
+ag:Var_HRL_RGB_Backwards01 rdf:type owl:NamedIndividual ;
+                           ag:dp_hasHardwareAddress "GVL_HRL.HRL_MOT_Ausleger_rueckwaerts" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_RGB_Backwards02
+ag:Var_HRL_RGB_Backwards02 rdf:type owl:NamedIndividual ;
+                           ag:dp_hasHardwareAddress "GVL_HRL.HRL_MOT_Ausleger_rueckwaerts" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_RGB_ET_Vertical01
+ag:Var_HRL_RGB_ET_Vertical01 rdf:type owl:NamedIndividual ;
+                             ag:dp_hasHardwareAddress "Encoder Values for InitialStateDrive" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_RGB_Forwards01
+ag:Var_HRL_RGB_Forwards01 rdf:type owl:NamedIndividual ;
+                          ag:dp_hasHardwareAddress "GVL_HRL.HRL_MOT_Ausleger_vorwaerts" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_RGB_Forwards02
+ag:Var_HRL_RGB_Forwards02 rdf:type owl:NamedIndividual ;
+                          ag:dp_hasHardwareAddress "GVL_HRL.HRL_MOT_Ausleger_vorwaerts" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_RGB_HorizontalBackwards01
+ag:Var_HRL_RGB_HorizontalBackwards01 rdf:type owl:NamedIndividual ;
+                                     ag:dp_hasHardwareAddress "GVL_HRL.HRL_MOT_horizontal_zum_Foerderband" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_RGB_HorizontalBackwards02
+ag:Var_HRL_RGB_HorizontalBackwards02 rdf:type owl:NamedIndividual ;
+                                     ag:dp_hasHardwareAddress "GVL_HRL.HRL_MOT_horizontal_zum_Foerderband" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_RGB_HorizontalForwards01
+ag:Var_HRL_RGB_HorizontalForwards01 rdf:type owl:NamedIndividual ;
+                                    ag:dp_hasHardwareAddress "GVL_HRL.HRL_MOT_horizontal_zum_Regal" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_RGB_HorizontalForwards02
+ag:Var_HRL_RGB_HorizontalForwards02 rdf:type owl:NamedIndividual ;
+                                    ag:dp_hasHardwareAddress "GVL_HRL.HRL_MOT_horizontal_zum_Regal" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_RGB_HorizontalMove
+ag:Var_HRL_RGB_HorizontalMove rdf:type owl:NamedIndividual ;
+                              ag:dp_hasHardwareAddress "FB Intatziation Variable" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_RGB_HorizontalMoveWithEncoder
+ag:Var_HRL_RGB_HorizontalMoveWithEncoder rdf:type owl:NamedIndividual ;
+                                         ag:dp_hasHardwareAddress "FB Intatziation Variable" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_RGB_InitialStateDrive
+ag:Var_HRL_RGB_InitialStateDrive rdf:type owl:NamedIndividual ;
+                                 ag:dp_hasHardwareAddress "InitialStateDrives" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_RGB_VerticalMoveWithEncoder
+ag:Var_HRL_RGB_VerticalMoveWithEncoder rdf:type owl:NamedIndividual ;
+                                       ag:dp_hasHardwareAddress "FB Intatziation Variable" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_RGB_VertikalDown01
+ag:Var_HRL_RGB_VertikalDown01 rdf:type owl:NamedIndividual ;
+                              ag:dp_hasHardwareAddress "GVL_HRL.HRL_MOT_vertikal_runter" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_RGB_VertikalDown02
+ag:Var_HRL_RGB_VertikalDown02 rdf:type owl:NamedIndividual ;
+                              ag:dp_hasHardwareAddress "GVL_HRL.HRL_MOT_vertikal_runter" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_RGB_VertikalUp01
+ag:Var_HRL_RGB_VertikalUp01 rdf:type owl:NamedIndividual ;
+                            ag:dp_hasHardwareAddress "GVL_HRL.HRL_MOT_vertikal_hoch" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_RGB_VertikalUp02
+ag:Var_HRL_RGB_VertikalUp02 rdf:type owl:NamedIndividual ;
+                            ag:dp_hasHardwareAddress "GVL_HRL.HRL_MOT_vertikal_hoch" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_Ref_Taster_Ausleger_hinten
+ag:Var_HRL_Ref_Taster_Ausleger_hinten rdf:type owl:NamedIndividual ;
+                                      ag:dp_hasHardwareAddress "xDI%136.7_A2_2" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_Ref_Taster_Ausleger_vorne
+ag:Var_HRL_Ref_Taster_Ausleger_vorne rdf:type owl:NamedIndividual ;
+                                     ag:dp_hasHardwareAddress "xDI%136.6_A2_2" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_Ref_Taster_horizontal
+ag:Var_HRL_Ref_Taster_horizontal rdf:type owl:NamedIndividual ;
+                                 ag:dp_hasHardwareAddress "xDI%136.0_A2_2" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_Ref_Taster_vertikal
+ag:Var_HRL_Ref_Taster_vertikal rdf:type owl:NamedIndividual ;
+                               ag:dp_hasHardwareAddress "xDI%136.3_A2_2" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_Skill_CB_MoveBackwards
+ag:Var_HRL_Skill_CB_MoveBackwards rdf:type owl:NamedIndividual ;
+                                  ag:dp_hasHardwareAddress "Movement to Store-In some goods on the Conveyorbelt" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_Skill_CB_MoveForwards
+ag:Var_HRL_Skill_CB_MoveForwards rdf:type owl:NamedIndividual ;
+                                 ag:dp_hasHardwareAddress "Movement to Store-Out some goods on the Conveyorbelt" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_Skill_RGB_MoveBackwards
+ag:Var_HRL_Skill_RGB_MoveBackwards rdf:type owl:NamedIndividual ;
+                                   ag:dp_hasHardwareAddress "HRL RGB Skills" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_Spursensor_1_unten
+ag:Var_HRL_Spursensor_1_unten rdf:type owl:NamedIndividual ;
+                              ag:dp_hasHardwareAddress "xDI%136.4_A2_3" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HRL_Spursensor_2_oben
+ag:Var_HRL_Spursensor_2_oben rdf:type owl:NamedIndividual ;
+                             ag:dp_hasHardwareAddress "xDI%136.5_A2_3" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_HardeningProcess
+ag:Var_HardeningProcess rdf:type owl:NamedIndividual ,
+                                 ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_InitDriveMode
+ag:Var_InitDriveMode rdf:type owl:NamedIndividual ,
+                              ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_InitStateDriveFinished
+ag:Var_InitStateDriveFinished rdf:type owl:NamedIndividual ,
+                                       ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_InitStateDrive_Input
+ag:Var_InitStateDrive_Input rdf:type owl:NamedIndividual ,
+                                     ag:class_Variable ;
+                            ag:dp_hasHardwareAddress "InputVariable für Initialfahrt" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Init_DmPD_RotateCCW
+ag:Var_Init_DmPD_RotateCCW rdf:type owl:NamedIndividual ,
+                                    ag:class_Variable ;
+                           ag:dp_hasHardwareAddress "InitDriveMode Output Control" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Init_DmPD_RotateCW
+ag:Var_Init_DmPD_RotateCW rdf:type owl:NamedIndividual ,
+                                   ag:class_Variable ;
+                          ag:dp_hasHardwareAddress "GVL_MBS.MBS_MOT_DK_CW" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Init_MR01_HorizontalBackwards
+ag:Var_Init_MR01_HorizontalBackwards rdf:type owl:NamedIndividual ,
+                                              ag:class_Variable ;
+                                     ag:dp_hasHardwareAddress "GVL_MBS.MBS_MOT_Ofenschieber_ausfahren" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Init_MR01_HorizontalForwards
+ag:Var_Init_MR01_HorizontalForwards rdf:type owl:NamedIndividual ,
+                                             ag:class_Variable ;
+                                    ag:dp_hasHardwareAddress "GVL_MBS.MBS_MOT_Ofenschieber_einfahren" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Init_MR02_CuttingProcess
+ag:Var_Init_MR02_CuttingProcess rdf:type owl:NamedIndividual ,
+                                         ag:class_Variable ;
+                                ag:dp_hasHardwareAddress "GVL_MBS.MBS_MOT_Saege" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Init_PD01_Compressor
+ag:Var_Init_PD01_Compressor rdf:type owl:NamedIndividual ,
+                                     ag:class_Variable ;
+                            ag:dp_hasHardwareAddress "Output-Variablen für Init-Fahrt" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Init_PD01_Valve
+ag:Var_Init_PD01_Valve rdf:type owl:NamedIndividual ,
+                                ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Init_PD02_Compressor
+ag:Var_Init_PD02_Compressor rdf:type owl:NamedIndividual ,
+                                     ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Init_PD02_Valve
+ag:Var_Init_PD02_Valve rdf:type owl:NamedIndividual ,
+                                ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Init_PD03_Compressor
+ag:Var_Init_PD03_Compressor rdf:type owl:NamedIndividual ,
+                                     ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Init_PD03_Valve
+ag:Var_Init_PD03_Valve rdf:type owl:NamedIndividual ,
+                                ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Init_RGB_Backwards
+ag:Var_Init_RGB_Backwards rdf:type owl:NamedIndividual ,
+                                   ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Init_RGB_Forwards
+ag:Var_Init_RGB_Forwards rdf:type owl:NamedIndividual ,
+                                  ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Init_RGB_HorizontalBackwards
+ag:Var_Init_RGB_HorizontalBackwards rdf:type owl:NamedIndividual ,
+                                             ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Init_RGB_HorizontalForwads
+ag:Var_Init_RGB_HorizontalForwads rdf:type owl:NamedIndividual ,
+                                           ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Init_RGB_VertikalDown
+ag:Var_Init_RGB_VertikalDown rdf:type owl:NamedIndividual ,
+                                      ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Init_RGB_VertikalUp
+ag:Var_Init_RGB_VertikalUp rdf:type owl:NamedIndividual ,
+                                    ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Init_SRM_MotorBackwards
+ag:Var_Init_SRM_MotorBackwards rdf:type owl:NamedIndividual ;
+                               ag:dp_hasHardwareAddress "OutputVariablen für Init-Fahrt" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Init_VSG_HorizontalBackwards
+ag:Var_Init_VSG_HorizontalBackwards rdf:type owl:NamedIndividual ,
+                                             ag:class_Variable ;
+                                    ag:dp_hasHardwareAddress "GVL_MBS.MBS_MOT_Sauger_zum_Ofen" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Init_VSG_HorizontalForwards
+ag:Var_Init_VSG_HorizontalForwards rdf:type owl:NamedIndividual ,
+                                            ag:class_Variable ;
+                                   ag:dp_hasHardwareAddress "GVL_MBS.MBS_MOT_Sauger_zum_DK" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Init_VSG_RotationCCW
+ag:Var_Init_VSG_RotationCCW rdf:type owl:NamedIndividual ,
+                                     ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Init_VSG_RotationCW
+ag:Var_Init_VSG_RotationCW rdf:type owl:NamedIndividual ,
+                                    ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Init_VSG_VertikalDown
+ag:Var_Init_VSG_VertikalDown rdf:type owl:NamedIndividual ,
+                                      ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Init_VSG_VertikalUp
+ag:Var_Init_VSG_VertikalUp rdf:type owl:NamedIndividual ,
+                                    ag:class_Variable ;
+                           ag:dp_hasHardwareAddress "Output-Variablen für Init-Fahrt" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_InputInitDriveMode
+ag:Var_InputInitDriveMode rdf:type owl:NamedIndividual ,
+                                   ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_InputInitStateDrive
+ag:Var_InputInitStateDrive rdf:type owl:NamedIndividual ,
+                                    ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_InputInitialStateDrive
+ag:Var_InputInitialStateDrive rdf:type owl:NamedIndividual ,
+                                       ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_LightBarrierSensor_01
+ag:Var_LightBarrierSensor_01 rdf:type owl:NamedIndividual ,
+                                      ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_LightBarrierSensor_02
+ag:Var_LightBarrierSensor_02 rdf:type owl:NamedIndividual ,
+                                      ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_LightSensor_01
+ag:Var_LightSensor_01 rdf:type owl:NamedIndividual ,
+                               ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_LightSensor_02
+ag:Var_LightSensor_02 rdf:type owl:NamedIndividual ,
+                               ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Light_Q1
+ag:Var_Light_Q1 rdf:type owl:NamedIndividual ,
+                         ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Light_Q2
+ag:Var_Light_Q2 rdf:type owl:NamedIndividual ,
+                         ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Light_Q3
+ag:Var_Light_Q3 rdf:type owl:NamedIndividual ,
+                         ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_CB_HorizontalMove
+ag:Var_MBS_CB_HorizontalMove rdf:type owl:NamedIndividual ;
+                             ag:dp_hasHardwareAddress "FB Intatziation Variable" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_ControlOfOutputs
+ag:Var_MBS_ControlOfOutputs rdf:type owl:NamedIndividual ;
+                            ag:dp_hasHardwareAddress "Organisation FBs" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_DmPD_RotationMove
+ag:Var_MBS_DmPD_RotationMove rdf:type owl:NamedIndividual ;
+                             ag:dp_hasHardwareAddress "Variablen des Transport FBs" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_DmPD_VerticalMove
+ag:Var_MBS_DmPD_VerticalMove rdf:type owl:NamedIndividual ;
+                             ag:dp_hasHardwareAddress "Variablen des Transport FBs" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_Kompressor
+ag:Var_MBS_Kompressor rdf:type owl:NamedIndividual ;
+                      ag:dp_hasHardwareAddress "xDO%113.1_A3_8" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_LS_Ende_Foerderband
+ag:Var_MBS_LS_Ende_Foerderband rdf:type owl:NamedIndividual ;
+                               ag:dp_hasHardwareAddress "xDI%137.2_A3_1" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_LS_Ofen
+ag:Var_MBS_LS_Ofen rdf:type owl:NamedIndividual ;
+                   ag:dp_hasHardwareAddress "xDI%138.0_A3_1" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_Leuchte_Ofen
+ag:Var_MBS_Leuchte_Ofen rdf:type owl:NamedIndividual ;
+                        ag:dp_hasHardwareAddress "xDO%113.0_A3_7" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_MOT_DK_CCW
+ag:Var_MBS_MOT_DK_CCW rdf:type owl:NamedIndividual ;
+                      ag:dp_hasHardwareAddress "xDO%112.1_A3_4" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_MOT_DK_CW
+ag:Var_MBS_MOT_DK_CW rdf:type owl:NamedIndividual ;
+                     ag:dp_hasHardwareAddress "xDO%112.0_A3_4" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_MOT_Foerderband_vorwaerts
+ag:Var_MBS_MOT_Foerderband_vorwaerts rdf:type owl:NamedIndividual ;
+                                     ag:dp_hasHardwareAddress "xDO%112.2_A3_2" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_MOT_Ofenschieber_ausfahren
+ag:Var_MBS_MOT_Ofenschieber_ausfahren rdf:type owl:NamedIndividual ;
+                                      ag:dp_hasHardwareAddress "xDO%112.5_A3_3" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_MOT_Ofenschieber_einfahren
+ag:Var_MBS_MOT_Ofenschieber_einfahren rdf:type owl:NamedIndividual ;
+                                      ag:dp_hasHardwareAddress "xDO%112.4_A3_3" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_MOT_Saege
+ag:Var_MBS_MOT_Saege rdf:type owl:NamedIndividual ;
+                     ag:dp_hasHardwareAddress "xDO%112.3_A3_6" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_MOT_Sauger_zum_DK
+ag:Var_MBS_MOT_Sauger_zum_DK rdf:type owl:NamedIndividual ;
+                             ag:dp_hasHardwareAddress "xDO%112.7_A3_5" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_MOT_Sauger_zum_Ofen
+ag:Var_MBS_MOT_Sauger_zum_Ofen rdf:type owl:NamedIndividual ;
+                               ag:dp_hasHardwareAddress "xDO%112.6_A3_5" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_MR01_HardeningProcess
+ag:Var_MBS_MR01_HardeningProcess rdf:type owl:NamedIndividual ;
+                                 ag:dp_hasHardwareAddress "Variablen des FBs" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_MR01_HorizontalMove
+ag:Var_MBS_MR01_HorizontalMove rdf:type owl:NamedIndividual ;
+                               ag:dp_hasHardwareAddress "Variablen des Transport FBs" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_MR01_InitialStateDrive
+ag:Var_MBS_MR01_InitialStateDrive rdf:type owl:NamedIndividual ;
+                                  ag:dp_hasHardwareAddress "InitialStateDrives" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_MR01_SecuringProcess
+ag:Var_MBS_MR01_SecuringProcess rdf:type owl:NamedIndividual ;
+                                ag:dp_hasHardwareAddress "Variablen des FBs" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_MR02_CuttingProcess
+ag:Var_MBS_MR02_CuttingProcess rdf:type owl:NamedIndividual ;
+                               ag:dp_hasHardwareAddress "Variablen des FBs" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_MV_Ofentuer
+ag:Var_MBS_MV_Ofentuer rdf:type owl:NamedIndividual ;
+                       ag:dp_hasHardwareAddress "xDO%113.4_A3_5" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_MV_Schieber
+ag:Var_MBS_MV_Schieber rdf:type owl:NamedIndividual ;
+                       ag:dp_hasHardwareAddress "xDO%113.5_A3_5" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_MV_Vakuum
+ag:Var_MBS_MV_Vakuum rdf:type owl:NamedIndividual ;
+                     ag:dp_hasHardwareAddress "xDO%113.2_A3_5" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_MV_senken
+ag:Var_MBS_MV_senken rdf:type owl:NamedIndividual ;
+                     ag:dp_hasHardwareAddress "xDO%113.3_A3_5" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_Ref_Taster_DK_Pos_Foerderband
+ag:Var_MBS_Ref_Taster_DK_Pos_Foerderband rdf:type owl:NamedIndividual ;
+                                         ag:dp_hasHardwareAddress "xDI%137.1_A3_2" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_Ref_Taster_DK_Pos_Saege
+ag:Var_MBS_Ref_Taster_DK_Pos_Saege rdf:type owl:NamedIndividual ;
+                                   ag:dp_hasHardwareAddress "xDI%137.3_A3_2" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_Ref_Taster_DK_Pos_Sauger
+ag:Var_MBS_Ref_Taster_DK_Pos_Sauger rdf:type owl:NamedIndividual ;
+                                    ag:dp_hasHardwareAddress "xDI%137.0_A3_2" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_Ref_Taster_Ofenschieber_aussen
+ag:Var_MBS_Ref_Taster_Ofenschieber_aussen rdf:type owl:NamedIndividual ;
+                                          ag:dp_hasHardwareAddress "xDI%137.6_A3_2" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_Ref_Taster_Ofenschieber_innen
+ag:Var_MBS_Ref_Taster_Ofenschieber_innen rdf:type owl:NamedIndividual ;
+                                         ag:dp_hasHardwareAddress "xDI%137.5_A3_2" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_Ref_Taster_Sauger_Pos_DK
+ag:Var_MBS_Ref_Taster_Sauger_Pos_DK rdf:type owl:NamedIndividual ;
+                                    ag:dp_hasHardwareAddress "xDI%137.4_A3_2" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_Ref_Taster_Sauger_Pos_Ofen
+ag:Var_MBS_Ref_Taster_Sauger_Pos_Ofen rdf:type owl:NamedIndividual ;
+                                      ag:dp_hasHardwareAddress "xDI%137.7_A3_2" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_Skill_CB_Moving
+ag:Var_MBS_Skill_CB_Moving rdf:type owl:NamedIndividual ;
+                           ag:dp_hasHardwareAddress "MBS ConveyorBelt Skills" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_Skill_DmPD_RotateFromVSGtoMR02
+ag:Var_MBS_Skill_DmPD_RotateFromVSGtoMR02 rdf:type owl:NamedIndividual ;
+                                          ag:dp_hasHardwareAddress "MBS Drehteller mit PushingDevice Skills" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_Skill_MR01_TransportIn
+ag:Var_MBS_Skill_MR01_TransportIn rdf:type owl:NamedIndividual ;
+                                  ag:dp_hasHardwareAddress """Multibearbeitungsstation Skills
+MBS Maschine1 (Ofen) Skills""" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_Skill_MR02_CuttingProcess
+ag:Var_MBS_Skill_MR02_CuttingProcess rdf:type owl:NamedIndividual ;
+                                     ag:dp_hasHardwareAddress "MBS Maschine2 (Schneidemaschine) Skills" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_Skill_VGS_PickUpWorkpieceToDmPD
+ag:Var_MBS_Skill_VGS_PickUpWorkpieceToDmPD rdf:type owl:NamedIndividual ;
+                                           ag:dp_hasHardwareAddress "MBS Vakuumsauggreifer Skills" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_VSG_HorizontalMove
+ag:Var_MBS_VSG_HorizontalMove rdf:type owl:NamedIndividual ;
+                              ag:dp_hasHardwareAddress "Variablen des Transport FBs" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_VSG_SuctionProcess
+ag:Var_MBS_VSG_SuctionProcess rdf:type owl:NamedIndividual ;
+                              ag:dp_hasHardwareAddress "Variablen des Transport FBs" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MBS_VSG_VerticalMove
+ag:Var_MBS_VSG_VerticalMove rdf:type owl:NamedIndividual ;
+                            ag:dp_hasHardwareAddress "FB Intatziation Variable" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MR01_Compressor
+ag:Var_MR01_Compressor rdf:type owl:NamedIndividual ,
+                                ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MR01_Compressor_SecuringProcess
+ag:Var_MR01_Compressor_SecuringProcess rdf:type owl:NamedIndividual ;
+                                       ag:dp_hasHardwareAddress "GVL_MBS.MBS_Kompressor" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MR01_HardeningProcess
+ag:Var_MR01_HardeningProcess rdf:type owl:NamedIndividual ,
+                                      ag:class_Variable ;
+                             ag:dp_hasHardwareAddress "GVL_MBS.MBS_Leuchte_Ofen" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MR01_HoritzontalBackwards
+ag:Var_MR01_HoritzontalBackwards rdf:type owl:NamedIndividual ,
+                                          ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MR01_HorizontalForwards
+ag:Var_MR01_HorizontalForwards rdf:type owl:NamedIndividual ,
+                                        ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MR01_MoveOvenslideIn
+ag:Var_MR01_MoveOvenslideIn rdf:type owl:NamedIndividual ;
+                            ag:dp_hasHardwareAddress "GVL_MBS.MBS_MOT_Ofenschieber_einfahren" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MR01_MoveOvenslideOut
+ag:Var_MR01_MoveOvenslideOut rdf:type owl:NamedIndividual ;
+                             ag:dp_hasHardwareAddress "GVL_MBS.MBS_MOT_Ofenschieber_ausfahren" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MR01_Valve
+ag:Var_MR01_Valve rdf:type owl:NamedIndividual ,
+                           ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MR01_Valve_OvenDoor
+ag:Var_MR01_Valve_OvenDoor rdf:type owl:NamedIndividual ;
+                           ag:dp_hasHardwareAddress "GVL_MBS.MBS_MV_Ofentuer" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MR02_CuttingProcess
+ag:Var_MR02_CuttingProcess rdf:type owl:NamedIndividual ,
+                                    ag:class_Variable ;
+                           ag:dp_hasHardwareAddress "GVL_MBS.MBS_MOT_Saege" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MethodCall
+ag:Var_MethodCall rdf:type owl:NamedIndividual ,
+                           ag:class_Variable ;
+                  ag:dp_hasHardwareAddress "some description" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MethodCall_ColorDetection
+ag:Var_MethodCall_ColorDetection rdf:type owl:NamedIndividual ;
+                                 ag:dp_hasHardwareAddress "used to store InputArg \"MethodCall\" from Start() method" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MethodCall_CompressorControl
+ag:Var_MethodCall_CompressorControl rdf:type owl:NamedIndividual ;
+                                    ag:dp_hasHardwareAddress "used to store InputArg \"MethodCall\" from Start() method" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MethodCall_CuttingProcess
+ag:Var_MethodCall_CuttingProcess rdf:type owl:NamedIndividual ;
+                                 ag:dp_hasHardwareAddress "used to store InputArg \"MethodCall\" from Start() method" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MethodCall_HardeningProcess
+ag:Var_MethodCall_HardeningProcess rdf:type owl:NamedIndividual ;
+                                   ag:dp_hasHardwareAddress "used to store InputArg \"MethodCall\" from Start() method" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MethodCall_HorizontalMove
+ag:Var_MethodCall_HorizontalMove rdf:type owl:NamedIndividual ;
+                                 ag:dp_hasHardwareAddress "used to store InputArg \"MethodCall\" from Start() method" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MethodCall_InitDrive
+ag:Var_MethodCall_InitDrive rdf:type owl:NamedIndividual ,
+                                     ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MethodCall_InitStateDrive
+ag:Var_MethodCall_InitStateDrive rdf:type owl:NamedIndividual ;
+                                 ag:dp_hasHardwareAddress """Encoder Values for InitialStateDrive
+Variable Values for InitialStateDrive""" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MethodCall_Name
+ag:Var_MethodCall_Name rdf:type owl:NamedIndividual ;
+                       ag:dp_hasHardwareAddress "used to store InputArg \"MethodCall\" from Start() method" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MethodCall_RotationMove
+ag:Var_MethodCall_RotationMove rdf:type owl:NamedIndividual ;
+                               ag:dp_hasHardwareAddress "used to store InputArg \"MethodCall\" from Start() method" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MethodCall_SecuringProcess
+ag:Var_MethodCall_SecuringProcess rdf:type owl:NamedIndividual ;
+                                  ag:dp_hasHardwareAddress "used to store InputArg \"MethodCall\" from Start() method" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MethodCall_VerticalMove
+ag:Var_MethodCall_VerticalMove rdf:type owl:NamedIndividual ;
+                               ag:dp_hasHardwareAddress "used to store InputArg \"MethodCall\" from Start() method" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MotorControlHorizontalBackwards
+ag:Var_MotorControlHorizontalBackwards rdf:type owl:NamedIndividual ,
+                                                ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MotorControlHorizontalForwards
+ag:Var_MotorControlHorizontalForwards rdf:type owl:NamedIndividual ,
+                                               ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MotorControl_CCW
+ag:Var_MotorControl_CCW rdf:type owl:NamedIndividual ,
+                                 ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MotorControl_CW
+ag:Var_MotorControl_CW rdf:type owl:NamedIndividual ,
+                                ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MotorControl_PD01_Compressor
+ag:Var_MotorControl_PD01_Compressor rdf:type owl:NamedIndividual ,
+                                             ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MotorControl_PD02_Compressor
+ag:Var_MotorControl_PD02_Compressor rdf:type owl:NamedIndividual ,
+                                             ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MotorControl_PD03_Compressor
+ag:Var_MotorControl_PD03_Compressor rdf:type owl:NamedIndividual ,
+                                             ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Motor_Ansteuerung01
+ag:Var_Motor_Ansteuerung01 rdf:type owl:NamedIndividual ,
+                                    ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MoveHorizontalBackwards
+ag:Var_MoveHorizontalBackwards rdf:type owl:NamedIndividual ,
+                                        ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MoveHorizontalForwards
+ag:Var_MoveHorizontalForwards rdf:type owl:NamedIndividual ,
+                                       ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MoveRotationCCW
+ag:Var_MoveRotationCCW rdf:type owl:NamedIndividual ,
+                                ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MoveRotationCW
+ag:Var_MoveRotationCW rdf:type owl:NamedIndividual ,
+                               ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MoveVSGHorizontalBackwards
+ag:Var_MoveVSGHorizontalBackwards rdf:type owl:NamedIndividual ,
+                                           ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MoveVSGHorizontalForwards
+ag:Var_MoveVSGHorizontalForwards rdf:type owl:NamedIndividual ,
+                                          ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MoveVerticalDown
+ag:Var_MoveVerticalDown rdf:type owl:NamedIndividual ,
+                                 ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MoveVerticalUp
+ag:Var_MoveVerticalUp rdf:type owl:NamedIndividual ,
+                               ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_NotAusSignal
+ag:Var_NotAusSignal rdf:type owl:NamedIndividual ,
+                             ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_OperatingMode
+ag:Var_OperatingMode rdf:type owl:NamedIndividual ,
+                              ag:class_Variable ;
+                     ag:dp_hasHardwareAddress "Variable zur Festlegung des benötigten Betriebszustandes für die Auslösung des FBs" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_PD01_Compressor
+ag:Var_PD01_Compressor rdf:type owl:NamedIndividual ,
+                                ag:class_Variable ;
+                       ag:dp_hasHardwareAddress "Output-Variablen der Komponente PushingDevice" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_PD01_Valve
+ag:Var_PD01_Valve rdf:type owl:NamedIndividual ,
+                           ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_PD02_Compressor
+ag:Var_PD02_Compressor rdf:type owl:NamedIndividual ,
+                                ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_PD02_Valve
+ag:Var_PD02_Valve rdf:type owl:NamedIndividual ,
+                           ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_PD03_Compressor
+ag:Var_PD03_Compressor rdf:type owl:NamedIndividual ,
+                                ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_PD03_Valve
+ag:Var_PD03_Valve rdf:type owl:NamedIndividual ,
+                           ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_PowerOFF_SelfSet
+ag:Var_PowerOFF_SelfSet rdf:type owl:NamedIndividual ,
+                                 ag:class_Variable ;
+                        ag:dp_hasHardwareAddress "Hilfsvariable um einen automatischen Ausschaltungsmodus des FBs über zu ermöglichen" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_PowerOnDelay_Compressor
+ag:Var_PowerOnDelay_Compressor rdf:type owl:NamedIndividual ,
+                                        ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_PowerOnDelay_Valve
+ag:Var_PowerOnDelay_Valve rdf:type owl:NamedIndividual ,
+                                   ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_RGB_Backwards
+ag:Var_RGB_Backwards rdf:type owl:NamedIndividual ,
+                              ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_RGB_Backwards01
+ag:Var_RGB_Backwards01 rdf:type owl:NamedIndividual ,
+                                ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_RGB_Backwards02
+ag:Var_RGB_Backwards02 rdf:type owl:NamedIndividual ,
+                                ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_RGB_Forwards
+ag:Var_RGB_Forwards rdf:type owl:NamedIndividual ,
+                             ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_RGB_Forwards01
+ag:Var_RGB_Forwards01 rdf:type owl:NamedIndividual ,
+                               ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_RGB_Forwards02
+ag:Var_RGB_Forwards02 rdf:type owl:NamedIndividual ,
+                               ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_RGB_HorizontalBackward
+ag:Var_RGB_HorizontalBackward rdf:type owl:NamedIndividual ,
+                                       ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_RGB_HorizontalBackwards
+ag:Var_RGB_HorizontalBackwards rdf:type owl:NamedIndividual ,
+                                        ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_RGB_HorizontalBackwards01
+ag:Var_RGB_HorizontalBackwards01 rdf:type owl:NamedIndividual ,
+                                          ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_RGB_HorizontalBackwards02
+ag:Var_RGB_HorizontalBackwards02 rdf:type owl:NamedIndividual ,
+                                          ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_RGB_HorizontalForward
+ag:Var_RGB_HorizontalForward rdf:type owl:NamedIndividual ,
+                                      ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_RGB_HorizontalForwards01
+ag:Var_RGB_HorizontalForwards01 rdf:type owl:NamedIndividual ,
+                                         ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_RGB_VerticalDown
+ag:Var_RGB_VerticalDown rdf:type owl:NamedIndividual ,
+                                 ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_RGB_VerticalUp
+ag:Var_RGB_VerticalUp rdf:type owl:NamedIndividual ,
+                               ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_RGB_VertikalDown01
+ag:Var_RGB_VertikalDown01 rdf:type owl:NamedIndividual ,
+                                   ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_RGB_VertikalDown02
+ag:Var_RGB_VertikalDown02 rdf:type owl:NamedIndividual ,
+                                   ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_RGB_VertikalUp01
+ag:Var_RGB_VertikalUp01 rdf:type owl:NamedIndividual ,
+                                 ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_RGB_VertikalUp02
+ag:Var_RGB_VertikalUp02 rdf:type owl:NamedIndividual ,
+                                 ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_RS_AxisControl
+ag:Var_RS_AxisControl rdf:type owl:NamedIndividual ;
+                      ag:dp_hasHardwareAddress "FlipFlop für die Ansteuerung der Achse oder des Transportbandes" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_RS_Compressor
+ag:Var_RS_Compressor rdf:type owl:NamedIndividual ;
+                     ag:dp_hasHardwareAddress "FlipFlop für die Ansteuerung des Kompressors" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_RS_CuttingProcess
+ag:Var_RS_CuttingProcess rdf:type owl:NamedIndividual ;
+                         ag:dp_hasHardwareAddress "FlipFlop für die Ansteuerung der Schneidemaschine" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_RS_HardeningProcess
+ag:Var_RS_HardeningProcess rdf:type owl:NamedIndividual ;
+                           ag:dp_hasHardwareAddress "FlipFlop für die Ansteuerung des Ofens" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_RS_SecuringProcessCompressorOFF
+ag:Var_RS_SecuringProcessCompressorOFF rdf:type owl:NamedIndividual ;
+                                       ag:dp_hasHardwareAddress "FlipFlop für die Ansteuerung des Ventils" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_RS_SecuringProcessCompressorON
+ag:Var_RS_SecuringProcessCompressorON rdf:type owl:NamedIndividual ;
+                                      ag:dp_hasHardwareAddress "FlipFlop für die Ansteuerung des Compressors" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_RS_StampingProcess
+ag:Var_RS_StampingProcess rdf:type owl:NamedIndividual ;
+                          ag:dp_hasHardwareAddress "FlipFlop für die Ansteuerung der Stanzmaschine" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_RS_TouchSensorRelief
+ag:Var_RS_TouchSensorRelief rdf:type owl:NamedIndividual ;
+                            ag:dp_hasHardwareAddress "FlipFlop zu Ansteuerung der Endschalterentlastung" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_RS_Valve
+ag:Var_RS_Valve rdf:type owl:NamedIndividual ;
+                ag:dp_hasHardwareAddress "FlipFlop für die Ansteuerung des Ventils" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_R_TRIG_EncoderPos01_CompressorInput
+ag:Var_R_TRIG_EncoderPos01_CompressorInput rdf:type owl:NamedIndividual ;
+                                           ag:dp_hasHardwareAddress "Flankenerkennung für Vergleich der Encoderwerte von Start- und Zielposition" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_R_TRIG_EncoderPos01_CompressorOutput
+ag:Var_R_TRIG_EncoderPos01_CompressorOutput rdf:type owl:NamedIndividual ;
+                                            ag:dp_hasHardwareAddress "Flankenerkennung für Vergleich der Encoderwerte von Start- und Zielposition" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_R_TRIG_EncoderPos01_Input
+ag:Var_R_TRIG_EncoderPos01_Input rdf:type owl:NamedIndividual ;
+                                 ag:dp_hasHardwareAddress "Flankenerkennung für Vergleich der Encoderwerte von Start- und Zielposition" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_R_TRIG_EncoderPos01_Output
+ag:Var_R_TRIG_EncoderPos01_Output rdf:type owl:NamedIndividual ;
+                                  ag:dp_hasHardwareAddress "Flankenerkennung für Vergleich der Encoderwerte von Start- und Zielposition" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_R_TRIG_EncoderPos01_ValveInput
+ag:Var_R_TRIG_EncoderPos01_ValveInput rdf:type owl:NamedIndividual ;
+                                      ag:dp_hasHardwareAddress "Flankenerkennung für Vergleich der Encoderwerte von Start- und Zielposition" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_R_TRIG_EncoderPos01_ValveOutput
+ag:Var_R_TRIG_EncoderPos01_ValveOutput rdf:type owl:NamedIndividual ;
+                                       ag:dp_hasHardwareAddress "Flankenerkennung für Vergleich der Encoderwerte von Start- und Zielposition" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_R_TRIG_EncoderPos02_CompressorInput
+ag:Var_R_TRIG_EncoderPos02_CompressorInput rdf:type owl:NamedIndividual ;
+                                           ag:dp_hasHardwareAddress "Flankenerkennung für Vergleich der Encoderwerte von Start- und Zielposition" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_R_TRIG_EncoderPos02_CompressorOutput
+ag:Var_R_TRIG_EncoderPos02_CompressorOutput rdf:type owl:NamedIndividual ;
+                                            ag:dp_hasHardwareAddress "Flankenerkennung für Vergleich der Encoderwerte von Start- und Zielposition" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_R_TRIG_EncoderPos02_Input
+ag:Var_R_TRIG_EncoderPos02_Input rdf:type owl:NamedIndividual ;
+                                 ag:dp_hasHardwareAddress "Flankenerkennung für Vergleich der Encoderwerte von Start- und Zielposition" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_R_TRIG_EncoderPos02_Output
+ag:Var_R_TRIG_EncoderPos02_Output rdf:type owl:NamedIndividual ;
+                                  ag:dp_hasHardwareAddress "Flankenerkennung für Vergleich der Encoderwerte von Start- und Zielposition" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_R_TRIG_EncoderPos02_ValveInput
+ag:Var_R_TRIG_EncoderPos02_ValveInput rdf:type owl:NamedIndividual ;
+                                      ag:dp_hasHardwareAddress "Flankenerkennung für Vergleich der Encoderwerte von Start- und Zielposition" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_R_TRIG_EncoderPos02_ValveOutput
+ag:Var_R_TRIG_EncoderPos02_ValveOutput rdf:type owl:NamedIndividual ;
+                                       ag:dp_hasHardwareAddress "Flankenerkennung für Vergleich der Encoderwerte von Start- und Zielposition" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_R_TRIG_EncoderPos03_CompressorInput
+ag:Var_R_TRIG_EncoderPos03_CompressorInput rdf:type owl:NamedIndividual ;
+                                           ag:dp_hasHardwareAddress "Flankenerkennung für Vergleich der Encoderwerte von Start- und Zielposition" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_R_TRIG_EncoderPos03_CompressorOutput
+ag:Var_R_TRIG_EncoderPos03_CompressorOutput rdf:type owl:NamedIndividual ;
+                                            ag:dp_hasHardwareAddress "Flankenerkennung für Vergleich der Encoderwerte von Start- und Zielposition" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_R_TRIG_EncoderPos03_ValveInput
+ag:Var_R_TRIG_EncoderPos03_ValveInput rdf:type owl:NamedIndividual ;
+                                      ag:dp_hasHardwareAddress "Flankenerkennung für Vergleich der Encoderwerte von Start- und Zielposition" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_R_TRIG_EncoderPos03_ValveOutput
+ag:Var_R_TRIG_EncoderPos03_ValveOutput rdf:type owl:NamedIndividual ;
+                                       ag:dp_hasHardwareAddress "Flankenerkennung für Vergleich der Encoderwerte von Start- und Zielposition" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_R_TRIG_EncoderPos04_CompressorInput
+ag:Var_R_TRIG_EncoderPos04_CompressorInput rdf:type owl:NamedIndividual ;
+                                           ag:dp_hasHardwareAddress "Flankenerkennung für Vergleich der Encoderwerte von Start- und Zielposition" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_R_TRIG_EncoderPos04_CompressorOutput
+ag:Var_R_TRIG_EncoderPos04_CompressorOutput rdf:type owl:NamedIndividual ;
+                                            ag:dp_hasHardwareAddress "Flankenerkennung für Vergleich der Encoderwerte von Start- und Zielposition" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_R_TRIG_EncoderPos04_ValveInput
+ag:Var_R_TRIG_EncoderPos04_ValveInput rdf:type owl:NamedIndividual ;
+                                      ag:dp_hasHardwareAddress "Flankenerkennung für Vergleich der Encoderwerte von Start- und Zielposition" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_R_TRIG_EncoderPos04_ValveOutput
+ag:Var_R_TRIG_EncoderPos04_ValveOutput rdf:type owl:NamedIndividual ;
+                                       ag:dp_hasHardwareAddress "Flankenerkennung für Vergleich der Encoderwerte von Start- und Zielposition" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_R_TRIG_EncoderPos05_CompressorInput
+ag:Var_R_TRIG_EncoderPos05_CompressorInput rdf:type owl:NamedIndividual ;
+                                           ag:dp_hasHardwareAddress "Flankenerkennung für Vergleich der Encoderwerte von Start- und Zielposition" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_R_TRIG_EncoderPos05_CompressorOutput
+ag:Var_R_TRIG_EncoderPos05_CompressorOutput rdf:type owl:NamedIndividual ;
+                                            ag:dp_hasHardwareAddress "Flankenerkennung für Vergleich der Encoderwerte von Start- und Zielposition" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_R_TRIG_EncoderPos05_ValveInput
+ag:Var_R_TRIG_EncoderPos05_ValveInput rdf:type owl:NamedIndividual ;
+                                      ag:dp_hasHardwareAddress "Flankenerkennung für Vergleich der Encoderwerte von Start- und Zielposition" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_R_TRIG_EncoderPos05_ValveOutput
+ag:Var_R_TRIG_EncoderPos05_ValveOutput rdf:type owl:NamedIndividual ;
+                                       ag:dp_hasHardwareAddress "Flankenerkennung für Vergleich der Encoderwerte von Start- und Zielposition" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_R_TRIG_EncoderPos06_CompressorInput
+ag:Var_R_TRIG_EncoderPos06_CompressorInput rdf:type owl:NamedIndividual ;
+                                           ag:dp_hasHardwareAddress "Flankenerkennung für Vergleich der Encoderwerte von Start- und Zielposition" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_R_TRIG_EncoderPos06_CompressorOutput
+ag:Var_R_TRIG_EncoderPos06_CompressorOutput rdf:type owl:NamedIndividual ;
+                                            ag:dp_hasHardwareAddress "Flankenerkennung für Vergleich der Encoderwerte von Start- und Zielposition" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_R_TRIG_EncoderPos06_ValveInput
+ag:Var_R_TRIG_EncoderPos06_ValveInput rdf:type owl:NamedIndividual ;
+                                      ag:dp_hasHardwareAddress "Flankenerkennung für Vergleich der Encoderwerte von Start- und Zielposition" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_R_TRIG_EncoderPos06_ValveOutput
+ag:Var_R_TRIG_EncoderPos06_ValveOutput rdf:type owl:NamedIndividual ;
+                                       ag:dp_hasHardwareAddress "Flankenerkennung für Vergleich der Encoderwerte von Start- und Zielposition" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_R_TRIG_Manual
+ag:Var_R_TRIG_Manual rdf:type owl:NamedIndividual ;
+                     ag:dp_hasHardwareAddress "Count: INT := 0;" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_R_TRIG_MethodCall
+ag:Var_R_TRIG_MethodCall rdf:type owl:NamedIndividual ;
+                         ag:dp_hasHardwareAddress "Flankenerkennung für eingehenden MethodenCall" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_R_TRIG_TSR
+ag:Var_R_TRIG_TSR rdf:type owl:NamedIndividual ;
+                  ag:dp_hasHardwareAddress "Flankenerkennung für eingehenden MethodenCall" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Reset
+ag:Var_Reset rdf:type owl:NamedIndividual ,
+                      ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_ResetButton
+ag:Var_ResetButton rdf:type owl:NamedIndividual ,
+                            ag:class_Variable ;
+                   ag:dp_hasHardwareAddress "Variablensetzung: Sollte später über SkillOA eingesetzt werden ODER Hard in SPS codiert (Diskussionspunkt)" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_ResetCall
+ag:Var_ResetCall rdf:type owl:NamedIndividual ;
+                 ag:dp_hasHardwareAddress "Variablen des Transport FBs" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_ResetMethodCall
+ag:Var_ResetMethodCall rdf:type owl:NamedIndividual ,
+                                ag:class_Variable ;
+                       ag:dp_hasHardwareAddress "Outputvariable für den Reset der OPC UA Methode" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_RotateDmPD_CCW
+ag:Var_RotateDmPD_CCW rdf:type owl:NamedIndividual ,
+                               ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_RotateDmPD_CW
+ag:Var_RotateDmPD_CW rdf:type owl:NamedIndividual ,
+                              ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_SRM_MotorBackwards
+ag:Var_SRM_MotorBackwards rdf:type owl:NamedIndividual ,
+                                   ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_SST_AutomaticColorDetection
+ag:Var_SST_AutomaticColorDetection rdf:type owl:NamedIndividual ;
+                                   ag:dp_hasHardwareAddress """Farbscanner- & Sortiertanlage Skills
+ColorSensor Skills""" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_SST_CB_HorizontalMove
+ag:Var_SST_CB_HorizontalMove rdf:type owl:NamedIndividual ;
+                             ag:dp_hasHardwareAddress "Variablen des Transport FBs" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_SST_ConveyorBeltMoveHorizontal_ToPD01
+ag:Var_SST_ConveyorBeltMoveHorizontal_ToPD01 rdf:type owl:NamedIndividual ;
+                                             ag:dp_hasHardwareAddress "ConveyorBelt Skills" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_SST_Farbsensor
+ag:Var_SST_Farbsensor rdf:type owl:NamedIndividual ;
+                      ag:dp_hasHardwareAddress "iAI%130.0_A5_4" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_SST_Impulstaster
+ag:Var_SST_Impulstaster rdf:type owl:NamedIndividual ;
+                        ag:dp_hasHardwareAddress "xDI%138.4_A5_1" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_SST_Kompressor
+ag:Var_SST_Kompressor rdf:type owl:NamedIndividual ;
+                      ag:dp_hasHardwareAddress "xDO%114.7_A5_8" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_SST_LS_Eingang
+ag:Var_SST_LS_Eingang rdf:type owl:NamedIndividual ;
+                      ag:dp_hasHardwareAddress "xDI%138.5_A5_1" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_SST_LS_blau
+ag:Var_SST_LS_blau rdf:type owl:NamedIndividual ;
+                   ag:dp_hasHardwareAddress "xDI%139.1_A5_1" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_SST_LS_nach_Farbsensor
+ag:Var_SST_LS_nach_Farbsensor rdf:type owl:NamedIndividual ;
+                              ag:dp_hasHardwareAddress "xDI%138.6_A5_1" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_SST_LS_rot
+ag:Var_SST_LS_rot rdf:type owl:NamedIndividual ;
+                  ag:dp_hasHardwareAddress "xDI%139.0_A5_1" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_SST_LS_weiss
+ag:Var_SST_LS_weiss rdf:type owl:NamedIndividual ;
+                    ag:dp_hasHardwareAddress "xDI%138.7_A5_1" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_SST_MOT_Foerderband
+ag:Var_SST_MOT_Foerderband rdf:type owl:NamedIndividual ;
+                           ag:dp_hasHardwareAddress "xDO%114.6_A5_2" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_SST_MV_blau
+ag:Var_SST_MV_blau rdf:type owl:NamedIndividual ;
+                   ag:dp_hasHardwareAddress "xDO%115.2_A5_5" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_SST_MV_rot
+ag:Var_SST_MV_rot rdf:type owl:NamedIndividual ;
+                  ag:dp_hasHardwareAddress "xDO%115.1_A5_5" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_SST_MV_weiss
+ag:Var_SST_MV_weiss rdf:type owl:NamedIndividual ;
+                    ag:dp_hasHardwareAddress "xDO%115.0_A5_5" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_SST_OperatingModes
+ag:Var_SST_OperatingModes rdf:type owl:NamedIndividual ;
+                          ag:dp_hasHardwareAddress "Organisation FBs" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_SST_PD01_HorizontalMove
+ag:Var_SST_PD01_HorizontalMove rdf:type owl:NamedIndividual ;
+                               ag:dp_hasHardwareAddress "PushingDeviceStation Skills" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_SST_PD_InitStateDrive
+ag:Var_SST_PD_InitStateDrive rdf:type owl:NamedIndividual ;
+                             ag:dp_hasHardwareAddress "InitialStateDrives" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Schalter
+ag:Var_Schalter rdf:type owl:NamedIndividual ,
+                         ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Schrittkette_GS
+ag:Var_Schrittkette_GS rdf:type owl:NamedIndividual ,
+                                ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_SecuringProcessingTime
+ag:Var_SecuringProcessingTime rdf:type owl:NamedIndividual ;
+                              ag:dp_hasHardwareAddress "Two Times for Securing the Workpiece (for Secure and Release) + HardeningProcessingTime" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_SecuringTime
+ag:Var_SecuringTime rdf:type owl:NamedIndividual ;
+                    ag:dp_hasHardwareAddress "Time for Securing the Workpiece" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Start
+ag:Var_Start rdf:type owl:NamedIndividual ,
+                      ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_StartButton
+ag:Var_StartButton rdf:type owl:NamedIndividual ,
+                            ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_State
+ag:Var_State rdf:type owl:NamedIndividual ;
+             ag:dp_hasHardwareAddress "Abgeschlossener MethodCall" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_Stop
+ag:Var_Stop rdf:type owl:NamedIndividual ,
+                     ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TIME_TSR
+ag:Var_TIME_TSR rdf:type owl:NamedIndividual ;
+                ag:dp_hasHardwareAddress "Time Constraints" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TOF_CuttingTime
+ag:Var_TOF_CuttingTime rdf:type owl:NamedIndividual ;
+                       ag:dp_hasHardwareAddress "Ausschaltverzögerung simulativ für die Bearbeitungszeit" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TOF_DigitalOutputControl
+ag:Var_TOF_DigitalOutputControl rdf:type owl:NamedIndividual ;
+                                ag:dp_hasHardwareAddress "Ausschaltverzögerung für die Outputansteuerung" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TOF_HardeningTime
+ag:Var_TOF_HardeningTime rdf:type owl:NamedIndividual ;
+                         ag:dp_hasHardwareAddress "Ausschaltverzögerung simulativ für die Bearbeitungszeit" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TOF_StampingTime
+ag:Var_TOF_StampingTime rdf:type owl:NamedIndividual ;
+                        ag:dp_hasHardwareAddress "Ausschaltverzögerung simulativ für die Bearbeitungszeit" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TOF_TSR_TIME
+ag:Var_TOF_TSR_TIME rdf:type owl:NamedIndividual ,
+                             ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TOF_Time_CuttingTime
+ag:Var_TOF_Time_CuttingTime rdf:type owl:NamedIndividual ,
+                                     ag:class_Variable ;
+                            ag:dp_hasHardwareAddress "Ausschaltverzögerung für die Rücksetzbedingung um eine Bearbeitungszeit zu simulieren" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TOF_Time_EndschalterEntlastung
+ag:Var_TOF_Time_EndschalterEntlastung rdf:type owl:NamedIndividual ,
+                                               ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TOF_Time_HardeningTime
+ag:Var_TOF_Time_HardeningTime rdf:type owl:NamedIndividual ,
+                                       ag:class_Variable ;
+                              ag:dp_hasHardwareAddress "Ausschaltverzögerung für die Rücksetzbedingung um eine Bearbeitungszeit zu simulieren" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TOF_Time_InitCuttingTime
+ag:Var_TOF_Time_InitCuttingTime rdf:type owl:NamedIndividual ,
+                                         ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TOF_Time_MotorControl
+ag:Var_TOF_Time_MotorControl rdf:type owl:NamedIndividual ,
+                                      ag:class_Variable ;
+                             ag:dp_hasHardwareAddress "Zeitvariable für die Ausschaltverzögerung des digitalen Outputs (Motoransteuerung)" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TOF_Time_Motoransteuerung
+ag:Var_TOF_Time_Motoransteuerung rdf:type owl:NamedIndividual ,
+                                          ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TOF_Time_StampingTime
+ag:Var_TOF_Time_StampingTime rdf:type owl:NamedIndividual ,
+                                      ag:class_Variable ;
+                             ag:dp_hasHardwareAddress "Ausschaltverzögerung für die Rücksetzbedingung um eine Bearbeitungszeit zu simulieren" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TOF_Time_TSR
+ag:Var_TOF_Time_TSR rdf:type owl:NamedIndividual ,
+                             ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TOF_Time_TouchSensorRelief
+ag:Var_TOF_Time_TouchSensorRelief rdf:type owl:NamedIndividual ,
+                                           ag:class_Variable ;
+                                  ag:dp_hasHardwareAddress "Ausschaltverzögerung für die Endschaltentlastung" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TOF_Time_TransportPD01
+ag:Var_TOF_Time_TransportPD01 rdf:type owl:NamedIndividual ;
+                              ag:dp_hasHardwareAddress "Time Constraints" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TOF_TouchSensorRelief
+ag:Var_TOF_TouchSensorRelief rdf:type owl:NamedIndividual ;
+                             ag:dp_hasHardwareAddress "Ausschaltverzögerung für die Endschalterentlastung" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TON_Compressor_Control
+ag:Var_TON_Compressor_Control rdf:type owl:NamedIndividual ;
+                              ag:dp_hasHardwareAddress "Einschaltverzögerung für die Kompressoransteuerung" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TON_PowerOnDelay_Compressor
+ag:Var_TON_PowerOnDelay_Compressor rdf:type owl:NamedIndividual ,
+                                            ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TON_PowerOnDelay_Valve
+ag:Var_TON_PowerOnDelay_Valve rdf:type owl:NamedIndividual ,
+                                       ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TON_SecuringProcessingTime
+ag:Var_TON_SecuringProcessingTime rdf:type owl:NamedIndividual ;
+                                  ag:dp_hasHardwareAddress "Einschaltverzögerung zur Simulation von einer Gesamtbearbeitungszeit" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TON_SecuringTime_Compressor
+ag:Var_TON_SecuringTime_Compressor rdf:type owl:NamedIndividual ;
+                                   ag:dp_hasHardwareAddress "Einschaltverzögerung für Einspannzeit" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TON_SecuringTime_Valve
+ag:Var_TON_SecuringTime_Valve rdf:type owl:NamedIndividual ;
+                              ag:dp_hasHardwareAddress "Einschaltverzögerung für Einspannzeit" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TON_SelfSet
+ag:Var_TON_SelfSet rdf:type owl:NamedIndividual ;
+                   ag:dp_hasHardwareAddress "Einschaltverzögerung für die automatisierte Selbst-Rücksetzung des FBs" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TON_Time_Compressor
+ag:Var_TON_Time_Compressor rdf:type owl:NamedIndividual ,
+                                    ag:class_Variable ;
+                           ag:dp_hasHardwareAddress "Einschaltverzögerung für die Kompressor-Ansteuerung" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TON_Time_PowerOFFSelfSet
+ag:Var_TON_Time_PowerOFFSelfSet rdf:type owl:NamedIndividual ,
+                                         ag:class_Variable ;
+                                ag:dp_hasHardwareAddress "Einschaltverzögerung für die automatische Rücksetzung des FBs" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TON_Time_Securing
+ag:Var_TON_Time_Securing rdf:type owl:NamedIndividual ,
+                                  ag:class_Variable ;
+                         ag:dp_hasHardwareAddress "Einschaltverzögerung um eine Bearbeitungszeit zu simulieren" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TON_Time_SecuringProcess
+ag:Var_TON_Time_SecuringProcess rdf:type owl:NamedIndividual ,
+                                         ag:class_Variable ;
+                                ag:dp_hasHardwareAddress "Einschaltverzögerung um einen Einspannprozess zu simulieren" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TON_Time_Valve
+ag:Var_TON_Time_Valve rdf:type owl:NamedIndividual ,
+                               ag:class_Variable ;
+                      ag:dp_hasHardwareAddress "Einschaltverzögerung für die Ventil-Ansteuerung" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TON_Valve_Control
+ag:Var_TON_Valve_Control rdf:type owl:NamedIndividual ;
+                         ag:dp_hasHardwareAddress "Einschaltverzögerung für die Ventilansteuerung" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TSR
+ag:Var_TSR rdf:type owl:NamedIndividual ;
+           ag:dp_hasHardwareAddress "Variable that is needed to perform the relief of the touch sensor" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TS_Endschalter_01
+ag:Var_TS_Endschalter_01 rdf:type owl:NamedIndividual ,
+                                  ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TS_Endschalter_02
+ag:Var_TS_Endschalter_02 rdf:type owl:NamedIndividual ,
+                                  ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TouchSensor01
+ag:Var_TouchSensor01 rdf:type owl:NamedIndividual ,
+                              ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TouchSensor01_Rotation
+ag:Var_TouchSensor01_Rotation rdf:type owl:NamedIndividual ,
+                                       ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TouchSensor01_SRM
+ag:Var_TouchSensor01_SRM rdf:type owl:NamedIndividual ,
+                                  ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TouchSensor02
+ag:Var_TouchSensor02 rdf:type owl:NamedIndividual ,
+                              ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TouchSensor02_RGB_vertical
+ag:Var_TouchSensor02_RGB_vertical rdf:type owl:NamedIndividual ,
+                                           ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TouchSensor02_Vertical
+ag:Var_TouchSensor02_Vertical rdf:type owl:NamedIndividual ,
+                                       ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TouchSensor03_RGB_horizontal
+ag:Var_TouchSensor03_RGB_horizontal rdf:type owl:NamedIndividual ,
+                                             ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TouchSensor03_horizontal
+ag:Var_TouchSensor03_horizontal rdf:type owl:NamedIndividual ,
+                                         ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TouchSensorRelief
+ag:Var_TouchSensorRelief rdf:type owl:NamedIndividual ,
+                                  ag:class_Variable ;
+                         ag:dp_hasHardwareAddress "Hilfsvariable zur Identifikation ob eine Endschalterentlastung notwendig ist" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TouchSensor_01
+ag:Var_TouchSensor_01 rdf:type owl:NamedIndividual ,
+                               ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TouchSensor_02
+ag:Var_TouchSensor_02 rdf:type owl:NamedIndividual ,
+                               ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TriggerD1
+ag:Var_TriggerD1 rdf:type owl:NamedIndividual ;
+                 ag:dp_hasHardwareAddress "für OPC UA freigeben" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TriggerD2
+ag:Var_TriggerD2 rdf:type owl:NamedIndividual ;
+                 ag:dp_hasHardwareAddress "für OPC UA freigeben" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_TriggerD3
+ag:Var_TriggerD3 rdf:type owl:NamedIndividual ;
+                 ag:dp_hasHardwareAddress "für OPC UA freigeben" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_Compressor
+ag:Var_VSG_Compressor rdf:type owl:NamedIndividual ,
+                               ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_Compressor_SuctionProcessToDmPD
+ag:Var_VSG_Compressor_SuctionProcessToDmPD rdf:type owl:NamedIndividual ;
+                                           ag:dp_hasHardwareAddress "GVL_MBS.MBS_Kompressor" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_Compressor_SuctionProcessToMR01
+ag:Var_VSG_Compressor_SuctionProcessToMR01 rdf:type owl:NamedIndividual ;
+                                           ag:dp_hasHardwareAddress "GVL_MBS.MBS_Kompressor" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_Compressor_SuctionToDmPD
+ag:Var_VSG_Compressor_SuctionToDmPD rdf:type owl:NamedIndividual ,
+                                             ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_Compressor_SuctionToMR01
+ag:Var_VSG_Compressor_SuctionToMR01 rdf:type owl:NamedIndividual ,
+                                             ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_Compressor_VerticalDown
+ag:Var_VSG_Compressor_VerticalDown rdf:type owl:NamedIndividual ,
+                                            ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_Compressor_VerticalMove
+ag:Var_VSG_Compressor_VerticalMove rdf:type owl:NamedIndividual ;
+                                   ag:dp_hasHardwareAddress "GVL_MBS.MBS_Kompressor" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_ControlOfOutputs
+ag:Var_VSG_ControlOfOutputs rdf:type owl:NamedIndividual ;
+                            ag:dp_hasHardwareAddress "Organisation FBs" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_Enc_drehen_I1
+ag:Var_VSG_Enc_drehen_I1 rdf:type owl:NamedIndividual ;
+                         ag:dp_hasHardwareAddress "udiDI%89.0_A4_5" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_Enc_drehen_I2
+ag:Var_VSG_Enc_drehen_I2 rdf:type owl:NamedIndividual ;
+                         ag:dp_hasHardwareAddress "udiDI%95.0_A4_5" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_Enc_horizontal_I1
+ag:Var_VSG_Enc_horizontal_I1 rdf:type owl:NamedIndividual ;
+                             ag:dp_hasHardwareAddress "udiDI%77.0_A4_5" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_Enc_horizontal_I2
+ag:Var_VSG_Enc_horizontal_I2 rdf:type owl:NamedIndividual ;
+                             ag:dp_hasHardwareAddress "udiDI%83.0_A4_5" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_Enc_vertikal_I1
+ag:Var_VSG_Enc_vertikal_I1 rdf:type owl:NamedIndividual ;
+                           ag:dp_hasHardwareAddress "udiDI%65.0_A4_5" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_Enc_vertikal_I2
+ag:Var_VSG_Enc_vertikal_I2 rdf:type owl:NamedIndividual ;
+                           ag:dp_hasHardwareAddress "udiDI%71.0_A4_5" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_HorizontalBackwards
+ag:Var_VSG_HorizontalBackwards rdf:type owl:NamedIndividual ,
+                                        ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_HorizontalBackwards01
+ag:Var_VSG_HorizontalBackwards01 rdf:type owl:NamedIndividual ,
+                                          ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_HorizontalBackwards02
+ag:Var_VSG_HorizontalBackwards02 rdf:type owl:NamedIndividual ,
+                                          ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_HorizontalForwards
+ag:Var_VSG_HorizontalForwards rdf:type owl:NamedIndividual ,
+                                       ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_HorizontalForwards01
+ag:Var_VSG_HorizontalForwards01 rdf:type owl:NamedIndividual ,
+                                         ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_HorizontalForwards02
+ag:Var_VSG_HorizontalForwards02 rdf:type owl:NamedIndividual ,
+                                         ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_InitDrive_Rotate_CW
+ag:Var_VSG_InitDrive_Rotate_CW rdf:type owl:NamedIndividual ;
+                               ag:dp_hasHardwareAddress "Instantiation of AtomicSkills" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_Init_HorizontalForwards
+ag:Var_VSG_Init_HorizontalForwards rdf:type owl:NamedIndividual ,
+                                            ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_Init_RotateCW
+ag:Var_VSG_Init_RotateCW rdf:type owl:NamedIndividual ,
+                                  ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_Init_VerticalUp
+ag:Var_VSG_Init_VerticalUp rdf:type owl:NamedIndividual ,
+                                    ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_InitialStateDrive
+ag:Var_VSG_InitialStateDrive rdf:type owl:NamedIndividual ;
+                             ag:dp_hasHardwareAddress "InitialStateDrives" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_Kompressor
+ag:Var_VSG_Kompressor rdf:type owl:NamedIndividual ;
+                      ag:dp_hasHardwareAddress "xDO%114.4_A4_8" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_MOT_drehen_CCW
+ag:Var_VSG_MOT_drehen_CCW rdf:type owl:NamedIndividual ;
+                          ag:dp_hasHardwareAddress "xDO%114.3_A4_4" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_MOT_drehen_CW
+ag:Var_VSG_MOT_drehen_CW rdf:type owl:NamedIndividual ;
+                         ag:dp_hasHardwareAddress "xDO%114.2_A4_4" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_MOT_horizontal_rueckwaerts
+ag:Var_VSG_MOT_horizontal_rueckwaerts rdf:type owl:NamedIndividual ;
+                                      ag:dp_hasHardwareAddress "xDO%114.0_A4_4" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_MOT_horizontal_vorwaerts
+ag:Var_VSG_MOT_horizontal_vorwaerts rdf:type owl:NamedIndividual ;
+                                    ag:dp_hasHardwareAddress "xDO%114.1_A4_4" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_MOT_vertikal_hoch
+ag:Var_VSG_MOT_vertikal_hoch rdf:type owl:NamedIndividual ;
+                             ag:dp_hasHardwareAddress "xDO%113.6_A4_4" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_MOT_vertikal_runter
+ag:Var_VSG_MOT_vertikal_runter rdf:type owl:NamedIndividual ;
+                               ag:dp_hasHardwareAddress "xDO%113.7_A4_4" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_MV_Vakuum
+ag:Var_VSG_MV_Vakuum rdf:type owl:NamedIndividual ;
+                     ag:dp_hasHardwareAddress "xDO%114.5_A4_5" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_MoveHorizontalBackwards
+ag:Var_VSG_MoveHorizontalBackwards rdf:type owl:NamedIndividual ;
+                                   ag:dp_hasHardwareAddress "GVL_MBS.MBS_MOT_Sauger_zum_Ofen" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_MoveHorizontalForwards
+ag:Var_VSG_MoveHorizontalForwards rdf:type owl:NamedIndividual ;
+                                  ag:dp_hasHardwareAddress "GVL_MBS.MBS_MOT_Sauger_zum_DK" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_MoveHorizontalForwards01
+ag:Var_VSG_MoveHorizontalForwards01 rdf:type owl:NamedIndividual ;
+                                    ag:dp_hasHardwareAddress """Variablen zur Outputsteuerung
+Output-Variablen des VSG""" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_Ref_Schalter_drehen
+ag:Var_VSG_Ref_Schalter_drehen rdf:type owl:NamedIndividual ;
+                               ag:dp_hasHardwareAddress "xDI%138.3_A4_2" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_Ref_Schalter_horizontal
+ag:Var_VSG_Ref_Schalter_horizontal rdf:type owl:NamedIndividual ;
+                                   ag:dp_hasHardwareAddress "xDI%138.2_A4_2" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_Ref_Schalter_vertikal
+ag:Var_VSG_Ref_Schalter_vertikal rdf:type owl:NamedIndividual ;
+                                 ag:dp_hasHardwareAddress "xDI%138.1_A4_2" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_RotationCCW01
+ag:Var_VSG_RotationCCW01 rdf:type owl:NamedIndividual ,
+                                  ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_RotationCCW02
+ag:Var_VSG_RotationCCW02 rdf:type owl:NamedIndividual ,
+                                  ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_RotationCW01
+ag:Var_VSG_RotationCW01 rdf:type owl:NamedIndividual ,
+                                 ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_RotationCW02
+ag:Var_VSG_RotationCW02 rdf:type owl:NamedIndividual ,
+                                 ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_Skill_HorizontalMoveForwards
+ag:Var_VSG_Skill_HorizontalMoveForwards rdf:type owl:NamedIndividual ;
+                                        ag:dp_hasHardwareAddress "Vakuumsauggreifer Skills" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_Valve
+ag:Var_VSG_Valve rdf:type owl:NamedIndividual ,
+                          ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_Valve_SuctionProcessToDmPD
+ag:Var_VSG_Valve_SuctionProcessToDmPD rdf:type owl:NamedIndividual ;
+                                      ag:dp_hasHardwareAddress "GVL_MBS.MBS_MV_Vakuum" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_Valve_SuctionProcessToMR01
+ag:Var_VSG_Valve_SuctionProcessToMR01 rdf:type owl:NamedIndividual ;
+                                      ag:dp_hasHardwareAddress "GVL_MBS.MBS_MV_Vakuum" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_Valve_SuctionToDmPD
+ag:Var_VSG_Valve_SuctionToDmPD rdf:type owl:NamedIndividual ,
+                                        ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_Valve_SuctionToMR01
+ag:Var_VSG_Valve_SuctionToMR01 rdf:type owl:NamedIndividual ,
+                                        ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_Valve_VerticalDown
+ag:Var_VSG_Valve_VerticalDown rdf:type owl:NamedIndividual ,
+                                       ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_Valve_VerticalMove
+ag:Var_VSG_Valve_VerticalMove rdf:type owl:NamedIndividual ;
+                              ag:dp_hasHardwareAddress "GVL_MBS.MBS_MV_senken" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_VertikalDown01
+ag:Var_VSG_VertikalDown01 rdf:type owl:NamedIndividual ,
+                                   ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_VertikalDown02
+ag:Var_VSG_VertikalDown02 rdf:type owl:NamedIndividual ,
+                                   ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_VertikalUp01
+ag:Var_VSG_VertikalUp01 rdf:type owl:NamedIndividual ,
+                                 ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_VSG_VertikalUp02
+ag:Var_VSG_VertikalUp02 rdf:type owl:NamedIndividual ,
+                                 ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_ValveDmPD_ON
+ag:Var_ValveDmPD_ON rdf:type owl:NamedIndividual ,
+                             ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_ValveMR01_ON
+ag:Var_ValveMR01_ON rdf:type owl:NamedIndividual ,
+                             ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_ValveON
+ag:Var_ValveON rdf:type owl:NamedIndividual ,
+                        ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_ValvePD01_ON
+ag:Var_ValvePD01_ON rdf:type owl:NamedIndividual ,
+                             ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_ValvePD02_ON
+ag:Var_ValvePD02_ON rdf:type owl:NamedIndividual ,
+                             ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_ValvePD03_ON
+ag:Var_ValvePD03_ON rdf:type owl:NamedIndividual ,
+                             ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_ValveVSG_Suction_ON
+ag:Var_ValveVSG_Suction_ON rdf:type owl:NamedIndividual ,
+                                    ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_ValveVSG_VerticalDown_ON
+ag:Var_ValveVSG_VerticalDown_ON rdf:type owl:NamedIndividual ,
+                                         ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_WorkpieceTableMoveHorizontalBackwards
+ag:Var_WorkpieceTableMoveHorizontalBackwards rdf:type owl:NamedIndividual ,
+                                                      ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_WorkpieceTableMoveHorizontalForwards
+ag:Var_WorkpieceTableMoveHorizontalForwards rdf:type owl:NamedIndividual ,
+                                                     ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_bBusy
+ag:Var_bBusy rdf:type owl:NamedIndividual ;
+             ag:dp_hasHardwareAddress "Do not change. Used by server to find out if the job is finished" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_callCounterAbort
+ag:Var_callCounterAbort rdf:type owl:NamedIndividual ;
+                        ag:dp_hasHardwareAddress "counts how many times the Abort() method has been called" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_callCounterCheckState
+ag:Var_callCounterCheckState rdf:type owl:NamedIndividual ;
+                             ag:dp_hasHardwareAddress "counts how many times the CheckState() method has been called" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_callCounterStart
+ag:Var_callCounterStart rdf:type owl:NamedIndividual ;
+                        ag:dp_hasHardwareAddress "counts how many times the Start() method has been called" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_diNotAus_Kanal_A
+ag:Var_diNotAus_Kanal_A rdf:type owl:NamedIndividual ;
+                        ag:dp_hasHardwareAddress "xDI%139.2_S1_2" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_diNotAus_Kanal_B
+ag:Var_diNotAus_Kanal_B rdf:type owl:NamedIndividual ;
+                        ag:dp_hasHardwareAddress "xDI%139.3_S1_2" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_hdl
+ag:Var_hdl rdf:type owl:NamedIndividual ;
+           ag:dp_hasHardwareAddress "Do not change, used by server." .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_jobRunning
+ag:Var_jobRunning rdf:type owl:NamedIndividual ;
+                  ag:dp_hasHardwareAddress "Variables to determine if a job has been started (Start() method has been called) or finished" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_state
+ag:Var_state rdf:type owl:NamedIndividual ;
+             ag:dp_hasHardwareAddress "State machine variable" .
+
+
+###  Generated by the OWL API (version 4.5.29.2024-05-13T12:11:03Z) https://github.com/owlcs/owlapi

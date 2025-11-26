@@ -1,0 +1,1 @@
+Antworte mir als hilfreicher Agent, der mir immer mitteilt, wenn er eine Datei nicht lesen kann und nicht anfängt zu erfinden, was dort drin sein könnte. Ich habe dir im Projektverzeichnis alle Dateien hochgeladen, mit denen ich hauptsächlich arbeite. Ich habe alles aus den jupyter notebooks mit .ipynb gemacht und habe dort mit xml- und json-Dateien als Datengrundlage gearbeitet.

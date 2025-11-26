@@ -1,0 +1,24 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": { "major": 3, "minor": 20 },
+  "configurePresets": [
+    {
+      "name": "x64-debug-vcpkg",
+      "displayName": "x64 + vcpkg (Debug)",
+      "generator": "Visual Studio 17 2022",
+      "architecture": { "value": "x64" },
+      "binaryDir": "${sourceDir}/build",
+      "environment": { "VCPKG_ROOT": "C:/vcpkg" },
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+        "UA_ENABLE_ENCRYPTION": "OPENSSL",
+        "UA_ENABLE_MBEDTLS": "OFF",
+        "PYBIND11_FINDPYTHON": "ON",
+        "Python3_EXECUTABLE": "D:/MA_Python_Agent/.venv311/Scripts/python.exe"
+      }
+    }
+  ],
+  "buildPresets": [
+    { "name": "x64-debug-vcpkg", "configurePreset": "x64-debug-vcpkg", "configuration": "Debug" }
+  ]
+}

@@ -1,9 +1,9 @@
-[submodule "open62541"]
-	path = open62541
+[submodule "MSRGuard_Anpassung/open62541"]
+	path = MSRGuard_Anpassung/open62541
 	url = https://github.com/open62541/open62541.git
-[submodule "extern/pybind11"]
-	path = extern/pybind11
+[submodule "MSRGuard_Anpassung/extern/pybind11"]
+	path = MSRGuard_Anpassung/extern/pybind11
 	url = https://github.com/pybind/pybind11.git
-[submodule "extern/nlohmann_json"]
-	path = extern/nlohmann_json
+[submodule "MSRGuard_Anpassung/extern/nlohmann_json"]
+	path = MSRGuard_Anpassung/extern/nlohmann_json
 	url = https://github.com/nlohmann/json.git

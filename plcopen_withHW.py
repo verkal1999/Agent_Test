@@ -1,111 +1,28 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, asdict, field
+from dataclasses import asdict
 from pathlib import Path
 from typing import List, Optional, Dict, Any, Tuple
 import re
 import json
+import sys
 import xml.etree.ElementTree as ET
 
 # Für COM-Export (TwinCAT)
 import pythoncom
 import win32com.client as com
-
-# -------------------------------------------------
-# Datenklassen für GVLs (wie in Agent_Test2_extracted.py)
-# -------------------------------------------------
-
-@dataclass
-class GlobalVar:
-    name: str
-    type: str
-    init: Optional[str] = None
-    address: Optional[str] = None
-
-
-@dataclass
-class GVL:
-    name: str
-    globals: List[GlobalVar]
-
-
-# -------------------------------------------------
-# Datenklassen für Program-Mapping (JSON-Schema)
-# -------------------------------------------------
-
-@dataclass
-class IOEntry:
-    internal: Optional[str]
-    external: Optional[str]
-    internal_type: Optional[str] = None
-
-
-@dataclass
-class TempEntry:
-    name: str
-    type: Optional[str] = None
-
-
-@dataclass
-class SubcallParam:
-    internal: Optional[str]
-    external: Optional[str]
-
-
-@dataclass
-class Subcall:
-    SubNetwork_Name: str
-    instanceName: Optional[str]
-    inputs: List[SubcallParam]
-    outputs: List[SubcallParam]
-
-
-@dataclass
-class ProgramMapping:
-    programm_name: str
-    inputs: List[IOEntry]
-    outputs: List[IOEntry]
-    inouts: List[IOEntry]
-    temps: List[TempEntry]
-    subcalls: List[Subcall]
-    program_code: str = ""
-
-#Datenklassen für HW-Adressen
-@dataclass
-class IoHardwareMeta:
-    """
-    Metadaten eines IO-Kanals, wie sie bisher im Feld 'meta' der JSON-Links lagen.
-    """
-    varBitAddr: int | None = None
-    varBitSize: int | None = None
-    varInOut: int | None = None
-    byte_offset: int | None = None
-    bit_offset: int | None = None
-    amsPort: int | None = None
-    indexGroup: int | None = None
-    indexGroupHex: str | None = None
-    indexOffset: int | None = None
-    indexOffsetHex: str | None = None
-    length: int | None = None
-    raw_offsets: dict[str, int] = field(default_factory=dict)
-
-
-@dataclass
-class IoHardwareAddress:
-    """
-    Verknüpfung zwischen einer PLC-Variable und einem konkreten IO-Kanal
-    inkl. Prozess-Image-Adresse (E/A Byte.Bit) und Meta-Infos.
-    """
-    plc_path: str                  # z. B. "Task 1 (PRG_MBS)"
-    plc_var: str                   # z. B. "GVL_HRL.HRL_MOT_horizontal_zum_Regal"
-    device_path: str               # z. B. "Device 3 (EtherCAT) / Term 2 (EL2008-0000)"
-    channel_label: str             # z. B. "Channel 1 (Output)"
-    io_path: str                   # device_path + " / " + channel_label
-    direction: str                 # "I", "O" oder "?"
-    ea_address: str | None         # z. B. "Q0.3" oder "I2.1"
-    meta: IoHardwareMeta           # Roh-Metadaten aus TwinCAT
-    io_raw_xml: str | None = None  # Optional: gekürztes XML-Snippet des IO-Kanals
-
+from datamodels import (
+    GlobalVar,
+    GVL,
+    IOEntry,
+    TempEntry,
+    SubcallParam,
+    Subcall,
+    ProgramMapping,
+    IoVarSide,
+    IoLink,
+    IoHardwareAddress,
+)
 
 # -------------------------------------------------
 # Parser-Klasse: Kapselt deine Agent_Test2-Logik
@@ -140,7 +57,7 @@ class PLCOpenXMLParser:
         self._mapping_raw: Optional[List[Dict[str, Any]]] = None
         self._program_models: Optional[List[ProgramMapping]] = None
         self._gvl_models: Optional[List[GVL]] = None
-
+        self.io_hw_mappings: list[IoHardwareAddress] = []
     # ----------------------------
     # Hilfsfunktionen aus Agent_Test2_extracted.py (Cell 2)
     # ----------------------------
@@ -331,43 +248,70 @@ class PLCOpenXMLParser:
     def _find_plcprojs_near(tsproj: Path) -> List[Path]:
         return list(tsproj.parent.rglob("*.plcproj"))
 
+    def _scan_single_tsproj(self, tsproj: Path) -> List[Dict[str, Any]]:
+        """
+        Durchsucht ein TwinCAT-Systemprojekt nach allen .plcproj-Dateien und liefert deren Artefakte.
+        """
+        objects: List[Dict[str, Any]] = []
+        for plcproj in self._find_plcprojs_near(tsproj):
+            try:
+                objects.extend(self._list_artifacts_in_plcproj(plcproj))
+            except Exception as exc:
+                print(f"Warnung: Fehler beim Scannen von {plcproj}: {exc}")
+        return objects
+
     # ----------------------------
     # Öffentliche Schritte aus Cell 2: Objects-JSON
     # ----------------------------
 
-    def scan_project_and_write_objects_json(self) -> None:
+    def scan_project_and_write_objects_json(self, write_json: bool = False) -> list[dict[str, Any]]:
+        """
+        Scannt das TwinCAT-Projekt und sammelt Informationen über Objekte (POUs, GVLs etc.).
+        Optional kann weiterhin eine JSON-Datei geschrieben werden, standardmäßig aber nicht.
+        """
         tsprojs = self._find_tsprojs_in_sln(self.sln_path)
-        plcprojs: List[Path] = []
-        for ts in tsprojs:
-            plcprojs.extend(self._find_plcprojs_near(ts))
-        plcprojs = sorted(set(plcprojs))
+        all_objs: list[dict[str, Any]] = []
 
-        all_objs: List[Dict[str, Any]] = []
-        for pp in plcprojs:
-            try:
-                all_objs.extend(self._list_artifacts_in_plcproj(pp))
-            except Exception as e:
-                print(f"⚠️ Fehler beim Parsen {pp}: {e}")
+        for tsproj in tsprojs:
+            proj_objects = self._scan_single_tsproj(tsproj)
+            all_objs.extend(proj_objects)
 
-        self.objects_json_path.write_text(json.dumps(all_objs, indent=2, ensure_ascii=False), encoding="utf-8")
-
-        # ST-POUs filtern (wie in deinem Notebook)
-        st_pous = [o for o in all_objs if o.get("kind") == "POU" and (o.get("implementation_lang") or "").upper() == "ST"]
-        self.pous_st_json_path.write_text(json.dumps(st_pous, indent=2, ensure_ascii=False), encoding="utf-8")
-
+        # Cache im Speicher
         self._objects_cache = all_objs
-        print("Objects- und ST-POUs-JSON geschrieben.")
+
+        # JSON nur schreiben, wenn explizit gewünscht
+        if write_json:
+            self.objects_json_path.parent.mkdir(parents=True, exist_ok=True)
+            self.objects_json_path.write_text(
+                json.dumps(all_objs, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+            print(f"Objektliste nach {self.objects_json_path} geschrieben.")
+        else:
+            print("Objektliste nur im Speicher aktualisiert (keine JSON-Datei geschrieben).")
+
+        return all_objs
+
 
     # ----------------------------
     # COM-Export aus Cell 4: export.xml erzeugen
     # ----------------------------
 
     def export_plcopen_xml(self) -> None:
-        export_xml = self.export_xml_path
-        export_xml.parent.mkdir(parents=True, exist_ok=True)
-
-        with open(self.objects_json_path, encoding="utf-8") as f:
-            objects = json.load(f)
+        """
+        Exportiert alle gefundenen POUs als PLCopen XML (TwinCAT-Export).
+        Verwendet bevorzugt den in-memory Cache, fällt nur im Notfall auf JSON zurück.
+        """
+        if self._objects_cache is not None:
+            objects = self._objects_cache
+        elif self.objects_json_path.exists():
+            with open(self.objects_json_path, "r", encoding="utf-8") as f:
+                objects = json.load(f)
+            self._objects_cache = objects
+        else:
+            # Falls weder Cache noch JSON existiert, neu scannen (ohne JSON zu schreiben)
+            print("Keine Objektliste im Speicher/JSON gefunden -> Projekt wird neu gescannt.")
+            objects = self.scan_project_and_write_objects_json(write_json=False)
         plc_names = set()
         for obj in objects:
             fpath = Path(obj["file"].split(" (inline)")[0])
@@ -425,7 +369,7 @@ class PLCOpenXMLParser:
         for child in children:
             try:
                 nested = child.NestedProject
-                try_export_from_node(nested, export_xml, selection="")
+                try_export_from_node(nested, self.export_xml_path, selection="")
                 exported = True
                 break
             except pythoncom.com_error as e:
@@ -454,7 +398,7 @@ class PLCOpenXMLParser:
             for c in uniq:
                 try:
                     node = sys_mgr.LookupTreeItem(c)
-                    try_export_from_node(node, export_xml, selection="")
+                    try_export_from_node(node, self.export_xml_path, selection="")
                     exported = True
                     break
                 except pythoncom.com_error as e:
@@ -623,9 +567,60 @@ class PLCOpenXMLParser:
         mapping = json.loads(self.program_io_mapping_path.read_text(encoding="utf-8"))
 
         xml_file = self.export_xml_path
-        tree = ET.parse(xml_file)
-        root = tree.getroot()
+        xml_text = xml_file.read_text(encoding="utf-8")
+        root = ET.fromstring(xml_text)
+        root_no_ns = ET.fromstring(self._strip_ns(xml_text))
         NS = {"ns": "http://www.plcopen.org/xml/tc6_0200", "html": "http://www.w3.org/1999/xhtml"}
+
+        def detect_pou_lang(pou_elem: ET.Element) -> Optional[str]:
+            body = pou_elem.find("body")
+            if body is None:
+                return None
+            if body.find("FBD") is not None:
+                return "FBD"
+            if body.find("ST") is not None:
+                return "ST"
+            return None
+
+        def collect_st_from_pou(pou_elem: ET.Element) -> str:
+            parts: list[str] = []
+            name = pou_elem.get("name", "?")
+
+            body = pou_elem.find("body")
+            if body is not None:
+                st = body.find(".//ST")
+                if st is not None:
+                    txt = (st.text or "").strip() if st.text else ""
+                    if not txt:
+                        xhtml = None
+                        for child in st.iter():
+                            if child.tag.endswith("xhtml"):
+                                xhtml = child
+                                break
+                        if xhtml is not None:
+                            txt = "".join(xhtml.itertext()).strip()
+                    if txt:
+                        parts.append(f"// POU {name} body\n{txt}")
+
+            for data in pou_elem.findall(".//data[@name='http://www.3s-software.com/plcopenxml/method']"):
+                for method in data.findall(".//Method"):
+                    m_name = method.get("name", "?")
+                    st = method.find(".//ST")
+                    if st is None:
+                        continue
+                    txt = (st.text or "").strip() if st.text else ""
+                    if not txt:
+                        xhtml = None
+                        for child in st.iter():
+                            if child.tag.endswith("xhtml"):
+                                xhtml = child
+                                break
+                        if xhtml is not None:
+                            txt = "".join(xhtml.itertext()).strip()
+                    if txt:
+                        parts.append(f"// METHOD {m_name} of {name}\n{txt}")
+
+            return "\n\n".join(parts).strip()
 
         pou_info: Dict[str, Dict[str, Any]] = {}
         pou_var_types: Dict[str, Dict[str, Optional[str]]] = {}
@@ -651,28 +646,60 @@ class PLCOpenXMLParser:
                         if sect_tag in ("localVars", "tempVars"):
                             locals_list.append(vname)
 
-            body = pou.find("ns:body", NS)
-            code_str = ""
-            if body is not None:
-                st = body.find("ns:ST", NS)
-                if st is not None and st.text:
-                    code_str = st.text.strip()
-                else:
-                    html_st = body.find(".//html:xhtml", NS)
-                    if html_st is not None and html_st.text:
-                        code_str = html_st.text.strip()
-
-            pou_info[name] = {"locals": locals_list, "code": code_str}
+            pou_info[name] = {"locals": locals_list}
             pou_var_types[name] = type_map
+
+        pou_plain_map = {p.attrib.get("name"): p for p in root_no_ns.findall(".//pou")}
+        pou_lang = {name: detect_pou_lang(p) for name, p in pou_plain_map.items()}
+
+        pylc_funcs: Dict[str, Any] = {}
+        pylc_available = False
+        if any(lang == "FBD" for lang in pou_lang.values()):
+            pylc_path = Path(__file__).resolve().parent / "PyLC_Anpassung"
+            if pylc_path.exists():
+                if str(pylc_path) not in sys.path:
+                    sys.path.append(str(pylc_path))
+                try:
+                    from PyLC1_Converter import parse_pou_blocks
+                    from PyLC2_Generator import generate_python_code
+                    from PyLC3_Rename import rename_variables
+                    from PyLC4_Cleanup import cleanup_code
+
+                    pylc_funcs = {
+                        "parse": parse_pou_blocks,
+                        "generate": generate_python_code,
+                        "rename": rename_variables,
+                        "cleanup": cleanup_code,
+                    }
+                    pylc_available = True
+                except Exception as exc:
+                    print(f"PyLC-Module konnten nicht geladen werden: {exc}")
+            else:
+                print(f"PyLC_Anpassung nicht gefunden unter {pylc_path}")
+
+        def run_pylc_pipeline(pou_name: str) -> str:
+            if not pylc_available:
+                return ""
+            temp0 = self.project_dir / "generated_code_0.py"
+            temp1 = self.project_dir / "generated_code_1.py"
+            temp2 = self.project_dir / "generated_code_2.py"
+            temp3 = self.project_dir / "generated_code_3.py"
+            try:
+                pylc_funcs["parse"](xml_path=str(self.export_xml_path), output_path=str(temp0), target_pou_name=pou_name)
+                pylc_funcs["generate"](blocks_module_path=str(temp0), output_path=str(temp1))
+                pylc_funcs["rename"](input_code_path=str(temp1), blocks_module_path=str(temp0), output_path=str(temp2))
+                pylc_funcs["cleanup"](input_code_path=str(temp2), output_path=str(temp3))
+                python_code = temp3.read_text(encoding="utf-8")
+                return python_code.replace("__DOT__", ".")
+            except Exception as exc:
+                print(f"PyLC-Pipeline fehlgeschlagen fuer {pou_name}: {exc}")
+                return ""
 
         for entry in mapping:
             name = entry["Programm_Name"]
-            info = pou_info.get(name, {})
             types = pou_var_types.get(name, {})
-
-            locals_list = info.get("locals", [])
+            locals_list = pou_info.get(name, {}).get("locals", [])
             entry["temps"] = [{"name": lv, "type": types.get(lv)} for lv in locals_list]
-            entry["program_code"] = info.get("code", "")
 
             for inp in entry.get("inputs", []):
                 vname = inp.get("internal")
@@ -682,6 +709,24 @@ class PLCOpenXMLParser:
                 vname = out.get("internal")
                 if vname in types:
                     out["internal_type"] = types[vname]
+            for inout in entry.get("inouts", []):
+                vname = inout.get("internal")
+                if vname in types:
+                    inout["internal_type"] = types[vname]
+
+            lang = pou_lang.get(name)
+            code_text = ""
+            if lang == "ST":
+                pou_plain = pou_plain_map.get(name)
+                if pou_plain is not None:
+                    code_text = collect_st_from_pou(pou_plain)
+            elif lang == "FBD":
+                code_text = run_pylc_pipeline(name)
+
+            if code_text:
+                entry["program_code"] = code_text
+            else:
+                entry["program_code"] = entry.get("program_code", "")
 
         self.program_io_mapping_path.write_text(json.dumps(mapping, indent=2, ensure_ascii=False), encoding="utf-8")
         self._mapping_raw = mapping
@@ -877,3 +922,345 @@ class PLCOpenXMLParser:
             gvl_list.append(GVL(name=g["name"], globals=globals_dc))
         self._gvl_models = gvl_list
         return gvl_list
+
+
+class PLCOpenXMLParserWithHW(PLCOpenXMLParser):
+    """
+    Erweiterung des PLCOpen-Parsers um die Hardware-Mapping-Schritte aus getHWAddr_extracted.py.
+    """
+
+    def __init__(
+        self,
+        project_dir: Path,
+        sln_path: Path,
+        io_mapping_xml_path: Optional[Path] = None,
+        io_mapping_json_path: Optional[Path] = None,
+    ):
+        super().__init__(project_dir, sln_path)
+        self.io_mapping_xml_path = Path(io_mapping_xml_path) if io_mapping_xml_path else self.project_dir / "io_mappings.xml"
+        self.io_mapping_json_path = Path(io_mapping_json_path) if io_mapping_json_path else self.project_dir / "io_mappings.json"
+
+    @staticmethod
+    def _split_tc_path(p: str) -> List[str]:
+        return [s for s in (p or "").split("^") if s]
+
+    @classmethod
+    def _parse_var_side(cls, var_str: str) -> IoVarSide:
+        parts = cls._split_tc_path(var_str)
+        return IoVarSide(
+            raw=var_str,
+            parts=parts,
+            is_plc_task=bool(parts and parts[0].lower().startswith("plctask ")),
+            channel=parts[-1] if parts else "",
+        )
+
+    @staticmethod
+    def _full_channel_path(ownerB_name: str, varB: str) -> str:
+        return f"{ownerB_name}^{varB}"
+
+    _num = r"[-]?\d+"
+
+    @classmethod
+    def _get_int(cls, xml_text: str, tag: str) -> Optional[int]:
+        m = re.search(fr"<{tag}[^>]*>\s*({cls._num})\s*</{tag}>", xml_text)
+        return int(m.group(1)) if m else None
+
+    @classmethod
+    def _get_hex_attr(cls, xml_text: str, tag: str) -> Optional[str]:
+        m = re.search(fr'<{tag}[^>]*Hex="#x([0-9A-Fa-f]+)"', xml_text)
+        return m.group(1) if m else None
+
+    @classmethod
+    def _parse_channel_meta(cls, xml_text: str) -> Dict[str, Any]:
+        vsize = cls._get_int(xml_text, "VarBitSize")
+        vaddr = cls._get_int(xml_text, "VarBitAddr")
+        vinout = cls._get_int(xml_text, "VarInOut")
+        ams = cls._get_int(xml_text, "AmsPort")
+        igrp = cls._get_int(xml_text, "IndexGroup")
+        ioff = cls._get_int(xml_text, "IndexOffset")
+        ln = cls._get_int(xml_text, "Length")
+        igrp_hex = cls._get_hex_attr(xml_text, "IndexGroup")
+        ioff_hex = cls._get_hex_attr(xml_text, "IndexOffset")
+
+        kv: Dict[str, int] = {}
+        for m in re.finditer(r"<([A-Za-z0-9_]+)>\s*([0-9]+)\s*</\1>", xml_text):
+            tag, val = m.group(1), int(m.group(2))
+            if "Offs" in tag or "Offset" in tag or tag in ("ByteOffset", "BitOffset"):
+                kv[tag] = val
+        for m in re.finditer(r'Name="([^"]*?(?:Offs|Offset)[^"]*)"\s*>\s*([0-9]+)\s*<', xml_text):
+            kv[m.group(1)] = int(m.group(2))
+
+        if isinstance(vaddr, int):
+            byte_off = vaddr // 8
+            bit_off = vaddr % 8
+        else:
+            byte_off = kv.get("InputOffsByte") or kv.get("OutputOffsByte") or kv.get("ByteOffset") or kv.get("OffsByte")
+            bit_off = kv.get("InputOffsBit") or kv.get("OutputOffsBit") or kv.get("BitOffset") or kv.get("OffsBit")
+
+        return {
+            "varBitSize": vsize,
+            "varBitAddr": vaddr,
+            "varInOut": vinout,
+            "amsPort": ams,
+            "indexGroup": igrp,
+            "indexOffset": ioff,
+            "length": ln,
+            "indexGroupHex": igrp_hex,
+            "indexOffsetHex": ioff_hex,
+            "byte_offset": byte_off,
+            "bit_offset": bit_off,
+            "rawOffsets": kv,
+        }
+
+    @staticmethod
+    def _dir_letter(plc_path_lower: str, var_inout: Optional[int], chan_spec: str) -> str:
+        if chan_spec.endswith("^Input"):
+            return "I"
+        if chan_spec.endswith("^Output"):
+            return "Q"
+        if "plctask inputs" in plc_path_lower:
+            return "I"
+        if "plctask outputs" in plc_path_lower:
+            return "Q"
+        if var_inout == 0:
+            return "I"
+        if var_inout == 1:
+            return "Q"
+        return "?"
+
+    @staticmethod
+    def _plc_var_only(plc_side_var: str) -> str:
+        parts = plc_side_var.split("^")
+        return parts[-1] if parts else plc_side_var
+
+    def produce_mapping_xml(self, out_path: Optional[Path] = None) -> str:
+        target = Path(out_path) if out_path else self.io_mapping_xml_path
+
+        dte = com.Dispatch("TcXaeShell.DTE.17.0")
+        dte.SuppressUI = False
+        dte.MainWindow.Visible = True
+
+        solution = dte.Solution
+        solution.Open(str(self.sln_path))
+
+        tc_project = None
+        for i in range(1, solution.Projects.Count + 1):
+            p = solution.Projects.Item(i)
+            if p.FullName.lower().endswith(".tsproj"):
+                tc_project = p
+                break
+
+        if tc_project is None:
+            raise RuntimeError("Kein TwinCAT-Systemprojekt (.tsproj) in der Solution gefunden")
+
+        sys_mgr = tc_project.Object
+        xml_text = sys_mgr.ProduceMappingInfo()
+        target.write_text(xml_text or "", encoding="utf-8")
+        print(f"Mapping-XML gespeichert: {target}")
+        return xml_text or ""
+
+    def parse_var_links(self, xml_text: str) -> List[IoLink]:
+        if not xml_text:
+            return []
+        root = ET.fromstring(xml_text)
+        links: List[IoLink] = []
+
+        for ownerA in root.findall(".//OwnerA"):
+            ownerA_name = ownerA.attrib.get("Name", "")
+            for ownerB in ownerA.findall("./OwnerB"):
+                ownerB_name = ownerB.attrib.get("Name", "")
+                for link in ownerB.findall("./Link"):
+                    varA = link.attrib.get("VarA", "")
+                    varB = link.attrib.get("VarB", "")
+                    sideA = self._parse_var_side(varA)
+                    sideB = self._parse_var_side(varB)
+
+                    if sideA.is_plc_task:
+                        plc_side, io_side = sideA, sideB
+                    elif sideB.is_plc_task:
+                        plc_side, io_side = sideB, sideA
+                    else:
+                        plc_side = None
+                        io_side = None
+
+                    links.append(
+                        IoLink(
+                            ownerA=ownerA_name,
+                            ownerB=ownerB_name,
+                            varA=varA,
+                            varB=varB,
+                            sideA=sideA,
+                            sideB=sideB,
+                            plc=plc_side,
+                            io=io_side,
+                        )
+                    )
+        return links
+
+    def _open_system_manager(self) -> Any:
+        dte = com.Dispatch("TcXaeShell.DTE.17.0")
+        dte.SuppressUI = False
+        dte.MainWindow.Visible = True
+
+        solution = dte.Solution
+        solution.Open(str(self.sln_path))
+
+        tc_project = None
+        for i in range(1, solution.Projects.Count + 1):
+            p = solution.Projects.Item(i)
+            if p.FullName.lower().endswith(".tsproj"):
+                tc_project = p
+                break
+        if tc_project is None:
+            raise RuntimeError("Kein TwinCAT-Systemprojekt (.tsproj) in der Solution gefunden")
+        return tc_project.Object
+
+    def build_io_mappings(self, xml_text: Optional[str] = None, save_json: bool = True) -> List[IoHardwareAddress]:
+        xml_content = xml_text or ""
+        if not xml_content:
+            if self.io_mapping_xml_path.exists():
+                xml_content = self.io_mapping_xml_path.read_text(encoding="utf-8", errors="replace")
+            else:
+                xml_content = self.produce_mapping_xml(self.io_mapping_xml_path)
+
+        links = self.parse_var_links(xml_content)
+        sys_mgr = self._open_system_manager()
+
+        bundle: List[IoHardwareAddress] = []
+        missing = 0
+
+        for rec in links:
+            if not rec.plc or not rec.io:
+                continue
+
+            plc_var_path = rec.plc.raw
+            plc_var_name = self._plc_var_only(plc_var_path)
+            io_owner = rec.ownerB if rec.ownerB.startswith("TIID^") else rec.ownerA
+            io_chan_spec = rec.io.raw
+            full_io_path = self._full_channel_path(io_owner, io_chan_spec)
+
+            meta = {
+                "varBitSize": None,
+                "varBitAddr": None,
+                "varInOut": None,
+                "amsPort": None,
+                "indexGroup": None,
+                "indexOffset": None,
+                "length": None,
+                "indexGroupHex": None,
+                "indexOffsetHex": None,
+                "byte_offset": None,
+                "bit_offset": None,
+                "rawOffsets": {},
+            }
+            raw_xml = ""
+            try:
+                ch_item = sys_mgr.LookupTreeItem(full_io_path)
+                try:
+                    ch_xml = ch_item.ProduceXml(0)
+                except TypeError:
+                    ch_xml = ch_item.ProduceXml()
+                raw_xml = ch_xml
+                meta = self._parse_channel_meta(ch_xml)
+            except Exception as e:
+                missing += 1
+                raw_xml = f"ERROR: {e}"
+
+            d_letter = self._dir_letter(plc_var_path.lower(), meta.get("varInOut"), io_chan_spec)
+            if isinstance(meta.get("byte_offset"), int) and isinstance(meta.get("bit_offset"), int):
+                pi_addr = f"{d_letter} {meta['byte_offset']}.{meta['bit_offset']}"
+            else:
+                vaddr = meta.get("varBitAddr")
+                if isinstance(vaddr, int):
+                    pi_addr = f"{d_letter} {vaddr//8}.{vaddr%8}"
+                    meta["byte_offset"] = vaddr // 8
+                    meta["bit_offset"] = vaddr % 8
+                else:
+                    pi_addr = None
+
+            bundle.append(
+                IoHardwareAddress(
+                    plc_path=plc_var_path,
+                    plc_var=plc_var_name,
+                    device_path=io_owner,
+                    channel_label=io_chan_spec,
+                    io_path=full_io_path,
+                    direction="Input" if d_letter == "I" else "Output" if d_letter == "Q" else "Unknown",
+                    ea_address=pi_addr,
+                    varBitAddr=meta.get("varBitAddr"),
+                    varBitSize=meta.get("varBitSize"),
+                    varInOut=meta.get("varInOut"),
+                    byte_offset=meta.get("byte_offset"),
+                    bit_offset=meta.get("bit_offset"),
+                    amsPort=meta.get("amsPort"),
+                    indexGroup=meta.get("indexGroup"),
+                    indexGroupHex=meta.get("indexGroupHex"),
+                    indexOffset=meta.get("indexOffset"),
+                    indexOffsetHex=meta.get("indexOffsetHex"),
+                    length=meta.get("length"),
+                    raw_offsets=meta.get("rawOffsets", {}),
+                    io_raw_xml=(raw_xml or "")[:4000],
+                )
+            )
+
+        self.io_hw_mappings = bundle
+
+        if save_json:
+            self.io_mapping_json_path.write_text(
+                json.dumps([asdict(b) for b in bundle], indent=2, ensure_ascii=False),
+                encoding="utf-8",
+            )
+            with_addr = sum(1 for x in bundle if x.byte_offset is not None)
+            print(
+                f"OK: {self.io_mapping_json_path}  ({len(bundle)} Links, {with_addr} mit Byte/Bit, {missing} ohne Channel-XML)"
+            )
+
+        return bundle
+
+    def load_io_mappings(self) -> List[IoHardwareAddress]:
+        data = json.loads(self.io_mapping_json_path.read_text(encoding="utf-8"))
+        self.io_hw_mappings = [IoHardwareAddress(**entry) for entry in data]
+        return self.io_hw_mappings
+
+    def mark_variable_traces_with_hw(self) -> None:
+        traces_path = self.variable_traces_path
+        if not traces_path.exists():
+            print("variable_traces.json nicht gefunden -> uebersprungen.")
+            return
+
+        if not self.io_hw_mappings and self.io_mapping_json_path.exists():
+            try:
+                self.load_io_mappings()
+            except Exception:
+                pass
+
+        bound_vars = {m.plc_var for m in self.io_hw_mappings}
+        bound_bases = {v.split(".")[-1] for v in bound_vars}
+
+        traces = json.loads(traces_path.read_text(encoding="utf-8"))
+        changed = 0
+
+        for outputs in traces.values():
+            for out in outputs:
+                if out.get("hardware"):
+                    continue
+                for path in out.get("paths", []):
+                    if not isinstance(path, list):
+                        continue
+                    hits = False
+                    for step in path:
+                        if not isinstance(step, dict):
+                            continue
+                        var = step.get("variable")
+                        hw = step.get("hardware")
+                        if var in bound_vars or var in bound_bases or hw in bound_vars or hw in bound_bases:
+                            hits = True
+                            break
+                    if hits:
+                        out["hardware"] = True
+                        changed += 1
+                        break
+
+        traces_path.write_text(json.dumps(traces, indent=2, ensure_ascii=False), encoding="utf-8")
+        print(f"variable_traces.json aktualisiert (hardware=true in {changed} Outputs).")
+

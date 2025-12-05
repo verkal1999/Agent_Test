@@ -723,6 +723,11 @@ class PLCOpenXMLParser:
             elif lang == "FBD":
                 code_text = run_pylc_pipeline(name)
 
+            if lang:
+                entry["programming_lang"] = lang
+            else:
+                entry["programming_lang"] = entry.get("programming_lang", "")
+
             if code_text:
                 entry["program_code"] = code_text
             else:
@@ -897,6 +902,7 @@ class PLCOpenXMLParser:
                     temps=temps,
                     subcalls=subcalls,
                     program_code=e.get("program_code", ""),
+                    programming_lang=e.get("programming_lang"),
                 )
             )
         self._program_models = models

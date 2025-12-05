@@ -54,6 +54,7 @@ class ProgramMapping:
     temps: List[TempEntry]
     subcalls: List[Subcall]
     program_code: str = ""
+    programming_lang: Optional[str] = None
 
 
 @dataclass

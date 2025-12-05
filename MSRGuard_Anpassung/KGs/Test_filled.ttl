@@ -1,5 +1,6 @@
 @prefix ag: <http://www.semanticweb.org/AgentProgramParams/> .
 @prefix dp: <http://www.semanticweb.org/AgentProgramParams/dp_> .
+@prefix op: <http://www.semanticweb.org/AgentProgramParams/op_> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
@@ -8,109 +9,125 @@
 ag: a owl:Ontology .
 
 ag:GVL__dot__DiagnoseRequested a ag:class_Variable ;
-    dp:dp_hasVariableName "GVL__dot__DiagnoseRequested" ;
-    dp:dp_hasVariableType "BOOL" .
+    dp:hasVariableName "GVL__dot__DiagnoseRequested" ;
+    dp:hasVariableType "BOOL" .
 
 ag:GVL__dot__Fehler a ag:class_Variable ;
-    dp:dp_hasVariableName "GVL__dot__Fehler" ;
-    dp:dp_hasVariableType "BOOL" .
+    dp:hasVariableName "GVL__dot__Fehler" ;
+    dp:hasVariableType "BOOL" .
 
 ag:GVL__dot__NotStopp a ag:class_Variable ;
-    dp:dp_hasInitialValue "TRUE" ;
-    dp:dp_hasVariableName "GVL__dot__NotStopp" ;
-    dp:dp_hasVariableType "BOOL" .
+    dp:hasInitialValue "TRUE" ;
+    dp:hasVariableName "GVL__dot__NotStopp" ;
+    dp:hasVariableType "BOOL" .
 
 ag:GVL__dot__Stopp a ag:class_Variable ;
-    dp:dp_hasInitialValue "FALSE" ;
-    dp:dp_hasVariableName "GVL__dot__Stopp" ;
-    dp:dp_hasVariableType "BOOL" .
+    dp:hasInitialValue "FALSE" ;
+    dp:hasVariableName "GVL__dot__Stopp" ;
+    dp:hasVariableType "BOOL" .
 
 ag:OPCUA__dot__Alt_abort a ag:class_Variable ;
-    dp:dp_hasInitialValue "FALSE" ;
-    dp:dp_hasVariableName "OPCUA__dot__Alt_abort" ;
-    dp:dp_hasVariableType "BOOL" .
+    dp:hasInitialValue "FALSE" ;
+    dp:hasVariableName "OPCUA__dot__Alt_abort" ;
+    dp:hasVariableType "BOOL" .
 
 ag:OPCUA__dot__Alt_found a ag:class_Variable ;
-    dp:dp_hasInitialValue "FALSE" ;
-    dp:dp_hasVariableName "OPCUA__dot__Alt_found" ;
-    dp:dp_hasVariableType "BOOL" .
+    dp:hasInitialValue "FALSE" ;
+    dp:hasVariableName "OPCUA__dot__Alt_found" ;
+    dp:hasVariableType "BOOL" .
 
 ag:OPCUA__dot__DiagnoseFinished a ag:class_Variable ;
-    dp:dp_hasInitialValue "FALSE" ;
-    dp:dp_hasVariableName "OPCUA__dot__DiagnoseFinished" ;
-    dp:dp_hasVariableType "BOOL" .
+    dp:hasInitialValue "FALSE" ;
+    dp:hasVariableName "OPCUA__dot__DiagnoseFinished" ;
+    dp:hasVariableType "BOOL" .
 
 ag:OPCUA__dot__M1 a ag:class_Variable ;
-    dp:dp_hasInitialValue "0" ;
-    dp:dp_hasVariableName "OPCUA__dot__M1" ;
-    dp:dp_hasVariableType "INT" .
+    dp:hasInitialValue "0" ;
+    dp:hasVariableName "OPCUA__dot__M1" ;
+    dp:hasVariableType "INT" .
 
 ag:OPCUA__dot__M2 a ag:class_Variable ;
-    dp:dp_hasInitialValue "0" ;
-    dp:dp_hasVariableName "OPCUA__dot__M2" ;
-    dp:dp_hasVariableType "INT" .
+    dp:hasInitialValue "0" ;
+    dp:hasVariableName "OPCUA__dot__M2" ;
+    dp:hasVariableType "INT" .
 
 ag:OPCUA__dot__M3 a ag:class_Variable ;
-    dp:dp_hasInitialValue "0" ;
-    dp:dp_hasVariableName "OPCUA__dot__M3" ;
-    dp:dp_hasVariableType "INT" .
+    dp:hasInitialValue "0" ;
+    dp:hasVariableName "OPCUA__dot__M3" ;
+    dp:hasVariableType "INT" .
 
 ag:OPCUA__dot__TriggerD1 a ag:class_Variable ;
-    dp:dp_hasInitialValue "FALSE" ;
-    dp:dp_hasVariableName "OPCUA__dot__TriggerD1" ;
-    dp:dp_hasVariableType "BOOL" .
+    dp:hasInitialValue "FALSE" ;
+    dp:hasVariableName "OPCUA__dot__TriggerD1" ;
+    dp:hasVariableType "BOOL" .
 
 ag:OPCUA__dot__TriggerD2 a ag:class_Variable ;
-    dp:dp_hasInitialValue "FALSE" ;
-    dp:dp_hasVariableName "OPCUA__dot__TriggerD2" ;
-    dp:dp_hasVariableType "BOOL" .
+    dp:hasInitialValue "FALSE" ;
+    dp:hasVariableName "OPCUA__dot__TriggerD2" ;
+    dp:hasVariableType "BOOL" .
 
 ag:OPCUA__dot__TriggerD3 a ag:class_Variable ;
-    dp:dp_hasInitialValue "FALSE" ;
-    dp:dp_hasVariableName "OPCUA__dot__TriggerD3" ;
-    dp:dp_hasVariableType "BOOL" .
+    dp:hasInitialValue "FALSE" ;
+    dp:hasVariableName "OPCUA__dot__TriggerD3" ;
+    dp:hasVariableType "BOOL" .
 
 ag:OPCUA__dot__Z1 a ag:class_Variable ;
-    dp:dp_hasInitialValue "0" ;
-    dp:dp_hasVariableName "OPCUA__dot__Z1" ;
-    dp:dp_hasVariableType "INT" .
+    dp:hasInitialValue "0" ;
+    dp:hasVariableName "OPCUA__dot__Z1" ;
+    dp:hasVariableType "INT" .
 
 ag:OPCUA__dot__Z2 a ag:class_Variable ;
-    dp:dp_hasInitialValue "0" ;
-    dp:dp_hasVariableName "OPCUA__dot__Z2" ;
-    dp:dp_hasVariableType "INT" .
+    dp:hasInitialValue "0" ;
+    dp:hasVariableName "OPCUA__dot__Z2" ;
+    dp:hasVariableType "INT" .
 
 ag:OPCUA__dot__Z3 a ag:class_Variable ;
-    dp:dp_hasInitialValue "0" ;
-    dp:dp_hasVariableName "OPCUA__dot__Z3" ;
-    dp:dp_hasVariableType "INT" .
+    dp:hasInitialValue "0" ;
+    dp:hasVariableName "OPCUA__dot__Z3" ;
+    dp:hasVariableType "INT" .
 
 ag:OPCUA__dot__bool1 a ag:class_Variable ;
-    dp:dp_hasInitialValue "FALSE" ;
-    dp:dp_hasVariableName "OPCUA__dot__bool1" ;
-    dp:dp_hasVariableType "BOOL" .
+    dp:hasInitialValue "FALSE" ;
+    dp:hasVariableName "OPCUA__dot__bool1" ;
+    dp:hasVariableType "BOOL" .
 
 ag:OPCUA__dot__bool2 a ag:class_Variable ;
-    dp:dp_hasInitialValue "FALSE" ;
-    dp:dp_hasVariableName "OPCUA__dot__bool2" ;
-    dp:dp_hasVariableType "BOOL" .
+    dp:hasInitialValue "FALSE" ;
+    dp:hasVariableName "OPCUA__dot__bool2" ;
+    dp:hasVariableType "BOOL" .
 
 ag:OPCUA__dot__bool3 a ag:class_Variable ;
-    dp:dp_hasInitialValue "FALSE" ;
-    dp:dp_hasVariableName "OPCUA__dot__bool3" ;
-    dp:dp_hasVariableType "BOOL" .
+    dp:hasInitialValue "FALSE" ;
+    dp:hasVariableName "OPCUA__dot__bool3" ;
+    dp:hasVariableType "BOOL" .
 
 ag:OPCUA__dot__lastExecutedProcess a ag:class_Variable ;
-    dp:dp_hasInitialValue "''" ;
-    dp:dp_hasVariableName "OPCUA__dot__lastExecutedProcess" ;
-    dp:dp_hasVariableType "STRING" .
+    dp:hasInitialValue "''" ;
+    dp:hasVariableName "OPCUA__dot__lastExecutedProcess" ;
+    dp:hasVariableType "STRING" .
 
 ag:OPCUA__dot__lastExecutedSkill a ag:class_Variable ;
-    dp:dp_hasInitialValue "''" ;
-    dp:dp_hasVariableName "OPCUA__dot__lastExecutedSkill" ;
-    dp:dp_hasVariableType "STRING" .
+    dp:hasInitialValue "''" ;
+    dp:hasVariableName "OPCUA__dot__lastExecutedSkill" ;
+    dp:hasVariableType "STRING" .
 
 ag:Program_FB_Automatikbetrieb_F1 a ag:class_Program ;
+    dp:hasConsistencyReport """Var_FB_Automatikbetrieb_F1_AutoRestartEnable (input): im Code vorhanden. Input nicht gefunden oder beschrieben.
+Var_FB_Automatikbetrieb_F1_Automatikbetrieb_Starten (input): im Code vorhanden. Input gefunden und nur gelesen.
+Var_FB_Automatikbetrieb_F1_FaultPulse (input): im Code vorhanden. Input gefunden und nur gelesen.
+Var_FB_Automatikbetrieb_F1_PeriodicFaultEnable (input): im Code NICHT vorhanden. Input nicht gefunden oder beschrieben.
+Var_FB_Automatikbetrieb_F1_PeriodicFaultPeriod (input): im Code vorhanden. Input gefunden und nur gelesen.
+Var_FB_Automatikbetrieb_F1_Automatikbetrieb_Fertig (output): im Code vorhanden. Output gefunden und nur geschrieben.
+Var_FB_Automatikbetrieb_F1_Stoerung_erkannt (output): im Code vorhanden. Output nicht gefunden oder auch gelesen.
+Var_FB_Automatikbetrieb_F1_AutoRestartEnable (used): im Code vorhanden. Interne Variable gelesen und geschrieben.
+Var_FB_Automatikbetrieb_F1_Automatikbetrieb_Fertig (used): im Code vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Var_FB_Automatikbetrieb_F1_Automatikbetrieb_Starten (used): im Code vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Var_FB_Automatikbetrieb_F1_FaultPulse (used): im Code vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Var_FB_Automatikbetrieb_F1_PeriodicFaultEnable (used): im Code NICHT vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Var_FB_Automatikbetrieb_F1_PeriodicFaultPeriod (used): im Code vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Var_FB_Automatikbetrieb_F1_Stoerung_erkannt (used): im Code vorhanden. Interne Variable gelesen und geschrieben.
+Var_FB_Automatikbetrieb_F1_lastSkillIsOne (used): im Code vorhanden. Interne Variable gelesen und geschrieben.
+Gesamtfazit: http://www.semanticweb.org/AgentProgramParams/Program_FB_Automatikbetrieb_F1 hat 15 modellierte Variablen. Davon 13 mit passenden Code-Variablen und 2 ohne Treffer im Code."""^^xsd:string ;
     dp:hasProgramCode """// POU FB_Automatikbetrieb_F1 body
 //GVL.Start := TRUE;
 IF GVL.Start THEN
@@ -188,15 +205,16 @@ IF (Schritt1 OR Schritt2) AND pPer.Q THEN
     Stoerung_erkannt := TRUE;
 	GVL.Fehler := TRUE;
 END_IF""" ;
-    ag:op_hasInputVariable ag:Var_FB_Automatikbetrieb_F1_AutoRestartEnable,
+    dp:hasProgrammingLanguage "ST" ;
+    op:hasInputVariable ag:Var_FB_Automatikbetrieb_F1_AutoRestartEnable,
         ag:Var_FB_Automatikbetrieb_F1_Automatikbetrieb_Starten,
         ag:Var_FB_Automatikbetrieb_F1_FaultPulse,
         ag:Var_FB_Automatikbetrieb_F1_PeriodicFaultEnable,
         ag:Var_FB_Automatikbetrieb_F1_PeriodicFaultPeriod ;
-    ag:op_hasInternVariable ag:Var_FB_Automatikbetrieb_F1_lastSkillIsOne ;
-    ag:op_hasOutputVariable ag:Var_FB_Automatikbetrieb_F1_Automatikbetrieb_Fertig,
+    op:hasInternVariable ag:Var_FB_Automatikbetrieb_F1_lastSkillIsOne ;
+    op:hasOutputVariable ag:Var_FB_Automatikbetrieb_F1_Automatikbetrieb_Fertig,
         ag:Var_FB_Automatikbetrieb_F1_Stoerung_erkannt ;
-    ag:op_usesVariable ag:Var_FB_Automatikbetrieb_F1_AutoRestartEnable,
+    op:usesVariable ag:Var_FB_Automatikbetrieb_F1_AutoRestartEnable,
         ag:Var_FB_Automatikbetrieb_F1_Automatikbetrieb_Fertig,
         ag:Var_FB_Automatikbetrieb_F1_Automatikbetrieb_Starten,
         ag:Var_FB_Automatikbetrieb_F1_FaultPulse,
@@ -206,6 +224,70 @@ END_IF""" ;
         ag:Var_FB_Automatikbetrieb_F1_lastSkillIsOne .
 
 ag:Program_FB_Betriebsarten a ag:class_Program ;
+    dp:hasConsistencyReport """Var_FB_Betriebsarten_A2_Requested (input): im Code vorhanden. Name im KG und im Code konsistent (Input).
+Var_FB_Betriebsarten_Alt_abort (input): im Code vorhanden. Name im KG und im Code konsistent (Input).
+Var_FB_Betriebsarten_Alt_found (input): im Code vorhanden. Name im KG und im Code konsistent (Input).
+Var_FB_Betriebsarten_Auto_Fertig (input): im Code NICHT vorhanden. Nur im KG modelliert (Input), im Code nicht gefunden.
+Var_FB_Betriebsarten_Auto_Stoerung (input): im Code vorhanden. Name im KG und im Code konsistent (Input).
+Var_FB_Betriebsarten_Cycle_ended (input): im Code vorhanden. Name im KG und im Code konsistent (Input).
+Var_FB_Betriebsarten_D3_Requested (input): im Code vorhanden. Name im KG und im Code konsistent (Input).
+Var_FB_Betriebsarten_Fehler (input): im Code NICHT vorhanden. Nur im KG modelliert (Input), im Code nicht gefunden.
+Var_FB_Betriebsarten_Init_reached (input): im Code vorhanden. Name im KG und im Code konsistent (Input).
+Var_FB_Betriebsarten_NotStop (input): im Code vorhanden. Name im KG und im Code konsistent (Input).
+Var_FB_Betriebsarten_Start (input): im Code vorhanden. Name im KG und im Code konsistent (Input).
+Var_FB_Betriebsarten_Start_Init (input): im Code vorhanden. Name im KG und im Code konsistent (Input).
+Var_FB_Betriebsarten_Weiter (input): im Code vorhanden. Name im KG und im Code konsistent (Input).
+Var_FB_Betriebsarten_A1 (output): im Code vorhanden. Name im KG und im Code konsistent (Output).
+Var_FB_Betriebsarten_A2 (output): im Code vorhanden. Name im KG und im Code konsistent (Output).
+Var_FB_Betriebsarten_A5 (output): im Code vorhanden. Name im KG und im Code konsistent (Output).
+Var_FB_Betriebsarten_A6 (output): im Code vorhanden. Name im KG und im Code konsistent (Output).
+Var_FB_Betriebsarten_D1 (output): im Code vorhanden. Name im KG und im Code konsistent (Output).
+Var_FB_Betriebsarten_D2 (output): im Code vorhanden. Name im KG und im Code konsistent (Output).
+Var_FB_Betriebsarten_D3 (output): im Code vorhanden. Name im KG und im Code konsistent (Output).
+Var_FB_Betriebsarten_F1 (output): im Code vorhanden. Name im KG und im Code konsistent (Output).
+Var_FB_Betriebsarten_F4 (output): im Code NICHT vorhanden. Nur im KG modelliert (Output), im Code nicht gefunden.
+Var_FB_Betriebsarten_A1 (used): im Code vorhanden. Name im KG und im Code konsistent (Used Variable).
+Var_FB_Betriebsarten_A2 (used): im Code vorhanden. Name im KG und im Code konsistent (Used Variable).
+Var_FB_Betriebsarten_A2_Requested (used): im Code vorhanden. Name im KG und im Code konsistent (Used Variable).
+Var_FB_Betriebsarten_A5 (used): im Code vorhanden. Name im KG und im Code konsistent (Used Variable).
+Var_FB_Betriebsarten_A6 (used): im Code vorhanden. Name im KG und im Code konsistent (Used Variable).
+Var_FB_Betriebsarten_Alt_abort (used): im Code vorhanden. Name im KG und im Code konsistent (Used Variable).
+Var_FB_Betriebsarten_Alt_found (used): im Code vorhanden. Name im KG und im Code konsistent (Used Variable).
+Var_FB_Betriebsarten_Auto_Fertig (used): im Code NICHT vorhanden. Nur im KG modelliert (Used Variable), im Code nicht gefunden.
+Var_FB_Betriebsarten_Auto_Stoerung (used): im Code vorhanden. Name im KG und im Code konsistent (Used Variable).
+Var_FB_Betriebsarten_Cycle_ended (used): im Code vorhanden. Name im KG und im Code konsistent (Used Variable).
+Var_FB_Betriebsarten_D1 (used): im Code vorhanden. Name im KG und im Code konsistent (Used Variable).
+Var_FB_Betriebsarten_D2 (used): im Code vorhanden. Name im KG und im Code konsistent (Used Variable).
+Var_FB_Betriebsarten_D3 (used): im Code vorhanden. Name im KG und im Code konsistent (Used Variable).
+Var_FB_Betriebsarten_D3_Requested (used): im Code vorhanden. Name im KG und im Code konsistent (Used Variable).
+Var_FB_Betriebsarten_F1 (used): im Code vorhanden. Name im KG und im Code konsistent (Used Variable).
+Var_FB_Betriebsarten_F4 (used): im Code NICHT vorhanden. Nur im KG modelliert (Used Variable), im Code nicht gefunden.
+Var_FB_Betriebsarten_Fehler (used): im Code NICHT vorhanden. Nur im KG modelliert (Used Variable), im Code nicht gefunden.
+Var_FB_Betriebsarten_Init_reached (used): im Code vorhanden. Name im KG und im Code konsistent (Used Variable).
+Var_FB_Betriebsarten_NotStop (used): im Code vorhanden. Name im KG und im Code konsistent (Used Variable).
+Var_FB_Betriebsarten_RS_A1 (used): im Code NICHT vorhanden. Nur im KG modelliert (Used Variable), im Code nicht gefunden.
+Var_FB_Betriebsarten_RS_A2 (used): im Code NICHT vorhanden. Nur im KG modelliert (Used Variable), im Code nicht gefunden.
+Var_FB_Betriebsarten_RS_A5 (used): im Code NICHT vorhanden. Nur im KG modelliert (Used Variable), im Code nicht gefunden.
+Var_FB_Betriebsarten_RS_A6 (used): im Code NICHT vorhanden. Nur im KG modelliert (Used Variable), im Code nicht gefunden.
+Var_FB_Betriebsarten_RS_AutomaticOperationMode (used): im Code NICHT vorhanden. Nur im KG modelliert (Used Variable), im Code nicht gefunden.
+Var_FB_Betriebsarten_RS_CycleEnded (used): im Code NICHT vorhanden. Nur im KG modelliert (Used Variable), im Code nicht gefunden.
+Var_FB_Betriebsarten_RS_D1 (used): im Code NICHT vorhanden. Nur im KG modelliert (Used Variable), im Code nicht gefunden.
+Var_FB_Betriebsarten_RS_D2 (used): im Code NICHT vorhanden. Nur im KG modelliert (Used Variable), im Code nicht gefunden.
+Var_FB_Betriebsarten_RS_D3 (used): im Code NICHT vorhanden. Nur im KG modelliert (Used Variable), im Code nicht gefunden.
+Var_FB_Betriebsarten_RS_F1 (used): im Code NICHT vorhanden. Nur im KG modelliert (Used Variable), im Code nicht gefunden.
+Var_FB_Betriebsarten_RS_InitialDrive (used): im Code NICHT vorhanden. Nur im KG modelliert (Used Variable), im Code nicht gefunden.
+Var_FB_Betriebsarten_RS_InitialState (used): im Code NICHT vorhanden. Nur im KG modelliert (Used Variable), im Code nicht gefunden.
+Var_FB_Betriebsarten_RS_ManualOperationMode (used): im Code NICHT vorhanden. Nur im KG modelliert (Used Variable), im Code nicht gefunden.
+Var_FB_Betriebsarten_R_TRIG_Automatic (used): im Code NICHT vorhanden. Nur im KG modelliert (Used Variable), im Code nicht gefunden.
+Var_FB_Betriebsarten_R_TRIG_CycleEnded (used): im Code NICHT vorhanden. Nur im KG modelliert (Used Variable), im Code nicht gefunden.
+Var_FB_Betriebsarten_R_TRIG_Init (used): im Code NICHT vorhanden. Nur im KG modelliert (Used Variable), im Code nicht gefunden.
+Var_FB_Betriebsarten_R_TRIG_InitialDrive (used): im Code NICHT vorhanden. Nur im KG modelliert (Used Variable), im Code nicht gefunden.
+Var_FB_Betriebsarten_R_TRIG_Manual (used): im Code NICHT vorhanden. Nur im KG modelliert (Used Variable), im Code nicht gefunden.
+Var_FB_Betriebsarten_Start (used): im Code vorhanden. Name im KG und im Code konsistent (Used Variable).
+Var_FB_Betriebsarten_Start_Init (used): im Code vorhanden. Name im KG und im Code konsistent (Used Variable).
+Var_FB_Betriebsarten_Weiter (used): im Code vorhanden. Name im KG und im Code konsistent (Used Variable).
+Var_FB_Betriebsarten_bFirstScan (used): im Code NICHT vorhanden. Nur im KG modelliert (Used Variable), im Code nicht gefunden.
+Gesamtfazit: http://www.semanticweb.org/AgentProgramParams/Program_FB_Betriebsarten hat 63 modellierte Variablen. Davon 38 mit passenden Code-Variablen und 25 ohne Treffer im Code."""^^xsd:string ;
     dp:hasProgramCode """import time
 
 def FB_Betriebsarten(V_10000000001: bool, D2: bool, A5: bool, GVL.Start: bool, A1: bool, D1: bool, D3: bool, V_30000000002: bool, V_30000000005: bool, GVL.Weiter: bool, GVL.NotStopp, A6, V_30000000011: bool, Auto_Stoerung, F1, GVL.DiagnoseRequested, Alt_abort, V_40000000012: bool, Alt_found, D3_Requested, A2, Init_reached, Cycle_ended, A2_Requested, Start_Init):
@@ -402,7 +484,8 @@ def FB_Betriebsarten(V_10000000001: bool, D2: bool, A5: bool, GVL.Start: bool, A
     A6 = V_80000000007
     print('Value of A6:', A6)
     return {'D1': D1, 'F1': F1, 'A5': A5, 'D2': D2, 'D3': D3, 'A1': A1, 'A2': A2, 'A6': A6}""" ;
-    ag:op_hasInputVariable ag:Var_FB_Betriebsarten_A2_Requested,
+    dp:hasProgrammingLanguage "FBD" ;
+    op:hasInputVariable ag:Var_FB_Betriebsarten_A2_Requested,
         ag:Var_FB_Betriebsarten_Alt_abort,
         ag:Var_FB_Betriebsarten_Alt_found,
         ag:Var_FB_Betriebsarten_Auto_Fertig,
@@ -415,7 +498,7 @@ def FB_Betriebsarten(V_10000000001: bool, D2: bool, A5: bool, GVL.Start: bool, A
         ag:Var_FB_Betriebsarten_Start,
         ag:Var_FB_Betriebsarten_Start_Init,
         ag:Var_FB_Betriebsarten_Weiter ;
-    ag:op_hasInternVariable ag:Var_FB_Betriebsarten_RS_A1,
+    op:hasInternVariable ag:Var_FB_Betriebsarten_RS_A1,
         ag:Var_FB_Betriebsarten_RS_A2,
         ag:Var_FB_Betriebsarten_RS_A5,
         ag:Var_FB_Betriebsarten_RS_A6,
@@ -434,7 +517,7 @@ def FB_Betriebsarten(V_10000000001: bool, D2: bool, A5: bool, GVL.Start: bool, A
         ag:Var_FB_Betriebsarten_R_TRIG_InitialDrive,
         ag:Var_FB_Betriebsarten_R_TRIG_Manual,
         ag:Var_FB_Betriebsarten_bFirstScan ;
-    ag:op_hasOutputVariable ag:Var_FB_Betriebsarten_A1,
+    op:hasOutputVariable ag:Var_FB_Betriebsarten_A1,
         ag:Var_FB_Betriebsarten_A2,
         ag:Var_FB_Betriebsarten_A5,
         ag:Var_FB_Betriebsarten_A6,
@@ -443,7 +526,7 @@ def FB_Betriebsarten(V_10000000001: bool, D2: bool, A5: bool, GVL.Start: bool, A
         ag:Var_FB_Betriebsarten_D3,
         ag:Var_FB_Betriebsarten_F1,
         ag:Var_FB_Betriebsarten_F4 ;
-    ag:op_usesVariable ag:Var_FB_Betriebsarten_A1,
+    op:usesVariable ag:Var_FB_Betriebsarten_A1,
         ag:Var_FB_Betriebsarten_A2,
         ag:Var_FB_Betriebsarten_A2_Requested,
         ag:Var_FB_Betriebsarten_A5,
@@ -486,6 +569,19 @@ def FB_Betriebsarten(V_10000000001: bool, D2: bool, A5: bool, GVL.Start: bool, A
         ag:Var_FB_Betriebsarten_bFirstScan .
 
 ag:Program_FB_Diagnose_D2 a ag:class_Program ;
+    dp:hasConsistencyReport """Var_FB_Diagnose_D2_Diagnose_gefordert (input): im Code vorhanden. Input nicht gefunden oder beschrieben.
+Var_FB_Diagnose_D2_Alt_gefunden (output): im Code vorhanden. Output gefunden und nur geschrieben.
+Var_FB_Diagnose_D2_Diagnose_beendet (output): im Code vorhanden. Output gefunden und nur geschrieben.
+Var_FB_Diagnose_D2_Alt_gefunden (used): im Code vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Var_FB_Diagnose_D2_Busy (used): im Code vorhanden. Interne Variable gelesen und geschrieben.
+Var_FB_Diagnose_D2_Diagnose_beendet (used): im Code vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Var_FB_Diagnose_D2_Diagnose_gefordert (used): im Code vorhanden. Interne Variable gelesen und geschrieben.
+Var_FB_Diagnose_D2_rtAck (used): im Code vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Var_FB_Diagnose_D2_rtD3 (used): im Code vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Var_FB_Diagnose_D2_rtFinished (used): im Code NICHT vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Var_FB_Diagnose_D2_rtReq (used): im Code vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Var_FB_Diagnose_D2_tpPulse (used): im Code NICHT vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Gesamtfazit: http://www.semanticweb.org/AgentProgramParams/Program_FB_Diagnose_D2 hat 12 modellierte Variablen. Davon 10 mit passenden Code-Variablen und 2 ohne Treffer im Code."""^^xsd:string ;
     dp:hasProgramCode """// POU FB_Diagnose_D2 body
 // 1) Startflanke erkennen
 rtReq(CLK := Diagnose_gefordert);
@@ -517,16 +613,17 @@ END_IF
 IF rtD3.Q THEN
 	Alt_gefunden := TRUE;
 END_IF""" ;
-    ag:op_hasInputVariable ag:Var_FB_Diagnose_D2_Diagnose_gefordert ;
-    ag:op_hasInternVariable ag:Var_FB_Diagnose_D2_Busy,
+    dp:hasProgrammingLanguage "ST" ;
+    op:hasInputVariable ag:Var_FB_Diagnose_D2_Diagnose_gefordert ;
+    op:hasInternVariable ag:Var_FB_Diagnose_D2_Busy,
         ag:Var_FB_Diagnose_D2_rtAck,
         ag:Var_FB_Diagnose_D2_rtD3,
         ag:Var_FB_Diagnose_D2_rtFinished,
         ag:Var_FB_Diagnose_D2_rtReq,
         ag:Var_FB_Diagnose_D2_tpPulse ;
-    ag:op_hasOutputVariable ag:Var_FB_Diagnose_D2_Alt_gefunden,
+    op:hasOutputVariable ag:Var_FB_Diagnose_D2_Alt_gefunden,
         ag:Var_FB_Diagnose_D2_Diagnose_beendet ;
-    ag:op_usesVariable ag:Var_FB_Diagnose_D2_Alt_gefunden,
+    op:usesVariable ag:Var_FB_Diagnose_D2_Alt_gefunden,
         ag:Var_FB_Diagnose_D2_Busy,
         ag:Var_FB_Diagnose_D2_Diagnose_beendet,
         ag:Var_FB_Diagnose_D2_Diagnose_gefordert,
@@ -537,6 +634,14 @@ END_IF""" ;
         ag:Var_FB_Diagnose_D2_tpPulse .
 
 ag:Program_FB_InitFahrt_A6_A2 a ag:class_Program ;
+    dp:hasConsistencyReport """Var_FB_InitFahrt_A6_A2_A2 (input): im Code vorhanden. Input gefunden und nur gelesen.
+Var_FB_InitFahrt_A6_A2_A6 (input): im Code vorhanden. Input gefunden und nur gelesen.
+Var_FB_InitFahrt_A6_A2_Init_erreicht (output): im Code vorhanden. Output gefunden und nur geschrieben.
+Var_FB_InitFahrt_A6_A2_A2 (used): im Code vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Var_FB_InitFahrt_A6_A2_A6 (used): im Code vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Var_FB_InitFahrt_A6_A2_Init_erreicht (used): im Code vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Var_FB_InitFahrt_A6_A2_tInit (used): im Code vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Gesamtfazit: http://www.semanticweb.org/AgentProgramParams/Program_FB_InitFahrt_A6_A2 hat 7 modellierte Variablen. Davon 7 mit passenden Code-Variablen und 0 ohne Treffer im Code."""^^xsd:string ;
     dp:hasProgramCode """// POU FB_InitFahrt_A6_A2 body
 IF A6 THEN
 	tInit(IN := A6, PT := T#3S);
@@ -549,16 +654,23 @@ IF tInit.Q THEN
 ELSE
 	Init_erreicht := FALSE;
 END_IF""" ;
-    ag:op_hasInputVariable ag:Var_FB_InitFahrt_A6_A2_A2,
+    dp:hasProgrammingLanguage "ST" ;
+    op:hasInputVariable ag:Var_FB_InitFahrt_A6_A2_A2,
         ag:Var_FB_InitFahrt_A6_A2_A6 ;
-    ag:op_hasInternVariable ag:Var_FB_InitFahrt_A6_A2_tInit ;
-    ag:op_hasOutputVariable ag:Var_FB_InitFahrt_A6_A2_Init_erreicht ;
-    ag:op_usesVariable ag:Var_FB_InitFahrt_A6_A2_A2,
+    op:hasInternVariable ag:Var_FB_InitFahrt_A6_A2_tInit ;
+    op:hasOutputVariable ag:Var_FB_InitFahrt_A6_A2_Init_erreicht ;
+    op:usesVariable ag:Var_FB_InitFahrt_A6_A2_A2,
         ag:Var_FB_InitFahrt_A6_A2_A6,
         ag:Var_FB_InitFahrt_A6_A2_Init_erreicht,
         ag:Var_FB_InitFahrt_A6_A2_tInit .
 
 ag:Program_FB_Methode1Job a ag:class_Program ;
+    dp:hasConsistencyReport """Var_FB_Methode1Job_counter (used): im Code vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Var_FB_Methode1Job_reached (used): im Code vorhanden. Interne Variable gelesen und geschrieben.
+Var_FB_Methode1Job_running (used): im Code vorhanden. Interne Variable gelesen und geschrieben.
+Var_FB_Methode1Job_t20s (used): im Code vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Var_FB_Methode1Job_y (used): im Code vorhanden. Interne Variable gelesen und geschrieben.
+Gesamtfazit: http://www.semanticweb.org/AgentProgramParams/Program_FB_Methode1Job hat 5 modellierte Variablen. Davon 5 mit passenden Code-Variablen und 0 ohne Treffer im Code."""^^xsd:string ;
     dp:hasProgramCode """// METHOD Abort of FB_Methode1Job
 running := FALSE;
 Abort := 0;
@@ -594,18 +706,27 @@ running := TRUE;
 t20s(IN := FALSE, PT := T#9S);   // Timer Reset
 hdl := 0;                         // (einfacher Fall)
 Start := 0;                       // 0 = OPC UA StatusCode "Good\"""" ;
-    ag:op_hasInternVariable ag:Var_FB_Methode1Job_counter,
+    dp:hasProgrammingLanguage "ST" ;
+    op:hasInternVariable ag:Var_FB_Methode1Job_counter,
         ag:Var_FB_Methode1Job_reached,
         ag:Var_FB_Methode1Job_running,
         ag:Var_FB_Methode1Job_t20s,
         ag:Var_FB_Methode1Job_y ;
-    ag:op_usesVariable ag:Var_FB_Methode1Job_counter,
+    op:usesVariable ag:Var_FB_Methode1Job_counter,
         ag:Var_FB_Methode1Job_reached,
         ag:Var_FB_Methode1Job_running,
         ag:Var_FB_Methode1Job_t20s,
         ag:Var_FB_Methode1Job_y .
 
 ag:Program_FB_Notaus_D1 a ag:class_Program ;
+    dp:hasConsistencyReport """Var_FB_Notaus_D1_D1 (input): im Code vorhanden. Input gefunden und nur gelesen.
+Var_FB_Notaus_D1_Diagnose_gefordert (output): im Code vorhanden. Output gefunden und nur geschrieben.
+Var_FB_Notaus_D1_Notaus_Entriegelt (output): im Code NICHT vorhanden. Output nicht gefunden oder auch gelesen.
+Var_FB_Notaus_D1_D1 (used): im Code vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Var_FB_Notaus_D1_Diagnose_gefordert (used): im Code vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Var_FB_Notaus_D1_Notaus_Entriegelt (used): im Code NICHT vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Var_FB_Notaus_D1_ton5s (used): im Code vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Gesamtfazit: http://www.semanticweb.org/AgentProgramParams/Program_FB_Notaus_D1 hat 7 modellierte Variablen. Davon 5 mit passenden Code-Variablen und 2 ohne Treffer im Code."""^^xsd:string ;
     dp:hasProgramCode """// POU FB_Notaus_D1 body
 IF D1 THEN
     OPCUA.TriggerD1 := TRUE;         // interne publizierte Variable (kein AT %I*)
@@ -621,16 +742,25 @@ IF ton5s.Q THEN
     GVL.Fehler := FALSE;
     GVL.Weiter := TRUE;
 END_IF;""" ;
-    ag:op_hasInputVariable ag:Var_FB_Notaus_D1_D1 ;
-    ag:op_hasInternVariable ag:Var_FB_Notaus_D1_ton5s ;
-    ag:op_hasOutputVariable ag:Var_FB_Notaus_D1_Diagnose_gefordert,
+    dp:hasProgrammingLanguage "ST" ;
+    op:hasInputVariable ag:Var_FB_Notaus_D1_D1 ;
+    op:hasInternVariable ag:Var_FB_Notaus_D1_ton5s ;
+    op:hasOutputVariable ag:Var_FB_Notaus_D1_Diagnose_gefordert,
         ag:Var_FB_Notaus_D1_Notaus_Entriegelt ;
-    ag:op_usesVariable ag:Var_FB_Notaus_D1_D1,
+    op:usesVariable ag:Var_FB_Notaus_D1_D1,
         ag:Var_FB_Notaus_D1_Diagnose_gefordert,
         ag:Var_FB_Notaus_D1_Notaus_Entriegelt,
         ag:Var_FB_Notaus_D1_ton5s .
 
 ag:Program_FB_ProduktionMitStoerung_D3 a ag:class_Program ;
+    dp:hasConsistencyReport """Var_FB_ProduktionMitStoerung_D3_ProduktionMitStoerung_Starten (input): im Code vorhanden. Input gefunden und nur gelesen.
+Var_FB_ProduktionMitStoerung_D3_Fertig (output): im Code vorhanden. Output gefunden und nur geschrieben.
+Var_FB_ProduktionMitStoerung_D3_Stoerung_erkannt (output): im Code vorhanden. Output nicht gefunden oder auch gelesen.
+Var_FB_ProduktionMitStoerung_D3_Fertig (used): im Code vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Var_FB_ProduktionMitStoerung_D3_ProduktionMitStoerung_Starten (used): im Code vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Var_FB_ProduktionMitStoerung_D3_Stoerung_erkannt (used): im Code vorhanden. Interne Variable gelesen und geschrieben.
+Var_FB_ProduktionMitStoerung_D3_lastSkillIsOne (used): im Code NICHT vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Gesamtfazit: http://www.semanticweb.org/AgentProgramParams/Program_FB_ProduktionMitStoerung_D3 hat 7 modellierte Variablen. Davon 6 mit passenden Code-Variablen und 1 ohne Treffer im Code."""^^xsd:string ;
     dp:hasProgramCode """// POU FB_ProduktionMitStoerung_D3 body
 rStart(CLK := ProduktionMitStoerung_Starten);
 IF rStart.Q THEN
@@ -666,16 +796,36 @@ IF tSchritt4.Q THEN
 	Schritt3 := TRUE;
 	OPCUA.lastExecutedSkill := 'TestSkill3';
 END_IF""" ;
-    ag:op_hasInputVariable ag:Var_FB_ProduktionMitStoerung_D3_ProduktionMitStoerung_Starten ;
-    ag:op_hasInternVariable ag:Var_FB_ProduktionMitStoerung_D3_lastSkillIsOne ;
-    ag:op_hasOutputVariable ag:Var_FB_ProduktionMitStoerung_D3_Fertig,
+    dp:hasProgrammingLanguage "ST" ;
+    op:hasInputVariable ag:Var_FB_ProduktionMitStoerung_D3_ProduktionMitStoerung_Starten ;
+    op:hasInternVariable ag:Var_FB_ProduktionMitStoerung_D3_lastSkillIsOne ;
+    op:hasOutputVariable ag:Var_FB_ProduktionMitStoerung_D3_Fertig,
         ag:Var_FB_ProduktionMitStoerung_D3_Stoerung_erkannt ;
-    ag:op_usesVariable ag:Var_FB_ProduktionMitStoerung_D3_Fertig,
+    op:usesVariable ag:Var_FB_ProduktionMitStoerung_D3_Fertig,
         ag:Var_FB_ProduktionMitStoerung_D3_ProduktionMitStoerung_Starten,
         ag:Var_FB_ProduktionMitStoerung_D3_Stoerung_erkannt,
         ag:Var_FB_ProduktionMitStoerung_D3_lastSkillIsOne .
 
 ag:Program_MAIN a ag:class_Program ;
+    dp:hasConsistencyReport """Var_MAIN_A2_angefordert (used): im Code vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Var_MAIN_D3_angefordert (used): im Code vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Var_MAIN_Init_erreicht (used): im Code vorhanden. Interne Variable gelesen und geschrieben.
+Var_MAIN_Init_start (used): im Code NICHT vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Var_MAIN_Start_eff (used): im Code vorhanden. Interne Variable gelesen und geschrieben.
+Var_MAIN_Weiter_eff (used): im Code vorhanden. Interne Variable gelesen und geschrieben.
+Var_MAIN_Zyklus_beendet (used): im Code vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Var_MAIN_alt_abort (used): im Code vorhanden. Interne Variable gelesen und geschrieben.
+Var_MAIN_alt_found (used): im Code vorhanden. Interne Variable gelesen und geschrieben.
+Var_MAIN_edgeDone (used): im Code vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Var_MAIN_edgeF1 (used): im Code vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Var_MAIN_fbAuto (used): im Code vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Var_MAIN_fbBA (used): im Code vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Var_MAIN_fbDiag (used): im Code vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Var_MAIN_fbInit (used): im Code vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Var_MAIN_fbJob (used): im Code NICHT vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Var_MAIN_fbNot (used): im Code vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Var_MAIN_fbProStoer (used): im Code vorhanden. Interne Variable nicht sowohl gelesen als auch geschrieben.
+Gesamtfazit: http://www.semanticweb.org/AgentProgramParams/Program_MAIN hat 18 modellierte Variablen. Davon 16 mit passenden Code-Variablen und 2 ohne Treffer im Code."""^^xsd:string ;
     dp:hasProgramCode """// POU MAIN body
 // Diagnose fertig -> Impuls
 edgeDone(CLK := fbDiag.Diagnose_beendet);
@@ -718,7 +868,8 @@ Init_erreicht := fbInit.Init_erreicht;
 // D2 fordert die Diagnose an
 fbDiag(Diagnose_gefordert := fbBA.D2);
 alt_found := fbDiag.Alt_gefunden;""" ;
-    ag:op_hasInternVariable ag:Var_MAIN_A2_angefordert,
+    dp:hasProgrammingLanguage "ST" ;
+    op:hasInternVariable ag:Var_MAIN_A2_angefordert,
         ag:Var_MAIN_D3_angefordert,
         ag:Var_MAIN_Init_erreicht,
         ag:Var_MAIN_Init_start,
@@ -736,7 +887,7 @@ alt_found := fbDiag.Alt_gefunden;""" ;
         ag:Var_MAIN_fbJob,
         ag:Var_MAIN_fbNot,
         ag:Var_MAIN_fbProStoer ;
-    ag:op_usesVariable ag:Var_MAIN_A2_angefordert,
+    op:usesVariable ag:Var_MAIN_A2_angefordert,
         ag:Var_MAIN_D3_angefordert,
         ag:Var_MAIN_Init_erreicht,
         ag:Var_MAIN_Init_start,
@@ -773,6 +924,10 @@ dp:hasProgramCode a owl:DatatypeProperty ;
     rdfs:domain ag:class_Program ;
     rdfs:range xsd:string .
 
+dp:hasProgrammingLanguage a owl:DatatypeProperty ;
+    rdfs:domain ag:class_Program ;
+    rdfs:range xsd:string .
+
 dp:hasVariableScope a owl:DatatypeProperty ;
     rdfs:range [ a rdfs:Datatype ;
             owl:oneOf [ a rdf:List ;
@@ -797,48 +952,48 @@ dp:onlyDeclaredNotUsed a owl:DatatypeProperty ;
     rdfs:domain ag:class_Variable ;
     rdfs:range xsd:boolean .
 
-ag:op_hasIinfluenceOnVariable a owl:ObjectProperty ;
+op:hasIinfluenceOnVariable a owl:ObjectProperty ;
     rdfs:domain ag:class_Variable ;
     rdfs:range ag:class_Variable .
 
-ag:op_hasInputVariable a owl:ObjectProperty ;
+op:hasInputVariable a owl:ObjectProperty ;
     rdfs:domain ag:class_Program ;
     rdfs:range ag:class_Variable ;
-    rdfs:subPropertyOf ag:op_usesVariable .
+    rdfs:subPropertyOf op:usesVariable .
 
-ag:op_hasInternVariable a owl:ObjectProperty ;
+op:hasInternVariable a owl:ObjectProperty ;
     rdfs:domain ag:class_Program ;
     rdfs:range ag:class_Variable ;
-    rdfs:subPropertyOf ag:op_usesVariable .
+    rdfs:subPropertyOf op:usesVariable .
 
-ag:op_hasOutputVariable a owl:ObjectProperty ;
+op:hasOutputVariable a owl:ObjectProperty ;
     rdfs:domain ag:class_Program ;
     rdfs:range ag:class_Variable ;
-    rdfs:subPropertyOf ag:op_usesVariable .
+    rdfs:subPropertyOf op:usesVariable .
 
-ag:op_isBoundToChannel a owl:ObjectProperty ;
+op:isBoundToChannel a owl:ObjectProperty ;
     rdfs:domain ag:class_Variable ;
     rdfs:range ag:class_IOChannel .
 
-ag:op_isMappedToProgram a owl:ObjectProperty ;
+op:isMappedToProgram a owl:ObjectProperty ;
     rdfs:domain ag:class_Variable ;
     rdfs:range ag:class_Program .
 
-ag:op_isMappedToVariable a owl:ObjectProperty ;
+op:isMappedToVariable a owl:ObjectProperty ;
     rdfs:domain ag:class_Variable ;
     rdfs:range ag:class_Variable .
 
-ag:op_isSubProgramOf a owl:ObjectProperty ;
+op:isSubProgramOf a owl:ObjectProperty ;
     rdfs:domain ag:class_Program ;
     rdfs:range ag:class_Program .
 
 ag:GVL__dot__Start a ag:class_Variable ;
-    dp:dp_hasVariableName "GVL__dot__Start" ;
-    dp:dp_hasVariableType "BOOL" .
+    dp:hasVariableName "GVL__dot__Start" ;
+    dp:hasVariableType "BOOL" .
 
 ag:GVL__dot__Weiter a ag:class_Variable ;
-    dp:dp_hasVariableName "GVL__dot__Weiter" ;
-    dp:dp_hasVariableType "BOOL" .
+    dp:hasVariableName "GVL__dot__Weiter" ;
+    dp:hasVariableType "BOOL" .
 
 ag:Var_NOT__leerz__GVL_Fehler a ag:class_Variable .
 
@@ -893,7 +1048,7 @@ ag:Var_FB_Betriebsarten_F1 a ag:class_Variable .
 ag:Var_FB_Betriebsarten_F4 a ag:class_Variable .
 
 ag:Var_FB_Betriebsarten_Fehler a ag:class_Variable ;
-    ag:op_isMappedToVariable ag:Var_NOT__leerz__GVL_Fehler .
+    op:isMappedToVariable ag:Var_NOT__leerz__GVL_Fehler .
 
 ag:Var_FB_Betriebsarten_Init_reached a ag:class_Variable .
 
@@ -936,12 +1091,12 @@ ag:Var_FB_Betriebsarten_R_TRIG_InitialDrive a ag:class_Variable .
 ag:Var_FB_Betriebsarten_R_TRIG_Manual a ag:class_Variable .
 
 ag:Var_FB_Betriebsarten_Start a ag:class_Variable ;
-    ag:op_isMappedToVariable ag:GVL__dot__Start .
+    op:isMappedToVariable ag:GVL__dot__Start .
 
 ag:Var_FB_Betriebsarten_Start_Init a ag:class_Variable .
 
 ag:Var_FB_Betriebsarten_Weiter a ag:class_Variable ;
-    ag:op_isMappedToVariable ag:GVL__dot__Weiter .
+    op:isMappedToVariable ag:GVL__dot__Weiter .
 
 ag:Var_FB_Betriebsarten_bFirstScan a ag:class_Variable .
 
@@ -1033,7 +1188,7 @@ ag:Var_MAIN_fbNot a ag:class_Variable .
 
 ag:Var_MAIN_fbProStoer a ag:class_Variable .
 
-ag:op_usesVariable a owl:ObjectProperty ;
+op:usesVariable a owl:ObjectProperty ;
     rdfs:domain ag:class_Program ;
     rdfs:range ag:class_Variable .
 

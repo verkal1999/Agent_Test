@@ -183,14 +183,14 @@ class KGLoader:
                     v_uri = self.get_local_var_uri(prog_name, vname)
 
                     if sec == "inputs":
-                        self.kg.add((prog_uri, self.AG.op_hasInputVariable, v_uri))
+                        self.kg.add((prog_uri, self.OP.hasInputVariable, v_uri))
                     elif sec == "outputs":
-                        self.kg.add((prog_uri, self.AG.op_hasOutputVariable, v_uri))
+                        self.kg.add((prog_uri, self.OP.hasOutputVariable, v_uri))
                     else:
-                        self.kg.add((prog_uri, self.AG.op_hasInputVariable, v_uri))
-                        self.kg.add((prog_uri, self.AG.op_hasOutputVariable, v_uri))
+                        self.kg.add((prog_uri, self.OP.hasInputVariable, v_uri))
+                        self.kg.add((prog_uri, self.OP.hasOutputVariable, v_uri))
 
-                    self.kg.add((prog_uri, self.AG.op_usesVariable, v_uri))
+                    self.kg.add((prog_uri, self.OP.usesVariable, v_uri))
 
                     internal = var.get("internal")
                     external = var.get("external")
@@ -200,7 +200,7 @@ class KGLoader:
                         ext_uri = self._get_ext_var_uri(external, prog_name)
 
                         if ext_uri is not None and int_uri != ext_uri:
-                            self.kg.add((int_uri, self.AG.op_isMappedToVariable, ext_uri))
+                            self.kg.add((int_uri, self.OP.isMappedToVariable, ext_uri))
 
                         if ext_uri is not None:
                             self.pending_ext_hw_links.append((ext_uri, external))
@@ -210,8 +210,8 @@ class KGLoader:
                 vname = temp.get("name")
                 if vname:
                     v_uri = self.get_local_var_uri(prog_name, vname)
-                    self.kg.add((prog_uri, self.AG.op_hasInternVariable, v_uri))
-                    self.kg.add((prog_uri, self.AG.op_usesVariable, v_uri))
+                    self.kg.add((prog_uri, self.OP.hasInternVariable, v_uri))
+                    self.kg.add((prog_uri, self.OP.usesVariable, v_uri))
 
             # Subcalls
             for sc in entry.get("subcalls", []):
@@ -220,13 +220,13 @@ class KGLoader:
 
                 if sub_prog:
                     sub_uri = self.get_program_uri(sub_prog)
-                    self.kg.add((sub_uri, self.AG.op_isSubProgramOf, prog_uri))
+                    self.kg.add((sub_uri, self.OP.isSubProgramOf, prog_uri))
                 else:
                     sub_uri = None
 
                 if instance and sub_prog:
                     inst_uri = self.get_local_var_uri(prog_name, instance)
-                    self.kg.add((inst_uri, self.AG.op_isMappedToProgram, sub_uri))
+                    self.kg.add((inst_uri, self.OP.isMappedToProgram, sub_uri))
 
                 for param in sc.get("inputs", []):
                     internal = param.get("internal")
@@ -235,7 +235,7 @@ class KGLoader:
                         int_uri = self.get_local_var_uri(sub_prog, internal)
                         ext_uri = self._get_ext_var_uri(external, prog_name)
                         if ext_uri is not None and int_uri != ext_uri:
-                            self.kg.add((int_uri, self.AG.op_isMappedToVariable, ext_uri))
+                            self.kg.add((int_uri, self.OP.isMappedToVariable, ext_uri))
                         if ext_uri is not None:
                             self.pending_ext_hw_links.append((ext_uri, external))
 
@@ -246,13 +246,16 @@ class KGLoader:
                         int_uri = self.get_local_var_uri(sub_prog, internal)
                         ext_uri = self._get_ext_var_uri(external, prog_name)
                         if ext_uri is not None and int_uri != ext_uri:
-                            self.kg.add((int_uri, self.AG.op_isMappedToVariable, ext_uri))
+                            self.kg.add((int_uri, self.OP.isMappedToVariable, ext_uri))
                         if ext_uri is not None:
                             self.pending_ext_hw_links.append((ext_uri, external))
 
             code = entry.get("program_code")
+            lang = entry.get("programming_lang")
             if code:
                 self.kg.add((prog_uri, self.DP.hasProgramCode, Literal(code)))
+            if lang:
+                self.kg.add((prog_uri, self.DP.hasProgrammingLanguage, Literal(lang)))
 
     # -------------------------------------------------
     # Schritt 3: io_mappings.json einlesen (Cell 5)
@@ -289,7 +292,7 @@ class KGLoader:
         for ext_uri, external_full in self.pending_ext_hw_links:
             hw_uri = self.hw_var_uris.get(external_full)
             if hw_uri is not None and ext_uri != hw_uri:
-                self.kg.add((ext_uri, self.AG.op_isMappedToVariable, hw_uri))
+                self.kg.add((ext_uri, self.OP.isMappedToVariable, hw_uri))
 
     # -------------------------------------------------
     # Schritt 4: GVL-Variablen aus gvl_globals.json (Cell 6)
@@ -309,14 +312,14 @@ class KGLoader:
                 var_uri = self.AG[var_local]
 
                 self.kg.add((var_uri, RDF.type, self.AG.class_Variable))
-                self.kg.add((var_uri, self.DP.dp_hasVariableName, Literal(var_local)))
+                self.kg.add((var_uri, self.DP.hasVariableName, Literal(var_local)))
 
                 if gv.get("type"):
-                    self.kg.add((var_uri, self.DP.dp_hasVariableType, Literal(gv["type"])))
+                    self.kg.add((var_uri, self.DP.hasVariableType, Literal(gv["type"])))
                 if gv.get("init") is not None:
-                    self.kg.add((var_uri, self.DP.dp_hasInitialValue, Literal(gv["init"])))
+                    self.kg.add((var_uri, self.DP.hasInitialValue, Literal(gv["init"])))
                 if gv.get("address"):
-                    self.kg.add((var_uri, self.DP.dp_hasHardwareAddress, Literal(gv["address"])))
+                    self.kg.add((var_uri, self.DP.hasHardwareAddress, Literal(gv["address"])))
 
     # -------------------------------------------------
     # Speichern

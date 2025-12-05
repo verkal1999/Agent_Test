@@ -14,10 +14,10 @@
 #    Object Properties
 #################################################################
 
-###  http://www.semanticweb.org/AgentProgramParams/op_hasIinfluenceOnVariable
-ag:op_hasIinfluenceOnVariable rdf:type owl:ObjectProperty ;
-                              rdfs:domain ag:class_Variable ;
-                              rdfs:range ag:class_Variable .
+###  http://www.semanticweb.org/AgentProgramParams/op_hasInfluenceOnVariable
+ag:op_hasInfluenceOnVariable rdf:type owl:ObjectProperty ;
+                             rdfs:domain ag:class_Variable ;
+                             rdfs:range ag:class_Variable .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/op_hasInputVariable
@@ -97,6 +97,12 @@ ag:dp_hasHardwareAddress rdf:type owl:DatatypeProperty ;
 ag:dp_hasProgramCode rdf:type owl:DatatypeProperty ;
                      rdfs:domain ag:class_Program ;
                      rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasProgrammingLanguage
+ag:dp_hasProgrammingLanguage rdf:type owl:DatatypeProperty ;
+                             rdfs:domain ag:class_Program ;
+                             rdfs:range xsd:string .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/dp_hasVariableScope

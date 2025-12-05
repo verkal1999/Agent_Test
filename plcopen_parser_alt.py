@@ -793,6 +793,7 @@ class PLCOpenXMLParser:
                     temps=temps,
                     subcalls=subcalls,
                     program_code=e.get("program_code", ""),
+                    programming_lang=e.get("programming_lang"),
                 )
             )
         self._program_models = models

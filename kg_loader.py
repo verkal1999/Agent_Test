@@ -75,12 +75,22 @@ class KGLoader:
         )
         return URIRef(self.AG + safe)
 
+    def _add_program_name(self, prog_uri: URIRef, raw_name: str) -> None:
+        """Annotate program with its raw (unescaped) name."""
+        self.kg.add((prog_uri, self.DP.hasProgramName, Literal(raw_name)))
+
+    def _add_variable_name(self, var_uri: URIRef, raw_name: str) -> None:
+        """Annotate variable with its raw (unescaped) name."""
+        vname = raw_name.replace("__dot__",".")
+        self.kg.add((var_uri, self.DP.hasVariableName, Literal(vname)))
+
     def get_program_uri(self, prog_name: str) -> URIRef:
         uri = self.prog_uris.get(prog_name)
         if uri is None:
             uri = self.make_uri(f"Program_{prog_name}")
             self.kg.add((uri, RDF.type, self.AG.class_Program))
             self.prog_uris[prog_name] = uri
+            self._add_program_name(uri, prog_name)
         return uri
 
     def get_local_var_uri(self, prog_name: str, var_name: str) -> URIRef:
@@ -91,6 +101,7 @@ class KGLoader:
             uri = self.make_uri(raw_id)
             self.kg.add((uri, RDF.type, self.AG.class_Variable))
             self.var_uris[key] = uri
+            self._add_variable_name(uri, var_name)
         return uri
 
     # -------------------------------------------------
@@ -145,6 +156,7 @@ class KGLoader:
                     uri = self.make_uri(full)
                     self.kg.add((uri, RDF.type, self.AG.class_Variable))
                     self.hw_var_uris[full] = uri
+                    self._add_variable_name(uri, full)
                 return uri
             return self.get_local_var_uri(caller_prog, external)
 
@@ -156,6 +168,7 @@ class KGLoader:
                 uri = self.make_uri(external)
                 self.kg.add((uri, RDF.type, self.AG.class_Variable))
                 self.hw_var_uris[external] = uri
+                self._add_variable_name(uri, external)
             return uri
 
         return self.get_local_var_uri(prefix, suffix)
@@ -181,6 +194,10 @@ class KGLoader:
                     if not vname:
                         continue
                     v_uri = self.get_local_var_uri(prog_name, vname)
+
+                    vtype = var.get("internal_type")
+                    if vtype:
+                        self.kg.add((v_uri, self.DP.hasVariableType, Literal(vtype)))
 
                     if sec == "inputs":
                         self.kg.add((prog_uri, self.OP.hasInputVariable, v_uri))
@@ -210,8 +227,12 @@ class KGLoader:
                 vname = temp.get("name")
                 if vname:
                     v_uri = self.get_local_var_uri(prog_name, vname)
-                    self.kg.add((prog_uri, self.OP.hasInternVariable, v_uri))
+                    self.kg.add((prog_uri, self.OP.hasInternalVariable, v_uri))
                     self.kg.add((prog_uri, self.OP.usesVariable, v_uri))
+
+                    ttype = temp.get("type")
+                    if ttype:
+                        self.kg.add((v_uri, self.DP.hasVariableType, Literal(ttype)))
 
             # Subcalls
             for sc in entry.get("subcalls", []):
@@ -274,6 +295,7 @@ class KGLoader:
                 var_uri = self.make_uri(plc_var)
                 self.kg.add((var_uri, RDF.type, self.AG.class_Variable))
                 self.hw_var_uris[plc_var] = var_uri
+                self._add_variable_name(var_uri, plc_var)
 
             hw_addr = entry.get("ea_address")
             if hw_addr:
@@ -306,13 +328,19 @@ class KGLoader:
 
         for gvl in gvl_data:
             gvl_name = gvl["name"]
+            list_uri = self.make_uri(f"GVLList_{gvl_name}")
+            self.kg.add((list_uri, RDF.type, self.AG.class_GobalVariableList))
+            self.kg.add((list_uri, self.DP.hasGlobalVariableListName, Literal(gvl_name)))
             for gv in gvl.get("globals", []):
                 base_name = gv["name"]
                 var_local = make_var_name(gvl_name, base_name)
+                locvname = var_local.replace("__dot__", ".")
                 var_uri = self.AG[var_local]
 
                 self.kg.add((var_uri, RDF.type, self.AG.class_Variable))
-                self.kg.add((var_uri, self.DP.hasVariableName, Literal(var_local)))
+                self.kg.add((var_uri, self.DP.hasVariableName, Literal(locvname)))
+                self._add_variable_name(var_uri, base_name)
+                self.kg.add((list_uri, self.OP.listsGlobalVariable, var_uri))
 
                 if gv.get("type"):
                     self.kg.add((var_uri, self.DP.hasVariableType, Literal(gv["type"])))

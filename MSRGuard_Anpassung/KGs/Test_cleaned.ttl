@@ -14,6 +14,42 @@
 #    Object Properties
 #################################################################
 
+###  http://www.semanticweb.org/AgentProgramParams/op_bindsArgument
+ag:op_bindsArgument rdf:type owl:ObjectProperty ;
+                    rdfs:domain ag:class_ArgumentBinding ;
+                    rdfs:range ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_bindsFormalParameter
+ag:op_bindsFormalParameter rdf:type owl:ObjectProperty ;
+                           rdfs:domain ag:class_ArgumentBinding ;
+                           rdfs:range ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_callsProgram
+ag:op_callsProgram rdf:type owl:ObjectProperty ;
+                   rdfs:domain ag:class_ProgramCall ;
+                   rdfs:range ag:class_Program .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_containsProgrammCall
+ag:op_containsProgrammCall rdf:type owl:ObjectProperty ;
+                           rdfs:domain ag:class_Program ;
+                           rdfs:range ag:class_ProgramCall .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_hasArgumentBinding
+ag:op_hasArgumentBinding rdf:type owl:ObjectProperty ;
+                         rdfs:domain ag:class_ProgramCall ;
+                         rdfs:range ag:class_ArgumentBinding .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_hasCallerVariable
+ag:op_hasCallerVariable rdf:type owl:ObjectProperty ;
+                        rdfs:domain ag:class_ProgramCall ;
+                        rdfs:range ag:class_Variable .
+
+
 ###  http://www.semanticweb.org/AgentProgramParams/op_hasInfluenceOnVariable
 ag:op_hasInfluenceOnVariable rdf:type owl:ObjectProperty ;
                              rdfs:domain ag:class_Variable ;
@@ -27,11 +63,11 @@ ag:op_hasInputVariable rdf:type owl:ObjectProperty ;
                        rdfs:range ag:class_Variable .
 
 
-###  http://www.semanticweb.org/AgentProgramParams/op_hasInternVariable
-ag:op_hasInternVariable rdf:type owl:ObjectProperty ;
-                        rdfs:subPropertyOf ag:op_usesVariable ;
-                        rdfs:domain ag:class_Program ;
-                        rdfs:range ag:class_Variable .
+###  http://www.semanticweb.org/AgentProgramParams/op_hasInternalVariable
+ag:op_hasInternalVariable rdf:type owl:ObjectProperty ;
+                          rdfs:subPropertyOf ag:op_usesVariable ;
+                          rdfs:domain ag:class_Program ;
+                          rdfs:range ag:class_Variable .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/op_hasOutputVariable
@@ -65,6 +101,12 @@ ag:op_isSubProgramOf rdf:type owl:ObjectProperty ;
                      rdfs:range ag:class_Program .
 
 
+###  http://www.semanticweb.org/AgentProgramParams/op_listsGlobalVariable
+ag:op_listsGlobalVariable rdf:type owl:ObjectProperty ;
+                          rdfs:domain ag:class_GobalVariableList ;
+                          rdfs:range ag:class_Variable .
+
+
 ###  http://www.semanticweb.org/AgentProgramParams/op_usesVariable
 ag:op_usesVariable rdf:type owl:ObjectProperty ;
                    rdfs:domain ag:class_Program ;
@@ -87,6 +129,12 @@ ag:dp_hasDescription rdf:type owl:DatatypeProperty ;
                      rdfs:range xsd:string .
 
 
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasGlobalVariableListName
+ag:dp_hasGlobalVariableListName rdf:type owl:DatatypeProperty ;
+                                rdfs:domain ag:class_GobalVariableList ;
+                                rdfs:range xsd:string .
+
+
 ###  http://www.semanticweb.org/AgentProgramParams/dp_hasHardwareAddress
 ag:dp_hasHardwareAddress rdf:type owl:DatatypeProperty ;
                          rdfs:domain ag:class_Variable ;
@@ -99,10 +147,22 @@ ag:dp_hasProgramCode rdf:type owl:DatatypeProperty ;
                      rdfs:range xsd:string .
 
 
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasProgramName
+ag:dp_hasProgramName rdf:type owl:DatatypeProperty ;
+                     rdfs:domain ag:class_Program ;
+                     rdfs:range xsd:string .
+
+
 ###  http://www.semanticweb.org/AgentProgramParams/dp_hasProgrammingLanguage
 ag:dp_hasProgrammingLanguage rdf:type owl:DatatypeProperty ;
                              rdfs:domain ag:class_Program ;
                              rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasVariableName
+ag:dp_hasVariableName rdf:type owl:DatatypeProperty ;
+                      rdfs:domain ag:class_Variable ;
+                      rdfs:range xsd:string .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/dp_hasVariableScope
@@ -136,6 +196,12 @@ ag:dp_ioRawXml rdf:type owl:DatatypeProperty ;
                rdfs:range xsd:string .
 
 
+###  http://www.semanticweb.org/AgentProgramParams/dp_isUnusedVar
+ag:dp_isUnusedVar rdf:type owl:DatatypeProperty ;
+                  rdfs:domain ag:class_Variable ;
+                  rdfs:range xsd:boolean .
+
+
 ###  http://www.semanticweb.org/AgentProgramParams/dp_onlyDeclaredNotUsed
 ag:dp_onlyDeclaredNotUsed rdf:type owl:DatatypeProperty ;
                           rdfs:domain ag:class_Variable ;
@@ -145,6 +211,14 @@ ag:dp_onlyDeclaredNotUsed rdf:type owl:DatatypeProperty ;
 #################################################################
 #    Classes
 #################################################################
+
+###  http://www.semanticweb.org/AgentProgramParams/class_ArgumentBinding
+ag:class_ArgumentBinding rdf:type owl:Class .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/class_GobalVariableList
+ag:class_GobalVariableList rdf:type owl:Class .
+
 
 ###  http://www.semanticweb.org/AgentProgramParams/class_IOChannel
 ag:class_IOChannel rdf:type owl:Class .
@@ -156,6 +230,10 @@ ag:class_PLCProject rdf:type owl:Class .
 
 ###  http://www.semanticweb.org/AgentProgramParams/class_Program
 ag:class_Program rdf:type owl:Class .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/class_ProgramCall
+ag:class_ProgramCall rdf:type owl:Class .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/class_Variable

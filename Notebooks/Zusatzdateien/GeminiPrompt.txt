@@ -1,0 +1,133 @@
+Ok, stimmt. Das mache sehr viel Sinn. Jetzt möchte ich nur wissen, wie ich am besten POU-Aufrufe modellieren soll. Ich habe z.B. diese Variablendeklaration "PROGRAM MAIN
+
+VAR
+
+	{attribute 'OPC.UA.DA' := '1'}       // falls Server im Filter-/Symbolmodus
+
+    fbJob : FB_Methode1Job;              // FB mit {attribute 'OPC.UA.DA.JobMethod' := 'M_Methode1'}
+
+    fbBA   : FB_Betriebsarten;
+
+    fbAuto : FB_Automatikbetrieb_F1;
+
+    fbDiag : FB_Diagnose_D2;
+
+	fbNot : FB_Notaus_D1;
+
+	fbInit : FB_InitFahrt_A6_A2;
+
+	fbProStoer : FB_ProduktionMitStoerung_D3;
+
+	
+
+	Init_start : BOOL := TRUE;
+
+	
+
+
+
+    edgeF1    : R_TRIG;  // F1 -> Start Automatik
+
+    edgeDone  : R_TRIG;  // Diagnose_beendet -> Restart/Weiter
+
+	alt_abort : BOOL := FALSE;
+
+	alt_found : BOOL := FALSE;
+
+    Start_eff  : BOOL := FALSE;
+
+    Weiter_eff : BOOL := FALSE;
+
+	A2_angefordert : BOOL := FALSE;
+
+	D3_angefordert : BOOL := FALSE;
+
+	Init_erreicht : BOOL := FALSE;
+
+	Zyklus_beendet : BOOL := FALSE;
+
+	
+
+END_VAR" und dieses Programm im MAIN "// Diagnose fertig -> Impuls
+
+edgeDone(CLK := fbDiag.Diagnose_beendet);
+
+
+
+// manuell ODER automatisch (Restart nach Diagnose)
+
+Start_eff  := GVL.Start  OR edgeDone.Q;
+
+Weiter_eff := GVL.Weiter OR edgeDone.Q;
+
+
+
+// Betriebsarten (RS-F1/RS-D2 sind dort)
+
+fbBA(
+
+    Start         := Start_eff,
+
+    NotStop       := GVL.NotStopp,
+
+    Weiter        := Weiter_eff,
+
+    Fehler        := GVL.Fehler,
+
+	Start_Init 	  := Init_Start,                  
+
+    Auto_Fertig   := fbAuto.Automatikbetrieb_Fertig,
+
+    Auto_Stoerung := fbAuto.Stoerung_erkannt,
+
+	A2_Requested := A2_angefordert,
+
+	Alt_abort := alt_abort,
+
+	Alt_found := alt_found,
+
+	D3_Requested := D3_angefordert,
+
+	Init_reached := Init_erreicht,
+
+	Cycle_ended := Zyklus_beendet
+
+);
+
+
+
+// F1-Flanke startet die Automatik
+
+edgeF1(CLK := fbBA.F1);
+
+fbAuto(Automatikbetrieb_Starten := edgeF1.Q);
+
+
+
+fbNot(D1 := fbBA.D1);
+
+GVL.DiagnoseRequested := fbNot.Diagnose_gefordert;
+
+
+
+fbProStoer(ProduktionMitStoerung_Starten := fbBA.D3);
+
+alt_abort := fbProStoer.Stoerung_erkannt;
+
+
+
+
+
+fbInit(A6 := fbBA.A6, A2 := fbBA.A2);
+
+Init_erreicht := fbInit.Init_erreicht;
+
+
+
+// D2 fordert die Diagnose an
+
+fbDiag(Diagnose_gefordert := fbBA.D2);
+
+alt_found := fbDiag.Alt_gefunden;" wie soll ich das hier z.B. im KG abbilden? "fbInit(A6 := fbBA.A6, A2 := fbBA.A2);
+
+Init_erreicht := fbInit.Init_erreicht;"

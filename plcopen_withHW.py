@@ -11,6 +11,8 @@ import xml.etree.ElementTree as ET
 # Für COM-Export (TwinCAT)
 import pythoncom
 import win32com.client as com
+import time
+from pythoncom import com_error
 from datamodels import (
     GlobalVar,
     GVL,
@@ -130,7 +132,24 @@ class PLCOpenXMLParser:
     # ----------------------------
     # .plcproj Utilities (Cell 2)
     # ----------------------------
-
+    def _wait_for_projects_ready(self, solution, retries: int = 20, delay: float = 0.5) -> None:
+        """
+        Wartet darauf, dass solution.Projects ohne RPC_E_CALL_REJECTED gelesen werden kann.
+        Vermeidet den COM-Fehler 'Aufruf wurde durch Aufgerufenen abgelehnt'.
+        """
+        for attempt in range(retries):
+            try:
+                _ = solution.Projects.Count
+                return
+            except com_error as e:
+                # -2147418111 = RPC_E_CALL_REJECTED
+                if e.hresult == -2147418111:
+                    time.sleep(delay)
+                    pythoncom.PumpWaitingMessages()
+                    continue
+                raise
+        raise RuntimeError("Timeout: solution.Projects antwortet nicht (TwinCAT/XAE Shell busy?).")
+    
     def _parse_tc_pou_anylang(self, pou_path: Path) -> Dict[str, Any]:
         txt = self._read_text(pou_path)
         root = ET.fromstring(self._strip_ns(txt))
@@ -292,7 +311,47 @@ class PLCOpenXMLParser:
 
         return all_objs
 
+     # --- NEU: Projektinformationen aus export.xml -----------------------------
 
+    def get_plc_project_info(self) -> dict:
+        """
+        Extrahiert Projektinformationen aus export.xml.
+
+        Rückgabe:
+            {
+                "project_name": str | None,
+                "project_object_id": str | None
+            }
+        """
+        if not self.export_xml_path.exists():
+            return {"project_name": None, "project_object_id": None}
+
+        xml_text = self._read_text(self.export_xml_path)
+        # Namespace entfernen, damit wir ohne NS-Prefixe suchen können
+        root = ET.fromstring(self._strip_ns(xml_text))
+
+        project_name: Optional[str] = None
+        project_object_id: Optional[str] = None
+
+        # contentHeader name="Proj1"
+        ch = root.find("contentHeader")
+        if ch is not None:
+            project_name = ch.get("name") or project_name
+
+        # ProjectStructure aus addData
+        for data in root.findall(".//data"):
+            if data.get("name") == "http://www.3s-software.com/plcopenxml/projectstructure":
+                ps_root = data.find("ProjectStructure/Object")
+                if ps_root is not None:
+                    if project_name is None:
+                        project_name = ps_root.get("Name")
+                    project_object_id = ps_root.get("ObjectId")
+                break
+
+        return {
+            "project_name": project_name,
+            "project_object_id": project_object_id,
+        }
     # ----------------------------
     # COM-Export aus Cell 4: export.xml erzeugen
     # ----------------------------
@@ -328,13 +387,25 @@ class PLCOpenXMLParser:
         dte.MainWindow.Visible = True
         solution = dte.Solution
         solution.Open(str(self.sln_path))
+        self._wait_for_projects_ready(solution)
 
         tc_project = None
         for i in range(1, solution.Projects.Count + 1):
             p = solution.Projects.Item(i)
-            if p.FullName.lower().endswith(".tsproj"):
+            try:
+                full_name = p.FullName
+            except com_error as e:
+                if e.hresult == -2147418111:
+                    # einmal kurz warten und nochmal versuchen
+                    time.sleep(0.5)
+                    pythoncom.PumpWaitingMessages()
+                    full_name = p.FullName
+                else:
+                    raise
+            if full_name.lower().endswith(".tsproj"):
                 tc_project = p
                 break
+
         if tc_project is None:
             raise RuntimeError("Kein TwinCAT-Systemprojekt (.tsproj) in der Solution gefunden")
         sys_mgr = tc_project.Object
@@ -522,6 +593,8 @@ class PLCOpenXMLParser:
         result: List[Dict[str, Any]] = []
         for pou in root.findall('.//ns:pou', NS):
             name = pou.attrib.get('name')
+            pou_type = pou.attrib.get('pouType')  # "program" oder "functionBlock"
+
             fbd = pou.find('.//ns:FBD', NS)
             node_map = PLCOpenXMLParser._build_node_mapping(fbd, NS) if fbd is not None else {}
             inputs, outputs = PLCOpenXMLParser._parse_io_vars(pou, NS)
@@ -533,11 +606,13 @@ class PLCOpenXMLParser:
             subcalls = PLCOpenXMLParser._extract_call_blocks(fbd, pou_names, node_map, NS) if fbd is not None else []
             result.append({
                 'Programm_Name': name,
+                'pou_type': pou_type,  
                 'inputs': mapped_inputs,
                 'outputs': mapped_outputs,
                 'subcalls': subcalls
             })
         return result
+
 
     def build_program_io_mapping(self) -> None:
         mapping = self.analyze_plcopen(self.export_xml_path)
@@ -733,9 +808,22 @@ class PLCOpenXMLParser:
             else:
                 entry["program_code"] = entry.get("program_code", "")
 
-        self.program_io_mapping_path.write_text(json.dumps(mapping, indent=2, ensure_ascii=False), encoding="utf-8")
+        proj_info = self.get_plc_project_info()
+        proj_name = proj_info.get("project_name")
+        proj_id = proj_info.get("project_object_id")
+        if proj_name:
+            for entry in mapping:
+                entry["PLCProject_Name"] = proj_name
+                if proj_id:
+                    entry["PLCProject_ObjectId"] = proj_id
+
+        self.program_io_mapping_path.write_text(
+            json.dumps(mapping, indent=2, ensure_ascii=False),
+            encoding="utf-8"
+        )
         self._mapping_raw = mapping
         print("Mapping um Typen, temps und Programmkode erweitert.")
+
 
     # ----------------------------
     # variable_traces.json aus Cell 7
@@ -1269,4 +1357,56 @@ class PLCOpenXMLParserWithHW(PLCOpenXMLParser):
 
         traces_path.write_text(json.dumps(traces, indent=2, ensure_ascii=False), encoding="utf-8")
         print(f"variable_traces.json aktualisiert (hardware=true in {changed} Outputs).")
+
+    @staticmethod
+    def _strip_ns(xml_text: str) -> str:
+        return re.sub(r'\sxmlns="[^"]+"', '', xml_text, count=1)
+
+    @staticmethod
+    def _strip_st_comments(s: str) -> str:
+        s = re.sub(r'\(\*.*?\*\)', '', s, flags=re.S)
+        s = re.sub(r'//.*', '', s)
+        return s
+
+    # --- NEU: Projektinformationen aus export.xml ---------------------------------
+
+    def get_plc_project_info(self) -> dict:
+        """
+        Extrahiert Projektinformationen aus export.xml.
+        Nutzt zuerst den contentHeader name, danach die ProjectStructure.
+        Rückgabe:
+            {
+                "project_name": str | None,
+                "project_object_id": str | None
+            }
+        """
+        if not self.export_xml_path.exists():
+            return {"project_name": None, "project_object_id": None}
+
+        xml_text = self.export_xml_path.read_text(encoding="utf-8", errors="replace")
+        # Namespace entfernen, damit wir ohne NS suchen können
+        root = ET.fromstring(self._strip_ns(xml_text))
+
+        project_name: Optional[str] = None
+        project_object_id: Optional[str] = None
+
+        # 1) contentHeader name (z. B. Proj1)
+        ch = root.find("contentHeader")
+        if ch is not None:
+            project_name = ch.get("name") or project_name
+
+        # 2) ProjectStructure als Fallback / Zusatzinfos
+        for data in root.findall("addData/data"):
+            if data.get("name") == "http://www.3s-software.com/plcopenxml/projectstructure":
+                ps_root = data.find("ProjectStructure/Object")
+                if ps_root is not None:
+                    if project_name is None:
+                        project_name = ps_root.get("Name")
+                    project_object_id = ps_root.get("ObjectId")
+                break
+
+        return {
+            "project_name": project_name,
+            "project_object_id": project_object_id,
+        }
 

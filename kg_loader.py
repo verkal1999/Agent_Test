@@ -58,10 +58,40 @@ class KGLoader:
         self.var_uris: Dict[Tuple[str, str], URIRef] = {}
         self.hw_var_uris: Dict[str, URIRef] = {}
         self.pending_ext_hw_links: List[Tuple[URIRef, str]] = []
-
+        self.plc_project_uris: Dict[str, URIRef] = {}
         self.gvl_short_to_full: Dict[str, set[str]] = {}
         self.gvl_full_to_type: Dict[str, str] = {}
 
+    # -------------------------------------------------
+    # Neue URI-Helfer für Ports und Instanzen
+    # -------------------------------------------------
+
+    def get_port_uri(self, pou_name: str, port_name: str) -> URIRef:
+        """Erstellt eine URI für die Schnittstelle (Port) eines Bausteins (Typ)."""
+        # Bsp: Port_FB_Diagnose_D2_Diagnose_gefordert
+        safe_pou = pou_name.replace('.', '__dot__')
+        safe_port = port_name.replace('.', '__dot__')
+        uri = self.make_uri(f"Port_{safe_pou}_{safe_port}")
+        return uri
+
+    def get_fb_instance_uri(self, parent_prog: str, var_name: str) -> URIRef:
+        """Erstellt eine URI für die logische Instanz eines FBs innerhalb eines Programms."""
+        # Bsp: FBInst_MAIN_fbDiag
+        uri = self.make_uri(f"FBInst_{parent_prog}_{var_name}")
+        return uri
+
+    def get_port_instance_uri(self, parent_prog: str, fb_var_name: str, port_name: str) -> URIRef:
+        """Erstellt eine URI für den Zugriff auf einen Port an einer Instanz (z.B. fbDiag.Busy)."""
+        # Bsp: PortInst_MAIN_fbDiag_Busy
+        uri = self.make_uri(f"PortInst_{parent_prog}_{fb_var_name}_{port_name}")
+        return uri
+        
+    def _is_standard_type(self, type_name: str) -> bool:
+        """Prüft, ob es sich um einen IEC-Basistyp handelt."""
+        standards = {'BOOL', 'INT', 'DINT', 'REAL', 'LREAL', 'TIME', 'STRING', 'WSTRING', 'BYTE', 'WORD', 'DWORD', 'LWORD', 'UDINT', 'UINT', 'SINT', 'USINT'}
+        # Einfache Prüfung, ignoriert Arrays vorerst
+        return type_name.upper() in standards
+    
     # -------------------------------------------------
     # URI-Helfer (make_uri, get_program_uri, get_local_var_uri)
     # -------------------------------------------------
@@ -84,14 +114,31 @@ class KGLoader:
         vname = raw_name.replace("__dot__",".")
         self.kg.add((var_uri, self.DP.hasVariableName, Literal(vname)))
 
+    def _clean_expression(self, expr: str) -> str:
+        """Entfernt NOT, Klammern etc. um den Kern-Variablennamen zu finden."""
+        if not expr: return ""
+        # Einfache Heuristik: Entferne logische Operatoren und Leerzeichen
+        clean = expr.replace('NOT ', '').replace('(', '').replace(')', '').strip()
+        return clean
+
     def get_program_uri(self, prog_name: str) -> URIRef:
         uri = self.prog_uris.get(prog_name)
         if uri is None:
+            # WICHTIG: Kein RDF.type hier setzen! Das macht der Aufrufer.
             uri = self.make_uri(f"Program_{prog_name}")
-            self.kg.add((uri, RDF.type, self.AG.class_Program))
             self.prog_uris[prog_name] = uri
             self._add_program_name(uri, prog_name)
         return uri
+    
+    def get_fb_uri(self, fb_name: str) -> URIRef:
+            uri = self.prog_uris.get(fb_name)
+            if uri is None:
+                # WICHTIG: Kein RDF.type hier setzen! Das macht der Aufrufer.
+                uri = self.make_uri(f"FBType_{fb_name}")
+                self.prog_uris[fb_name] = uri
+                self.kg.add((uri, RDF.type, self.AG.class_FBType))
+            return uri
+
 
     def get_local_var_uri(self, prog_name: str, var_name: str) -> URIRef:
         key = (prog_name, var_name)
@@ -142,36 +189,58 @@ class KGLoader:
         ext = item.get("external")
         return ext.split('.')[-1] if ext else item.get('internal')
 
-    def _get_ext_var_uri(self, external: Optional[str], caller_prog: str) -> Optional[URIRef]:
-        if not external:
+    def _get_ext_var_uri(self, external_raw: Optional[str], caller_prog: str) -> Optional[URIRef]:
+        if not external_raw:
             return None
+        
+        # 1. Bereinigen (z.B. "NOT GVL.Fehler" -> "GVL.Fehler")
+        external = self._clean_expression(external_raw)
 
-        # Fall 1: kein Punkt -> ggf. GVL-Shortname oder lokale Var
-        if '.' not in external:
-            if external in self.gvl_short_to_full:
-                full_names = sorted(self.gvl_short_to_full[external])
-                full = full_names[0]
-                uri = self.hw_var_uris.get(full)
-                if uri is None:
-                    uri = self.make_uri(full)
-                    self.kg.add((uri, RDF.type, self.AG.class_Variable))
-                    self.hw_var_uris[full] = uri
-                    self._add_variable_name(uri, full)
-                return uri
-            return self.get_local_var_uri(caller_prog, external)
-
-        prefix, suffix = external.split('.', 1)
-
-        if prefix.startswith('GVL') or prefix.startswith('GV'):
+        # Fall 1: GVL (Global Variable)
+        # Check auf bekannte GVL-Listen oder Präfix
+        if external.startswith('GVL') or external.startswith('GV') or external.startswith('OPCUA'):
             uri = self.hw_var_uris.get(external)
             if uri is None:
                 uri = self.make_uri(external)
                 self.kg.add((uri, RDF.type, self.AG.class_Variable))
                 self.hw_var_uris[external] = uri
                 self._add_variable_name(uri, external)
+                # Optional: Scope Global setzen
+                self.kg.add((uri, self.DP.hasVariableScope, Literal("global")))
             return uri
 
-        return self.get_local_var_uri(prefix, suffix)
+        # Fall 2: Punkt im Namen -> Port-Zugriff auf eine lokale Instanz (z.B. fbBA.D2)
+        # ABER: Nur wenn der Teil vor dem Punkt KEINE GVL ist.
+        if '.' in external:
+            parts = external.split('.')
+            if len(parts) == 2:
+                instance_name, port_name = parts
+                
+                # Prüfen: Existiert instance_name als lokale Variable im Caller?
+                # (Wir nehmen an, ja, wenn es keine GVL ist)
+                
+                # 1. Die FB-Instanz Variable holen (z.B. Var_MAIN_fbBA)
+                fb_var_uri = self.get_local_var_uri(caller_prog, instance_name)
+                
+                # 2. Die logische FB-Instanz URI (FBInst_MAIN_fbBA)
+                fb_inst_uri = self.get_fb_instance_uri(caller_prog, instance_name)
+                
+                # 3. Die PortInstance erstellen (PortInst_MAIN_fbBA_D2)
+                p_inst_uri = self.get_port_instance_uri(caller_prog, instance_name, port_name)
+                self.kg.add((p_inst_uri, RDF.type, self.AG.class_PortInstance))
+                
+                # Verbindung: PortInstance gehört zur FBInstance
+                self.kg.add((p_inst_uri, self.OP.isPortOfInstance, fb_inst_uri))
+                
+                # Wichtig: Wir geben die URI der PortInstance zurück, 
+                # damit der Aufrufer diese z.B. an einen anderen Port binden kann.
+                return p_inst_uri
+
+        # Fall 3: Lokale Variable
+        return self.get_local_var_uri(caller_prog, external)
+    # -------------------------------------------------
+    # Schritt 2: Programme + Variablen aus program_io_with_mapping.json
+    # -------------------------------------------------
 
     # -------------------------------------------------
     # Schritt 2: Programme + Variablen aus program_io_with_mapping.json
@@ -184,99 +253,112 @@ class KGLoader:
             prog_name = entry.get("Programm_Name")
             if not prog_name:
                 continue
+            
+            pou_type = entry.get("pou_type") # 'program' oder 'functionBlock'
+            
+            # Wir nutzen 'pou_uri' als gemeinsame Variable für Program ODER FB,
+            # damit die nachfolgenden Schritte (Ports, Vars) immer eine valide URI haben.
+            pou_uri = None
 
-            prog_uri = self.get_program_uri(prog_name)
+            # -------------------------------------------------
+            # TYPISIERUNG & URI ERSTELLUNG
+            # -------------------------------------------------
+            if pou_type == "functionBlock":
+                # Hole URI für FB
+                pou_uri = self.get_fb_uri(prog_name)
+                # Spezifische FB-Typisierung
+                self.kg.add((pou_uri, RDF.type, self.AG.class_FBType))
+                # Optional: self.kg.add((pou_uri, self.DP.hasPOUType, Literal("FunctionBlock")))
+                
+            elif pou_type == "program":
+                # Hole URI für Programm
+                pou_uri = self.get_program_uri(prog_name)
+                # Spezifische Programm-Typisierung
+                self.kg.add((pou_uri, RDF.type, self.AG.class_Program))
+                # Optional: self.kg.add((pou_uri, self.DP.hasPOUType, Literal("Program")))
+            
+            else:
+                # Fallback für unbekannte Typen (verhindert Absturz)
+                pou_uri = self.get_program_uri(prog_name)
 
-            # Inputs / Outputs / InOuts
-            for sec in ("inputs", "outputs", "inouts"):
+            # SICHERHEITSCHECK: Wenn pou_uri immer noch None ist, abbrechen
+            if pou_uri is None:
+                continue
+
+            # -------------------------------------------------
+            # PROJEKT VERKNÜPFUNG
+            # -------------------------------------------------
+            project_name = entry.get("PLCProject_Name")
+            if project_name:
+                project_uri = self.get_or_create_plc_project(project_name)
+                self.kg.add((project_uri, self.OP.consistsOfPOU, pou_uri))
+
+            # -------------------------------------------------
+            # A. PORTS (Inputs / Outputs)
+            # -------------------------------------------------
+            # AB HIER: Nur noch 'pou_uri' verwenden!
+            
+            for sec in ("inputs", "outputs"):
+                direction = "Input" if sec == "inputs" else "Output"
+                
                 for var in entry.get(sec, []):
                     vname = self._pick_var(var)
-                    if not vname:
-                        continue
-                    v_uri = self.get_local_var_uri(prog_name, vname)
+                    if not vname: continue
+                    
+                    # Port erstellen
+                    port_uri = self.get_port_uri(prog_name, vname)
+                    self.kg.add((port_uri, RDF.type, self.AG.class_Port))
+                    self.kg.add((port_uri, self.DP.hasPortName, Literal(vname)))
+                    self.kg.add((port_uri, self.DP.hasPortDirection, Literal(direction)))
+                    
+                    # Port gehört zum Baustein (Typ) -> Hier war der Fehler (prog_uri war None)
+                    self.kg.add((pou_uri, self.OP.hasPort, port_uri))
 
                     vtype = var.get("internal_type")
                     if vtype:
-                        self.kg.add((v_uri, self.DP.hasVariableType, Literal(vtype)))
+                        self.kg.add((port_uri, self.DP.hasPortType, Literal(vtype)))
 
-                    if sec == "inputs":
-                        self.kg.add((prog_uri, self.OP.hasInputVariable, v_uri))
-                    elif sec == "outputs":
-                        self.kg.add((prog_uri, self.OP.hasOutputVariable, v_uri))
-                    else:
-                        self.kg.add((prog_uri, self.OP.hasInputVariable, v_uri))
-                        self.kg.add((prog_uri, self.OP.hasOutputVariable, v_uri))
-
-                    self.kg.add((prog_uri, self.OP.usesVariable, v_uri))
-
-                    internal = var.get("internal")
+                    # MAPPINGS (External)
                     external = var.get("external")
+                    if external:
+                        target_uri = self._get_ext_var_uri(external, prog_name)
+                        
+                        if target_uri:
+                            self.kg.add((target_uri, self.OP.isBoundToPort, port_uri))
+                            clean_ext = self._clean_expression(external)
+                            self.pending_ext_hw_links.append((target_uri, clean_ext))
 
-                    if internal and external:
-                        int_uri = self.get_local_var_uri(prog_name, internal)
-                        ext_uri = self._get_ext_var_uri(external, prog_name)
-
-                        if ext_uri is not None and int_uri != ext_uri:
-                            self.kg.add((int_uri, self.OP.isMappedToVariable, ext_uri))
-
-                        if ext_uri is not None:
-                            self.pending_ext_hw_links.append((ext_uri, external))
-
-            # Temps
+            # -------------------------------------------------
+            # B. VARIABLES (Temps) & INSTANCES
+            # -------------------------------------------------
             for temp in entry.get("temps", []):
                 vname = temp.get("name")
-                if vname:
-                    v_uri = self.get_local_var_uri(prog_name, vname)
-                    self.kg.add((prog_uri, self.OP.hasInternalVariable, v_uri))
-                    self.kg.add((prog_uri, self.OP.usesVariable, v_uri))
+                if not vname: continue
+                
+                # Lokale Variable erstellen
+                v_uri = self.get_local_var_uri(prog_name, vname)
+                self.kg.add((pou_uri, self.OP.usesVariable, v_uri))
+                
+                ttype = temp.get("type")
+                if ttype:
+                    self.kg.add((v_uri, self.DP.hasVariableType, Literal(ttype)))
+                    
+                    # Instanz-Erkennung
+                    if not self._is_standard_type(ttype):
+                        fb_inst_uri = self.get_fb_instance_uri(prog_name, vname)
+                        self.kg.add((fb_inst_uri, RDF.type, self.AG.class_FBInstance))
+                        self.kg.add((v_uri, self.OP.representsFBInstance, fb_inst_uri))
+                        
+                        fb_type_uri = self.get_fb_uri(ttype) 
+                        self.kg.add((fb_inst_uri, self.OP.isInstanceOfFBType, fb_type_uri))
 
-                    ttype = temp.get("type")
-                    if ttype:
-                        self.kg.add((v_uri, self.DP.hasVariableType, Literal(ttype)))
-
-            # Subcalls
-            for sc in entry.get("subcalls", []):
-                sub_prog = sc.get("SubNetwork_Name")
-                instance = sc.get("instanceName")
-
-                if sub_prog:
-                    sub_uri = self.get_program_uri(sub_prog)
-                    self.kg.add((sub_uri, self.OP.isSubProgramOf, prog_uri))
-                else:
-                    sub_uri = None
-
-                if instance and sub_prog:
-                    inst_uri = self.get_local_var_uri(prog_name, instance)
-                    self.kg.add((inst_uri, self.OP.isMappedToProgram, sub_uri))
-
-                for param in sc.get("inputs", []):
-                    internal = param.get("internal")
-                    external = param.get("external")
-                    if internal and external and sub_prog:
-                        int_uri = self.get_local_var_uri(sub_prog, internal)
-                        ext_uri = self._get_ext_var_uri(external, prog_name)
-                        if ext_uri is not None and int_uri != ext_uri:
-                            self.kg.add((int_uri, self.OP.isMappedToVariable, ext_uri))
-                        if ext_uri is not None:
-                            self.pending_ext_hw_links.append((ext_uri, external))
-
-                for param in sc.get("outputs", []):
-                    internal = param.get("internal")
-                    external = param.get("external")
-                    if internal and external and sub_prog:
-                        int_uri = self.get_local_var_uri(sub_prog, internal)
-                        ext_uri = self._get_ext_var_uri(external, prog_name)
-                        if ext_uri is not None and int_uri != ext_uri:
-                            self.kg.add((int_uri, self.OP.isMappedToVariable, ext_uri))
-                        if ext_uri is not None:
-                            self.pending_ext_hw_links.append((ext_uri, external))
-
+            # Code & Meta
             code = entry.get("program_code")
             lang = entry.get("programming_lang")
             if code:
-                self.kg.add((prog_uri, self.DP.hasProgramCode, Literal(code)))
+                self.kg.add((pou_uri, self.DP.hasPOUCode, Literal(code)))
             if lang:
-                self.kg.add((prog_uri, self.DP.hasProgrammingLanguage, Literal(lang)))
+                self.kg.add((pou_uri, self.DP.hasPOULanguage, Literal(lang)))
 
     # -------------------------------------------------
     # Schritt 3: io_mappings.json einlesen (Cell 5)
@@ -348,6 +430,23 @@ class KGLoader:
                     self.kg.add((var_uri, self.DP.hasInitialValue, Literal(gv["init"])))
                 if gv.get("address"):
                     self.kg.add((var_uri, self.DP.hasHardwareAddress, Literal(gv["address"])))
+
+    # -------------------------------------------------
+    # PLC-Projekt hinzufügen
+    # -------------------------------------------------
+
+    def get_or_create_plc_project(self, project_name: str) -> URIRef:
+        """
+        Erzeugt (oder findet) eine Instanz von AG:class_PLCProject mit Label.
+        """
+        # eigener Namensraum, damit es nicht mit Programmen kollidiert
+        proj_uri = self.make_uri(f"PLCProject__{project_name}")
+
+        if (proj_uri, RDF.type, self.AG.class_PLCProject) not in self.kg:
+            self.kg.add((proj_uri, RDF.type, self.AG.class_PLCProject))
+            # Datenproperty kannst du je nach Ontologie anpassen:
+            self.kg.add((proj_uri, self.DP.hasPLCProjectName, Literal(project_name)))
+        return proj_uri
 
     # -------------------------------------------------
     # Speichern

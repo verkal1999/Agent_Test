@@ -14,39 +14,47 @@
 #    Object Properties
 #################################################################
 
-###  http://www.semanticweb.org/AgentProgramParams/op_bindsArgument
-ag:op_bindsArgument rdf:type owl:ObjectProperty ;
-                    rdfs:domain ag:class_ArgumentBinding ;
-                    rdfs:range ag:class_Variable .
+###  http://www.semanticweb.org/AgentProgramParams/op_assignsFrom
+ag:op_assignsFrom rdf:type owl:ObjectProperty ;
+                  rdfs:domain ag:class_ParameterAssignment ;
+                  rdfs:range ag:class_SignalSource ;
+                  rdfs:comment "# 2. Woher kommt das Signal? Hier ist die Signal-Quelle bei Funktionsaufruf" .
 
 
-###  http://www.semanticweb.org/AgentProgramParams/op_bindsFormalParameter
-ag:op_bindsFormalParameter rdf:type owl:ObjectProperty ;
-                           rdfs:domain ag:class_ArgumentBinding ;
-                           rdfs:range ag:class_Variable .
+###  http://www.semanticweb.org/AgentProgramParams/op_assignsToPort
+ag:op_assignsToPort rdf:type owl:ObjectProperty ;
+                    rdfs:domain ag:class_ParameterAssignment ;
+                    rdfs:range ag:class_Port ;
+                    rdfs:comment "# 1. Wohin geht das Signal? (Zum Port \"CLK\" definiert im Typ R_TRIG)" .
 
 
-###  http://www.semanticweb.org/AgentProgramParams/op_callsProgram
-ag:op_callsProgram rdf:type owl:ObjectProperty ;
-                   rdfs:domain ag:class_ProgramCall ;
-                   rdfs:range ag:class_Program .
+###  http://www.semanticweb.org/AgentProgramParams/op_callsPOU
+ag:op_callsPOU rdf:type owl:ObjectProperty ;
+               rdfs:domain ag:class_POUCall ;
+               rdfs:range ag:class_POU .
 
 
-###  http://www.semanticweb.org/AgentProgramParams/op_containsProgrammCall
-ag:op_containsProgrammCall rdf:type owl:ObjectProperty ;
-                           rdfs:domain ag:class_Program ;
-                           rdfs:range ag:class_ProgramCall .
+###  http://www.semanticweb.org/AgentProgramParams/op_consistsOfPOU
+ag:op_consistsOfPOU rdf:type owl:ObjectProperty ;
+                    rdfs:domain ag:class_PLCProject ;
+                    rdfs:range ag:class_POU .
 
 
-###  http://www.semanticweb.org/AgentProgramParams/op_hasArgumentBinding
-ag:op_hasArgumentBinding rdf:type owl:ObjectProperty ;
-                         rdfs:domain ag:class_ProgramCall ;
-                         rdfs:range ag:class_ArgumentBinding .
+###  http://www.semanticweb.org/AgentProgramParams/op_containsPOUCall
+ag:op_containsPOUCall rdf:type owl:ObjectProperty ;
+                      rdfs:domain ag:class_POU ;
+                      rdfs:range ag:class_POUCall .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_hasAssignment
+ag:op_hasAssignment rdf:type owl:ObjectProperty ;
+                    rdfs:domain ag:class_POUCall ;
+                    rdfs:range ag:class_ParameterAssignment .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/op_hasCallerVariable
 ag:op_hasCallerVariable rdf:type owl:ObjectProperty ;
-                        rdfs:domain ag:class_ProgramCall ;
+                        rdfs:domain ag:class_POUCall ;
                         rdfs:range ag:class_Variable .
 
 
@@ -56,25 +64,17 @@ ag:op_hasInfluenceOnVariable rdf:type owl:ObjectProperty ;
                              rdfs:range ag:class_Variable .
 
 
-###  http://www.semanticweb.org/AgentProgramParams/op_hasInputVariable
-ag:op_hasInputVariable rdf:type owl:ObjectProperty ;
-                       rdfs:subPropertyOf ag:op_usesVariable ;
-                       rdfs:domain ag:class_Program ;
-                       rdfs:range ag:class_Variable .
+###  http://www.semanticweb.org/AgentProgramParams/op_hasPort
+ag:op_hasPort rdf:type owl:ObjectProperty ;
+              rdfs:domain ag:class_FBType ;
+              rdfs:range ag:class_Port .
 
 
-###  http://www.semanticweb.org/AgentProgramParams/op_hasInternalVariable
-ag:op_hasInternalVariable rdf:type owl:ObjectProperty ;
-                          rdfs:subPropertyOf ag:op_usesVariable ;
-                          rdfs:domain ag:class_Program ;
-                          rdfs:range ag:class_Variable .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/op_hasOutputVariable
-ag:op_hasOutputVariable rdf:type owl:ObjectProperty ;
-                        rdfs:subPropertyOf ag:op_usesVariable ;
-                        rdfs:domain ag:class_Program ;
-                        rdfs:range ag:class_Variable .
+###  http://www.semanticweb.org/AgentProgramParams/op_instantiatesPort
+ag:op_instantiatesPort rdf:type owl:ObjectProperty ;
+                       owl:inverseOf ag:op_isInstanceOfPort ;
+                       rdfs:domain ag:class_PortInstance ;
+                       rdfs:range ag:class_Port .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/op_isBoundToChannel
@@ -83,16 +83,40 @@ ag:op_isBoundToChannel rdf:type owl:ObjectProperty ;
                        rdfs:range ag:class_IOChannel .
 
 
-###  http://www.semanticweb.org/AgentProgramParams/op_isMappedToProgram
-ag:op_isMappedToProgram rdf:type owl:ObjectProperty ;
-                        rdfs:domain ag:class_Variable ;
-                        rdfs:range ag:class_Program .
+###  http://www.semanticweb.org/AgentProgramParams/op_isBoundToPort
+ag:op_isBoundToPort rdf:type owl:ObjectProperty ;
+                    rdfs:domain ag:class_Variable ;
+                    rdfs:range ag:class_Port .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_isInstanceOfFBType
+ag:op_isInstanceOfFBType rdf:type owl:ObjectProperty ;
+                         rdfs:domain ag:class_FBInstance ;
+                         rdfs:range ag:class_FBType .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_isInstanceOfPort
+ag:op_isInstanceOfPort rdf:type owl:ObjectProperty ;
+                       rdfs:domain ag:class_PortInstance ;
+                       rdfs:range ag:class_Port .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_isMappedToPOU
+ag:op_isMappedToPOU rdf:type owl:ObjectProperty ;
+                    rdfs:domain ag:class_Variable ;
+                    rdfs:range ag:class_POU .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/op_isMappedToVariable
 ag:op_isMappedToVariable rdf:type owl:ObjectProperty ;
                          rdfs:domain ag:class_Variable ;
                          rdfs:range ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_isPortOfInstance
+ag:op_isPortOfInstance rdf:type owl:ObjectProperty ;
+                       rdfs:domain ag:class_PortInstance ;
+                       rdfs:range ag:class_FBInstance .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/op_isSubProgramOf
@@ -107,10 +131,16 @@ ag:op_listsGlobalVariable rdf:type owl:ObjectProperty ;
                           rdfs:range ag:class_Variable .
 
 
-###  http://www.semanticweb.org/AgentProgramParams/op_usesVariable
-ag:op_usesVariable rdf:type owl:ObjectProperty ;
-                   rdfs:domain ag:class_Program ;
-                   rdfs:range ag:class_Variable .
+###  http://www.semanticweb.org/AgentProgramParams/op_representsFBInstance
+ag:op_representsFBInstance rdf:type owl:ObjectProperty ;
+                           rdfs:domain ag:class_Variable ;
+                           rdfs:range ag:class_FBInstance .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_usesPort
+ag:op_usesPort rdf:type owl:ObjectProperty ;
+               rdfs:domain ag:class_Variable ;
+               rdfs:range ag:class_Port .
 
 
 #################################################################
@@ -119,7 +149,7 @@ ag:op_usesVariable rdf:type owl:ObjectProperty ;
 
 ###  http://www.semanticweb.org/AgentProgramParams/dp_hasConsistencyReport
 ag:dp_hasConsistencyReport rdf:type owl:DatatypeProperty ;
-                           rdfs:domain ag:class_Program ;
+                           rdfs:domain ag:class_POU ;
                            rdfs:range xsd:string .
 
 
@@ -141,22 +171,52 @@ ag:dp_hasHardwareAddress rdf:type owl:DatatypeProperty ;
                          rdfs:range xsd:string .
 
 
-###  http://www.semanticweb.org/AgentProgramParams/dp_hasProgramCode
-ag:dp_hasProgramCode rdf:type owl:DatatypeProperty ;
-                     rdfs:domain ag:class_Program ;
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasPLCProjectName
+ag:dp_hasPLCProjectName rdf:type owl:DatatypeProperty ;
+                        rdfs:domain ag:class_PLCProject ;
+                        rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasPOUCode
+ag:dp_hasPOUCode rdf:type owl:DatatypeProperty ;
+                 rdfs:domain ag:class_POU ;
+                 rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasPOULanguage
+ag:dp_hasPOULanguage rdf:type owl:DatatypeProperty ;
+                     rdfs:domain ag:class_POU ;
                      rdfs:range xsd:string .
 
 
-###  http://www.semanticweb.org/AgentProgramParams/dp_hasProgramName
-ag:dp_hasProgramName rdf:type owl:DatatypeProperty ;
-                     rdfs:domain ag:class_Program ;
-                     rdfs:range xsd:string .
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasPOUName
+ag:dp_hasPOUName rdf:type owl:DatatypeProperty ;
+                 rdfs:domain ag:class_POU ;
+                 rdfs:range xsd:string .
 
 
-###  http://www.semanticweb.org/AgentProgramParams/dp_hasProgrammingLanguage
-ag:dp_hasProgrammingLanguage rdf:type owl:DatatypeProperty ;
-                             rdfs:domain ag:class_Program ;
-                             rdfs:range xsd:string .
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasPOUType
+ag:dp_hasPOUType rdf:type owl:DatatypeProperty ;
+                 rdfs:domain ag:class_POU ;
+                 rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasPortDirection
+ag:dp_hasPortDirection rdf:type owl:DatatypeProperty ;
+                       rdfs:domain ag:class_Port ;
+                       rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasPortName
+ag:dp_hasPortName rdf:type owl:DatatypeProperty ;
+                  rdfs:domain ag:class_Port ;
+                  rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasPortType
+ag:dp_hasPortType rdf:type owl:DatatypeProperty ;
+                  rdfs:domain ag:class_Port ;
+                  rdfs:range xsd:string .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/dp_hasVariableName
@@ -212,8 +272,18 @@ ag:dp_onlyDeclaredNotUsed rdf:type owl:DatatypeProperty ;
 #    Classes
 #################################################################
 
-###  http://www.semanticweb.org/AgentProgramParams/class_ArgumentBinding
-ag:class_ArgumentBinding rdf:type owl:Class .
+###  http://www.semanticweb.org/AgentProgramParams/class_CustomFBType
+ag:class_CustomFBType rdf:type owl:Class ;
+                      rdfs:subClassOf ag:class_FBType .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/class_FBInstance
+ag:class_FBInstance rdf:type owl:Class .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/class_FBType
+ag:class_FBType rdf:type owl:Class ;
+                rdfs:subClassOf ag:class_POU .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/class_GobalVariableList
@@ -228,16 +298,503 @@ ag:class_IOChannel rdf:type owl:Class .
 ag:class_PLCProject rdf:type owl:Class .
 
 
+###  http://www.semanticweb.org/AgentProgramParams/class_POU
+ag:class_POU rdf:type owl:Class .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/class_POUCall
+ag:class_POUCall rdf:type owl:Class .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/class_ParameterAssignment
+ag:class_ParameterAssignment rdf:type owl:Class .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/class_Port
+ag:class_Port rdf:type owl:Class .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/class_PortInstance
+ag:class_PortInstance rdf:type owl:Class ;
+                      rdfs:subClassOf ag:class_SignalSource .
+
+
 ###  http://www.semanticweb.org/AgentProgramParams/class_Program
-ag:class_Program rdf:type owl:Class .
+ag:class_Program rdf:type owl:Class ;
+                 rdfs:subClassOf ag:class_POU .
 
 
-###  http://www.semanticweb.org/AgentProgramParams/class_ProgramCall
-ag:class_ProgramCall rdf:type owl:Class .
+###  http://www.semanticweb.org/AgentProgramParams/class_SignalSource
+ag:class_SignalSource rdf:type owl:Class .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/class_SourceLiteral
+ag:class_SourceLiteral rdf:type owl:Class ;
+                       rdfs:subClassOf ag:class_SignalSource .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/class_StandardFBType
+ag:class_StandardFBType rdf:type owl:Class ;
+                        rdfs:subClassOf ag:class_FBType .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/class_Variable
-ag:class_Variable rdf:type owl:Class .
+ag:class_Variable rdf:type owl:Class ;
+                  rdfs:subClassOf ag:class_SignalSource .
+
+
+#################################################################
+#    Individuals
+#################################################################
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_CTD_CD
+ag:Port_CTD_CD rdf:type owl:NamedIndividual ,
+                        ag:class_Port ;
+               ag:dp_hasPortDirection "Input" ;
+               ag:dp_hasPortName "CD" ;
+               ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_CTD_CV
+ag:Port_CTD_CV rdf:type owl:NamedIndividual ,
+                        ag:class_Port ;
+               ag:dp_hasPortDirection "Output" ;
+               ag:dp_hasPortName "CV" ;
+               ag:dp_hasPortType "INT" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_CTD_LD
+ag:Port_CTD_LD rdf:type owl:NamedIndividual ,
+                        ag:class_Port ;
+               ag:dp_hasPortDirection "Input" ;
+               ag:dp_hasPortName "LD" ;
+               ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_CTD_PV
+ag:Port_CTD_PV rdf:type owl:NamedIndividual ,
+                        ag:class_Port ;
+               ag:dp_hasPortDirection "Input" ;
+               ag:dp_hasPortName "PV" ;
+               ag:dp_hasPortType "INT" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_CTD_Q
+ag:Port_CTD_Q rdf:type owl:NamedIndividual ,
+                       ag:class_Port ;
+              ag:dp_hasPortDirection "Output" ;
+              ag:dp_hasPortName "Q" ;
+              ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_CTUD_CD
+ag:Port_CTUD_CD rdf:type owl:NamedIndividual ,
+                         ag:class_Port ;
+                ag:dp_hasPortDirection "Input" ;
+                ag:dp_hasPortName "CD" ;
+                ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_CTUD_CU
+ag:Port_CTUD_CU rdf:type owl:NamedIndividual ,
+                         ag:class_Port ;
+                ag:dp_hasPortDirection "Input" ;
+                ag:dp_hasPortName "CU" ;
+                ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_CTUD_CV
+ag:Port_CTUD_CV rdf:type owl:NamedIndividual ,
+                         ag:class_Port ;
+                ag:dp_hasPortDirection "Output" ;
+                ag:dp_hasPortName "CV" ;
+                ag:dp_hasPortType "INT" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_CTUD_LD
+ag:Port_CTUD_LD rdf:type owl:NamedIndividual ,
+                         ag:class_Port ;
+                ag:dp_hasPortDirection "Input" ;
+                ag:dp_hasPortName "LD" ;
+                ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_CTUD_PV
+ag:Port_CTUD_PV rdf:type owl:NamedIndividual ,
+                         ag:class_Port ;
+                ag:dp_hasPortDirection "Input" ;
+                ag:dp_hasPortName "PV" ;
+                ag:dp_hasPortType "INT" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_CTUD_QD
+ag:Port_CTUD_QD rdf:type owl:NamedIndividual ,
+                         ag:class_Port ;
+                ag:dp_hasPortDirection "Output" ;
+                ag:dp_hasPortName "QD" ;
+                ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_CTUD_QU
+ag:Port_CTUD_QU rdf:type owl:NamedIndividual ,
+                         ag:class_Port ;
+                ag:dp_hasPortDirection "Output" ;
+                ag:dp_hasPortName "QU" ;
+                ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_CTUD_R
+ag:Port_CTUD_R rdf:type owl:NamedIndividual ,
+                        ag:class_Port ;
+               ag:dp_hasPortDirection "Input" ;
+               ag:dp_hasPortName "R" ;
+               ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_CTU_CU
+ag:Port_CTU_CU rdf:type owl:NamedIndividual ,
+                        ag:class_Port ;
+               ag:dp_hasPortDirection "Input" ;
+               ag:dp_hasPortName "CU" ;
+               ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_CTU_CV
+ag:Port_CTU_CV rdf:type owl:NamedIndividual ,
+                        ag:class_Port ;
+               ag:dp_hasPortDirection "Output" ;
+               ag:dp_hasPortName "CV" ;
+               ag:dp_hasPortType "INT" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_CTU_PV
+ag:Port_CTU_PV rdf:type owl:NamedIndividual ,
+                        ag:class_Port ;
+               ag:dp_hasPortDirection "Input" ;
+               ag:dp_hasPortName "PV" ;
+               ag:dp_hasPortType "INT" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_CTU_Q
+ag:Port_CTU_Q rdf:type owl:NamedIndividual ,
+                       ag:class_Port ;
+              ag:dp_hasPortDirection "Output" ;
+              ag:dp_hasPortName "Q" ;
+              ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_CTU_R
+ag:Port_CTU_R rdf:type owl:NamedIndividual ,
+                       ag:class_Port ;
+              ag:dp_hasPortDirection "Input" ;
+              ag:dp_hasPortName "R" ;
+              ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_F_TRIG_CLK
+ag:Port_F_TRIG_CLK rdf:type owl:NamedIndividual ,
+                            ag:class_Port ;
+                   ag:dp_hasPortDirection "Input" ;
+                   ag:dp_hasPortName "CLK" ;
+                   ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_F_TRIG_Q
+ag:Port_F_TRIG_Q rdf:type owl:NamedIndividual ,
+                          ag:class_Port ;
+                 ag:dp_hasPortDirection "Output" ;
+                 ag:dp_hasPortName "Q" ;
+                 ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_RS_Q1
+ag:Port_RS_Q1 rdf:type owl:NamedIndividual ,
+                       ag:class_Port ;
+              ag:dp_hasPortDirection "Output" ;
+              ag:dp_hasPortName "Q1" ;
+              ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_RS_R1
+ag:Port_RS_R1 rdf:type owl:NamedIndividual ,
+                       ag:class_Port ;
+              ag:dp_hasPortDirection "Input" ;
+              ag:dp_hasPortName "R1" ;
+              ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_RS_S
+ag:Port_RS_S rdf:type owl:NamedIndividual ,
+                      ag:class_Port ;
+             ag:dp_hasPortDirection "Input" ;
+             ag:dp_hasPortName "S" ;
+             ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_R_TRIG_CLK
+ag:Port_R_TRIG_CLK rdf:type owl:NamedIndividual ,
+                            ag:class_Port ;
+                   ag:dp_hasPortDirection "Input" ;
+                   ag:dp_hasPortName "CLK" ;
+                   ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_R_TRIG_Q
+ag:Port_R_TRIG_Q rdf:type owl:NamedIndividual ,
+                          ag:class_Port ;
+                 ag:dp_hasPortDirection "Output" ;
+                 ag:dp_hasPortName "Q" ;
+                 ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_SR_Q1
+ag:Port_SR_Q1 rdf:type owl:NamedIndividual ,
+                       ag:class_Port ;
+              ag:dp_hasPortDirection "Output" ;
+              ag:dp_hasPortName "Q1" ;
+              ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_SR_R
+ag:Port_SR_R rdf:type owl:NamedIndividual ,
+                      ag:class_Port ;
+             ag:dp_hasPortDirection "Input" ;
+             ag:dp_hasPortName "R" ;
+             ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_SR_S1
+ag:Port_SR_S1 rdf:type owl:NamedIndividual ,
+                       ag:class_Port ;
+              ag:dp_hasPortDirection "Input" ;
+              ag:dp_hasPortName "S1" ;
+              ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_TOF_ET
+ag:Port_TOF_ET rdf:type owl:NamedIndividual ,
+                        ag:class_Port ;
+               ag:dp_hasPortDirection "Output" ;
+               ag:dp_hasPortName "ET" ;
+               ag:dp_hasPortType "TIME" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_TOF_IN
+ag:Port_TOF_IN rdf:type owl:NamedIndividual ,
+                        ag:class_Port ;
+               ag:dp_hasPortDirection "Input" ;
+               ag:dp_hasPortName "IN" ;
+               ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_TOF_PT
+ag:Port_TOF_PT rdf:type owl:NamedIndividual ,
+                        ag:class_Port ;
+               ag:dp_hasPortDirection "Input" ;
+               ag:dp_hasPortName "PT" ;
+               ag:dp_hasPortType "TIME" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_TOF_Q
+ag:Port_TOF_Q rdf:type owl:NamedIndividual ,
+                       ag:class_Port ;
+              ag:dp_hasPortDirection "Output" ;
+              ag:dp_hasPortName "Q" ;
+              ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_TON_ET
+ag:Port_TON_ET rdf:type owl:NamedIndividual ,
+                        ag:class_Port ;
+               ag:dp_hasPortDirection "Output" ;
+               ag:dp_hasPortName "ET" ;
+               ag:dp_hasPortType "TIME" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_TON_IN
+ag:Port_TON_IN rdf:type owl:NamedIndividual ,
+                        ag:class_Port ;
+               ag:dp_hasPortDirection "Input" ;
+               ag:dp_hasPortName "IN" ;
+               ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_TON_PT
+ag:Port_TON_PT rdf:type owl:NamedIndividual ,
+                        ag:class_Port ;
+               ag:dp_hasPortDirection "Input" ;
+               ag:dp_hasPortName "PT" ;
+               ag:dp_hasPortType "TIME" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_TON_Q
+ag:Port_TON_Q rdf:type owl:NamedIndividual ,
+                       ag:class_Port ;
+              ag:dp_hasPortDirection "Output" ;
+              ag:dp_hasPortName "Q" ;
+              ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_TP_ET
+ag:Port_TP_ET rdf:type owl:NamedIndividual ,
+                       ag:class_Port ;
+              ag:dp_hasPortDirection "Output" ;
+              ag:dp_hasPortName "ET" ;
+              ag:dp_hasPortType "TIME" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_TP_IN
+ag:Port_TP_IN rdf:type owl:NamedIndividual ,
+                       ag:class_Port ;
+              ag:dp_hasPortDirection "Input" ;
+              ag:dp_hasPortName "IN" ;
+              ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_TP_PT
+ag:Port_TP_PT rdf:type owl:NamedIndividual ,
+                       ag:class_Port ;
+              ag:dp_hasPortDirection "Input" ;
+              ag:dp_hasPortName "PT" ;
+              ag:dp_hasPortType "TIME" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_TP_Q
+ag:Port_TP_Q rdf:type owl:NamedIndividual ,
+                      ag:class_Port ;
+             ag:dp_hasPortDirection "Output" ;
+             ag:dp_hasPortName "Q" ;
+             ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_CTD
+ag:StandardFBType_CTD rdf:type owl:NamedIndividual ,
+                               ag:class_FBType ,
+                               ag:class_StandardFBType ;
+                      ag:op_hasPort ag:Port_CTD_CD ,
+                                    ag:Port_CTD_CV ,
+                                    ag:Port_CTD_LD ,
+                                    ag:Port_CTD_PV ,
+                                    ag:Port_CTD_Q ;
+                      ag:dp_hasPOULanguage "ST" ;
+                      ag:dp_hasPOUName "CTD" ;
+                      ag:dp_hasPOUType "FunctionBlock" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_CTU
+ag:StandardFBType_CTU rdf:type owl:NamedIndividual ,
+                               ag:class_FBType ,
+                               ag:class_StandardFBType ;
+                      ag:op_hasPort ag:Port_CTU_CU ,
+                                    ag:Port_CTU_CV ,
+                                    ag:Port_CTU_PV ,
+                                    ag:Port_CTU_Q ,
+                                    ag:Port_CTU_R ;
+                      ag:dp_hasPOULanguage "ST" ;
+                      ag:dp_hasPOUName "CTU" ;
+                      ag:dp_hasPOUType "FunctionBlock" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_CTUD
+ag:StandardFBType_CTUD rdf:type owl:NamedIndividual ,
+                                ag:class_FBType ,
+                                ag:class_StandardFBType ;
+                       ag:op_hasPort ag:Port_CTUD_CD ,
+                                     ag:Port_CTUD_CU ,
+                                     ag:Port_CTUD_CV ,
+                                     ag:Port_CTUD_LD ,
+                                     ag:Port_CTUD_PV ,
+                                     ag:Port_CTUD_QD ,
+                                     ag:Port_CTUD_QU ,
+                                     ag:Port_CTUD_R ;
+                       ag:dp_hasPOULanguage "ST" ;
+                       ag:dp_hasPOUName "CTUD" ;
+                       ag:dp_hasPOUType "FunctionBlock" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_F_TRIG
+ag:StandardFBType_F_TRIG rdf:type owl:NamedIndividual ,
+                                  ag:class_FBType ,
+                                  ag:class_StandardFBType ;
+                         ag:op_hasPort ag:Port_F_TRIG_CLK ,
+                                       ag:Port_F_TRIG_Q ;
+                         ag:dp_hasPOULanguage "ST" ;
+                         ag:dp_hasPOUName "F_TRIG" ;
+                         ag:dp_hasPOUType "FunctionBlock" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_RS
+ag:StandardFBType_RS rdf:type owl:NamedIndividual ,
+                              ag:class_FBType ,
+                              ag:class_StandardFBType ;
+                     ag:op_hasPort ag:Port_RS_Q1 ,
+                                   ag:Port_RS_R1 ,
+                                   ag:Port_RS_S ;
+                     ag:dp_hasPOULanguage "ST" ;
+                     ag:dp_hasPOUName "RS" ;
+                     ag:dp_hasPOUType "FunctionBlock" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_R_TRIG
+ag:StandardFBType_R_TRIG rdf:type owl:NamedIndividual ,
+                                  ag:class_FBType ,
+                                  ag:class_StandardFBType ;
+                         ag:op_hasPort ag:Port_R_TRIG_CLK ,
+                                       ag:Port_R_TRIG_Q ;
+                         ag:dp_hasPOULanguage "ST" ;
+                         ag:dp_hasPOUName "R_TRIG" ;
+                         ag:dp_hasPOUType "FunctionBlock" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_SR
+ag:StandardFBType_SR rdf:type owl:NamedIndividual ,
+                              ag:class_FBType ,
+                              ag:class_StandardFBType ;
+                     ag:op_hasPort ag:Port_SR_Q1 ,
+                                   ag:Port_SR_R ,
+                                   ag:Port_SR_S1 ;
+                     ag:dp_hasPOULanguage "ST" ;
+                     ag:dp_hasPOUName "SR" ;
+                     ag:dp_hasPOUType "FunctionBlock" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_TOF
+ag:StandardFBType_TOF rdf:type owl:NamedIndividual ,
+                               ag:class_FBType ,
+                               ag:class_StandardFBType ;
+                      ag:op_hasPort ag:Port_TOF_ET ,
+                                    ag:Port_TOF_IN ,
+                                    ag:Port_TOF_PT ,
+                                    ag:Port_TOF_Q ;
+                      ag:dp_hasPOULanguage "ST" ;
+                      ag:dp_hasPOUName "TOF" ;
+                      ag:dp_hasPOUType "FunctionBlock" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_TON
+ag:StandardFBType_TON rdf:type owl:NamedIndividual ,
+                               ag:class_FBType ,
+                               ag:class_StandardFBType ;
+                      ag:op_hasPort ag:Port_TON_ET ,
+                                    ag:Port_TON_IN ,
+                                    ag:Port_TON_PT ,
+                                    ag:Port_TON_Q ;
+                      ag:dp_hasPOULanguage "ST" ;
+                      ag:dp_hasPOUName "TON" ;
+                      ag:dp_hasPOUType "FunctionBlock" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_TP
+ag:StandardFBType_TP rdf:type owl:NamedIndividual ,
+                              ag:class_FBType ,
+                              ag:class_StandardFBType ;
+                     ag:op_hasPort ag:Port_TP_ET ,
+                                   ag:Port_TP_IN ,
+                                   ag:Port_TP_PT ,
+                                   ag:Port_TP_Q ;
+                     ag:dp_hasPOULanguage "ST" ;
+                     ag:dp_hasPOUName "TP" ;
+                     ag:dp_hasPOUType "FunctionBlock" .
 
 
 ###  Generated by the OWL API (version 4.5.29.2024-05-13T12:11:03Z) https://github.com/owlcs/owlapi

@@ -72,7 +72,6 @@ ag:op_hasPort rdf:type owl:ObjectProperty ;
 
 ###  http://www.semanticweb.org/AgentProgramParams/op_instantiatesPort
 ag:op_instantiatesPort rdf:type owl:ObjectProperty ;
-                       owl:inverseOf ag:op_isInstanceOfPort ;
                        rdfs:domain ag:class_PortInstance ;
                        rdfs:range ag:class_Port .
 
@@ -137,10 +136,22 @@ ag:op_representsFBInstance rdf:type owl:ObjectProperty ;
                            rdfs:range ag:class_FBInstance .
 
 
+###  http://www.semanticweb.org/AgentProgramParams/op_usesLiteral
+ag:op_usesLiteral rdf:type owl:ObjectProperty ;
+                  rdfs:domain ag:class_POU ;
+                  rdfs:range ag:class_SourceLiteral .
+
+
 ###  http://www.semanticweb.org/AgentProgramParams/op_usesPort
 ag:op_usesPort rdf:type owl:ObjectProperty ;
                rdfs:domain ag:class_Variable ;
                rdfs:range ag:class_Port .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_usesVariable
+ag:op_usesVariable rdf:type owl:ObjectProperty ;
+                   rdfs:domain ag:class_POU ;
+                   rdfs:range ag:class_Variable .
 
 
 #################################################################

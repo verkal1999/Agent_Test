@@ -35,23 +35,13 @@ class KGConfig:
 
 class KGLoader:
     """
-    KGLoader mit integrierter Definition von IEC 61131-3 Standard-Bausteinen.
-    Stellt sicher, dass StandardFBType_TON etc. samt Ports existieren.
+    Objektorientierte Variante von agent_kg_ingestion_full2_extracted.py:
+      - bestehende KG (Test_cleaned.ttl) laden
+      - Programme + Variablen aus program_io_with_mapping.json einfügen
+      - Hardware & IO-Channels aus io_mappings.json
+      - GVL-Variablen aus gvl_globals.json
+    Die Logik ist 1:1 aus deinem Notebook übernommen, nur in Methoden aufgeteilt.
     """
-
-    # Definition der Standard-FBs und ihrer Ports
-    IEC_STANDARD_FBS = {
-        "SR": {"inputs": {"S1": "BOOL", "R": "BOOL"}, "outputs": {"Q1": "BOOL"}},
-        "RS": {"inputs": {"S": "BOOL", "R1": "BOOL"}, "outputs": {"Q1": "BOOL"}},
-        "R_TRIG": {"inputs": {"CLK": "BOOL"}, "outputs": {"Q": "BOOL"}},
-        "F_TRIG": {"inputs": {"CLK": "BOOL"}, "outputs": {"Q": "BOOL"}},
-        "CTU": {"inputs": {"CU": "BOOL", "R": "BOOL", "PV": "INT"}, "outputs": {"Q": "BOOL", "CV": "INT"}},
-        "CTD": {"inputs": {"CD": "BOOL", "LD": "BOOL", "PV": "INT"}, "outputs": {"Q": "BOOL", "CV": "INT"}},
-        "CTUD": {"inputs": {"CU": "BOOL", "CD": "BOOL", "R": "BOOL", "LD": "BOOL", "PV": "INT"}, "outputs": {"QU": "BOOL", "QD": "BOOL", "CV": "INT"}},
-        "TP": {"inputs": {"IN": "BOOL", "PT": "TIME"}, "outputs": {"Q": "BOOL", "ET": "TIME"}},
-        "TON": {"inputs": {"IN": "BOOL", "PT": "TIME"}, "outputs": {"Q": "BOOL", "ET": "TIME"}},
-        "TOF": {"inputs": {"IN": "BOOL", "PT": "TIME"}, "outputs": {"Q": "BOOL", "ET": "TIME"}}
-    }
 
     def __init__(self, config: KGConfig):
         self.config = config
@@ -61,11 +51,8 @@ class KGLoader:
         self.OP = Namespace('http://www.semanticweb.org/AgentProgramParams/op_')
 
         self.kg = Graph()
-        if self.config.kg_cleaned_path.exists():
-            with open(self.config.kg_cleaned_path, "r", encoding="utf-8") as fkg:
-                self.kg.parse(file=fkg, format="turtle")
-        else:
-            print(f"WARNUNG: Basis-KG {self.config.kg_cleaned_path} nicht gefunden. Starte leer.")
+        with open(self.config.kg_cleaned_path, "r", encoding="utf-8") as fkg:
+            self.kg.parse(file=fkg, format="turtle")
 
         self.prog_uris: Dict[str, URIRef] = {}
         self.var_uris: Dict[Tuple[str, str], URIRef] = {}
@@ -75,48 +62,38 @@ class KGLoader:
         self.gvl_short_to_full: Dict[str, set[str]] = {}
         self.gvl_full_to_type: Dict[str, str] = {}
 
-        # Set für schnelle Abfrage
-        self.standard_fbs_set = set(self.IEC_STANDARD_FBS.keys())
-
-        # WICHTIG: Standard-FBs direkt beim Start initialisieren
-        self._ensure_standard_fbs_exist()
-
     # -------------------------------------------------
-    # Standard FBs Erzeugung (NEU)
+    # Neue URI-Helfer für Ports und Instanzen
     # -------------------------------------------------
-    def _ensure_standard_fbs_exist(self):
-        """Erzeugt die Definitionen (Typen + Ports) für Standard-FBs im Graphen."""
-        for fb_name, ports in self.IEC_STANDARD_FBS.items():
-            # Typ URI
-            fb_uri = self.make_uri(f"StandardFBType_{fb_name}")
-            self.kg.add((fb_uri, RDF.type, self.AG.class_StandardFBType))
-            self.kg.add((fb_uri, RDF.type, self.AG.class_FBType))
-            self.kg.add((fb_uri, self.DP.hasPOUName, Literal(fb_name)))
-            self.kg.add((fb_uri, self.DP.hasPOUType, Literal("FunctionBlock")))
-            self.kg.add((fb_uri, self.DP.hasPOULanguage, Literal("ST")))
-            
-            # Cache aktualisieren damit get_fb_uri schnell zugreifen kann
-            self.prog_uris[fb_name] = fb_uri
 
-            # Ports erzeugen
-            all_ports = []
-            for pname, ptype in ports["inputs"].items():
-                all_ports.append((pname, ptype, "Input"))
-            for pname, ptype in ports["outputs"].items():
-                all_ports.append((pname, ptype, "Output"))
+    def get_port_uri(self, pou_name: str, port_name: str) -> URIRef:
+        """Erstellt eine URI für die Schnittstelle (Port) eines Bausteins (Typ)."""
+        # Bsp: Port_FB_Diagnose_D2_Diagnose_gefordert
+        safe_pou = pou_name.replace('.', '__dot__')
+        safe_port = port_name.replace('.', '__dot__')
+        uri = self.make_uri(f"Port_{safe_pou}_{safe_port}")
+        return uri
 
-            for pname, ptype, pdir in all_ports:
-                port_uri = self.make_uri(f"Port_{fb_name}_{pname}")
-                self.kg.add((port_uri, RDF.type, self.AG.class_Port))
-                self.kg.add((port_uri, self.DP.hasPortName, Literal(pname)))
-                self.kg.add((port_uri, self.DP.hasPortDirection, Literal(pdir)))
-                self.kg.add((port_uri, self.DP.hasPortType, Literal(ptype)))
-                
-                # Verknüpfung
-                self.kg.add((fb_uri, self.OP.hasPort, port_uri))
+    def get_fb_instance_uri(self, parent_prog: str, var_name: str) -> URIRef:
+        """Erstellt eine URI für die logische Instanz eines FBs innerhalb eines Programms."""
+        # Bsp: FBInst_MAIN_fbDiag
+        uri = self.make_uri(f"FBInst_{parent_prog}_{var_name}")
+        return uri
 
+    def get_port_instance_uri(self, parent_prog: str, fb_var_name: str, port_name: str) -> URIRef:
+        """Erstellt eine URI für den Zugriff auf einen Port an einer Instanz (z.B. fbDiag.Busy)."""
+        # Bsp: PortInst_MAIN_fbDiag_Busy
+        uri = self.make_uri(f"PortInst_{parent_prog}_{fb_var_name}_{port_name}")
+        return uri
+        
+    def _is_standard_type(self, type_name: str) -> bool:
+        """Prüft, ob es sich um einen IEC-Basistyp handelt."""
+        standards = {'BOOL', 'INT', 'DINT', 'REAL', 'LREAL', 'TIME', 'STRING', 'WSTRING', 'BYTE', 'WORD', 'DWORD', 'LWORD', 'UDINT', 'UINT', 'SINT', 'USINT'}
+        # Einfache Prüfung, ignoriert Arrays vorerst
+        return type_name.upper() in standards
+    
     # -------------------------------------------------
-    # URI-Helfer
+    # URI-Helfer (make_uri, get_program_uri, get_local_var_uri)
     # -------------------------------------------------
 
     def make_uri(self, name: str) -> URIRef:
@@ -129,38 +106,39 @@ class KGLoader:
         return URIRef(self.AG + safe)
 
     def _add_program_name(self, prog_uri: URIRef, raw_name: str) -> None:
+        """Annotate program with its raw (unescaped) name."""
         self.kg.add((prog_uri, self.DP.hasProgramName, Literal(raw_name)))
 
     def _add_variable_name(self, var_uri: URIRef, raw_name: str) -> None:
+        """Annotate variable with its raw (unescaped) name."""
         vname = raw_name.replace("__dot__",".")
         self.kg.add((var_uri, self.DP.hasVariableName, Literal(vname)))
 
     def _clean_expression(self, expr: str) -> str:
+        """Entfernt NOT, Klammern etc. um den Kern-Variablennamen zu finden."""
         if not expr: return ""
+        # Einfache Heuristik: Entferne logische Operatoren und Leerzeichen
         clean = expr.replace('NOT ', '').replace('(', '').replace(')', '').strip()
         return clean
 
     def get_program_uri(self, prog_name: str) -> URIRef:
         uri = self.prog_uris.get(prog_name)
         if uri is None:
+            # WICHTIG: Kein RDF.type hier setzen! Das macht der Aufrufer.
             uri = self.make_uri(f"Program_{prog_name}")
             self.prog_uris[prog_name] = uri
             self._add_program_name(uri, prog_name)
         return uri
     
     def get_fb_uri(self, fb_name: str) -> URIRef:
-        """Holt URI für FB-Typ. Standard-FBs werden bevorzugt."""
-        uri = self.prog_uris.get(fb_name)
-        if uri is None:
-            # Falls Standard FB noch nicht im Cache (sollte durch __init__ eigentlich da sein)
-            if fb_name.upper() in self.standard_fbs_set:
-                uri = self.make_uri(f"StandardFBType_{fb_name.upper()}")
-            else:
+            uri = self.prog_uris.get(fb_name)
+            if uri is None:
+                # WICHTIG: Kein RDF.type hier setzen! Das macht der Aufrufer.
                 uri = self.make_uri(f"FBType_{fb_name}")
+                self.prog_uris[fb_name] = uri
                 self.kg.add((uri, RDF.type, self.AG.class_FBType))
-            
-            self.prog_uris[fb_name] = uri
-        return uri
+            return uri
+
 
     def get_local_var_uri(self, prog_name: str, var_name: str) -> URIRef:
         key = (prog_name, var_name)
@@ -173,31 +151,12 @@ class KGLoader:
             self._add_variable_name(uri, var_name)
         return uri
 
-    def get_port_uri(self, pou_name: str, port_name: str) -> URIRef:
-        safe_pou = pou_name.replace('.', '__dot__')
-        safe_port = port_name.replace('.', '__dot__')
-        uri = self.make_uri(f"Port_{safe_pou}_{safe_port}")
-        return uri
-
-    def get_fb_instance_uri(self, parent_prog: str, var_name: str) -> URIRef:
-        uri = self.make_uri(f"FBInst_{parent_prog}_{var_name}")
-        return uri
-
-    def get_port_instance_uri(self, parent_prog: str, fb_var_name: str, port_name: str) -> URIRef:
-        uri = self.make_uri(f"PortInst_{parent_prog}_{fb_var_name}_{port_name}")
-        return uri
-        
-    def _is_standard_type(self, type_name: str) -> bool:
-        standards = {'BOOL', 'INT', 'DINT', 'REAL', 'LREAL', 'TIME', 'STRING', 'WSTRING', 'BYTE', 'WORD', 'DWORD', 'LWORD', 'UDINT', 'UINT', 'SINT', 'USINT'}
-        return type_name.upper() in standards
-
     # -------------------------------------------------
-    # Schritt 1: GVL-Index
+    # Schritt 1: GVL-Index aus objects.json (wie in Cell 4)
     # -------------------------------------------------
 
     def build_gvl_index_from_objects(self) -> None:
         objects_path = self.config.objects_path
-        if not objects_path.exists(): return
         objects_data = json.loads(objects_path.read_text(encoding="utf-8"))
 
         gvl_short_to_full: Dict[str, set[str]] = {}
@@ -208,7 +167,8 @@ class KGLoader:
                 gvl_name = obj.get("name")
                 for glob in obj.get("globals", []):
                     short = glob.get("name")
-                    if not short: continue
+                    if not short:
+                        continue
                     if gvl_name == "GVL":
                         full = f"GVL.{short}"
                     else:
@@ -221,6 +181,10 @@ class KGLoader:
         self.gvl_short_to_full = gvl_short_to_full
         self.gvl_full_to_type = gvl_full_to_type
 
+    # -------------------------------------------------
+    # Hilfsfunktionen aus Cell 4: get_ext_var_uri etc.
+    # -------------------------------------------------
+
     def _pick_var(self, item: Dict[str, Any]) -> Optional[str]:
         ext = item.get("external")
         return ext.split('.')[-1] if ext else item.get('internal')
@@ -229,8 +193,11 @@ class KGLoader:
         if not external_raw:
             return None
         
+        # 1. Bereinigen (z.B. "NOT GVL.Fehler" -> "GVL.Fehler")
         external = self._clean_expression(external_raw)
 
+        # Fall 1: GVL (Global Variable)
+        # Check auf bekannte GVL-Listen oder Präfix
         if external.startswith('GVL') or external.startswith('GV') or external.startswith('OPCUA'):
             uri = self.hw_var_uris.get(external)
             if uri is None:
@@ -238,24 +205,45 @@ class KGLoader:
                 self.kg.add((uri, RDF.type, self.AG.class_Variable))
                 self.hw_var_uris[external] = uri
                 self._add_variable_name(uri, external)
+                # Optional: Scope Global setzen
                 self.kg.add((uri, self.DP.hasVariableScope, Literal("global")))
             return uri
 
+        # Fall 2: Punkt im Namen -> Port-Zugriff auf eine lokale Instanz (z.B. fbBA.D2)
+        # ABER: Nur wenn der Teil vor dem Punkt KEINE GVL ist.
         if '.' in external:
             parts = external.split('.')
             if len(parts) == 2:
                 instance_name, port_name = parts
+                
+                # Prüfen: Existiert instance_name als lokale Variable im Caller?
+                # (Wir nehmen an, ja, wenn es keine GVL ist)
+                
+                # 1. Die FB-Instanz Variable holen (z.B. Var_MAIN_fbBA)
                 fb_var_uri = self.get_local_var_uri(caller_prog, instance_name)
+                
+                # 2. Die logische FB-Instanz URI (FBInst_MAIN_fbBA)
                 fb_inst_uri = self.get_fb_instance_uri(caller_prog, instance_name)
+                
+                # 3. Die PortInstance erstellen (PortInst_MAIN_fbBA_D2)
                 p_inst_uri = self.get_port_instance_uri(caller_prog, instance_name, port_name)
                 self.kg.add((p_inst_uri, RDF.type, self.AG.class_PortInstance))
+                
+                # Verbindung: PortInstance gehört zur FBInstance
                 self.kg.add((p_inst_uri, self.OP.isPortOfInstance, fb_inst_uri))
+                
+                # Wichtig: Wir geben die URI der PortInstance zurück, 
+                # damit der Aufrufer diese z.B. an einen anderen Port binden kann.
                 return p_inst_uri
 
+        # Fall 3: Lokale Variable
         return self.get_local_var_uri(caller_prog, external)
+    # -------------------------------------------------
+    # Schritt 2: Programme + Variablen aus program_io_with_mapping.json
+    # -------------------------------------------------
 
     # -------------------------------------------------
-    # Schritt 2: Programme
+    # Schritt 2: Programme + Variablen aus program_io_with_mapping.json
     # -------------------------------------------------
 
     def ingest_programs_from_mapping_json(self) -> None:
@@ -263,57 +251,91 @@ class KGLoader:
 
         for entry in prog_data:
             prog_name = entry.get("Programm_Name")
-            if not prog_name: continue
+            if not prog_name:
+                continue
             
-            pou_type = entry.get("pou_type")
+            pou_type = entry.get("pou_type") # 'program' oder 'functionBlock'
+            
+            # Wir nutzen 'pou_uri' als gemeinsame Variable für Program ODER FB,
+            # damit die nachfolgenden Schritte (Ports, Vars) immer eine valide URI haben.
             pou_uri = None
 
+            # -------------------------------------------------
+            # TYPISIERUNG & URI ERSTELLUNG
+            # -------------------------------------------------
             if pou_type == "functionBlock":
+                # Hole URI für FB
                 pou_uri = self.get_fb_uri(prog_name)
+                # Spezifische FB-Typisierung
                 self.kg.add((pou_uri, RDF.type, self.AG.class_FBType))
+                # Optional: self.kg.add((pou_uri, self.DP.hasPOUType, Literal("FunctionBlock")))
+                
             elif pou_type == "program":
+                # Hole URI für Programm
                 pou_uri = self.get_program_uri(prog_name)
+                # Spezifische Programm-Typisierung
                 self.kg.add((pou_uri, RDF.type, self.AG.class_Program))
+                # Optional: self.kg.add((pou_uri, self.DP.hasPOUType, Literal("Program")))
+            
             else:
+                # Fallback für unbekannte Typen (verhindert Absturz)
                 pou_uri = self.get_program_uri(prog_name)
 
-            if pou_uri is None: continue
+            # SICHERHEITSCHECK: Wenn pou_uri immer noch None ist, abbrechen
+            if pou_uri is None:
+                continue
 
+            # -------------------------------------------------
+            # PROJEKT VERKNÜPFUNG
+            # -------------------------------------------------
             project_name = entry.get("PLCProject_Name")
             if project_name:
                 project_uri = self.get_or_create_plc_project(project_name)
                 self.kg.add((project_uri, self.OP.consistsOfPOU, pou_uri))
 
-            # A. PORTS
+            # -------------------------------------------------
+            # A. PORTS (Inputs / Outputs)
+            # -------------------------------------------------
+            # AB HIER: Nur noch 'pou_uri' verwenden!
+            
             for sec in ("inputs", "outputs"):
                 direction = "Input" if sec == "inputs" else "Output"
+                
                 for var in entry.get(sec, []):
                     vname = self._pick_var(var)
                     if not vname: continue
                     
+                    # Port erstellen
                     port_uri = self.get_port_uri(prog_name, vname)
                     self.kg.add((port_uri, RDF.type, self.AG.class_Port))
                     self.kg.add((port_uri, self.DP.hasPortName, Literal(vname)))
                     self.kg.add((port_uri, self.DP.hasPortDirection, Literal(direction)))
+                    
+                    # Port gehört zum Baustein (Typ) -> Hier war der Fehler (prog_uri war None)
                     self.kg.add((pou_uri, self.OP.hasPort, port_uri))
 
                     vtype = var.get("internal_type")
                     if vtype:
                         self.kg.add((port_uri, self.DP.hasPortType, Literal(vtype)))
 
+                    # MAPPINGS (External)
                     external = var.get("external")
                     if external:
                         target_uri = self._get_ext_var_uri(external, prog_name)
+                        
                         if target_uri:
                             self.kg.add((target_uri, self.OP.isBoundToPort, port_uri))
                             clean_ext = self._clean_expression(external)
                             self.pending_ext_hw_links.append((target_uri, clean_ext))
 
-            # B. VARIABLES & INSTANCES
+            # -------------------------------------------------
+            # B. VARIABLES (Temps) & INSTANCES
+            # -------------------------------------------------
             for temp in entry.get("temps", []):
                 vname = temp.get("name")
                 if not vname: continue
                 
+                # Lokale Variable erstellen
                 v_uri = self.get_local_var_uri(prog_name, vname)
                 self.kg.add((pou_uri, self.OP.usesVariable, v_uri))
                 
@@ -321,16 +343,16 @@ class KGLoader:
                 if ttype:
                     self.kg.add((v_uri, self.DP.hasVariableType, Literal(ttype)))
                     
+                    # Instanz-Erkennung
                     if not self._is_standard_type(ttype):
                         fb_inst_uri = self.get_fb_instance_uri(prog_name, vname)
                         self.kg.add((fb_inst_uri, RDF.type, self.AG.class_FBInstance))
                         self.kg.add((v_uri, self.OP.representsFBInstance, fb_inst_uri))
                         
-                        # get_fb_uri liefert jetzt sicher StandardFBType_TON mit Ports
                         fb_type_uri = self.get_fb_uri(ttype) 
                         self.kg.add((fb_inst_uri, self.OP.isInstanceOfFBType, fb_type_uri))
 
-            # Code
+            # Code & Meta
             code = entry.get("program_code")
             lang = entry.get("programming_lang")
             if code:
@@ -339,16 +361,16 @@ class KGLoader:
                 self.kg.add((pou_uri, self.DP.hasPOULanguage, Literal(lang)))
 
     # -------------------------------------------------
-    # Schritt 3 & 4
+    # Schritt 3: io_mappings.json einlesen (Cell 5)
     # -------------------------------------------------
 
     def ingest_io_mappings(self) -> None:
-        if not self.config.io_map_path.exists(): return
         io_data = json.loads(self.config.io_map_path.read_text(encoding="utf-8"))
 
         for entry in io_data:
             plc_var = entry.get("plc_var")
-            if not plc_var: continue
+            if not plc_var:
+                continue
 
             var_uri = self.hw_var_uris.get(plc_var)
             if var_uri is None:
@@ -376,8 +398,11 @@ class KGLoader:
             if hw_uri is not None and ext_uri != hw_uri:
                 self.kg.add((ext_uri, self.OP.isMappedToVariable, hw_uri))
 
+    # -------------------------------------------------
+    # Schritt 4: GVL-Variablen aus gvl_globals.json (Cell 6)
+    # -------------------------------------------------
+
     def ingest_gvl_globals(self) -> None:
-        if not self.config.gvl_globals_path.exists(): return
         gvl_data = json.loads(self.config.gvl_globals_path.read_text(encoding="utf-8"))
 
         def make_var_name(gvl_name: str, var_name: str) -> str:
@@ -406,12 +431,26 @@ class KGLoader:
                 if gv.get("address"):
                     self.kg.add((var_uri, self.DP.hasHardwareAddress, Literal(gv["address"])))
 
+    # -------------------------------------------------
+    # PLC-Projekt hinzufügen
+    # -------------------------------------------------
+
     def get_or_create_plc_project(self, project_name: str) -> URIRef:
+        """
+        Erzeugt (oder findet) eine Instanz von AG:class_PLCProject mit Label.
+        """
+        # eigener Namensraum, damit es nicht mit Programmen kollidiert
         proj_uri = self.make_uri(f"PLCProject__{project_name}")
+
         if (proj_uri, RDF.type, self.AG.class_PLCProject) not in self.kg:
             self.kg.add((proj_uri, RDF.type, self.AG.class_PLCProject))
+            # Datenproperty kannst du je nach Ontologie anpassen:
             self.kg.add((proj_uri, self.DP.hasPLCProjectName, Literal(project_name)))
         return proj_uri
+
+    # -------------------------------------------------
+    # Speichern
+    # -------------------------------------------------
 
     def save(self) -> None:
         self.kg.serialize(self.config.kg_to_fill_path, format='turtle')

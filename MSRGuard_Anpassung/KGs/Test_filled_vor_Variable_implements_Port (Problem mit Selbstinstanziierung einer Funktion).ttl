@@ -1,0 +1,3729 @@
+@prefix : <http://www.semanticweb.org/AgentProgramParams/> .
+@prefix ag: <http://www.semanticweb.org/AgentProgramParams/> .
+@prefix dp: <http://www.semanticweb.org/AgentProgramParams/dp_> .
+@prefix op: <http://www.semanticweb.org/AgentProgramParams/op_> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <http://www.semanticweb.org/AgentProgramParams/> .
+
+<http://www.semanticweb.org/AgentProgramParams/> rdf:type owl:Ontology .
+
+#################################################################
+#    Annotation properties
+#################################################################
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasInitialValue
+ag:dp_hasInitialValue rdf:type owl:AnnotationProperty .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasProgramName
+ag:dp_hasProgramName rdf:type owl:AnnotationProperty .
+
+
+#################################################################
+#    Object Properties
+#################################################################
+
+###  http://www.semanticweb.org/AgentProgramParams/op_assignsFrom
+ag:op_assignsFrom rdf:type owl:ObjectProperty ;
+                  rdfs:domain ag:class_ParameterAssignment ;
+                  rdfs:range ag:class_SignalSource ;
+                  rdfs:comment "# 2. Woher kommt das Signal? Hier ist die Signal-Quelle bei Funktionsaufruf" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_assignsToPort
+ag:op_assignsToPort rdf:type owl:ObjectProperty ;
+                    rdfs:domain ag:class_ParameterAssignment ;
+                    rdfs:range ag:class_Port ;
+                    rdfs:comment "# 1. Wohin geht das Signal? (Zum Port \"CLK\" definiert im Typ R_TRIG)" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_callsPOU
+ag:op_callsPOU rdf:type owl:ObjectProperty ;
+               rdfs:domain ag:class_POUCall ;
+               rdfs:range ag:class_POU .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_consistsOfPOU
+ag:op_consistsOfPOU rdf:type owl:ObjectProperty ;
+                    rdfs:domain ag:class_PLCProject ;
+                    rdfs:range ag:class_POU .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_containsPOUCall
+ag:op_containsPOUCall rdf:type owl:ObjectProperty ;
+                      rdfs:domain ag:class_POU ;
+                      rdfs:range ag:class_POUCall .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_hasAssignment
+ag:op_hasAssignment rdf:type owl:ObjectProperty ;
+                    rdfs:domain ag:class_POUCall ;
+                    rdfs:range ag:class_ParameterAssignment .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_hasCallerVariable
+ag:op_hasCallerVariable rdf:type owl:ObjectProperty ;
+                        rdfs:domain ag:class_POUCall ;
+                        rdfs:range ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_hasInfluenceOnVariable
+ag:op_hasInfluenceOnVariable rdf:type owl:ObjectProperty ;
+                             rdfs:domain ag:class_Variable ;
+                             rdfs:range ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_hasPort
+ag:op_hasPort rdf:type owl:ObjectProperty ;
+              rdfs:domain ag:class_FBType ;
+              rdfs:range ag:class_Port .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_instantiatesPort
+ag:op_instantiatesPort rdf:type owl:ObjectProperty ;
+                       rdfs:domain ag:class_PortInstance ;
+                       rdfs:range ag:class_Port .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_isBoundToChannel
+ag:op_isBoundToChannel rdf:type owl:ObjectProperty ;
+                       rdfs:domain ag:class_Variable ;
+                       rdfs:range ag:class_IOChannel .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_isBoundToPort
+ag:op_isBoundToPort rdf:type owl:ObjectProperty ;
+                    rdfs:domain ag:class_Variable ;
+                    rdfs:range ag:class_Port .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_isInstanceOfFBType
+ag:op_isInstanceOfFBType rdf:type owl:ObjectProperty ;
+                         rdfs:domain ag:class_FBInstance ;
+                         rdfs:range ag:class_FBType .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_isInstanceOfPort
+ag:op_isInstanceOfPort rdf:type owl:ObjectProperty ;
+                       rdfs:domain ag:class_PortInstance ;
+                       rdfs:range ag:class_Port .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_isMappedToPOU
+ag:op_isMappedToPOU rdf:type owl:ObjectProperty ;
+                    rdfs:domain ag:class_Variable ;
+                    rdfs:range ag:class_POU .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_isMappedToVariable
+ag:op_isMappedToVariable rdf:type owl:ObjectProperty ;
+                         rdfs:domain ag:class_Variable ;
+                         rdfs:range ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_isPortOfInstance
+ag:op_isPortOfInstance rdf:type owl:ObjectProperty ;
+                       rdfs:domain ag:class_PortInstance ;
+                       rdfs:range ag:class_FBInstance .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_isSubProgramOf
+ag:op_isSubProgramOf rdf:type owl:ObjectProperty ;
+                     rdfs:domain ag:class_Program ;
+                     rdfs:range ag:class_Program .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_listsGlobalVariable
+ag:op_listsGlobalVariable rdf:type owl:ObjectProperty ;
+                          rdfs:domain ag:class_GobalVariableList ;
+                          rdfs:range ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_representsFBInstance
+ag:op_representsFBInstance rdf:type owl:ObjectProperty ;
+                           rdfs:domain ag:class_Variable ;
+                           rdfs:range ag:class_FBInstance .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_usesLiteral
+ag:op_usesLiteral rdf:type owl:ObjectProperty ;
+                  rdfs:domain ag:class_POU ;
+                  rdfs:range ag:class_SourceLiteral .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_usesPort
+ag:op_usesPort rdf:type owl:ObjectProperty ;
+               rdfs:domain ag:class_Variable ;
+               rdfs:range ag:class_Port .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_usesVariable
+ag:op_usesVariable rdf:type owl:ObjectProperty ;
+                   rdfs:domain ag:class_POU ;
+                   rdfs:range ag:class_Variable .
+
+
+#################################################################
+#    Data properties
+#################################################################
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasConsistencyReport
+ag:dp_hasConsistencyReport rdf:type owl:DatatypeProperty ;
+                           rdfs:domain ag:class_POU ;
+                           rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasDescription
+ag:dp_hasDescription rdf:type owl:DatatypeProperty ;
+                     rdfs:domain ag:class_Variable ;
+                     rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasGlobalVariableListName
+ag:dp_hasGlobalVariableListName rdf:type owl:DatatypeProperty ;
+                                rdfs:domain ag:class_GobalVariableList ;
+                                rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasHardwareAddress
+ag:dp_hasHardwareAddress rdf:type owl:DatatypeProperty ;
+                         rdfs:domain ag:class_Variable ;
+                         rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasPLCProjectName
+ag:dp_hasPLCProjectName rdf:type owl:DatatypeProperty ;
+                        rdfs:domain ag:class_PLCProject ;
+                        rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasPOUCode
+ag:dp_hasPOUCode rdf:type owl:DatatypeProperty ;
+                 rdfs:domain ag:class_POU ;
+                 rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasPOULanguage
+ag:dp_hasPOULanguage rdf:type owl:DatatypeProperty ;
+                     rdfs:domain ag:class_POU ;
+                     rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasPOUName
+ag:dp_hasPOUName rdf:type owl:DatatypeProperty ;
+                 rdfs:domain ag:class_POU ;
+                 rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasPOUType
+ag:dp_hasPOUType rdf:type owl:DatatypeProperty ;
+                 rdfs:domain ag:class_POU ;
+                 rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasPortDirection
+ag:dp_hasPortDirection rdf:type owl:DatatypeProperty ;
+                       rdfs:domain ag:class_Port ;
+                       rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasPortName
+ag:dp_hasPortName rdf:type owl:DatatypeProperty ;
+                  rdfs:domain ag:class_Port ;
+                  rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasPortType
+ag:dp_hasPortType rdf:type owl:DatatypeProperty ;
+                  rdfs:domain ag:class_Port ;
+                  rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasVariableName
+ag:dp_hasVariableName rdf:type owl:DatatypeProperty ;
+                      rdfs:domain ag:class_Variable ;
+                      rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasVariableScope
+ag:dp_hasVariableScope rdf:type owl:DatatypeProperty ;
+                       rdfs:range [ rdf:type rdfs:Datatype ;
+                                    owl:oneOf [ rdf:type rdf:List ;
+                                                rdf:first "global" ;
+                                                rdf:rest [ rdf:type rdf:List ;
+                                                           rdf:first "input" ;
+                                                           rdf:rest [ rdf:type rdf:List ;
+                                                                      rdf:first "local" ;
+                                                                      rdf:rest [ rdf:type rdf:List ;
+                                                                                 rdf:first "output" ;
+                                                                                 rdf:rest rdf:nil
+                                                                               ]
+                                                                    ]
+                                                         ]
+                                              ]
+                                  ] .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasVariableType
+ag:dp_hasVariableType rdf:type owl:DatatypeProperty ;
+                      rdfs:domain ag:class_Variable ;
+                      rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_ioRawXml
+ag:dp_ioRawXml rdf:type owl:DatatypeProperty ;
+               rdfs:domain ag:class_Variable ;
+               rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_isUnusedVar
+ag:dp_isUnusedVar rdf:type owl:DatatypeProperty ;
+                  rdfs:domain ag:class_Variable ;
+                  rdfs:range xsd:boolean .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_onlyDeclaredNotUsed
+ag:dp_onlyDeclaredNotUsed rdf:type owl:DatatypeProperty ;
+                          rdfs:domain ag:class_Variable ;
+                          rdfs:range xsd:boolean .
+
+
+#################################################################
+#    Classes
+#################################################################
+
+###  http://www.semanticweb.org/AgentProgramParams/class_CustomFBType
+ag:class_CustomFBType rdf:type owl:Class ;
+                      rdfs:subClassOf ag:class_FBType .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/class_FBInstance
+ag:class_FBInstance rdf:type owl:Class .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/class_FBType
+ag:class_FBType rdf:type owl:Class ;
+                rdfs:subClassOf ag:class_POU .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/class_GobalVariableList
+ag:class_GobalVariableList rdf:type owl:Class .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/class_IOChannel
+ag:class_IOChannel rdf:type owl:Class .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/class_PLCProject
+ag:class_PLCProject rdf:type owl:Class .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/class_POU
+ag:class_POU rdf:type owl:Class .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/class_POUCall
+ag:class_POUCall rdf:type owl:Class .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/class_ParameterAssignment
+ag:class_ParameterAssignment rdf:type owl:Class .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/class_Port
+ag:class_Port rdf:type owl:Class .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/class_PortInstance
+ag:class_PortInstance rdf:type owl:Class ;
+                      rdfs:subClassOf ag:class_SignalSource .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/class_Program
+ag:class_Program rdf:type owl:Class ;
+                 rdfs:subClassOf ag:class_POU .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/class_SignalSource
+ag:class_SignalSource rdf:type owl:Class .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/class_SourceLiteral
+ag:class_SourceLiteral rdf:type owl:Class ;
+                       rdfs:subClassOf ag:class_SignalSource .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/class_StandardFBType
+ag:class_StandardFBType rdf:type owl:Class ;
+                        rdfs:subClassOf ag:class_FBType .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/class_Variable
+ag:class_Variable rdf:type owl:Class ;
+                  rdfs:subClassOf ag:class_SignalSource .
+
+
+#################################################################
+#    Individuals
+#################################################################
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_FBType_FB_Automatikbetrieb_F1_pPer_IN_1
+ag:Assign_FBType_FB_Automatikbetrieb_F1_pPer_IN_1 rdf:type owl:NamedIndividual ,
+                                                           ag:class_ParameterAssignment ;
+                                                  ag:op_assignsFrom ag:PortInstance_FBInst_FB_ProduktionMitStoerung_D3_rPer_Q ;
+                                                  ag:op_assignsToPort ag:Port_TP_IN .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_FBType_FB_Automatikbetrieb_F1_pPer_PT_1
+ag:Assign_FBType_FB_Automatikbetrieb_F1_pPer_PT_1 rdf:type owl:NamedIndividual ,
+                                                           ag:class_ParameterAssignment ;
+                                                  ag:op_assignsFrom ag:Port_FB_Automatikbetrieb_F1_FaultPulse ;
+                                                  ag:op_assignsToPort ag:Port_TP_PT .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_FBType_FB_Automatikbetrieb_F1_rPer_CLK_1
+ag:Assign_FBType_FB_Automatikbetrieb_F1_rPer_CLK_1 rdf:type owl:NamedIndividual ,
+                                                            ag:class_ParameterAssignment ;
+                                                   ag:op_assignsFrom ag:PortInstance_FBInst_FB_ProduktionMitStoerung_D3_tPer_Q ;
+                                                   ag:op_assignsToPort ag:Port_R_TRIG_CLK .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_FBType_FB_Automatikbetrieb_F1_rStart_CLK_1
+ag:Assign_FBType_FB_Automatikbetrieb_F1_rStart_CLK_1 rdf:type owl:NamedIndividual ,
+                                                              ag:class_ParameterAssignment ;
+                                                     ag:op_assignsFrom ag:Port_FB_Automatikbetrieb_F1_Automatikbetrieb_Starten ;
+                                                     ag:op_assignsToPort ag:Port_R_TRIG_CLK .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_FBType_FB_Automatikbetrieb_F1_rStep1_CLK_1
+ag:Assign_FBType_FB_Automatikbetrieb_F1_rStep1_CLK_1 rdf:type owl:NamedIndividual ,
+                                                              ag:class_ParameterAssignment ;
+                                                     ag:op_assignsFrom ag:Var_FB_Automatikbetrieb_F1_Schritt1 ;
+                                                     ag:op_assignsToPort ag:Port_R_TRIG_CLK .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_FBType_FB_Automatikbetrieb_F1_tPer_IN_1
+ag:Assign_FBType_FB_Automatikbetrieb_F1_tPer_IN_1 rdf:type owl:NamedIndividual ,
+                                                           ag:class_ParameterAssignment ;
+                                                  ag:op_assignsFrom ag:PortInstance_FBInst_FB_ProduktionMitStoerung_D3_tPer_Q ;
+                                                  ag:op_assignsToPort ag:Port_TON_IN .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_FBType_FB_Automatikbetrieb_F1_tPer_PT_1
+ag:Assign_FBType_FB_Automatikbetrieb_F1_tPer_PT_1 rdf:type owl:NamedIndividual ,
+                                                           ag:class_ParameterAssignment ;
+                                                  ag:op_assignsFrom ag:Port_FB_Automatikbetrieb_F1_PeriodicFaultPeriod ;
+                                                  ag:op_assignsToPort ag:Port_TON_PT .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_FBType_FB_Automatikbetrieb_F1_tSchritt1_IN_1
+ag:Assign_FBType_FB_Automatikbetrieb_F1_tSchritt1_IN_1 rdf:type owl:NamedIndividual ,
+                                                                ag:class_ParameterAssignment ;
+                                                       ag:op_assignsFrom ag:Var_FB_Automatikbetrieb_F1_Schritt1 ;
+                                                       ag:op_assignsToPort ag:Port_TON_IN .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_FBType_FB_Automatikbetrieb_F1_tSchritt1_PT_1
+ag:Assign_FBType_FB_Automatikbetrieb_F1_tSchritt1_PT_1 rdf:type owl:NamedIndividual ,
+                                                                ag:class_ParameterAssignment ;
+                                                       ag:op_assignsFrom ag:Literal_T_55S ;
+                                                       ag:op_assignsToPort ag:Port_TON_PT .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_FBType_FB_Automatikbetrieb_F1_tSchritt2_IN_1
+ag:Assign_FBType_FB_Automatikbetrieb_F1_tSchritt2_IN_1 rdf:type owl:NamedIndividual ,
+                                                                ag:class_ParameterAssignment ;
+                                                       ag:op_assignsFrom ag:Var_FB_Automatikbetrieb_F1_Schritt2 ;
+                                                       ag:op_assignsToPort ag:Port_TON_IN .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_FBType_FB_Automatikbetrieb_F1_tSchritt2_PT_1
+ag:Assign_FBType_FB_Automatikbetrieb_F1_tSchritt2_PT_1 rdf:type owl:NamedIndividual ,
+                                                                ag:class_ParameterAssignment ;
+                                                       ag:op_assignsFrom ag:Literal_T_55S ;
+                                                       ag:op_assignsToPort ag:Port_TON_PT .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_FBType_FB_Diagnose_D2_rtAck_CLK_1
+ag:Assign_FBType_FB_Diagnose_D2_rtAck_CLK_1 rdf:type owl:NamedIndividual ,
+                                                     ag:class_ParameterAssignment ;
+                                            ag:op_assignsFrom ag:OPCUA__dot__DiagnoseFinished ;
+                                            ag:op_assignsToPort ag:Port_R_TRIG_CLK .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_FBType_FB_Diagnose_D2_rtD3_CLK_1
+ag:Assign_FBType_FB_Diagnose_D2_rtD3_CLK_1 rdf:type owl:NamedIndividual ,
+                                                    ag:class_ParameterAssignment ;
+                                           ag:op_assignsFrom ag:OPCUA__dot__Alt_found ;
+                                           ag:op_assignsToPort ag:Port_R_TRIG_CLK .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_FBType_FB_Diagnose_D2_rtReq_CLK_1
+ag:Assign_FBType_FB_Diagnose_D2_rtReq_CLK_1 rdf:type owl:NamedIndividual ,
+                                                     ag:class_ParameterAssignment ;
+                                            ag:op_assignsFrom ag:Port_FB_Diagnose_D2_Diagnose_gefordert ;
+                                            ag:op_assignsToPort ag:Port_R_TRIG_CLK .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_FBType_FB_InitFahrt_A6_A2_tInit_IN_1
+ag:Assign_FBType_FB_InitFahrt_A6_A2_tInit_IN_1 rdf:type owl:NamedIndividual ,
+                                                        ag:class_ParameterAssignment ;
+                                               ag:op_assignsFrom ag:Port_FB_InitFahrt_A6_A2_A6 ;
+                                               ag:op_assignsToPort ag:Port_TON_IN .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_FBType_FB_InitFahrt_A6_A2_tInit_IN_2
+ag:Assign_FBType_FB_InitFahrt_A6_A2_tInit_IN_2 rdf:type owl:NamedIndividual ,
+                                                        ag:class_ParameterAssignment ;
+                                               ag:op_assignsFrom ag:Port_FB_InitFahrt_A6_A2_A2 ;
+                                               ag:op_assignsToPort ag:Port_TON_IN .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_FBType_FB_InitFahrt_A6_A2_tInit_PT_1
+ag:Assign_FBType_FB_InitFahrt_A6_A2_tInit_PT_1 rdf:type owl:NamedIndividual ,
+                                                        ag:class_ParameterAssignment ;
+                                               ag:op_assignsFrom ag:Literal_T_3S ;
+                                               ag:op_assignsToPort ag:Port_TON_PT .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_FBType_FB_InitFahrt_A6_A2_tInit_PT_2
+ag:Assign_FBType_FB_InitFahrt_A6_A2_tInit_PT_2 rdf:type owl:NamedIndividual ,
+                                                        ag:class_ParameterAssignment ;
+                                               ag:op_assignsFrom ag:Literal_T_5S ;
+                                               ag:op_assignsToPort ag:Port_TON_PT .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_FBType_FB_Methode1Job_t20s_IN_1
+ag:Assign_FBType_FB_Methode1Job_t20s_IN_1 rdf:type owl:NamedIndividual ,
+                                                   ag:class_ParameterAssignment ;
+                                          ag:op_assignsFrom ag:Var_FB_Methode1Job_reached ;
+                                          ag:op_assignsToPort ag:Port_TON_IN .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_FBType_FB_Methode1Job_t20s_IN_2
+ag:Assign_FBType_FB_Methode1Job_t20s_IN_2 rdf:type owl:NamedIndividual ,
+                                                   ag:class_ParameterAssignment ;
+                                          ag:op_assignsFrom ag:Literal_FALSE ;
+                                          ag:op_assignsToPort ag:Port_TON_IN .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_FBType_FB_Methode1Job_t20s_PT_1
+ag:Assign_FBType_FB_Methode1Job_t20s_PT_1 rdf:type owl:NamedIndividual ,
+                                                   ag:class_ParameterAssignment ;
+                                          ag:op_assignsFrom ag:Literal_T_9S ;
+                                          ag:op_assignsToPort ag:Port_TON_PT .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_FBType_FB_Methode1Job_t20s_PT_2
+ag:Assign_FBType_FB_Methode1Job_t20s_PT_2 rdf:type owl:NamedIndividual ,
+                                                   ag:class_ParameterAssignment ;
+                                          ag:op_assignsFrom ag:Literal_T_9S ;
+                                          ag:op_assignsToPort ag:Port_TON_PT .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_FBType_FB_Notaus_D1_ton5s_IN_1
+ag:Assign_FBType_FB_Notaus_D1_ton5s_IN_1 rdf:type owl:NamedIndividual ,
+                                                  ag:class_ParameterAssignment ;
+                                         ag:op_assignsFrom ag:Literal_TRUE ;
+                                         ag:op_assignsToPort ag:Port_TON_IN .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_FBType_FB_Notaus_D1_ton5s_IN_2
+ag:Assign_FBType_FB_Notaus_D1_ton5s_IN_2 rdf:type owl:NamedIndividual ,
+                                                  ag:class_ParameterAssignment ;
+                                         ag:op_assignsFrom ag:Literal_FALSE ;
+                                         ag:op_assignsToPort ag:Port_TON_IN .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_FBType_FB_Notaus_D1_ton5s_PT_1
+ag:Assign_FBType_FB_Notaus_D1_ton5s_PT_1 rdf:type owl:NamedIndividual ,
+                                                  ag:class_ParameterAssignment ;
+                                         ag:op_assignsFrom ag:Literal_T_5S ;
+                                         ag:op_assignsToPort ag:Port_TON_PT .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_FBType_FB_Notaus_D1_ton5s_PT_2
+ag:Assign_FBType_FB_Notaus_D1_ton5s_PT_2 rdf:type owl:NamedIndividual ,
+                                                  ag:class_ParameterAssignment ;
+                                         ag:op_assignsFrom ag:Literal_T_5S ;
+                                         ag:op_assignsToPort ag:Port_TON_PT .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_FBType_FB_ProduktionMitStoerung_D3_rStart_CLK_1
+ag:Assign_FBType_FB_ProduktionMitStoerung_D3_rStart_CLK_1 rdf:type owl:NamedIndividual ,
+                                                                   ag:class_ParameterAssignment ;
+                                                          ag:op_assignsFrom ag:Port_FB_ProduktionMitStoerung_D3_ProduktionMitStoerung_Starten ;
+                                                          ag:op_assignsToPort ag:Port_R_TRIG_CLK .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_FBType_FB_ProduktionMitStoerung_D3_tSchritt3_IN_1
+ag:Assign_FBType_FB_ProduktionMitStoerung_D3_tSchritt3_IN_1 rdf:type owl:NamedIndividual ,
+                                                                     ag:class_ParameterAssignment ;
+                                                            ag:op_assignsFrom ag:Var_FB_ProduktionMitStoerung_D3_Schritt3 ;
+                                                            ag:op_assignsToPort ag:Port_TON_IN .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_FBType_FB_ProduktionMitStoerung_D3_tSchritt3_PT_1
+ag:Assign_FBType_FB_ProduktionMitStoerung_D3_tSchritt3_PT_1 rdf:type owl:NamedIndividual ,
+                                                                     ag:class_ParameterAssignment ;
+                                                            ag:op_assignsFrom ag:Literal_T_10S ;
+                                                            ag:op_assignsToPort ag:Port_TON_PT .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_FBType_FB_ProduktionMitStoerung_D3_tSchritt4_IN_1
+ag:Assign_FBType_FB_ProduktionMitStoerung_D3_tSchritt4_IN_1 rdf:type owl:NamedIndividual ,
+                                                                     ag:class_ParameterAssignment ;
+                                                            ag:op_assignsFrom ag:Var_FB_ProduktionMitStoerung_D3_Schritt4 ;
+                                                            ag:op_assignsToPort ag:Port_TON_IN .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_FBType_FB_ProduktionMitStoerung_D3_tSchritt4_PT_1
+ag:Assign_FBType_FB_ProduktionMitStoerung_D3_tSchritt4_PT_1 rdf:type owl:NamedIndividual ,
+                                                                     ag:class_ParameterAssignment ;
+                                                            ag:op_assignsFrom ag:Literal_T_10S ;
+                                                            ag:op_assignsToPort ag:Port_TON_PT .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_MAIN_edgeDone_CLK_1
+ag:Assign_MAIN_edgeDone_CLK_1 rdf:type owl:NamedIndividual ,
+                                       ag:class_ParameterAssignment ;
+                              ag:op_assignsFrom ag:PortInstance_FBInst_MAIN_fbDiag_Diagnose_beendet ;
+                              ag:op_assignsToPort ag:Port_R_TRIG_CLK .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_MAIN_edgeF1_CLK_1
+ag:Assign_MAIN_edgeF1_CLK_1 rdf:type owl:NamedIndividual ,
+                                     ag:class_ParameterAssignment ;
+                            ag:op_assignsFrom ag:PortInstance_FBInst_MAIN_fbBA_F1 ;
+                            ag:op_assignsToPort ag:Port_R_TRIG_CLK .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_MAIN_fbAuto_Automatikbetrieb_Starten_1
+ag:Assign_MAIN_fbAuto_Automatikbetrieb_Starten_1 rdf:type owl:NamedIndividual ,
+                                                          ag:class_ParameterAssignment ;
+                                                 ag:op_assignsFrom ag:PortInstance_FBInst_MAIN_edgeF1_Q ;
+                                                 ag:op_assignsToPort ag:Port_FB_Automatikbetrieb_F1_Automatikbetrieb_Starten .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_MAIN_fbBA_A2_Requested_1
+ag:Assign_MAIN_fbBA_A2_Requested_1 rdf:type owl:NamedIndividual ,
+                                            ag:class_ParameterAssignment ;
+                                   ag:op_assignsFrom ag:Var_MAIN_A2_angefordert ;
+                                   ag:op_assignsToPort ag:Port_FB_Betriebsarten_A2_Requested .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_MAIN_fbBA_Alt_abort_1
+ag:Assign_MAIN_fbBA_Alt_abort_1 rdf:type owl:NamedIndividual ,
+                                         ag:class_ParameterAssignment ;
+                                ag:op_assignsFrom ag:Var_MAIN_alt_abort ;
+                                ag:op_assignsToPort ag:Port_FB_Betriebsarten_Alt_abort .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_MAIN_fbBA_Alt_found_1
+ag:Assign_MAIN_fbBA_Alt_found_1 rdf:type owl:NamedIndividual ,
+                                         ag:class_ParameterAssignment ;
+                                ag:op_assignsFrom ag:Var_MAIN_alt_found ;
+                                ag:op_assignsToPort ag:Port_FB_Betriebsarten_Alt_found .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_MAIN_fbBA_Auto_Fertig_1
+ag:Assign_MAIN_fbBA_Auto_Fertig_1 rdf:type owl:NamedIndividual ,
+                                           ag:class_ParameterAssignment ;
+                                  ag:op_assignsFrom ag:PortInstance_FBInst_MAIN_fbAuto_Automatikbetrieb_Fertig ;
+                                  ag:op_assignsToPort ag:Port_FB_Betriebsarten_Auto_Fertig .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_MAIN_fbBA_Auto_Stoerung_1
+ag:Assign_MAIN_fbBA_Auto_Stoerung_1 rdf:type owl:NamedIndividual ,
+                                             ag:class_ParameterAssignment ;
+                                    ag:op_assignsFrom ag:PortInstance_FBInst_MAIN_fbAuto_Stoerung_erkannt ;
+                                    ag:op_assignsToPort ag:Port_FB_Betriebsarten_Auto_Stoerung .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_MAIN_fbBA_Cycle_ended_1
+ag:Assign_MAIN_fbBA_Cycle_ended_1 rdf:type owl:NamedIndividual ,
+                                           ag:class_ParameterAssignment ;
+                                  ag:op_assignsFrom ag:Var_MAIN_Zyklus_beendet ;
+                                  ag:op_assignsToPort ag:Port_FB_Betriebsarten_Cycle_ended .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_MAIN_fbBA_D3_Requested_1
+ag:Assign_MAIN_fbBA_D3_Requested_1 rdf:type owl:NamedIndividual ,
+                                            ag:class_ParameterAssignment ;
+                                   ag:op_assignsFrom ag:Var_MAIN_D3_angefordert ;
+                                   ag:op_assignsToPort ag:Port_FB_Betriebsarten_D3_Requested .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_MAIN_fbBA_Fehler_1
+ag:Assign_MAIN_fbBA_Fehler_1 rdf:type owl:NamedIndividual ,
+                                      ag:class_ParameterAssignment ;
+                             ag:op_assignsFrom ag:GVL__dot__Fehler ;
+                             ag:op_assignsToPort ag:Port_FB_Betriebsarten_Fehler .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_MAIN_fbBA_Init_reached_1
+ag:Assign_MAIN_fbBA_Init_reached_1 rdf:type owl:NamedIndividual ,
+                                            ag:class_ParameterAssignment ;
+                                   ag:op_assignsFrom ag:Var_MAIN_Init_erreicht ;
+                                   ag:op_assignsToPort ag:Port_FB_Betriebsarten_Init_reached .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_MAIN_fbBA_NotStop_1
+ag:Assign_MAIN_fbBA_NotStop_1 rdf:type owl:NamedIndividual ,
+                                       ag:class_ParameterAssignment ;
+                              ag:op_assignsFrom ag:GVL__dot__NotStopp ;
+                              ag:op_assignsToPort ag:Port_FB_Betriebsarten_NotStop .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_MAIN_fbBA_Start_1
+ag:Assign_MAIN_fbBA_Start_1 rdf:type owl:NamedIndividual ,
+                                     ag:class_ParameterAssignment ;
+                            ag:op_assignsFrom ag:Var_MAIN_Start_eff ;
+                            ag:op_assignsToPort ag:Port_FB_Betriebsarten_Start .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_MAIN_fbBA_Start_Init_1
+ag:Assign_MAIN_fbBA_Start_Init_1 rdf:type owl:NamedIndividual ,
+                                          ag:class_ParameterAssignment ;
+                                 ag:op_assignsFrom ag:Var_MAIN_Init_start ;
+                                 ag:op_assignsToPort ag:Port_FB_Betriebsarten_Start_Init .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_MAIN_fbBA_Weiter_1
+ag:Assign_MAIN_fbBA_Weiter_1 rdf:type owl:NamedIndividual ,
+                                      ag:class_ParameterAssignment ;
+                             ag:op_assignsFrom ag:Var_MAIN_Weiter_eff ;
+                             ag:op_assignsToPort ag:Port_FB_Betriebsarten_Weiter .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_MAIN_fbDiag_Diagnose_gefordert_1
+ag:Assign_MAIN_fbDiag_Diagnose_gefordert_1 rdf:type owl:NamedIndividual ,
+                                                    ag:class_ParameterAssignment ;
+                                           ag:op_assignsFrom ag:PortInstance_FBInst_MAIN_fbBA_D2 ;
+                                           ag:op_assignsToPort ag:Port_FB_Diagnose_D2_Diagnose_gefordert .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_MAIN_fbInit_A2_1
+ag:Assign_MAIN_fbInit_A2_1 rdf:type owl:NamedIndividual ,
+                                    ag:class_ParameterAssignment ;
+                           ag:op_assignsFrom ag:PortInstance_FBInst_MAIN_fbBA_A2 ;
+                           ag:op_assignsToPort ag:Port_FB_InitFahrt_A6_A2_A2 .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_MAIN_fbInit_A6_1
+ag:Assign_MAIN_fbInit_A6_1 rdf:type owl:NamedIndividual ,
+                                    ag:class_ParameterAssignment ;
+                           ag:op_assignsFrom ag:PortInstance_FBInst_MAIN_fbBA_A6 ;
+                           ag:op_assignsToPort ag:Port_FB_InitFahrt_A6_A2_A6 .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_MAIN_fbNot_D1_1
+ag:Assign_MAIN_fbNot_D1_1 rdf:type owl:NamedIndividual ,
+                                   ag:class_ParameterAssignment ;
+                          ag:op_assignsFrom ag:PortInstance_FBInst_MAIN_fbBA_D1 ;
+                          ag:op_assignsToPort ag:Port_FB_Notaus_D1_D1 .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Assign_MAIN_fbProStoer_ProduktionMitStoerung_Starten_1
+ag:Assign_MAIN_fbProStoer_ProduktionMitStoerung_Starten_1 rdf:type owl:NamedIndividual ,
+                                                                   ag:class_ParameterAssignment ;
+                                                          ag:op_assignsFrom ag:PortInstance_FBInst_MAIN_fbBA_D3 ;
+                                                          ag:op_assignsToPort ag:Port_FB_ProduktionMitStoerung_D3_ProduktionMitStoerung_Starten .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_Automatikbetrieb_F1_pPer
+ag:FBInst_FB_Automatikbetrieb_F1_pPer rdf:type owl:NamedIndividual ,
+                                               ag:class_FBInstance ;
+                                      ag:op_isInstanceOfFBType ag:StandardFBType_TP .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_Automatikbetrieb_F1_rPer
+ag:FBInst_FB_Automatikbetrieb_F1_rPer rdf:type owl:NamedIndividual ,
+                                               ag:class_FBInstance ;
+                                      ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_Automatikbetrieb_F1_rStart
+ag:FBInst_FB_Automatikbetrieb_F1_rStart rdf:type owl:NamedIndividual ,
+                                                 ag:class_FBInstance ;
+                                        ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_Automatikbetrieb_F1_rStep1
+ag:FBInst_FB_Automatikbetrieb_F1_rStep1 rdf:type owl:NamedIndividual ,
+                                                 ag:class_FBInstance ;
+                                        ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_Automatikbetrieb_F1_rtStoer
+ag:FBInst_FB_Automatikbetrieb_F1_rtStoer rdf:type owl:NamedIndividual ,
+                                                  ag:class_FBInstance ;
+                                         ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_Automatikbetrieb_F1_tPer
+ag:FBInst_FB_Automatikbetrieb_F1_tPer rdf:type owl:NamedIndividual ,
+                                               ag:class_FBInstance ;
+                                      ag:op_isInstanceOfFBType ag:StandardFBType_TON .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_Automatikbetrieb_F1_tSchritt1
+ag:FBInst_FB_Automatikbetrieb_F1_tSchritt1 rdf:type owl:NamedIndividual ,
+                                                    ag:class_FBInstance ;
+                                           ag:op_isInstanceOfFBType ag:StandardFBType_TON .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_Automatikbetrieb_F1_tSchritt2
+ag:FBInst_FB_Automatikbetrieb_F1_tSchritt2 rdf:type owl:NamedIndividual ,
+                                                    ag:class_FBInstance ;
+                                           ag:op_isInstanceOfFBType ag:StandardFBType_TON .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_Betriebsarten_RS_A1
+ag:FBInst_FB_Betriebsarten_RS_A1 rdf:type owl:NamedIndividual ,
+                                          ag:class_FBInstance ;
+                                 ag:op_isInstanceOfFBType ag:StandardFBType_RS .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_Betriebsarten_RS_A2
+ag:FBInst_FB_Betriebsarten_RS_A2 rdf:type owl:NamedIndividual ,
+                                          ag:class_FBInstance ;
+                                 ag:op_isInstanceOfFBType ag:StandardFBType_RS .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_Betriebsarten_RS_A5
+ag:FBInst_FB_Betriebsarten_RS_A5 rdf:type owl:NamedIndividual ,
+                                          ag:class_FBInstance ;
+                                 ag:op_isInstanceOfFBType ag:StandardFBType_RS .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_Betriebsarten_RS_A6
+ag:FBInst_FB_Betriebsarten_RS_A6 rdf:type owl:NamedIndividual ,
+                                          ag:class_FBInstance ;
+                                 ag:op_isInstanceOfFBType ag:StandardFBType_RS .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_Betriebsarten_RS_AutomaticOperationMode
+ag:FBInst_FB_Betriebsarten_RS_AutomaticOperationMode rdf:type owl:NamedIndividual ,
+                                                              ag:class_FBInstance ;
+                                                     ag:op_isInstanceOfFBType ag:StandardFBType_RS .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_Betriebsarten_RS_CycleEnded
+ag:FBInst_FB_Betriebsarten_RS_CycleEnded rdf:type owl:NamedIndividual ,
+                                                  ag:class_FBInstance ;
+                                         ag:op_isInstanceOfFBType ag:StandardFBType_RS .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_Betriebsarten_RS_D1
+ag:FBInst_FB_Betriebsarten_RS_D1 rdf:type owl:NamedIndividual ,
+                                          ag:class_FBInstance ;
+                                 ag:op_isInstanceOfFBType ag:StandardFBType_RS .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_Betriebsarten_RS_D2
+ag:FBInst_FB_Betriebsarten_RS_D2 rdf:type owl:NamedIndividual ,
+                                          ag:class_FBInstance ;
+                                 ag:op_isInstanceOfFBType ag:StandardFBType_RS .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_Betriebsarten_RS_D3
+ag:FBInst_FB_Betriebsarten_RS_D3 rdf:type owl:NamedIndividual ,
+                                          ag:class_FBInstance ;
+                                 ag:op_isInstanceOfFBType ag:StandardFBType_RS .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_Betriebsarten_RS_F1
+ag:FBInst_FB_Betriebsarten_RS_F1 rdf:type owl:NamedIndividual ,
+                                          ag:class_FBInstance ;
+                                 ag:op_isInstanceOfFBType ag:StandardFBType_RS .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_Betriebsarten_RS_InitialDrive
+ag:FBInst_FB_Betriebsarten_RS_InitialDrive rdf:type owl:NamedIndividual ,
+                                                    ag:class_FBInstance ;
+                                           ag:op_isInstanceOfFBType ag:StandardFBType_RS .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_Betriebsarten_RS_InitialState
+ag:FBInst_FB_Betriebsarten_RS_InitialState rdf:type owl:NamedIndividual ,
+                                                    ag:class_FBInstance ;
+                                           ag:op_isInstanceOfFBType ag:StandardFBType_RS .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_Betriebsarten_RS_ManualOperationMode
+ag:FBInst_FB_Betriebsarten_RS_ManualOperationMode rdf:type owl:NamedIndividual ,
+                                                           ag:class_FBInstance ;
+                                                  ag:op_isInstanceOfFBType ag:StandardFBType_RS .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_Betriebsarten_R_TRIG_Automatic
+ag:FBInst_FB_Betriebsarten_R_TRIG_Automatic rdf:type owl:NamedIndividual ,
+                                                     ag:class_FBInstance ;
+                                            ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_Betriebsarten_R_TRIG_CycleEnded
+ag:FBInst_FB_Betriebsarten_R_TRIG_CycleEnded rdf:type owl:NamedIndividual ,
+                                                      ag:class_FBInstance ;
+                                             ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_Betriebsarten_R_TRIG_Init
+ag:FBInst_FB_Betriebsarten_R_TRIG_Init rdf:type owl:NamedIndividual ,
+                                                ag:class_FBInstance ;
+                                       ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_Betriebsarten_R_TRIG_InitialDrive
+ag:FBInst_FB_Betriebsarten_R_TRIG_InitialDrive rdf:type owl:NamedIndividual ,
+                                                        ag:class_FBInstance ;
+                                               ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_Betriebsarten_R_TRIG_Manual
+ag:FBInst_FB_Betriebsarten_R_TRIG_Manual rdf:type owl:NamedIndividual ,
+                                                  ag:class_FBInstance ;
+                                         ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_Diagnose_D2_rtAck
+ag:FBInst_FB_Diagnose_D2_rtAck rdf:type owl:NamedIndividual ,
+                                        ag:class_FBInstance ;
+                               ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_Diagnose_D2_rtD3
+ag:FBInst_FB_Diagnose_D2_rtD3 rdf:type owl:NamedIndividual ,
+                                       ag:class_FBInstance ;
+                              ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_Diagnose_D2_rtFinished
+ag:FBInst_FB_Diagnose_D2_rtFinished rdf:type owl:NamedIndividual ,
+                                             ag:class_FBInstance ;
+                                    ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_Diagnose_D2_rtReq
+ag:FBInst_FB_Diagnose_D2_rtReq rdf:type owl:NamedIndividual ,
+                                        ag:class_FBInstance ;
+                               ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_Diagnose_D2_tpPulse
+ag:FBInst_FB_Diagnose_D2_tpPulse rdf:type owl:NamedIndividual ,
+                                          ag:class_FBInstance ;
+                                 ag:op_isInstanceOfFBType ag:StandardFBType_TP .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_InitFahrt_A6_A2_tInit
+ag:FBInst_FB_InitFahrt_A6_A2_tInit rdf:type owl:NamedIndividual ,
+                                            ag:class_FBInstance ;
+                                   ag:op_isInstanceOfFBType ag:StandardFBType_TON .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_Methode1Job_t20s
+ag:FBInst_FB_Methode1Job_t20s rdf:type owl:NamedIndividual ,
+                                       ag:class_FBInstance ;
+                              ag:op_isInstanceOfFBType ag:StandardFBType_TON .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_Notaus_D1_ton5s
+ag:FBInst_FB_Notaus_D1_ton5s rdf:type owl:NamedIndividual ,
+                                      ag:class_FBInstance ;
+                             ag:op_isInstanceOfFBType ag:StandardFBType_TON .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_ProduktionMitStoerung_D3_pPer
+ag:FBInst_FB_ProduktionMitStoerung_D3_pPer rdf:type owl:NamedIndividual ,
+                                                    ag:class_FBInstance ;
+                                           ag:op_isInstanceOfFBType ag:StandardFBType_TP .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_ProduktionMitStoerung_D3_rPer
+ag:FBInst_FB_ProduktionMitStoerung_D3_rPer rdf:type owl:NamedIndividual ,
+                                                    ag:class_FBInstance ;
+                                           ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_ProduktionMitStoerung_D3_rStart
+ag:FBInst_FB_ProduktionMitStoerung_D3_rStart rdf:type owl:NamedIndividual ,
+                                                      ag:class_FBInstance ;
+                                             ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_ProduktionMitStoerung_D3_rStep1
+ag:FBInst_FB_ProduktionMitStoerung_D3_rStep1 rdf:type owl:NamedIndividual ,
+                                                      ag:class_FBInstance ;
+                                             ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_ProduktionMitStoerung_D3_rtStoer
+ag:FBInst_FB_ProduktionMitStoerung_D3_rtStoer rdf:type owl:NamedIndividual ,
+                                                       ag:class_FBInstance ;
+                                              ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_ProduktionMitStoerung_D3_tPer
+ag:FBInst_FB_ProduktionMitStoerung_D3_tPer rdf:type owl:NamedIndividual ,
+                                                    ag:class_FBInstance ;
+                                           ag:op_isInstanceOfFBType ag:StandardFBType_TON .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_ProduktionMitStoerung_D3_tSchritt3
+ag:FBInst_FB_ProduktionMitStoerung_D3_tSchritt3 rdf:type owl:NamedIndividual ,
+                                                         ag:class_FBInstance ;
+                                                ag:op_isInstanceOfFBType ag:StandardFBType_TON .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_FB_ProduktionMitStoerung_D3_tSchritt4
+ag:FBInst_FB_ProduktionMitStoerung_D3_tSchritt4 rdf:type owl:NamedIndividual ,
+                                                         ag:class_FBInstance ;
+                                                ag:op_isInstanceOfFBType ag:StandardFBType_TON .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_MAIN_edgeDone
+ag:FBInst_MAIN_edgeDone rdf:type owl:NamedIndividual ,
+                                 ag:class_FBInstance ;
+                        ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_MAIN_edgeF1
+ag:FBInst_MAIN_edgeF1 rdf:type owl:NamedIndividual ,
+                               ag:class_FBInstance ;
+                      ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_MAIN_fbAuto
+ag:FBInst_MAIN_fbAuto rdf:type owl:NamedIndividual ,
+                               ag:class_FBInstance ;
+                      ag:op_isInstanceOfFBType ag:FBType_FB_Automatikbetrieb_F1 .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_MAIN_fbBA
+ag:FBInst_MAIN_fbBA rdf:type owl:NamedIndividual ,
+                             ag:class_FBInstance ;
+                    ag:op_isInstanceOfFBType ag:FBType_FB_Betriebsarten .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_MAIN_fbDiag
+ag:FBInst_MAIN_fbDiag rdf:type owl:NamedIndividual ,
+                               ag:class_FBInstance ;
+                      ag:op_isInstanceOfFBType ag:FBType_FB_Diagnose_D2 .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_MAIN_fbInit
+ag:FBInst_MAIN_fbInit rdf:type owl:NamedIndividual ,
+                               ag:class_FBInstance ;
+                      ag:op_isInstanceOfFBType ag:FBType_FB_InitFahrt_A6_A2 .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_MAIN_fbJob
+ag:FBInst_MAIN_fbJob rdf:type owl:NamedIndividual ,
+                              ag:class_FBInstance ;
+                     ag:op_isInstanceOfFBType ag:FBType_FB_Methode1Job .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_MAIN_fbNot
+ag:FBInst_MAIN_fbNot rdf:type owl:NamedIndividual ,
+                              ag:class_FBInstance ;
+                     ag:op_isInstanceOfFBType ag:FBType_FB_Notaus_D1 .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBInst_MAIN_fbProStoer
+ag:FBInst_MAIN_fbProStoer rdf:type owl:NamedIndividual ,
+                                   ag:class_FBInstance ;
+                          ag:op_isInstanceOfFBType ag:FBType_FB_ProduktionMitStoerung_D3 .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBType_FB_Automatikbetrieb_F1
+ag:FBType_FB_Automatikbetrieb_F1 rdf:type owl:NamedIndividual ,
+                                          ag:class_FBType ;
+                                 ag:op_containsPOUCall ag:POUCall_FBType_FB_Automatikbetrieb_F1_pPer_1 ,
+                                                       ag:POUCall_FBType_FB_Automatikbetrieb_F1_rPer_1 ,
+                                                       ag:POUCall_FBType_FB_Automatikbetrieb_F1_rStart_1 ,
+                                                       ag:POUCall_FBType_FB_Automatikbetrieb_F1_rStep1_1 ,
+                                                       ag:POUCall_FBType_FB_Automatikbetrieb_F1_tPer_1 ,
+                                                       ag:POUCall_FBType_FB_Automatikbetrieb_F1_tSchritt1_1 ,
+                                                       ag:POUCall_FBType_FB_Automatikbetrieb_F1_tSchritt2_1 ;
+                                 ag:op_hasPort ag:Port_FB_Automatikbetrieb_F1_AutoRestartEnable ,
+                                               ag:Port_FB_Automatikbetrieb_F1_Automatikbetrieb_Fertig ,
+                                               ag:Port_FB_Automatikbetrieb_F1_Automatikbetrieb_Starten ,
+                                               ag:Port_FB_Automatikbetrieb_F1_FaultPulse ,
+                                               ag:Port_FB_Automatikbetrieb_F1_PeriodicFaultEnable ,
+                                               ag:Port_FB_Automatikbetrieb_F1_PeriodicFaultPeriod ,
+                                               ag:Port_FB_Automatikbetrieb_F1_Stoerung_erkannt ;
+                                 ag:op_usesVariable ag:Var_FB_Automatikbetrieb_F1_RestartPulseLength ,
+                                                    ag:Var_FB_Automatikbetrieb_F1_Schritt1 ,
+                                                    ag:Var_FB_Automatikbetrieb_F1_Schritt2 ,
+                                                    ag:Var_FB_Automatikbetrieb_F1_Zwischen ,
+                                                    ag:Var_FB_Automatikbetrieb_F1_dbg_Stoerung_Manuell ,
+                                                    ag:Var_FB_Automatikbetrieb_F1_lastSkillIsOne ,
+                                                    ag:Var_FB_Automatikbetrieb_F1_pPer ,
+                                                    ag:Var_FB_Automatikbetrieb_F1_perEn ,
+                                                    ag:Var_FB_Automatikbetrieb_F1_rPer ,
+                                                    ag:Var_FB_Automatikbetrieb_F1_rStart ,
+                                                    ag:Var_FB_Automatikbetrieb_F1_rStep1 ,
+                                                    ag:Var_FB_Automatikbetrieb_F1_rtStoer ,
+                                                    ag:Var_FB_Automatikbetrieb_F1_tPer ,
+                                                    ag:Var_FB_Automatikbetrieb_F1_tSchritt1 ,
+                                                    ag:Var_FB_Automatikbetrieb_F1_tSchritt2 ,
+                                                    ag:Var_FB_Automatikbetrieb_F1_tpRestart ;
+                                 ag:dp_hasPOUCode """// POU FB_Automatikbetrieb_F1 body
+IF GVL.Start THEN
+	AutoRestartEnable := TRUE;
+END_IF
+
+rStart(CLK := Automatikbetrieb_Starten);
+rStep1(CLK := Schritt1);
+
+
+IF (AutoRestartEnable AND NOT (Schritt1 OR Schritt2)) OR (Stoerung_erkannt AND GVL.Weiter) THEN
+    
+    Automatikbetrieb_Fertig := FALSE;
+    Stoerung_erkannt        := FALSE;
+	GVL.Weiter := FALSE;
+    
+    Schritt1 := TRUE;
+	OPCUA.lastExecutedProcess := 'ExTechnProcess1';
+    Schritt2 := FALSE;
+END_IF
+
+
+tSchritt1(IN := Schritt1, PT := T#55S);
+tSchritt2(IN := Schritt2, PT := T#55S);
+
+IF rStep1.Q THEN
+    lastSkillIsOne := NOT lastSkillIsOne;
+    IF lastSkillIsOne THEN
+        OPCUA.lastExecutedSkill := 'TestSkill1';
+    ELSE
+        OPCUA.lastExecutedSkill := 'TestSkill1';
+    END_IF
+END_IF
+
+IF rStart.Q AND NOT (Schritt1 OR Schritt2) THEN
+    Automatikbetrieb_Fertig := FALSE;
+    Stoerung_erkannt := FALSE;
+    GVL.Weiter := FALSE;
+    Schritt1 := TRUE;
+    Schritt2 := FALSE;
+    OPCUA.lastExecutedProcess := 'ExTechnProcess1';
+END_IF
+
+
+IF NOT Stoerung_erkannt THEN
+    
+    IF Schritt1 AND tSchritt1.Q THEN
+        Schritt1 := FALSE;
+        Schritt2 := TRUE;
+		OPCUA.lastExecutedSkill := 'TestSkill1';
+    END_IF
+
+    
+    IF Schritt2 AND tSchritt2.Q THEN
+        Schritt2 := FALSE;
+        Automatikbetrieb_Fertig := TRUE;
+        
+    END_IF
+END_IF
+
+
+IF rtStoer.Q THEN
+    Stoerung_erkannt := TRUE;
+END_IF
+
+
+tPer(IN := NOT tPer.Q, PT := PeriodicFaultPeriod);  
+
+
+rPer(CLK := tPer.Q);
+pPer(IN := rPer.Q, PT := FaultPulse);                
+
+
+IF (Schritt1 OR Schritt2) AND pPer.Q THEN
+    Stoerung_erkannt := TRUE;
+	GVL.Fehler := TRUE;
+END_IF""" ;
+                                 ag:dp_hasPOULanguage "ST" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBType_FB_Betriebsarten
+ag:FBType_FB_Betriebsarten rdf:type owl:NamedIndividual ,
+                                    ag:class_FBType ;
+                           ag:op_hasPort ag:Port_FB_Betriebsarten_A1 ,
+                                         ag:Port_FB_Betriebsarten_A2 ,
+                                         ag:Port_FB_Betriebsarten_A2_Requested ,
+                                         ag:Port_FB_Betriebsarten_A5 ,
+                                         ag:Port_FB_Betriebsarten_A6 ,
+                                         ag:Port_FB_Betriebsarten_Alt_abort ,
+                                         ag:Port_FB_Betriebsarten_Alt_found ,
+                                         ag:Port_FB_Betriebsarten_Auto_Fertig ,
+                                         ag:Port_FB_Betriebsarten_Auto_Stoerung ,
+                                         ag:Port_FB_Betriebsarten_Cycle_ended ,
+                                         ag:Port_FB_Betriebsarten_D1 ,
+                                         ag:Port_FB_Betriebsarten_D2 ,
+                                         ag:Port_FB_Betriebsarten_D3 ,
+                                         ag:Port_FB_Betriebsarten_D3_Requested ,
+                                         ag:Port_FB_Betriebsarten_F1 ,
+                                         ag:Port_FB_Betriebsarten_F4 ,
+                                         ag:Port_FB_Betriebsarten_Fehler ,
+                                         ag:Port_FB_Betriebsarten_Init_reached ,
+                                         ag:Port_FB_Betriebsarten_NotStop ,
+                                         ag:Port_FB_Betriebsarten_Start ,
+                                         ag:Port_FB_Betriebsarten_Start_Init ,
+                                         ag:Port_FB_Betriebsarten_Weiter ;
+                           ag:op_usesVariable ag:Var_FB_Betriebsarten_RS_A1 ,
+                                              ag:Var_FB_Betriebsarten_RS_A2 ,
+                                              ag:Var_FB_Betriebsarten_RS_A5 ,
+                                              ag:Var_FB_Betriebsarten_RS_A6 ,
+                                              ag:Var_FB_Betriebsarten_RS_AutomaticOperationMode ,
+                                              ag:Var_FB_Betriebsarten_RS_CycleEnded ,
+                                              ag:Var_FB_Betriebsarten_RS_D1 ,
+                                              ag:Var_FB_Betriebsarten_RS_D2 ,
+                                              ag:Var_FB_Betriebsarten_RS_D3 ,
+                                              ag:Var_FB_Betriebsarten_RS_F1 ,
+                                              ag:Var_FB_Betriebsarten_RS_InitialDrive ,
+                                              ag:Var_FB_Betriebsarten_RS_InitialState ,
+                                              ag:Var_FB_Betriebsarten_RS_ManualOperationMode ,
+                                              ag:Var_FB_Betriebsarten_R_TRIG_Automatic ,
+                                              ag:Var_FB_Betriebsarten_R_TRIG_CycleEnded ,
+                                              ag:Var_FB_Betriebsarten_R_TRIG_Init ,
+                                              ag:Var_FB_Betriebsarten_R_TRIG_InitialDrive ,
+                                              ag:Var_FB_Betriebsarten_R_TRIG_Manual ,
+                                              ag:Var_FB_Betriebsarten_bFirstScan ;
+                           ag:dp_hasPOUCode """import time
+
+def FB_Betriebsarten(V_10000000001: bool, D2: bool, A5: bool, GVL.Start: bool, A1: bool, D1: bool, D3: bool, V_30000000002: bool, V_30000000005: bool, GVL.Weiter: bool, GVL.NotStopp, A6, V_30000000011: bool, Auto_Stoerung, F1, GVL.DiagnoseRequested, Alt_abort, V_40000000012: bool, Alt_found, D3_Requested, A2, Init_reached, Cycle_ended, A2_Requested, Start_Init):
+    \"\"\"Auto-generated from PLCopen XML (vereinfachte Semantik).\"\"\"
+
+    def OR_1(V_10000000002, V_10000000003):
+        result = D2 or A5
+        return result
+    V_10000000004 = OR_1(D2, A5)
+
+    def RS_1(V_10000000001, V_10000000004):
+        result = V_10000000004
+        return result
+    V_10000000005 = RS_1(V_10000000001, V_10000000004)
+
+    def AND_1(V_20000000000, V_20000000001):
+        result = GVL.Start and A1
+        return result
+    V_20000000002 = AND_1(GVL.Start, A1)
+
+    def OR_2(V_20000000003, V_20000000004, V_20000000005):
+        result = D2 or D1 or D3
+        return result
+    V_20000000006 = OR_2(D2, D1, D3)
+
+    def RS_2(V_20000000002, V_20000000006):
+        result = V_20000000006
+        return result
+    V_20000000007 = RS_2(V_20000000002, V_20000000006)
+
+    def AND_2(V_30000000001, V_30000000002):
+        result = D1 and V_30000000002
+        return result
+    V_30000000003 = AND_2(D1, V_30000000002)
+
+    def OR_3(V_30000000000, V_30000000003):
+        result = D2 or V_30000000003
+        return result
+    V_30000000004 = OR_3(D2, V_30000000003)
+
+    def AND_3(V_30000000004, V_30000000005, V_30000000006, V_30000000007):
+        result = V_30000000004 and V_30000000005 and GVL.Weiter and GVL.NotStopp
+        return result
+    V_30000000008 = AND_3(V_30000000004, V_30000000005, GVL.Weiter, GVL.NotStopp)
+
+    def AND_4(V_30000000010, V_30000000011):
+        result = D1 and V_30000000011
+        return result
+    V_30000000012 = AND_4(D1, V_30000000011)
+
+    def OR_4(V_30000000009, V_30000000012):
+        result = A6 or V_30000000012
+        return result
+    V_30000000013 = OR_4(A6, V_30000000012)
+
+    def RS_3(V_30000000008, V_30000000013):
+        result = V_30000000013
+        return result
+    V_30000000014 = RS_3(V_30000000008, V_30000000013)
+
+    def AND_5(V_40000000000, V_40000000001):
+        result = Auto_Stoerung and F1
+        return result
+    V_40000000002 = AND_5(Auto_Stoerung, F1)
+
+    def AND_6(V_40000000003, V_40000000004, V_40000000005):
+        result = GVL.DiagnoseRequested and D1 and GVL.NotStopp
+        return result
+    V_40000000006 = AND_6(GVL.DiagnoseRequested, D1, GVL.NotStopp)
+
+    def AND_7(V_40000000007, V_40000000008):
+        result = D3 and Alt_abort
+        return result
+    V_40000000009 = AND_7(D3, Alt_abort)
+
+    def OR_5(V_40000000002, V_40000000006, V_40000000009):
+        result = V_40000000002 or V_40000000006 or V_40000000009
+        return result
+    V_40000000010 = OR_5(V_40000000002, V_40000000006, V_40000000009)
+
+    def AND_8(V_40000000011, V_40000000012):
+        result = D1 and V_40000000012
+        return result
+    V_40000000013 = AND_8(D1, V_40000000012)
+
+    def OR_6(V_40000000013, V_40000000014, V_40000000015):
+        result = V_40000000013 or D3 or A5
+        return result
+    V_40000000016 = OR_6(V_40000000013, D3, A5)
+
+    def RS_4(V_40000000010, V_40000000016):
+        result = V_40000000016
+        return result
+    V_40000000017 = RS_4(V_40000000010, V_40000000016)
+
+    def AND_9(V_50000000000, V_50000000001):
+        result = D2 and Alt_found
+        return result
+    V_50000000002 = AND_9(D2, Alt_found)
+
+    def AND_10(V_50000000003, V_50000000004):
+        result = F1 and D3_Requested
+        return result
+    V_50000000005 = AND_10(F1, D3_Requested)
+
+    def OR_7(V_50000000002, V_50000000005):
+        result = V_50000000002 or V_50000000005
+        return result
+    V_50000000006 = OR_7(V_50000000002, V_50000000005)
+
+    def OR_8(V_50000000007, V_50000000008, V_50000000009):
+        result = A2 or D1 or D2
+        return result
+    V_50000000010 = OR_8(A2, D1, D2)
+
+    def RS_5(V_50000000006, V_50000000010):
+        result = V_50000000010
+        return result
+    V_50000000011 = RS_5(V_50000000006, V_50000000010)
+
+    def AND_11(V_60000000000, V_60000000001):
+        result = A6 and Init_reached
+        return result
+    V_60000000002 = AND_11(A6, Init_reached)
+
+    def AND_12(V_60000000003, V_60000000004, V_60000000005):
+        result = A2 and Init_reached and Cycle_ended
+        return result
+    V_60000000006 = AND_12(A2, Init_reached, Cycle_ended)
+
+    def OR_9(V_60000000002, V_60000000006):
+        result = V_60000000002 or V_60000000006
+        return result
+    V_60000000007 = OR_9(V_60000000002, V_60000000006)
+
+    def OR_10(V_60000000008, V_60000000009):
+        result = F1 or D1
+        return result
+    V_60000000010 = OR_10(F1, D1)
+
+    def RS_6(V_60000000007, V_60000000010):
+        result = V_60000000010
+        return result
+    V_60000000011 = RS_6(V_60000000007, V_60000000010)
+
+    def AND_13(V_70000000000, V_70000000001):
+        result = D3 and A2_Requested
+        return result
+    V_70000000002 = AND_13(D3, A2_Requested)
+
+    def OR_11(V_70000000003, V_70000000004):
+        result = A1 or D1
+        return result
+    V_70000000005 = OR_11(A1, D1)
+
+    def RS_7(V_70000000002, V_70000000005):
+        result = V_70000000005
+        return result
+    V_70000000006 = RS_7(V_70000000002, V_70000000005)
+
+    def R_TRIG(V_80000000000):
+        result = Start_Init
+        return result
+    V_80000000001 = R_TRIG(Start_Init)
+
+    def OR_12(V_80000000001, V_80000000002):
+        result = V_80000000001 or A5
+        return result
+    V_80000000003 = OR_12(V_80000000001, A5)
+
+    def OR_13(V_80000000004, V_80000000005):
+        result = A1 or D1
+        return result
+    V_80000000006 = OR_13(A1, D1)
+
+    def RS_8(V_80000000003, V_80000000006):
+        result = V_80000000006
+        return result
+    V_80000000007 = RS_8(V_80000000003, V_80000000006)
+    D1 = V_10000000005
+    print('Value of D1:', D1)
+    F1 = V_20000000007
+    print('Value of F1:', F1)
+    A5 = V_30000000014
+    print('Value of A5:', A5)
+    D2 = V_40000000017
+    print('Value of D2:', D2)
+    D3 = V_50000000011
+    print('Value of D3:', D3)
+    A1 = V_60000000011
+    print('Value of A1:', A1)
+    A2 = V_70000000006
+    print('Value of A2:', A2)
+    A6 = V_80000000007
+    print('Value of A6:', A6)
+    return {'D1': D1, 'F1': F1, 'A5': A5, 'D2': D2, 'D3': D3, 'A1': A1, 'A2': A2, 'A6': A6}""" ;
+                           ag:dp_hasPOULanguage "FBD" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBType_FB_Diagnose_D2
+ag:FBType_FB_Diagnose_D2 rdf:type owl:NamedIndividual ,
+                                  ag:class_FBType ;
+                         ag:op_containsPOUCall ag:POUCall_FBType_FB_Diagnose_D2_rtAck_1 ,
+                                               ag:POUCall_FBType_FB_Diagnose_D2_rtD3_1 ,
+                                               ag:POUCall_FBType_FB_Diagnose_D2_rtReq_1 ;
+                         ag:op_hasPort ag:Port_FB_Diagnose_D2_Alt_gefunden ,
+                                       ag:Port_FB_Diagnose_D2_Diagnose_beendet ,
+                                       ag:Port_FB_Diagnose_D2_Diagnose_gefordert ;
+                         ag:op_usesVariable ag:Var_FB_Diagnose_D2_Busy ,
+                                            ag:Var_FB_Diagnose_D2_rtAck ,
+                                            ag:Var_FB_Diagnose_D2_rtD3 ,
+                                            ag:Var_FB_Diagnose_D2_rtFinished ,
+                                            ag:Var_FB_Diagnose_D2_rtReq ,
+                                            ag:Var_FB_Diagnose_D2_tpPulse ;
+                         ag:dp_hasPOUCode """// POU FB_Diagnose_D2 body
+rtReq(CLK := Diagnose_gefordert);
+
+
+IF rtReq.Q AND NOT Busy THEN
+    Busy := TRUE;
+	Alt_gefunden := FALSE;
+	OPCUA.TriggerD2 := TRUE; 
+	OPCUA.bool1 := TRUE;
+END_IF
+
+  
+
+
+
+rtAck(CLK := OPCUA.DiagnoseFinished);
+rtD3(CLK := OPCUA.Alt_found);
+IF rtAck.Q OR rtD3.Q THEN
+    Diagnose_beendet := TRUE;
+    GVL.Weiter := TRUE;
+    Busy := FALSE;
+    OPCUA.TriggerD2 := FALSE;
+	OPCUA.bool2 := FALSE;
+    GVL.Fehler := FALSE;
+    Diagnose_gefordert := FALSE;
+	GVL.DiagnoseRequested := FALSE;
+END_IF
+IF rtD3.Q THEN
+	Alt_gefunden := TRUE;
+END_IF""" ;
+                         ag:dp_hasPOULanguage "ST" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBType_FB_InitFahrt_A6_A2
+ag:FBType_FB_InitFahrt_A6_A2 rdf:type owl:NamedIndividual ,
+                                      ag:class_FBType ;
+                             ag:op_containsPOUCall ag:POUCall_FBType_FB_InitFahrt_A6_A2_tInit_1 ,
+                                                   ag:POUCall_FBType_FB_InitFahrt_A6_A2_tInit_2 ;
+                             ag:op_hasPort ag:Port_FB_InitFahrt_A6_A2_A2 ,
+                                           ag:Port_FB_InitFahrt_A6_A2_A6 ,
+                                           ag:Port_FB_InitFahrt_A6_A2_Init_erreicht ;
+                             ag:op_usesVariable ag:Var_FB_InitFahrt_A6_A2_tInit ;
+                             ag:dp_hasPOUCode """// POU FB_InitFahrt_A6_A2 body
+IF A6 THEN
+	tInit(IN := A6, PT := T#3S);
+ELSIF A2 THEN
+	tInit(IN := A2, PT := T#5S);
+END_IF
+
+IF tInit.Q THEN
+	Init_erreicht := TRUE;
+ELSE
+	Init_erreicht := FALSE;
+END_IF""" ;
+                             ag:dp_hasPOULanguage "ST" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBType_FB_Methode1Job
+ag:FBType_FB_Methode1Job rdf:type owl:NamedIndividual ,
+                                  ag:class_FBType ;
+                         ag:op_containsPOUCall ag:POUCall_FBType_FB_Methode1Job_t20s_1 ,
+                                               ag:POUCall_FBType_FB_Methode1Job_t20s_2 ;
+                         ag:op_usesVariable ag:Var_FB_Methode1Job_counter ,
+                                            ag:Var_FB_Methode1Job_reached ,
+                                            ag:Var_FB_Methode1Job_running ,
+                                            ag:Var_FB_Methode1Job_t20s ,
+                                            ag:Var_FB_Methode1Job_y ;
+                         ag:dp_hasPOUCode """// METHOD Abort of FB_Methode1Job
+running := FALSE;
+Abort := 0;
+
+// METHOD CheckState of FB_Methode1Job
+IF running THEN
+	
+    
+    
+        
+    
+	reached := TRUE;
+
+    
+    t20s(IN := reached, PT := T#9S);
+
+    IF reached AND t20s.Q THEN
+        y := 119;
+        running := FALSE;
+    END_IF
+END_IF
+
+bBusy := running;
+yOut  := y;
+CheckState := 0;
+
+// METHOD Start of FB_Methode1Job
+counter := x;
+reached := FALSE;
+running := TRUE;
+t20s(IN := FALSE, PT := T#9S);   
+hdl := 0;                         
+Start := 0;""" ;
+                         ag:dp_hasPOULanguage "ST" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBType_FB_Notaus_D1
+ag:FBType_FB_Notaus_D1 rdf:type owl:NamedIndividual ,
+                                ag:class_FBType ;
+                       ag:op_containsPOUCall ag:POUCall_FBType_FB_Notaus_D1_ton5s_1 ,
+                                             ag:POUCall_FBType_FB_Notaus_D1_ton5s_2 ;
+                       ag:op_hasPort ag:Port_FB_Notaus_D1_D1 ,
+                                     ag:Port_FB_Notaus_D1_Diagnose_gefordert ,
+                                     ag:Port_FB_Notaus_D1_Notaus_Entriegelt ;
+                       ag:op_usesVariable ag:Var_FB_Notaus_D1_ton5s ;
+                       ag:dp_hasPOUCode """// POU FB_Notaus_D1 body
+IF D1 THEN
+    OPCUA.TriggerD1 := TRUE;         
+    ton5s(IN := TRUE, PT := T#5S);
+ELSE
+    ton5s(IN := FALSE, PT := T#5S);
+END_IF;
+
+IF ton5s.Q THEN
+    OPCUA.TriggerD1 := FALSE;
+    Diagnose_gefordert := FALSE;
+    GVL.NotStopp := TRUE;
+    GVL.Fehler := FALSE;
+    GVL.Weiter := TRUE;
+END_IF;""" ;
+                       ag:dp_hasPOULanguage "ST" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/FBType_FB_ProduktionMitStoerung_D3
+ag:FBType_FB_ProduktionMitStoerung_D3 rdf:type owl:NamedIndividual ,
+                                               ag:class_FBType ;
+                                      ag:op_containsPOUCall ag:POUCall_FBType_FB_ProduktionMitStoerung_D3_rStart_1 ,
+                                                            ag:POUCall_FBType_FB_ProduktionMitStoerung_D3_tSchritt3_1 ,
+                                                            ag:POUCall_FBType_FB_ProduktionMitStoerung_D3_tSchritt4_1 ;
+                                      ag:op_hasPort ag:Port_FB_ProduktionMitStoerung_D3_Fertig ,
+                                                    ag:Port_FB_ProduktionMitStoerung_D3_ProduktionMitStoerung_Starten ,
+                                                    ag:Port_FB_ProduktionMitStoerung_D3_Stoerung_erkannt ;
+                                      ag:op_usesVariable ag:Var_FB_ProduktionMitStoerung_D3_RestartPulseLength ,
+                                                         ag:Var_FB_ProduktionMitStoerung_D3_Schritt3 ,
+                                                         ag:Var_FB_ProduktionMitStoerung_D3_Schritt4 ,
+                                                         ag:Var_FB_ProduktionMitStoerung_D3_Zwischen ,
+                                                         ag:Var_FB_ProduktionMitStoerung_D3_dbg_Stoerung_Manuell ,
+                                                         ag:Var_FB_ProduktionMitStoerung_D3_lastSkillIsOne ,
+                                                         ag:Var_FB_ProduktionMitStoerung_D3_pPer ,
+                                                         ag:Var_FB_ProduktionMitStoerung_D3_perEn ,
+                                                         ag:Var_FB_ProduktionMitStoerung_D3_rPer ,
+                                                         ag:Var_FB_ProduktionMitStoerung_D3_rStart ,
+                                                         ag:Var_FB_ProduktionMitStoerung_D3_rStep1 ,
+                                                         ag:Var_FB_ProduktionMitStoerung_D3_rtStoer ,
+                                                         ag:Var_FB_ProduktionMitStoerung_D3_tPer ,
+                                                         ag:Var_FB_ProduktionMitStoerung_D3_tSchritt3 ,
+                                                         ag:Var_FB_ProduktionMitStoerung_D3_tSchritt4 ,
+                                                         ag:Var_FB_ProduktionMitStoerung_D3_tpRestart ,
+                                                         ag:Var_FB_ProduktionMitStoerung_D3_z ;
+                                      ag:dp_hasPOUCode """// POU FB_ProduktionMitStoerung_D3 body
+rStart(CLK := ProduktionMitStoerung_Starten);
+IF rStart.Q THEN
+	z := 0;
+END_IF
+
+IF ProduktionMitStoerung_Starten AND NOT (Schritt3 OR Schritt4) AND NOT Stoerung_erkannt THEN
+	Fertig := FALSE;
+	Schritt3 := TRUE;
+	OPCUA.lastExecutedSkill := 'TestSkill3';
+	OPCUA.lastExecutedProcess := 'D3Process';
+	Schritt4 := FALSE;
+END_IF
+
+tSchritt3(IN := Schritt3, PT:=T#10S);
+tSchritt4(IN := Schritt4, PT:=T#10S);
+
+IF tSchritt3.Q THEN
+	Schritt3 := FALSE;
+	z := z+1;
+	IF z > 2 THEN
+		Stoerung_erkannt := TRUE;
+		OPCUA.Alt_abort := TRUE;
+	END_IF
+	IF NOT Stoerung_erkannt THEN
+		Schritt4 := TRUE;
+		OPCUA.lastExecutedSkill := 'TestSkill4';
+	END_IF
+END_IF
+
+IF tSchritt4.Q THEN
+	Schritt4 := FALSE;
+	Schritt3 := TRUE;
+	OPCUA.lastExecutedSkill := 'TestSkill3';
+END_IF""" ;
+                                      ag:dp_hasPOULanguage "ST" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/GVLList_GVL
+ag:GVLList_GVL rdf:type owl:NamedIndividual ,
+                        ag:class_GobalVariableList ;
+               ag:op_listsGlobalVariable ag:GVL__dot__DiagnoseRequested ,
+                                         ag:GVL__dot__Fehler ,
+                                         ag:GVL__dot__NotStopp ,
+                                         ag:GVL__dot__Start ,
+                                         ag:GVL__dot__Stopp ,
+                                         ag:GVL__dot__Weiter ;
+               ag:dp_hasGlobalVariableListName "GVL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/GVLList_OPCUA
+ag:GVLList_OPCUA rdf:type owl:NamedIndividual ,
+                          ag:class_GobalVariableList ;
+                 ag:op_listsGlobalVariable ag:OPCUA__dot__Alt_abort ,
+                                           ag:OPCUA__dot__Alt_found ,
+                                           ag:OPCUA__dot__DiagnoseFinished ,
+                                           ag:OPCUA__dot__M1 ,
+                                           ag:OPCUA__dot__M2 ,
+                                           ag:OPCUA__dot__M3 ,
+                                           ag:OPCUA__dot__TriggerD1 ,
+                                           ag:OPCUA__dot__TriggerD2 ,
+                                           ag:OPCUA__dot__TriggerD3 ,
+                                           ag:OPCUA__dot__Z1 ,
+                                           ag:OPCUA__dot__Z2 ,
+                                           ag:OPCUA__dot__Z3 ,
+                                           ag:OPCUA__dot__bool1 ,
+                                           ag:OPCUA__dot__bool2 ,
+                                           ag:OPCUA__dot__bool3 ,
+                                           ag:OPCUA__dot__lastExecutedProcess ,
+                                           ag:OPCUA__dot__lastExecutedSkill ;
+                 ag:dp_hasGlobalVariableListName "OPCUA" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/GVL__dot__DiagnoseRequested
+ag:GVL__dot__DiagnoseRequested rdf:type owl:NamedIndividual ,
+                                        ag:class_Variable ;
+                               ag:dp_hasVariableName "DiagnoseRequested" ,
+                                                     "GVL.DiagnoseRequested" ;
+                               ag:dp_hasVariableType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/GVL__dot__Fehler
+ag:GVL__dot__Fehler rdf:type owl:NamedIndividual ,
+                             ag:class_Variable ;
+                    ag:op_isBoundToPort ag:Port_FB_Betriebsarten_Fehler ;
+                    ag:dp_hasVariableName "Fehler" ,
+                                          "GVL.Fehler" ;
+                    ag:dp_hasVariableScope "global" ;
+                    ag:dp_hasVariableType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/GVL__dot__NotStopp
+ag:GVL__dot__NotStopp rdf:type owl:NamedIndividual ,
+                               ag:class_Variable ;
+                      ag:dp_hasVariableName "GVL.NotStopp" ,
+                                            "NotStopp" ;
+                      ag:dp_hasVariableType "BOOL" ;
+                      ag:dp_hasInitialValue "TRUE" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/GVL__dot__Start
+ag:GVL__dot__Start rdf:type owl:NamedIndividual ,
+                            ag:class_Variable ;
+                   ag:op_isBoundToPort ag:Port_FB_Betriebsarten_Start ;
+                   ag:dp_hasVariableName "GVL.Start" ,
+                                         "Start" ;
+                   ag:dp_hasVariableScope "global" ;
+                   ag:dp_hasVariableType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/GVL__dot__Stopp
+ag:GVL__dot__Stopp rdf:type owl:NamedIndividual ,
+                            ag:class_Variable ;
+                   ag:dp_hasVariableName "GVL.Stopp" ,
+                                         "Stopp" ;
+                   ag:dp_hasVariableType "BOOL" ;
+                   ag:dp_hasInitialValue "FALSE" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/GVL__dot__Weiter
+ag:GVL__dot__Weiter rdf:type owl:NamedIndividual ,
+                             ag:class_Variable ;
+                    ag:op_isBoundToPort ag:Port_FB_Betriebsarten_Weiter ;
+                    ag:dp_hasVariableName "GVL.Weiter" ,
+                                          "Weiter" ;
+                    ag:dp_hasVariableScope "global" ;
+                    ag:dp_hasVariableType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Literal_FALSE
+ag:Literal_FALSE rdf:type owl:NamedIndividual ,
+                          ag:class_SignalSource ,
+                          ag:class_SourceLiteral .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Literal_TRUE
+ag:Literal_TRUE rdf:type owl:NamedIndividual ,
+                         ag:class_SignalSource ,
+                         ag:class_SourceLiteral .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Literal_T_10S
+ag:Literal_T_10S rdf:type owl:NamedIndividual ,
+                          ag:class_SignalSource ,
+                          ag:class_SourceLiteral .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Literal_T_3S
+ag:Literal_T_3S rdf:type owl:NamedIndividual ,
+                         ag:class_SignalSource ,
+                         ag:class_SourceLiteral .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Literal_T_55S
+ag:Literal_T_55S rdf:type owl:NamedIndividual ,
+                          ag:class_SignalSource ,
+                          ag:class_SourceLiteral .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Literal_T_5S
+ag:Literal_T_5S rdf:type owl:NamedIndividual ,
+                         ag:class_SignalSource ,
+                         ag:class_SourceLiteral .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Literal_T_9S
+ag:Literal_T_9S rdf:type owl:NamedIndividual ,
+                         ag:class_SignalSource ,
+                         ag:class_SourceLiteral .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/OPCUA__dot__Alt_abort
+ag:OPCUA__dot__Alt_abort rdf:type owl:NamedIndividual ,
+                                  ag:class_Variable ;
+                         ag:dp_hasVariableName "Alt_abort" ,
+                                               "OPCUA.Alt_abort" ;
+                         ag:dp_hasVariableType "BOOL" ;
+                         ag:dp_hasInitialValue "FALSE" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/OPCUA__dot__Alt_found
+ag:OPCUA__dot__Alt_found rdf:type owl:NamedIndividual ,
+                                  ag:class_Variable ;
+                         ag:dp_hasVariableName "Alt_found" ,
+                                               "OPCUA.Alt_found" ;
+                         ag:dp_hasVariableType "BOOL" ;
+                         ag:dp_hasInitialValue "FALSE" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/OPCUA__dot__DiagnoseFinished
+ag:OPCUA__dot__DiagnoseFinished rdf:type owl:NamedIndividual ,
+                                         ag:class_Variable ;
+                                ag:dp_hasVariableName "DiagnoseFinished" ,
+                                                      "OPCUA.DiagnoseFinished" ;
+                                ag:dp_hasVariableType "BOOL" ;
+                                ag:dp_hasInitialValue "FALSE" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/OPCUA__dot__M1
+ag:OPCUA__dot__M1 rdf:type owl:NamedIndividual ,
+                           ag:class_Variable ;
+                  ag:dp_hasVariableName "M1" ,
+                                        "OPCUA.M1" ;
+                  ag:dp_hasVariableType "INT" ;
+                  ag:dp_hasInitialValue "0" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/OPCUA__dot__M2
+ag:OPCUA__dot__M2 rdf:type owl:NamedIndividual ,
+                           ag:class_Variable ;
+                  ag:dp_hasVariableName "M2" ,
+                                        "OPCUA.M2" ;
+                  ag:dp_hasVariableType "INT" ;
+                  ag:dp_hasInitialValue "0" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/OPCUA__dot__M3
+ag:OPCUA__dot__M3 rdf:type owl:NamedIndividual ,
+                           ag:class_Variable ;
+                  ag:dp_hasVariableName "M3" ,
+                                        "OPCUA.M3" ;
+                  ag:dp_hasVariableType "INT" ;
+                  ag:dp_hasInitialValue "0" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/OPCUA__dot__TriggerD1
+ag:OPCUA__dot__TriggerD1 rdf:type owl:NamedIndividual ,
+                                  ag:class_Variable ;
+                         ag:dp_hasVariableName "OPCUA.TriggerD1" ,
+                                               "TriggerD1" ;
+                         ag:dp_hasVariableType "BOOL" ;
+                         ag:dp_hasInitialValue "FALSE" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/OPCUA__dot__TriggerD2
+ag:OPCUA__dot__TriggerD2 rdf:type owl:NamedIndividual ,
+                                  ag:class_Variable ;
+                         ag:dp_hasVariableName "OPCUA.TriggerD2" ,
+                                               "TriggerD2" ;
+                         ag:dp_hasVariableType "BOOL" ;
+                         ag:dp_hasInitialValue "FALSE" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/OPCUA__dot__TriggerD3
+ag:OPCUA__dot__TriggerD3 rdf:type owl:NamedIndividual ,
+                                  ag:class_Variable ;
+                         ag:dp_hasVariableName "OPCUA.TriggerD3" ,
+                                               "TriggerD3" ;
+                         ag:dp_hasVariableType "BOOL" ;
+                         ag:dp_hasInitialValue "FALSE" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/OPCUA__dot__Z1
+ag:OPCUA__dot__Z1 rdf:type owl:NamedIndividual ,
+                           ag:class_Variable ;
+                  ag:dp_hasVariableName "OPCUA.Z1" ,
+                                        "Z1" ;
+                  ag:dp_hasVariableType "INT" ;
+                  ag:dp_hasInitialValue "0" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/OPCUA__dot__Z2
+ag:OPCUA__dot__Z2 rdf:type owl:NamedIndividual ,
+                           ag:class_Variable ;
+                  ag:dp_hasVariableName "OPCUA.Z2" ,
+                                        "Z2" ;
+                  ag:dp_hasVariableType "INT" ;
+                  ag:dp_hasInitialValue "0" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/OPCUA__dot__Z3
+ag:OPCUA__dot__Z3 rdf:type owl:NamedIndividual ,
+                           ag:class_Variable ;
+                  ag:dp_hasVariableName "OPCUA.Z3" ,
+                                        "Z3" ;
+                  ag:dp_hasVariableType "INT" ;
+                  ag:dp_hasInitialValue "0" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/OPCUA__dot__bool1
+ag:OPCUA__dot__bool1 rdf:type owl:NamedIndividual ,
+                              ag:class_Variable ;
+                     ag:dp_hasVariableName "OPCUA.bool1" ,
+                                           "bool1" ;
+                     ag:dp_hasVariableType "BOOL" ;
+                     ag:dp_hasInitialValue "FALSE" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/OPCUA__dot__bool2
+ag:OPCUA__dot__bool2 rdf:type owl:NamedIndividual ,
+                              ag:class_Variable ;
+                     ag:dp_hasVariableName "OPCUA.bool2" ,
+                                           "bool2" ;
+                     ag:dp_hasVariableType "BOOL" ;
+                     ag:dp_hasInitialValue "FALSE" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/OPCUA__dot__bool3
+ag:OPCUA__dot__bool3 rdf:type owl:NamedIndividual ,
+                              ag:class_Variable ;
+                     ag:dp_hasVariableName "OPCUA.bool3" ,
+                                           "bool3" ;
+                     ag:dp_hasVariableType "BOOL" ;
+                     ag:dp_hasInitialValue "FALSE" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/OPCUA__dot__lastExecutedProcess
+ag:OPCUA__dot__lastExecutedProcess rdf:type owl:NamedIndividual ,
+                                            ag:class_Variable ;
+                                   ag:dp_hasVariableName "OPCUA.lastExecutedProcess" ,
+                                                         "lastExecutedProcess" ;
+                                   ag:dp_hasVariableType "STRING" ;
+                                   ag:dp_hasInitialValue "''" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/OPCUA__dot__lastExecutedSkill
+ag:OPCUA__dot__lastExecutedSkill rdf:type owl:NamedIndividual ,
+                                          ag:class_Variable ;
+                                 ag:dp_hasVariableName "OPCUA.lastExecutedSkill" ,
+                                                       "lastExecutedSkill" ;
+                                 ag:dp_hasVariableType "STRING" ;
+                                 ag:dp_hasInitialValue "''" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/PLCProject__Proj1
+ag:PLCProject__Proj1 rdf:type owl:NamedIndividual ,
+                              ag:class_PLCProject ;
+                     ag:op_consistsOfPOU ag:FBType_FB_Automatikbetrieb_F1 ,
+                                         ag:FBType_FB_Betriebsarten ,
+                                         ag:FBType_FB_Diagnose_D2 ,
+                                         ag:FBType_FB_InitFahrt_A6_A2 ,
+                                         ag:FBType_FB_Methode1Job ,
+                                         ag:FBType_FB_Notaus_D1 ,
+                                         ag:FBType_FB_ProduktionMitStoerung_D3 ,
+                                         ag:Program_MAIN ;
+                     ag:dp_hasPLCProjectName "Proj1" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/POUCall_FBType_FB_Automatikbetrieb_F1_pPer_1
+ag:POUCall_FBType_FB_Automatikbetrieb_F1_pPer_1 rdf:type owl:NamedIndividual ,
+                                                         ag:class_POUCall ;
+                                                ag:op_callsPOU ag:StandardFBType_TP ;
+                                                ag:op_hasAssignment ag:Assign_FBType_FB_Automatikbetrieb_F1_pPer_IN_1 ,
+                                                                    ag:Assign_FBType_FB_Automatikbetrieb_F1_pPer_PT_1 ;
+                                                ag:op_hasCallerVariable ag:Var_FB_Automatikbetrieb_F1_pPer .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/POUCall_FBType_FB_Automatikbetrieb_F1_rPer_1
+ag:POUCall_FBType_FB_Automatikbetrieb_F1_rPer_1 rdf:type owl:NamedIndividual ,
+                                                         ag:class_POUCall ;
+                                                ag:op_callsPOU ag:StandardFBType_R_TRIG ;
+                                                ag:op_hasAssignment ag:Assign_FBType_FB_Automatikbetrieb_F1_rPer_CLK_1 ;
+                                                ag:op_hasCallerVariable ag:Var_FB_Automatikbetrieb_F1_rPer .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/POUCall_FBType_FB_Automatikbetrieb_F1_rStart_1
+ag:POUCall_FBType_FB_Automatikbetrieb_F1_rStart_1 rdf:type owl:NamedIndividual ,
+                                                           ag:class_POUCall ;
+                                                  ag:op_callsPOU ag:StandardFBType_R_TRIG ;
+                                                  ag:op_hasAssignment ag:Assign_FBType_FB_Automatikbetrieb_F1_rStart_CLK_1 ;
+                                                  ag:op_hasCallerVariable ag:Var_FB_Automatikbetrieb_F1_rStart .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/POUCall_FBType_FB_Automatikbetrieb_F1_rStep1_1
+ag:POUCall_FBType_FB_Automatikbetrieb_F1_rStep1_1 rdf:type owl:NamedIndividual ,
+                                                           ag:class_POUCall ;
+                                                  ag:op_callsPOU ag:StandardFBType_R_TRIG ;
+                                                  ag:op_hasAssignment ag:Assign_FBType_FB_Automatikbetrieb_F1_rStep1_CLK_1 ;
+                                                  ag:op_hasCallerVariable ag:Var_FB_Automatikbetrieb_F1_rStep1 .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/POUCall_FBType_FB_Automatikbetrieb_F1_tPer_1
+ag:POUCall_FBType_FB_Automatikbetrieb_F1_tPer_1 rdf:type owl:NamedIndividual ,
+                                                         ag:class_POUCall ;
+                                                ag:op_callsPOU ag:StandardFBType_TON ;
+                                                ag:op_hasAssignment ag:Assign_FBType_FB_Automatikbetrieb_F1_tPer_IN_1 ,
+                                                                    ag:Assign_FBType_FB_Automatikbetrieb_F1_tPer_PT_1 ;
+                                                ag:op_hasCallerVariable ag:Var_FB_Automatikbetrieb_F1_tPer .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/POUCall_FBType_FB_Automatikbetrieb_F1_tSchritt1_1
+ag:POUCall_FBType_FB_Automatikbetrieb_F1_tSchritt1_1 rdf:type owl:NamedIndividual ,
+                                                              ag:class_POUCall ;
+                                                     ag:op_callsPOU ag:StandardFBType_TON ;
+                                                     ag:op_hasAssignment ag:Assign_FBType_FB_Automatikbetrieb_F1_tSchritt1_IN_1 ,
+                                                                         ag:Assign_FBType_FB_Automatikbetrieb_F1_tSchritt1_PT_1 ;
+                                                     ag:op_hasCallerVariable ag:Var_FB_Automatikbetrieb_F1_tSchritt1 .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/POUCall_FBType_FB_Automatikbetrieb_F1_tSchritt2_1
+ag:POUCall_FBType_FB_Automatikbetrieb_F1_tSchritt2_1 rdf:type owl:NamedIndividual ,
+                                                              ag:class_POUCall ;
+                                                     ag:op_callsPOU ag:StandardFBType_TON ;
+                                                     ag:op_hasAssignment ag:Assign_FBType_FB_Automatikbetrieb_F1_tSchritt2_IN_1 ,
+                                                                         ag:Assign_FBType_FB_Automatikbetrieb_F1_tSchritt2_PT_1 ;
+                                                     ag:op_hasCallerVariable ag:Var_FB_Automatikbetrieb_F1_tSchritt2 .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/POUCall_FBType_FB_Diagnose_D2_rtAck_1
+ag:POUCall_FBType_FB_Diagnose_D2_rtAck_1 rdf:type owl:NamedIndividual ,
+                                                  ag:class_POUCall ;
+                                         ag:op_callsPOU ag:StandardFBType_R_TRIG ;
+                                         ag:op_hasAssignment ag:Assign_FBType_FB_Diagnose_D2_rtAck_CLK_1 ;
+                                         ag:op_hasCallerVariable ag:Var_FB_Diagnose_D2_rtAck .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/POUCall_FBType_FB_Diagnose_D2_rtD3_1
+ag:POUCall_FBType_FB_Diagnose_D2_rtD3_1 rdf:type owl:NamedIndividual ,
+                                                 ag:class_POUCall ;
+                                        ag:op_callsPOU ag:StandardFBType_R_TRIG ;
+                                        ag:op_hasAssignment ag:Assign_FBType_FB_Diagnose_D2_rtD3_CLK_1 ;
+                                        ag:op_hasCallerVariable ag:Var_FB_Diagnose_D2_rtD3 .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/POUCall_FBType_FB_Diagnose_D2_rtReq_1
+ag:POUCall_FBType_FB_Diagnose_D2_rtReq_1 rdf:type owl:NamedIndividual ,
+                                                  ag:class_POUCall ;
+                                         ag:op_callsPOU ag:StandardFBType_R_TRIG ;
+                                         ag:op_hasAssignment ag:Assign_FBType_FB_Diagnose_D2_rtReq_CLK_1 ;
+                                         ag:op_hasCallerVariable ag:Var_FB_Diagnose_D2_rtReq .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/POUCall_FBType_FB_InitFahrt_A6_A2_tInit_1
+ag:POUCall_FBType_FB_InitFahrt_A6_A2_tInit_1 rdf:type owl:NamedIndividual ,
+                                                      ag:class_POUCall ;
+                                             ag:op_callsPOU ag:StandardFBType_TON ;
+                                             ag:op_hasAssignment ag:Assign_FBType_FB_InitFahrt_A6_A2_tInit_IN_1 ,
+                                                                 ag:Assign_FBType_FB_InitFahrt_A6_A2_tInit_PT_1 ;
+                                             ag:op_hasCallerVariable ag:Var_FB_InitFahrt_A6_A2_tInit .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/POUCall_FBType_FB_InitFahrt_A6_A2_tInit_2
+ag:POUCall_FBType_FB_InitFahrt_A6_A2_tInit_2 rdf:type owl:NamedIndividual ,
+                                                      ag:class_POUCall ;
+                                             ag:op_callsPOU ag:StandardFBType_TON ;
+                                             ag:op_hasAssignment ag:Assign_FBType_FB_InitFahrt_A6_A2_tInit_IN_2 ,
+                                                                 ag:Assign_FBType_FB_InitFahrt_A6_A2_tInit_PT_2 ;
+                                             ag:op_hasCallerVariable ag:Var_FB_InitFahrt_A6_A2_tInit .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/POUCall_FBType_FB_Methode1Job_t20s_1
+ag:POUCall_FBType_FB_Methode1Job_t20s_1 rdf:type owl:NamedIndividual ,
+                                                 ag:class_POUCall ;
+                                        ag:op_callsPOU ag:StandardFBType_TON ;
+                                        ag:op_hasAssignment ag:Assign_FBType_FB_Methode1Job_t20s_IN_1 ,
+                                                            ag:Assign_FBType_FB_Methode1Job_t20s_PT_1 ;
+                                        ag:op_hasCallerVariable ag:Var_FB_Methode1Job_t20s .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/POUCall_FBType_FB_Methode1Job_t20s_2
+ag:POUCall_FBType_FB_Methode1Job_t20s_2 rdf:type owl:NamedIndividual ,
+                                                 ag:class_POUCall ;
+                                        ag:op_callsPOU ag:StandardFBType_TON ;
+                                        ag:op_hasAssignment ag:Assign_FBType_FB_Methode1Job_t20s_IN_2 ,
+                                                            ag:Assign_FBType_FB_Methode1Job_t20s_PT_2 ;
+                                        ag:op_hasCallerVariable ag:Var_FB_Methode1Job_t20s .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/POUCall_FBType_FB_Notaus_D1_ton5s_1
+ag:POUCall_FBType_FB_Notaus_D1_ton5s_1 rdf:type owl:NamedIndividual ,
+                                                ag:class_POUCall ;
+                                       ag:op_callsPOU ag:StandardFBType_TON ;
+                                       ag:op_hasAssignment ag:Assign_FBType_FB_Notaus_D1_ton5s_IN_1 ,
+                                                           ag:Assign_FBType_FB_Notaus_D1_ton5s_PT_1 ;
+                                       ag:op_hasCallerVariable ag:Var_FB_Notaus_D1_ton5s .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/POUCall_FBType_FB_Notaus_D1_ton5s_2
+ag:POUCall_FBType_FB_Notaus_D1_ton5s_2 rdf:type owl:NamedIndividual ,
+                                                ag:class_POUCall ;
+                                       ag:op_callsPOU ag:StandardFBType_TON ;
+                                       ag:op_hasAssignment ag:Assign_FBType_FB_Notaus_D1_ton5s_IN_2 ,
+                                                           ag:Assign_FBType_FB_Notaus_D1_ton5s_PT_2 ;
+                                       ag:op_hasCallerVariable ag:Var_FB_Notaus_D1_ton5s .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/POUCall_FBType_FB_ProduktionMitStoerung_D3_rStart_1
+ag:POUCall_FBType_FB_ProduktionMitStoerung_D3_rStart_1 rdf:type owl:NamedIndividual ,
+                                                                ag:class_POUCall ;
+                                                       ag:op_callsPOU ag:StandardFBType_R_TRIG ;
+                                                       ag:op_hasAssignment ag:Assign_FBType_FB_ProduktionMitStoerung_D3_rStart_CLK_1 ;
+                                                       ag:op_hasCallerVariable ag:Var_FB_ProduktionMitStoerung_D3_rStart .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/POUCall_FBType_FB_ProduktionMitStoerung_D3_tSchritt3_1
+ag:POUCall_FBType_FB_ProduktionMitStoerung_D3_tSchritt3_1 rdf:type owl:NamedIndividual ,
+                                                                   ag:class_POUCall ;
+                                                          ag:op_callsPOU ag:StandardFBType_TON ;
+                                                          ag:op_hasAssignment ag:Assign_FBType_FB_ProduktionMitStoerung_D3_tSchritt3_IN_1 ,
+                                                                              ag:Assign_FBType_FB_ProduktionMitStoerung_D3_tSchritt3_PT_1 ;
+                                                          ag:op_hasCallerVariable ag:Var_FB_ProduktionMitStoerung_D3_tSchritt3 .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/POUCall_FBType_FB_ProduktionMitStoerung_D3_tSchritt4_1
+ag:POUCall_FBType_FB_ProduktionMitStoerung_D3_tSchritt4_1 rdf:type owl:NamedIndividual ,
+                                                                   ag:class_POUCall ;
+                                                          ag:op_callsPOU ag:StandardFBType_TON ;
+                                                          ag:op_hasAssignment ag:Assign_FBType_FB_ProduktionMitStoerung_D3_tSchritt4_IN_1 ,
+                                                                              ag:Assign_FBType_FB_ProduktionMitStoerung_D3_tSchritt4_PT_1 ;
+                                                          ag:op_hasCallerVariable ag:Var_FB_ProduktionMitStoerung_D3_tSchritt4 .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/POUCall_MAIN_edgeDone_1
+ag:POUCall_MAIN_edgeDone_1 rdf:type owl:NamedIndividual ,
+                                    ag:class_POUCall ;
+                           ag:op_callsPOU ag:StandardFBType_R_TRIG ;
+                           ag:op_hasAssignment ag:Assign_MAIN_edgeDone_CLK_1 ;
+                           ag:op_hasCallerVariable ag:Var_MAIN_edgeDone .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/POUCall_MAIN_edgeF1_1
+ag:POUCall_MAIN_edgeF1_1 rdf:type owl:NamedIndividual ,
+                                  ag:class_POUCall ;
+                         ag:op_callsPOU ag:StandardFBType_R_TRIG ;
+                         ag:op_hasAssignment ag:Assign_MAIN_edgeF1_CLK_1 ;
+                         ag:op_hasCallerVariable ag:Var_MAIN_edgeF1 .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/POUCall_MAIN_fbAuto_1
+ag:POUCall_MAIN_fbAuto_1 rdf:type owl:NamedIndividual ,
+                                  ag:class_POUCall ;
+                         ag:op_callsPOU ag:FBType_FB_Automatikbetrieb_F1 ;
+                         ag:op_hasAssignment ag:Assign_MAIN_fbAuto_Automatikbetrieb_Starten_1 ;
+                         ag:op_hasCallerVariable ag:Var_MAIN_fbAuto .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/POUCall_MAIN_fbBA_1
+ag:POUCall_MAIN_fbBA_1 rdf:type owl:NamedIndividual ,
+                                ag:class_POUCall ;
+                       ag:op_callsPOU ag:FBType_FB_Betriebsarten ;
+                       ag:op_hasAssignment ag:Assign_MAIN_fbBA_A2_Requested_1 ,
+                                           ag:Assign_MAIN_fbBA_Alt_abort_1 ,
+                                           ag:Assign_MAIN_fbBA_Alt_found_1 ,
+                                           ag:Assign_MAIN_fbBA_Auto_Fertig_1 ,
+                                           ag:Assign_MAIN_fbBA_Auto_Stoerung_1 ,
+                                           ag:Assign_MAIN_fbBA_Cycle_ended_1 ,
+                                           ag:Assign_MAIN_fbBA_D3_Requested_1 ,
+                                           ag:Assign_MAIN_fbBA_Fehler_1 ,
+                                           ag:Assign_MAIN_fbBA_Init_reached_1 ,
+                                           ag:Assign_MAIN_fbBA_NotStop_1 ,
+                                           ag:Assign_MAIN_fbBA_Start_1 ,
+                                           ag:Assign_MAIN_fbBA_Start_Init_1 ,
+                                           ag:Assign_MAIN_fbBA_Weiter_1 ;
+                       ag:op_hasCallerVariable ag:Var_MAIN_fbBA .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/POUCall_MAIN_fbDiag_1
+ag:POUCall_MAIN_fbDiag_1 rdf:type owl:NamedIndividual ,
+                                  ag:class_POUCall ;
+                         ag:op_callsPOU ag:FBType_FB_Diagnose_D2 ;
+                         ag:op_hasAssignment ag:Assign_MAIN_fbDiag_Diagnose_gefordert_1 ;
+                         ag:op_hasCallerVariable ag:Var_MAIN_fbDiag .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/POUCall_MAIN_fbInit_1
+ag:POUCall_MAIN_fbInit_1 rdf:type owl:NamedIndividual ,
+                                  ag:class_POUCall ;
+                         ag:op_callsPOU ag:FBType_FB_InitFahrt_A6_A2 ;
+                         ag:op_hasAssignment ag:Assign_MAIN_fbInit_A2_1 ,
+                                             ag:Assign_MAIN_fbInit_A6_1 ;
+                         ag:op_hasCallerVariable ag:Var_MAIN_fbInit .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/POUCall_MAIN_fbNot_1
+ag:POUCall_MAIN_fbNot_1 rdf:type owl:NamedIndividual ,
+                                 ag:class_POUCall ;
+                        ag:op_callsPOU ag:FBType_FB_Notaus_D1 ;
+                        ag:op_hasAssignment ag:Assign_MAIN_fbNot_D1_1 ;
+                        ag:op_hasCallerVariable ag:Var_MAIN_fbNot .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/POUCall_MAIN_fbProStoer_1
+ag:POUCall_MAIN_fbProStoer_1 rdf:type owl:NamedIndividual ,
+                                      ag:class_POUCall ;
+                             ag:op_callsPOU ag:FBType_FB_ProduktionMitStoerung_D3 ;
+                             ag:op_hasAssignment ag:Assign_MAIN_fbProStoer_ProduktionMitStoerung_Starten_1 ;
+                             ag:op_hasCallerVariable ag:Var_MAIN_fbProStoer .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/PortInstance_FBInst_FB_ProduktionMitStoerung_D3_rPer_Q
+ag:PortInstance_FBInst_FB_ProduktionMitStoerung_D3_rPer_Q rdf:type owl:NamedIndividual ,
+                                                                   ag:class_PortInstance ,
+                                                                   ag:class_SignalSource ;
+                                                          ag:op_instantiatesPort ag:Port_R_TRIG_Q ;
+                                                          ag:op_isPortOfInstance ag:FBInst_FB_ProduktionMitStoerung_D3_rPer .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/PortInstance_FBInst_FB_ProduktionMitStoerung_D3_tPer_Q
+ag:PortInstance_FBInst_FB_ProduktionMitStoerung_D3_tPer_Q rdf:type owl:NamedIndividual ,
+                                                                   ag:class_PortInstance ,
+                                                                   ag:class_SignalSource ;
+                                                          ag:op_instantiatesPort ag:Port_TON_Q ;
+                                                          ag:op_isPortOfInstance ag:FBInst_FB_ProduktionMitStoerung_D3_tPer .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/PortInstance_FBInst_MAIN_edgeF1_Q
+ag:PortInstance_FBInst_MAIN_edgeF1_Q rdf:type owl:NamedIndividual ,
+                                              ag:class_PortInstance ,
+                                              ag:class_SignalSource ;
+                                     ag:op_instantiatesPort ag:Port_R_TRIG_Q ;
+                                     ag:op_isPortOfInstance ag:FBInst_MAIN_edgeF1 .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/PortInstance_FBInst_MAIN_fbAuto_Automatikbetrieb_Fertig
+ag:PortInstance_FBInst_MAIN_fbAuto_Automatikbetrieb_Fertig rdf:type owl:NamedIndividual ,
+                                                                    ag:class_PortInstance ,
+                                                                    ag:class_SignalSource ;
+                                                           ag:op_instantiatesPort ag:Port_FB_Automatikbetrieb_F1_Automatikbetrieb_Fertig ;
+                                                           ag:op_isPortOfInstance ag:FBInst_MAIN_fbAuto .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/PortInstance_FBInst_MAIN_fbAuto_Stoerung_erkannt
+ag:PortInstance_FBInst_MAIN_fbAuto_Stoerung_erkannt rdf:type owl:NamedIndividual ,
+                                                             ag:class_PortInstance ,
+                                                             ag:class_SignalSource ;
+                                                    ag:op_instantiatesPort ag:Port_FB_Automatikbetrieb_F1_Stoerung_erkannt ;
+                                                    ag:op_isPortOfInstance ag:FBInst_MAIN_fbAuto .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/PortInstance_FBInst_MAIN_fbBA_A2
+ag:PortInstance_FBInst_MAIN_fbBA_A2 rdf:type owl:NamedIndividual ,
+                                             ag:class_PortInstance ,
+                                             ag:class_SignalSource ;
+                                    ag:op_instantiatesPort ag:Port_FB_Betriebsarten_A2 ;
+                                    ag:op_isPortOfInstance ag:FBInst_MAIN_fbBA .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/PortInstance_FBInst_MAIN_fbBA_A6
+ag:PortInstance_FBInst_MAIN_fbBA_A6 rdf:type owl:NamedIndividual ,
+                                             ag:class_PortInstance ,
+                                             ag:class_SignalSource ;
+                                    ag:op_instantiatesPort ag:Port_FB_Betriebsarten_A6 ;
+                                    ag:op_isPortOfInstance ag:FBInst_MAIN_fbBA .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/PortInstance_FBInst_MAIN_fbBA_D1
+ag:PortInstance_FBInst_MAIN_fbBA_D1 rdf:type owl:NamedIndividual ,
+                                             ag:class_PortInstance ,
+                                             ag:class_SignalSource ;
+                                    ag:op_instantiatesPort ag:Port_FB_Betriebsarten_D1 ;
+                                    ag:op_isPortOfInstance ag:FBInst_MAIN_fbBA .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/PortInstance_FBInst_MAIN_fbBA_D2
+ag:PortInstance_FBInst_MAIN_fbBA_D2 rdf:type owl:NamedIndividual ,
+                                             ag:class_PortInstance ,
+                                             ag:class_SignalSource ;
+                                    ag:op_instantiatesPort ag:Port_FB_Betriebsarten_D2 ;
+                                    ag:op_isPortOfInstance ag:FBInst_MAIN_fbBA .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/PortInstance_FBInst_MAIN_fbBA_D3
+ag:PortInstance_FBInst_MAIN_fbBA_D3 rdf:type owl:NamedIndividual ,
+                                             ag:class_PortInstance ,
+                                             ag:class_SignalSource ;
+                                    ag:op_instantiatesPort ag:Port_FB_Betriebsarten_D3 ;
+                                    ag:op_isPortOfInstance ag:FBInst_MAIN_fbBA .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/PortInstance_FBInst_MAIN_fbBA_F1
+ag:PortInstance_FBInst_MAIN_fbBA_F1 rdf:type owl:NamedIndividual ,
+                                             ag:class_PortInstance ,
+                                             ag:class_SignalSource ;
+                                    ag:op_instantiatesPort ag:Port_FB_Betriebsarten_F1 ;
+                                    ag:op_isPortOfInstance ag:FBInst_MAIN_fbBA .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/PortInstance_FBInst_MAIN_fbDiag_Diagnose_beendet
+ag:PortInstance_FBInst_MAIN_fbDiag_Diagnose_beendet rdf:type owl:NamedIndividual ,
+                                                             ag:class_PortInstance ,
+                                                             ag:class_SignalSource ;
+                                                    ag:op_instantiatesPort ag:Port_FB_Diagnose_D2_Diagnose_beendet ;
+                                                    ag:op_isPortOfInstance ag:FBInst_MAIN_fbDiag .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_CTD_CD
+ag:Port_CTD_CD rdf:type owl:NamedIndividual ,
+                        ag:class_Port ;
+               ag:dp_hasPortDirection "Input" ;
+               ag:dp_hasPortName "CD" ;
+               ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_CTD_CV
+ag:Port_CTD_CV rdf:type owl:NamedIndividual ,
+                        ag:class_Port ;
+               ag:dp_hasPortDirection "Output" ;
+               ag:dp_hasPortName "CV" ;
+               ag:dp_hasPortType "INT" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_CTD_LD
+ag:Port_CTD_LD rdf:type owl:NamedIndividual ,
+                        ag:class_Port ;
+               ag:dp_hasPortDirection "Input" ;
+               ag:dp_hasPortName "LD" ;
+               ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_CTD_PV
+ag:Port_CTD_PV rdf:type owl:NamedIndividual ,
+                        ag:class_Port ;
+               ag:dp_hasPortDirection "Input" ;
+               ag:dp_hasPortName "PV" ;
+               ag:dp_hasPortType "INT" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_CTD_Q
+ag:Port_CTD_Q rdf:type owl:NamedIndividual ,
+                       ag:class_Port ;
+              ag:dp_hasPortDirection "Output" ;
+              ag:dp_hasPortName "Q" ;
+              ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_CTUD_CD
+ag:Port_CTUD_CD rdf:type owl:NamedIndividual ,
+                         ag:class_Port ;
+                ag:dp_hasPortDirection "Input" ;
+                ag:dp_hasPortName "CD" ;
+                ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_CTUD_CU
+ag:Port_CTUD_CU rdf:type owl:NamedIndividual ,
+                         ag:class_Port ;
+                ag:dp_hasPortDirection "Input" ;
+                ag:dp_hasPortName "CU" ;
+                ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_CTUD_CV
+ag:Port_CTUD_CV rdf:type owl:NamedIndividual ,
+                         ag:class_Port ;
+                ag:dp_hasPortDirection "Output" ;
+                ag:dp_hasPortName "CV" ;
+                ag:dp_hasPortType "INT" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_CTUD_LD
+ag:Port_CTUD_LD rdf:type owl:NamedIndividual ,
+                         ag:class_Port ;
+                ag:dp_hasPortDirection "Input" ;
+                ag:dp_hasPortName "LD" ;
+                ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_CTUD_PV
+ag:Port_CTUD_PV rdf:type owl:NamedIndividual ,
+                         ag:class_Port ;
+                ag:dp_hasPortDirection "Input" ;
+                ag:dp_hasPortName "PV" ;
+                ag:dp_hasPortType "INT" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_CTUD_QD
+ag:Port_CTUD_QD rdf:type owl:NamedIndividual ,
+                         ag:class_Port ;
+                ag:dp_hasPortDirection "Output" ;
+                ag:dp_hasPortName "QD" ;
+                ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_CTUD_QU
+ag:Port_CTUD_QU rdf:type owl:NamedIndividual ,
+                         ag:class_Port ;
+                ag:dp_hasPortDirection "Output" ;
+                ag:dp_hasPortName "QU" ;
+                ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_CTUD_R
+ag:Port_CTUD_R rdf:type owl:NamedIndividual ,
+                        ag:class_Port ;
+               ag:dp_hasPortDirection "Input" ;
+               ag:dp_hasPortName "R" ;
+               ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_CTU_CU
+ag:Port_CTU_CU rdf:type owl:NamedIndividual ,
+                        ag:class_Port ;
+               ag:dp_hasPortDirection "Input" ;
+               ag:dp_hasPortName "CU" ;
+               ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_CTU_CV
+ag:Port_CTU_CV rdf:type owl:NamedIndividual ,
+                        ag:class_Port ;
+               ag:dp_hasPortDirection "Output" ;
+               ag:dp_hasPortName "CV" ;
+               ag:dp_hasPortType "INT" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_CTU_PV
+ag:Port_CTU_PV rdf:type owl:NamedIndividual ,
+                        ag:class_Port ;
+               ag:dp_hasPortDirection "Input" ;
+               ag:dp_hasPortName "PV" ;
+               ag:dp_hasPortType "INT" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_CTU_Q
+ag:Port_CTU_Q rdf:type owl:NamedIndividual ,
+                       ag:class_Port ;
+              ag:dp_hasPortDirection "Output" ;
+              ag:dp_hasPortName "Q" ;
+              ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_CTU_R
+ag:Port_CTU_R rdf:type owl:NamedIndividual ,
+                       ag:class_Port ;
+              ag:dp_hasPortDirection "Input" ;
+              ag:dp_hasPortName "R" ;
+              ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_Automatikbetrieb_F1_AutoRestartEnable
+ag:Port_FB_Automatikbetrieb_F1_AutoRestartEnable rdf:type owl:NamedIndividual ,
+                                                          ag:class_Port ;
+                                                 ag:dp_hasPortDirection "Input" ;
+                                                 ag:dp_hasPortName "AutoRestartEnable" ;
+                                                 ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_Automatikbetrieb_F1_Automatikbetrieb_Fertig
+ag:Port_FB_Automatikbetrieb_F1_Automatikbetrieb_Fertig rdf:type owl:NamedIndividual ,
+                                                                ag:class_Port ;
+                                                       ag:dp_hasPortDirection "Output" ;
+                                                       ag:dp_hasPortName "Automatikbetrieb_Fertig" ;
+                                                       ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_Automatikbetrieb_F1_Automatikbetrieb_Starten
+ag:Port_FB_Automatikbetrieb_F1_Automatikbetrieb_Starten rdf:type owl:NamedIndividual ,
+                                                                 ag:class_Port ;
+                                                        ag:dp_hasPortDirection "Input" ;
+                                                        ag:dp_hasPortName "Automatikbetrieb_Starten" ;
+                                                        ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_Automatikbetrieb_F1_FaultPulse
+ag:Port_FB_Automatikbetrieb_F1_FaultPulse rdf:type owl:NamedIndividual ,
+                                                   ag:class_Port ;
+                                          ag:dp_hasPortDirection "Input" ;
+                                          ag:dp_hasPortName "FaultPulse" ;
+                                          ag:dp_hasPortType "TIME" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_Automatikbetrieb_F1_PeriodicFaultEnable
+ag:Port_FB_Automatikbetrieb_F1_PeriodicFaultEnable rdf:type owl:NamedIndividual ,
+                                                            ag:class_Port ;
+                                                   ag:dp_hasPortDirection "Input" ;
+                                                   ag:dp_hasPortName "PeriodicFaultEnable" ;
+                                                   ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_Automatikbetrieb_F1_PeriodicFaultPeriod
+ag:Port_FB_Automatikbetrieb_F1_PeriodicFaultPeriod rdf:type owl:NamedIndividual ,
+                                                            ag:class_Port ;
+                                                   ag:dp_hasPortDirection "Input" ;
+                                                   ag:dp_hasPortName "PeriodicFaultPeriod" ;
+                                                   ag:dp_hasPortType "TIME" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_Automatikbetrieb_F1_Stoerung_erkannt
+ag:Port_FB_Automatikbetrieb_F1_Stoerung_erkannt rdf:type owl:NamedIndividual ,
+                                                         ag:class_Port ;
+                                                ag:dp_hasPortDirection "Output" ;
+                                                ag:dp_hasPortName "Stoerung_erkannt" ;
+                                                ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_Betriebsarten_A1
+ag:Port_FB_Betriebsarten_A1 rdf:type owl:NamedIndividual ,
+                                     ag:class_Port ;
+                            ag:dp_hasPortDirection "Output" ;
+                            ag:dp_hasPortName "A1" ;
+                            ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_Betriebsarten_A2
+ag:Port_FB_Betriebsarten_A2 rdf:type owl:NamedIndividual ,
+                                     ag:class_Port ;
+                            ag:dp_hasPortDirection "Output" ;
+                            ag:dp_hasPortName "A2" ;
+                            ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_Betriebsarten_A2_Requested
+ag:Port_FB_Betriebsarten_A2_Requested rdf:type owl:NamedIndividual ,
+                                               ag:class_Port ;
+                                      ag:dp_hasPortDirection "Input" ;
+                                      ag:dp_hasPortName "A2_Requested" ;
+                                      ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_Betriebsarten_A5
+ag:Port_FB_Betriebsarten_A5 rdf:type owl:NamedIndividual ,
+                                     ag:class_Port ;
+                            ag:dp_hasPortDirection "Output" ;
+                            ag:dp_hasPortName "A5" ;
+                            ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_Betriebsarten_A6
+ag:Port_FB_Betriebsarten_A6 rdf:type owl:NamedIndividual ,
+                                     ag:class_Port ;
+                            ag:dp_hasPortDirection "Output" ;
+                            ag:dp_hasPortName "A6" ;
+                            ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_Betriebsarten_Alt_abort
+ag:Port_FB_Betriebsarten_Alt_abort rdf:type owl:NamedIndividual ,
+                                            ag:class_Port ;
+                                   ag:dp_hasPortDirection "Input" ;
+                                   ag:dp_hasPortName "Alt_abort" ;
+                                   ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_Betriebsarten_Alt_found
+ag:Port_FB_Betriebsarten_Alt_found rdf:type owl:NamedIndividual ,
+                                            ag:class_Port ;
+                                   ag:dp_hasPortDirection "Input" ;
+                                   ag:dp_hasPortName "Alt_found" ;
+                                   ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_Betriebsarten_Auto_Fertig
+ag:Port_FB_Betriebsarten_Auto_Fertig rdf:type owl:NamedIndividual ,
+                                              ag:class_Port ;
+                                     ag:dp_hasPortDirection "Input" ;
+                                     ag:dp_hasPortName "Auto_Fertig" ;
+                                     ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_Betriebsarten_Auto_Stoerung
+ag:Port_FB_Betriebsarten_Auto_Stoerung rdf:type owl:NamedIndividual ,
+                                                ag:class_Port ;
+                                       ag:dp_hasPortDirection "Input" ;
+                                       ag:dp_hasPortName "Auto_Stoerung" ;
+                                       ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_Betriebsarten_Cycle_ended
+ag:Port_FB_Betriebsarten_Cycle_ended rdf:type owl:NamedIndividual ,
+                                              ag:class_Port ;
+                                     ag:dp_hasPortDirection "Input" ;
+                                     ag:dp_hasPortName "Cycle_ended" ;
+                                     ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_Betriebsarten_D1
+ag:Port_FB_Betriebsarten_D1 rdf:type owl:NamedIndividual ,
+                                     ag:class_Port ;
+                            ag:dp_hasPortDirection "Output" ;
+                            ag:dp_hasPortName "D1" ;
+                            ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_Betriebsarten_D2
+ag:Port_FB_Betriebsarten_D2 rdf:type owl:NamedIndividual ,
+                                     ag:class_Port ;
+                            ag:dp_hasPortDirection "Output" ;
+                            ag:dp_hasPortName "D2" ;
+                            ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_Betriebsarten_D3
+ag:Port_FB_Betriebsarten_D3 rdf:type owl:NamedIndividual ,
+                                     ag:class_Port ;
+                            ag:dp_hasPortDirection "Output" ;
+                            ag:dp_hasPortName "D3" ;
+                            ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_Betriebsarten_D3_Requested
+ag:Port_FB_Betriebsarten_D3_Requested rdf:type owl:NamedIndividual ,
+                                               ag:class_Port ;
+                                      ag:dp_hasPortDirection "Input" ;
+                                      ag:dp_hasPortName "D3_Requested" ;
+                                      ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_Betriebsarten_F1
+ag:Port_FB_Betriebsarten_F1 rdf:type owl:NamedIndividual ,
+                                     ag:class_Port ;
+                            ag:dp_hasPortDirection "Output" ;
+                            ag:dp_hasPortName "F1" ;
+                            ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_Betriebsarten_F4
+ag:Port_FB_Betriebsarten_F4 rdf:type owl:NamedIndividual ,
+                                     ag:class_Port ;
+                            ag:dp_hasPortDirection "Output" ;
+                            ag:dp_hasPortName "F4" ;
+                            ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_Betriebsarten_Fehler
+ag:Port_FB_Betriebsarten_Fehler rdf:type owl:NamedIndividual ,
+                                         ag:class_Port ;
+                                ag:dp_hasPortDirection "Input" ;
+                                ag:dp_hasPortName "Fehler" ;
+                                ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_Betriebsarten_Init_reached
+ag:Port_FB_Betriebsarten_Init_reached rdf:type owl:NamedIndividual ,
+                                               ag:class_Port ;
+                                      ag:dp_hasPortDirection "Input" ;
+                                      ag:dp_hasPortName "Init_reached" ;
+                                      ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_Betriebsarten_NotStop
+ag:Port_FB_Betriebsarten_NotStop rdf:type owl:NamedIndividual ,
+                                          ag:class_Port ;
+                                 ag:dp_hasPortDirection "Input" ;
+                                 ag:dp_hasPortName "NotStop" ;
+                                 ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_Betriebsarten_Start
+ag:Port_FB_Betriebsarten_Start rdf:type owl:NamedIndividual ,
+                                        ag:class_Port ;
+                               ag:dp_hasPortDirection "Input" ;
+                               ag:dp_hasPortName "Start" ;
+                               ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_Betriebsarten_Start_Init
+ag:Port_FB_Betriebsarten_Start_Init rdf:type owl:NamedIndividual ,
+                                             ag:class_Port ;
+                                    ag:dp_hasPortDirection "Input" ;
+                                    ag:dp_hasPortName "Start_Init" ;
+                                    ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_Betriebsarten_Weiter
+ag:Port_FB_Betriebsarten_Weiter rdf:type owl:NamedIndividual ,
+                                         ag:class_Port ;
+                                ag:dp_hasPortDirection "Input" ;
+                                ag:dp_hasPortName "Weiter" ;
+                                ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_Diagnose_D2_Alt_gefunden
+ag:Port_FB_Diagnose_D2_Alt_gefunden rdf:type owl:NamedIndividual ,
+                                             ag:class_Port ;
+                                    ag:dp_hasPortDirection "Output" ;
+                                    ag:dp_hasPortName "Alt_gefunden" ;
+                                    ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_Diagnose_D2_Diagnose_beendet
+ag:Port_FB_Diagnose_D2_Diagnose_beendet rdf:type owl:NamedIndividual ,
+                                                 ag:class_Port ;
+                                        ag:dp_hasPortDirection "Output" ;
+                                        ag:dp_hasPortName "Diagnose_beendet" ;
+                                        ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_Diagnose_D2_Diagnose_gefordert
+ag:Port_FB_Diagnose_D2_Diagnose_gefordert rdf:type owl:NamedIndividual ,
+                                                   ag:class_Port ;
+                                          ag:dp_hasPortDirection "Input" ;
+                                          ag:dp_hasPortName "Diagnose_gefordert" ;
+                                          ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_InitFahrt_A6_A2_A2
+ag:Port_FB_InitFahrt_A6_A2_A2 rdf:type owl:NamedIndividual ,
+                                       ag:class_Port ;
+                              ag:dp_hasPortDirection "Input" ;
+                              ag:dp_hasPortName "A2" ;
+                              ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_InitFahrt_A6_A2_A6
+ag:Port_FB_InitFahrt_A6_A2_A6 rdf:type owl:NamedIndividual ,
+                                       ag:class_Port ;
+                              ag:dp_hasPortDirection "Input" ;
+                              ag:dp_hasPortName "A6" ;
+                              ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_InitFahrt_A6_A2_Init_erreicht
+ag:Port_FB_InitFahrt_A6_A2_Init_erreicht rdf:type owl:NamedIndividual ,
+                                                  ag:class_Port ;
+                                         ag:dp_hasPortDirection "Output" ;
+                                         ag:dp_hasPortName "Init_erreicht" ;
+                                         ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_Notaus_D1_D1
+ag:Port_FB_Notaus_D1_D1 rdf:type owl:NamedIndividual ,
+                                 ag:class_Port ;
+                        ag:dp_hasPortDirection "Input" ;
+                        ag:dp_hasPortName "D1" ;
+                        ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_Notaus_D1_Diagnose_gefordert
+ag:Port_FB_Notaus_D1_Diagnose_gefordert rdf:type owl:NamedIndividual ,
+                                                 ag:class_Port ;
+                                        ag:dp_hasPortDirection "Output" ;
+                                        ag:dp_hasPortName "Diagnose_gefordert" ;
+                                        ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_Notaus_D1_Notaus_Entriegelt
+ag:Port_FB_Notaus_D1_Notaus_Entriegelt rdf:type owl:NamedIndividual ,
+                                                ag:class_Port ;
+                                       ag:dp_hasPortDirection "Output" ;
+                                       ag:dp_hasPortName "Notaus_Entriegelt" ;
+                                       ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_ProduktionMitStoerung_D3_Fertig
+ag:Port_FB_ProduktionMitStoerung_D3_Fertig rdf:type owl:NamedIndividual ,
+                                                    ag:class_Port ;
+                                           ag:dp_hasPortDirection "Output" ;
+                                           ag:dp_hasPortName "Fertig" ;
+                                           ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_ProduktionMitStoerung_D3_ProduktionMitStoerung_Starten
+ag:Port_FB_ProduktionMitStoerung_D3_ProduktionMitStoerung_Starten rdf:type owl:NamedIndividual ,
+                                                                           ag:class_Port ;
+                                                                  ag:dp_hasPortDirection "Input" ;
+                                                                  ag:dp_hasPortName "ProduktionMitStoerung_Starten" ;
+                                                                  ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_FB_ProduktionMitStoerung_D3_Stoerung_erkannt
+ag:Port_FB_ProduktionMitStoerung_D3_Stoerung_erkannt rdf:type owl:NamedIndividual ,
+                                                              ag:class_Port ;
+                                                     ag:dp_hasPortDirection "Output" ;
+                                                     ag:dp_hasPortName "Stoerung_erkannt" ;
+                                                     ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_F_TRIG_CLK
+ag:Port_F_TRIG_CLK rdf:type owl:NamedIndividual ,
+                            ag:class_Port ;
+                   ag:dp_hasPortDirection "Input" ;
+                   ag:dp_hasPortName "CLK" ;
+                   ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_F_TRIG_Q
+ag:Port_F_TRIG_Q rdf:type owl:NamedIndividual ,
+                          ag:class_Port ;
+                 ag:dp_hasPortDirection "Output" ;
+                 ag:dp_hasPortName "Q" ;
+                 ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_RS_Q1
+ag:Port_RS_Q1 rdf:type owl:NamedIndividual ,
+                       ag:class_Port ;
+              ag:dp_hasPortDirection "Output" ;
+              ag:dp_hasPortName "Q1" ;
+              ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_RS_R1
+ag:Port_RS_R1 rdf:type owl:NamedIndividual ,
+                       ag:class_Port ;
+              ag:dp_hasPortDirection "Input" ;
+              ag:dp_hasPortName "R1" ;
+              ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_RS_S
+ag:Port_RS_S rdf:type owl:NamedIndividual ,
+                      ag:class_Port ;
+             ag:dp_hasPortDirection "Input" ;
+             ag:dp_hasPortName "S" ;
+             ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_R_TRIG_CLK
+ag:Port_R_TRIG_CLK rdf:type owl:NamedIndividual ,
+                            ag:class_Port ;
+                   ag:dp_hasPortDirection "Input" ;
+                   ag:dp_hasPortName "CLK" ;
+                   ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_R_TRIG_Q
+ag:Port_R_TRIG_Q rdf:type owl:NamedIndividual ,
+                          ag:class_Port ;
+                 ag:dp_hasPortDirection "Output" ;
+                 ag:dp_hasPortName "Q" ;
+                 ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_SR_Q1
+ag:Port_SR_Q1 rdf:type owl:NamedIndividual ,
+                       ag:class_Port ;
+              ag:dp_hasPortDirection "Output" ;
+              ag:dp_hasPortName "Q1" ;
+              ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_SR_R
+ag:Port_SR_R rdf:type owl:NamedIndividual ,
+                      ag:class_Port ;
+             ag:dp_hasPortDirection "Input" ;
+             ag:dp_hasPortName "R" ;
+             ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_SR_S1
+ag:Port_SR_S1 rdf:type owl:NamedIndividual ,
+                       ag:class_Port ;
+              ag:dp_hasPortDirection "Input" ;
+              ag:dp_hasPortName "S1" ;
+              ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_TOF_ET
+ag:Port_TOF_ET rdf:type owl:NamedIndividual ,
+                        ag:class_Port ;
+               ag:dp_hasPortDirection "Output" ;
+               ag:dp_hasPortName "ET" ;
+               ag:dp_hasPortType "TIME" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_TOF_IN
+ag:Port_TOF_IN rdf:type owl:NamedIndividual ,
+                        ag:class_Port ;
+               ag:dp_hasPortDirection "Input" ;
+               ag:dp_hasPortName "IN" ;
+               ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_TOF_PT
+ag:Port_TOF_PT rdf:type owl:NamedIndividual ,
+                        ag:class_Port ;
+               ag:dp_hasPortDirection "Input" ;
+               ag:dp_hasPortName "PT" ;
+               ag:dp_hasPortType "TIME" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_TOF_Q
+ag:Port_TOF_Q rdf:type owl:NamedIndividual ,
+                       ag:class_Port ;
+              ag:dp_hasPortDirection "Output" ;
+              ag:dp_hasPortName "Q" ;
+              ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_TON_ET
+ag:Port_TON_ET rdf:type owl:NamedIndividual ,
+                        ag:class_Port ;
+               ag:dp_hasPortDirection "Output" ;
+               ag:dp_hasPortName "ET" ;
+               ag:dp_hasPortType "TIME" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_TON_IN
+ag:Port_TON_IN rdf:type owl:NamedIndividual ,
+                        ag:class_Port ;
+               ag:dp_hasPortDirection "Input" ;
+               ag:dp_hasPortName "IN" ;
+               ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_TON_PT
+ag:Port_TON_PT rdf:type owl:NamedIndividual ,
+                        ag:class_Port ;
+               ag:dp_hasPortDirection "Input" ;
+               ag:dp_hasPortName "PT" ;
+               ag:dp_hasPortType "TIME" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_TON_Q
+ag:Port_TON_Q rdf:type owl:NamedIndividual ,
+                       ag:class_Port ;
+              ag:dp_hasPortDirection "Output" ;
+              ag:dp_hasPortName "Q" ;
+              ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_TP_ET
+ag:Port_TP_ET rdf:type owl:NamedIndividual ,
+                       ag:class_Port ;
+              ag:dp_hasPortDirection "Output" ;
+              ag:dp_hasPortName "ET" ;
+              ag:dp_hasPortType "TIME" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_TP_IN
+ag:Port_TP_IN rdf:type owl:NamedIndividual ,
+                       ag:class_Port ;
+              ag:dp_hasPortDirection "Input" ;
+              ag:dp_hasPortName "IN" ;
+              ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_TP_PT
+ag:Port_TP_PT rdf:type owl:NamedIndividual ,
+                       ag:class_Port ;
+              ag:dp_hasPortDirection "Input" ;
+              ag:dp_hasPortName "PT" ;
+              ag:dp_hasPortType "TIME" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Port_TP_Q
+ag:Port_TP_Q rdf:type owl:NamedIndividual ,
+                      ag:class_Port ;
+             ag:dp_hasPortDirection "Output" ;
+             ag:dp_hasPortName "Q" ;
+             ag:dp_hasPortType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Program_MAIN
+ag:Program_MAIN rdf:type owl:NamedIndividual ,
+                         ag:class_Program ;
+                ag:op_containsPOUCall ag:POUCall_MAIN_edgeDone_1 ,
+                                      ag:POUCall_MAIN_edgeF1_1 ,
+                                      ag:POUCall_MAIN_fbAuto_1 ,
+                                      ag:POUCall_MAIN_fbBA_1 ,
+                                      ag:POUCall_MAIN_fbDiag_1 ,
+                                      ag:POUCall_MAIN_fbInit_1 ,
+                                      ag:POUCall_MAIN_fbNot_1 ,
+                                      ag:POUCall_MAIN_fbProStoer_1 ;
+                ag:op_usesVariable ag:Var_MAIN_A2_angefordert ,
+                                   ag:Var_MAIN_D3_angefordert ,
+                                   ag:Var_MAIN_Init_erreicht ,
+                                   ag:Var_MAIN_Init_start ,
+                                   ag:Var_MAIN_Start_eff ,
+                                   ag:Var_MAIN_Weiter_eff ,
+                                   ag:Var_MAIN_Zyklus_beendet ,
+                                   ag:Var_MAIN_alt_abort ,
+                                   ag:Var_MAIN_alt_found ,
+                                   ag:Var_MAIN_edgeDone ,
+                                   ag:Var_MAIN_edgeF1 ,
+                                   ag:Var_MAIN_fbAuto ,
+                                   ag:Var_MAIN_fbBA ,
+                                   ag:Var_MAIN_fbDiag ,
+                                   ag:Var_MAIN_fbInit ,
+                                   ag:Var_MAIN_fbJob ,
+                                   ag:Var_MAIN_fbNot ,
+                                   ag:Var_MAIN_fbProStoer ;
+                ag:dp_hasPOUCode """// POU MAIN body
+edgeDone(CLK := fbDiag.Diagnose_beendet);
+
+
+Start_eff  := GVL.Start  OR edgeDone.Q;
+Weiter_eff := GVL.Weiter OR edgeDone.Q;
+
+
+fbBA(
+    Start         := Start_eff,
+    NotStop       := GVL.NotStopp,
+    Weiter        := Weiter_eff,
+    Fehler        := GVL.Fehler,
+	Start_Init 	  := Init_Start,                  
+    Auto_Fertig   := fbAuto.Automatikbetrieb_Fertig,
+    Auto_Stoerung := fbAuto.Stoerung_erkannt,
+	A2_Requested := A2_angefordert,
+	Alt_abort := alt_abort,
+	Alt_found := alt_found,
+	D3_Requested := D3_angefordert,
+	Init_reached := Init_erreicht,
+	Cycle_ended := Zyklus_beendet
+);
+
+
+edgeF1(CLK := fbBA.F1);
+fbAuto(Automatikbetrieb_Starten := edgeF1.Q);
+
+fbNot(D1 := fbBA.D1);
+GVL.DiagnoseRequested := fbNot.Diagnose_gefordert;
+
+fbProStoer(ProduktionMitStoerung_Starten := fbBA.D3);
+alt_abort := fbProStoer.Stoerung_erkannt;
+
+
+fbInit(A6 := fbBA.A6, A2 := fbBA.A2);
+Init_erreicht := fbInit.Init_erreicht;
+
+
+fbDiag(Diagnose_gefordert := fbBA.D2);
+alt_found := fbDiag.Alt_gefunden;""" ;
+                ag:dp_hasPOULanguage "ST" ;
+                ag:dp_hasProgramName "MAIN" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_CTD
+ag:StandardFBType_CTD rdf:type owl:NamedIndividual ,
+                               ag:class_FBType ,
+                               ag:class_StandardFBType ;
+                      ag:op_hasPort ag:Port_CTD_CD ,
+                                    ag:Port_CTD_CV ,
+                                    ag:Port_CTD_LD ,
+                                    ag:Port_CTD_PV ,
+                                    ag:Port_CTD_Q ;
+                      ag:dp_hasPOULanguage "ST" ;
+                      ag:dp_hasPOUName "CTD" ;
+                      ag:dp_hasPOUType "FunctionBlock" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_CTU
+ag:StandardFBType_CTU rdf:type owl:NamedIndividual ,
+                               ag:class_FBType ,
+                               ag:class_StandardFBType ;
+                      ag:op_hasPort ag:Port_CTU_CU ,
+                                    ag:Port_CTU_CV ,
+                                    ag:Port_CTU_PV ,
+                                    ag:Port_CTU_Q ,
+                                    ag:Port_CTU_R ;
+                      ag:dp_hasPOULanguage "ST" ;
+                      ag:dp_hasPOUName "CTU" ;
+                      ag:dp_hasPOUType "FunctionBlock" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_CTUD
+ag:StandardFBType_CTUD rdf:type owl:NamedIndividual ,
+                                ag:class_FBType ,
+                                ag:class_StandardFBType ;
+                       ag:op_hasPort ag:Port_CTUD_CD ,
+                                     ag:Port_CTUD_CU ,
+                                     ag:Port_CTUD_CV ,
+                                     ag:Port_CTUD_LD ,
+                                     ag:Port_CTUD_PV ,
+                                     ag:Port_CTUD_QD ,
+                                     ag:Port_CTUD_QU ,
+                                     ag:Port_CTUD_R ;
+                       ag:dp_hasPOULanguage "ST" ;
+                       ag:dp_hasPOUName "CTUD" ;
+                       ag:dp_hasPOUType "FunctionBlock" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_F_TRIG
+ag:StandardFBType_F_TRIG rdf:type owl:NamedIndividual ,
+                                  ag:class_FBType ,
+                                  ag:class_StandardFBType ;
+                         ag:op_hasPort ag:Port_F_TRIG_CLK ,
+                                       ag:Port_F_TRIG_Q ;
+                         ag:dp_hasPOULanguage "ST" ;
+                         ag:dp_hasPOUName "F_TRIG" ;
+                         ag:dp_hasPOUType "FunctionBlock" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_RS
+ag:StandardFBType_RS rdf:type owl:NamedIndividual ,
+                              ag:class_FBType ,
+                              ag:class_StandardFBType ;
+                     ag:op_hasPort ag:Port_RS_Q1 ,
+                                   ag:Port_RS_R1 ,
+                                   ag:Port_RS_S ;
+                     ag:dp_hasPOULanguage "ST" ;
+                     ag:dp_hasPOUName "RS" ;
+                     ag:dp_hasPOUType "FunctionBlock" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_R_TRIG
+ag:StandardFBType_R_TRIG rdf:type owl:NamedIndividual ,
+                                  ag:class_FBType ,
+                                  ag:class_StandardFBType ;
+                         ag:op_hasPort ag:Port_R_TRIG_CLK ,
+                                       ag:Port_R_TRIG_Q ;
+                         ag:dp_hasPOULanguage "ST" ;
+                         ag:dp_hasPOUName "R_TRIG" ;
+                         ag:dp_hasPOUType "FunctionBlock" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_SR
+ag:StandardFBType_SR rdf:type owl:NamedIndividual ,
+                              ag:class_FBType ,
+                              ag:class_StandardFBType ;
+                     ag:op_hasPort ag:Port_SR_Q1 ,
+                                   ag:Port_SR_R ,
+                                   ag:Port_SR_S1 ;
+                     ag:dp_hasPOULanguage "ST" ;
+                     ag:dp_hasPOUName "SR" ;
+                     ag:dp_hasPOUType "FunctionBlock" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_TOF
+ag:StandardFBType_TOF rdf:type owl:NamedIndividual ,
+                               ag:class_FBType ,
+                               ag:class_StandardFBType ;
+                      ag:op_hasPort ag:Port_TOF_ET ,
+                                    ag:Port_TOF_IN ,
+                                    ag:Port_TOF_PT ,
+                                    ag:Port_TOF_Q ;
+                      ag:dp_hasPOULanguage "ST" ;
+                      ag:dp_hasPOUName "TOF" ;
+                      ag:dp_hasPOUType "FunctionBlock" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_TON
+ag:StandardFBType_TON rdf:type owl:NamedIndividual ,
+                               ag:class_FBType ,
+                               ag:class_StandardFBType ;
+                      ag:op_hasPort ag:Port_TON_ET ,
+                                    ag:Port_TON_IN ,
+                                    ag:Port_TON_PT ,
+                                    ag:Port_TON_Q ;
+                      ag:dp_hasPOULanguage "ST" ;
+                      ag:dp_hasPOUName "TON" ;
+                      ag:dp_hasPOUType "FunctionBlock" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_TP
+ag:StandardFBType_TP rdf:type owl:NamedIndividual ,
+                              ag:class_FBType ,
+                              ag:class_StandardFBType ;
+                     ag:op_hasPort ag:Port_TP_ET ,
+                                   ag:Port_TP_IN ,
+                                   ag:Port_TP_PT ,
+                                   ag:Port_TP_Q ;
+                     ag:dp_hasPOULanguage "ST" ;
+                     ag:dp_hasPOUName "TP" ;
+                     ag:dp_hasPOUType "FunctionBlock" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Automatikbetrieb_F1_RestartPulseLength
+ag:Var_FB_Automatikbetrieb_F1_RestartPulseLength rdf:type owl:NamedIndividual ,
+                                                          ag:class_Variable ;
+                                                 ag:dp_hasVariableName "RestartPulseLength" ;
+                                                 ag:dp_hasVariableType "INT" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Automatikbetrieb_F1_Schritt1
+ag:Var_FB_Automatikbetrieb_F1_Schritt1 rdf:type owl:NamedIndividual ,
+                                                ag:class_Variable ;
+                                       ag:dp_hasVariableName "Schritt1" ;
+                                       ag:dp_hasVariableType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Automatikbetrieb_F1_Schritt2
+ag:Var_FB_Automatikbetrieb_F1_Schritt2 rdf:type owl:NamedIndividual ,
+                                                ag:class_Variable ;
+                                       ag:dp_hasVariableName "Schritt2" ;
+                                       ag:dp_hasVariableType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Automatikbetrieb_F1_Zwischen
+ag:Var_FB_Automatikbetrieb_F1_Zwischen rdf:type owl:NamedIndividual ,
+                                                ag:class_Variable ;
+                                       ag:dp_hasVariableName "Zwischen" ;
+                                       ag:dp_hasVariableType "string" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Automatikbetrieb_F1_dbg_Stoerung_Manuell
+ag:Var_FB_Automatikbetrieb_F1_dbg_Stoerung_Manuell rdf:type owl:NamedIndividual ,
+                                                            ag:class_Variable ;
+                                                   ag:dp_hasVariableName "dbg_Stoerung_Manuell" ;
+                                                   ag:dp_hasVariableType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Automatikbetrieb_F1_lastSkillIsOne
+ag:Var_FB_Automatikbetrieb_F1_lastSkillIsOne rdf:type owl:NamedIndividual ,
+                                                      ag:class_Variable ;
+                                             ag:dp_hasVariableName "lastSkillIsOne" ;
+                                             ag:dp_hasVariableType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Automatikbetrieb_F1_pPer
+ag:Var_FB_Automatikbetrieb_F1_pPer rdf:type owl:NamedIndividual ,
+                                            ag:class_Variable ;
+                                   ag:op_representsFBInstance ag:FBInst_FB_Automatikbetrieb_F1_pPer ;
+                                   ag:dp_hasVariableName "pPer" ;
+                                   ag:dp_hasVariableType "TP" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Automatikbetrieb_F1_perEn
+ag:Var_FB_Automatikbetrieb_F1_perEn rdf:type owl:NamedIndividual ,
+                                             ag:class_Variable ;
+                                    ag:dp_hasVariableName "perEn" ;
+                                    ag:dp_hasVariableType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Automatikbetrieb_F1_rPer
+ag:Var_FB_Automatikbetrieb_F1_rPer rdf:type owl:NamedIndividual ,
+                                            ag:class_Variable ;
+                                   ag:op_representsFBInstance ag:FBInst_FB_Automatikbetrieb_F1_rPer ;
+                                   ag:dp_hasVariableName "rPer" ;
+                                   ag:dp_hasVariableType "R_TRIG" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Automatikbetrieb_F1_rStart
+ag:Var_FB_Automatikbetrieb_F1_rStart rdf:type owl:NamedIndividual ,
+                                              ag:class_Variable ;
+                                     ag:op_representsFBInstance ag:FBInst_FB_Automatikbetrieb_F1_rStart ;
+                                     ag:dp_hasVariableName "rStart" ;
+                                     ag:dp_hasVariableType "R_TRIG" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Automatikbetrieb_F1_rStep1
+ag:Var_FB_Automatikbetrieb_F1_rStep1 rdf:type owl:NamedIndividual ,
+                                              ag:class_Variable ;
+                                     ag:op_representsFBInstance ag:FBInst_FB_Automatikbetrieb_F1_rStep1 ;
+                                     ag:dp_hasVariableName "rStep1" ;
+                                     ag:dp_hasVariableType "R_TRIG" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Automatikbetrieb_F1_rtStoer
+ag:Var_FB_Automatikbetrieb_F1_rtStoer rdf:type owl:NamedIndividual ,
+                                               ag:class_Variable ;
+                                      ag:op_representsFBInstance ag:FBInst_FB_Automatikbetrieb_F1_rtStoer ;
+                                      ag:dp_hasVariableName "rtStoer" ;
+                                      ag:dp_hasVariableType "R_TRIG" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Automatikbetrieb_F1_tPer
+ag:Var_FB_Automatikbetrieb_F1_tPer rdf:type owl:NamedIndividual ,
+                                            ag:class_Variable ;
+                                   ag:op_representsFBInstance ag:FBInst_FB_Automatikbetrieb_F1_tPer ;
+                                   ag:dp_hasVariableName "tPer" ;
+                                   ag:dp_hasVariableType "TON" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Automatikbetrieb_F1_tSchritt1
+ag:Var_FB_Automatikbetrieb_F1_tSchritt1 rdf:type owl:NamedIndividual ,
+                                                 ag:class_Variable ;
+                                        ag:op_representsFBInstance ag:FBInst_FB_Automatikbetrieb_F1_tSchritt1 ;
+                                        ag:dp_hasVariableName "tSchritt1" ;
+                                        ag:dp_hasVariableType "TON" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Automatikbetrieb_F1_tSchritt2
+ag:Var_FB_Automatikbetrieb_F1_tSchritt2 rdf:type owl:NamedIndividual ,
+                                                 ag:class_Variable ;
+                                        ag:op_representsFBInstance ag:FBInst_FB_Automatikbetrieb_F1_tSchritt2 ;
+                                        ag:dp_hasVariableName "tSchritt2" ;
+                                        ag:dp_hasVariableType "TON" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Automatikbetrieb_F1_tpRestart
+ag:Var_FB_Automatikbetrieb_F1_tpRestart rdf:type owl:NamedIndividual ,
+                                                 ag:class_Variable ;
+                                        ag:dp_hasVariableName "tpRestart" ;
+                                        ag:dp_hasVariableType "INT" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Betriebsarten_RS_A1
+ag:Var_FB_Betriebsarten_RS_A1 rdf:type owl:NamedIndividual ,
+                                       ag:class_Variable ;
+                              ag:op_representsFBInstance ag:FBInst_FB_Betriebsarten_RS_A1 ;
+                              ag:dp_hasVariableName "RS_A1" ;
+                              ag:dp_hasVariableType "RS" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Betriebsarten_RS_A2
+ag:Var_FB_Betriebsarten_RS_A2 rdf:type owl:NamedIndividual ,
+                                       ag:class_Variable ;
+                              ag:op_representsFBInstance ag:FBInst_FB_Betriebsarten_RS_A2 ;
+                              ag:dp_hasVariableName "RS_A2" ;
+                              ag:dp_hasVariableType "RS" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Betriebsarten_RS_A5
+ag:Var_FB_Betriebsarten_RS_A5 rdf:type owl:NamedIndividual ,
+                                       ag:class_Variable ;
+                              ag:op_representsFBInstance ag:FBInst_FB_Betriebsarten_RS_A5 ;
+                              ag:dp_hasVariableName "RS_A5" ;
+                              ag:dp_hasVariableType "RS" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Betriebsarten_RS_A6
+ag:Var_FB_Betriebsarten_RS_A6 rdf:type owl:NamedIndividual ,
+                                       ag:class_Variable ;
+                              ag:op_representsFBInstance ag:FBInst_FB_Betriebsarten_RS_A6 ;
+                              ag:dp_hasVariableName "RS_A6" ;
+                              ag:dp_hasVariableType "RS" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Betriebsarten_RS_AutomaticOperationMode
+ag:Var_FB_Betriebsarten_RS_AutomaticOperationMode rdf:type owl:NamedIndividual ,
+                                                           ag:class_Variable ;
+                                                  ag:op_representsFBInstance ag:FBInst_FB_Betriebsarten_RS_AutomaticOperationMode ;
+                                                  ag:dp_hasVariableName "RS_AutomaticOperationMode" ;
+                                                  ag:dp_hasVariableType "RS" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Betriebsarten_RS_CycleEnded
+ag:Var_FB_Betriebsarten_RS_CycleEnded rdf:type owl:NamedIndividual ,
+                                               ag:class_Variable ;
+                                      ag:op_representsFBInstance ag:FBInst_FB_Betriebsarten_RS_CycleEnded ;
+                                      ag:dp_hasVariableName "RS_CycleEnded" ;
+                                      ag:dp_hasVariableType "RS" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Betriebsarten_RS_D1
+ag:Var_FB_Betriebsarten_RS_D1 rdf:type owl:NamedIndividual ,
+                                       ag:class_Variable ;
+                              ag:op_representsFBInstance ag:FBInst_FB_Betriebsarten_RS_D1 ;
+                              ag:dp_hasVariableName "RS_D1" ;
+                              ag:dp_hasVariableType "RS" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Betriebsarten_RS_D2
+ag:Var_FB_Betriebsarten_RS_D2 rdf:type owl:NamedIndividual ,
+                                       ag:class_Variable ;
+                              ag:op_representsFBInstance ag:FBInst_FB_Betriebsarten_RS_D2 ;
+                              ag:dp_hasVariableName "RS_D2" ;
+                              ag:dp_hasVariableType "RS" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Betriebsarten_RS_D3
+ag:Var_FB_Betriebsarten_RS_D3 rdf:type owl:NamedIndividual ,
+                                       ag:class_Variable ;
+                              ag:op_representsFBInstance ag:FBInst_FB_Betriebsarten_RS_D3 ;
+                              ag:dp_hasVariableName "RS_D3" ;
+                              ag:dp_hasVariableType "RS" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Betriebsarten_RS_F1
+ag:Var_FB_Betriebsarten_RS_F1 rdf:type owl:NamedIndividual ,
+                                       ag:class_Variable ;
+                              ag:op_representsFBInstance ag:FBInst_FB_Betriebsarten_RS_F1 ;
+                              ag:dp_hasVariableName "RS_F1" ;
+                              ag:dp_hasVariableType "RS" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Betriebsarten_RS_InitialDrive
+ag:Var_FB_Betriebsarten_RS_InitialDrive rdf:type owl:NamedIndividual ,
+                                                 ag:class_Variable ;
+                                        ag:op_representsFBInstance ag:FBInst_FB_Betriebsarten_RS_InitialDrive ;
+                                        ag:dp_hasVariableName "RS_InitialDrive" ;
+                                        ag:dp_hasVariableType "RS" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Betriebsarten_RS_InitialState
+ag:Var_FB_Betriebsarten_RS_InitialState rdf:type owl:NamedIndividual ,
+                                                 ag:class_Variable ;
+                                        ag:op_representsFBInstance ag:FBInst_FB_Betriebsarten_RS_InitialState ;
+                                        ag:dp_hasVariableName "RS_InitialState" ;
+                                        ag:dp_hasVariableType "RS" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Betriebsarten_RS_ManualOperationMode
+ag:Var_FB_Betriebsarten_RS_ManualOperationMode rdf:type owl:NamedIndividual ,
+                                                        ag:class_Variable ;
+                                               ag:op_representsFBInstance ag:FBInst_FB_Betriebsarten_RS_ManualOperationMode ;
+                                               ag:dp_hasVariableName "RS_ManualOperationMode" ;
+                                               ag:dp_hasVariableType "RS" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Betriebsarten_R_TRIG_Automatic
+ag:Var_FB_Betriebsarten_R_TRIG_Automatic rdf:type owl:NamedIndividual ,
+                                                  ag:class_Variable ;
+                                         ag:op_representsFBInstance ag:FBInst_FB_Betriebsarten_R_TRIG_Automatic ;
+                                         ag:dp_hasVariableName "R_TRIG_Automatic" ;
+                                         ag:dp_hasVariableType "R_TRIG" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Betriebsarten_R_TRIG_CycleEnded
+ag:Var_FB_Betriebsarten_R_TRIG_CycleEnded rdf:type owl:NamedIndividual ,
+                                                   ag:class_Variable ;
+                                          ag:op_representsFBInstance ag:FBInst_FB_Betriebsarten_R_TRIG_CycleEnded ;
+                                          ag:dp_hasVariableName "R_TRIG_CycleEnded" ;
+                                          ag:dp_hasVariableType "R_TRIG" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Betriebsarten_R_TRIG_Init
+ag:Var_FB_Betriebsarten_R_TRIG_Init rdf:type owl:NamedIndividual ,
+                                             ag:class_Variable ;
+                                    ag:op_representsFBInstance ag:FBInst_FB_Betriebsarten_R_TRIG_Init ;
+                                    ag:dp_hasVariableName "R_TRIG_Init" ;
+                                    ag:dp_hasVariableType "R_TRIG" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Betriebsarten_R_TRIG_InitialDrive
+ag:Var_FB_Betriebsarten_R_TRIG_InitialDrive rdf:type owl:NamedIndividual ,
+                                                     ag:class_Variable ;
+                                            ag:op_representsFBInstance ag:FBInst_FB_Betriebsarten_R_TRIG_InitialDrive ;
+                                            ag:dp_hasVariableName "R_TRIG_InitialDrive" ;
+                                            ag:dp_hasVariableType "R_TRIG" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Betriebsarten_R_TRIG_Manual
+ag:Var_FB_Betriebsarten_R_TRIG_Manual rdf:type owl:NamedIndividual ,
+                                               ag:class_Variable ;
+                                      ag:op_representsFBInstance ag:FBInst_FB_Betriebsarten_R_TRIG_Manual ;
+                                      ag:dp_hasVariableName "R_TRIG_Manual" ;
+                                      ag:dp_hasVariableType "R_TRIG" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Betriebsarten_bFirstScan
+ag:Var_FB_Betriebsarten_bFirstScan rdf:type owl:NamedIndividual ,
+                                            ag:class_Variable ;
+                                   ag:dp_hasVariableName "bFirstScan" ;
+                                   ag:dp_hasVariableType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Diagnose_D2_Busy
+ag:Var_FB_Diagnose_D2_Busy rdf:type owl:NamedIndividual ,
+                                    ag:class_Variable ;
+                           ag:dp_hasVariableName "Busy" ;
+                           ag:dp_hasVariableType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Diagnose_D2_rtAck
+ag:Var_FB_Diagnose_D2_rtAck rdf:type owl:NamedIndividual ,
+                                     ag:class_Variable ;
+                            ag:op_representsFBInstance ag:FBInst_FB_Diagnose_D2_rtAck ;
+                            ag:dp_hasVariableName "rtAck" ;
+                            ag:dp_hasVariableType "R_TRIG" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Diagnose_D2_rtD3
+ag:Var_FB_Diagnose_D2_rtD3 rdf:type owl:NamedIndividual ,
+                                    ag:class_Variable ;
+                           ag:op_representsFBInstance ag:FBInst_FB_Diagnose_D2_rtD3 ;
+                           ag:dp_hasVariableName "rtD3" ;
+                           ag:dp_hasVariableType "R_TRIG" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Diagnose_D2_rtFinished
+ag:Var_FB_Diagnose_D2_rtFinished rdf:type owl:NamedIndividual ,
+                                          ag:class_Variable ;
+                                 ag:op_representsFBInstance ag:FBInst_FB_Diagnose_D2_rtFinished ;
+                                 ag:dp_hasVariableName "rtFinished" ;
+                                 ag:dp_hasVariableType "R_TRIG" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Diagnose_D2_rtReq
+ag:Var_FB_Diagnose_D2_rtReq rdf:type owl:NamedIndividual ,
+                                     ag:class_Variable ;
+                            ag:op_representsFBInstance ag:FBInst_FB_Diagnose_D2_rtReq ;
+                            ag:dp_hasVariableName "rtReq" ;
+                            ag:dp_hasVariableType "R_TRIG" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Diagnose_D2_tpPulse
+ag:Var_FB_Diagnose_D2_tpPulse rdf:type owl:NamedIndividual ,
+                                       ag:class_Variable ;
+                              ag:op_representsFBInstance ag:FBInst_FB_Diagnose_D2_tpPulse ;
+                              ag:dp_hasVariableName "tpPulse" ;
+                              ag:dp_hasVariableType "TP" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_InitFahrt_A6_A2_tInit
+ag:Var_FB_InitFahrt_A6_A2_tInit rdf:type owl:NamedIndividual ,
+                                         ag:class_Variable ;
+                                ag:op_representsFBInstance ag:FBInst_FB_InitFahrt_A6_A2_tInit ;
+                                ag:dp_hasVariableName "tInit" ;
+                                ag:dp_hasVariableType "TON" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Methode1Job_counter
+ag:Var_FB_Methode1Job_counter rdf:type owl:NamedIndividual ,
+                                       ag:class_Variable ;
+                              ag:dp_hasVariableName "counter" ;
+                              ag:dp_hasVariableType "DINT" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Methode1Job_reached
+ag:Var_FB_Methode1Job_reached rdf:type owl:NamedIndividual ,
+                                       ag:class_Variable ;
+                              ag:dp_hasVariableName "reached" ;
+                              ag:dp_hasVariableType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Methode1Job_running
+ag:Var_FB_Methode1Job_running rdf:type owl:NamedIndividual ,
+                                       ag:class_Variable ;
+                              ag:dp_hasVariableName "running" ;
+                              ag:dp_hasVariableType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Methode1Job_t20s
+ag:Var_FB_Methode1Job_t20s rdf:type owl:NamedIndividual ,
+                                    ag:class_Variable ;
+                           ag:op_representsFBInstance ag:FBInst_FB_Methode1Job_t20s ;
+                           ag:dp_hasVariableName "t20s" ;
+                           ag:dp_hasVariableType "TON" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Methode1Job_y
+ag:Var_FB_Methode1Job_y rdf:type owl:NamedIndividual ,
+                                 ag:class_Variable ;
+                        ag:dp_hasVariableName "y" ;
+                        ag:dp_hasVariableType "DINT" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_Notaus_D1_ton5s
+ag:Var_FB_Notaus_D1_ton5s rdf:type owl:NamedIndividual ,
+                                   ag:class_Variable ;
+                          ag:op_representsFBInstance ag:FBInst_FB_Notaus_D1_ton5s ;
+                          ag:dp_hasVariableName "ton5s" ;
+                          ag:dp_hasVariableType "TON" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_ProduktionMitStoerung_D3_RestartPulseLength
+ag:Var_FB_ProduktionMitStoerung_D3_RestartPulseLength rdf:type owl:NamedIndividual ,
+                                                               ag:class_Variable ;
+                                                      ag:dp_hasVariableName "RestartPulseLength" ;
+                                                      ag:dp_hasVariableType "INT" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_ProduktionMitStoerung_D3_Schritt3
+ag:Var_FB_ProduktionMitStoerung_D3_Schritt3 rdf:type owl:NamedIndividual ,
+                                                     ag:class_Variable ;
+                                            ag:dp_hasVariableName "Schritt3" ;
+                                            ag:dp_hasVariableType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_ProduktionMitStoerung_D3_Schritt4
+ag:Var_FB_ProduktionMitStoerung_D3_Schritt4 rdf:type owl:NamedIndividual ,
+                                                     ag:class_Variable ;
+                                            ag:dp_hasVariableName "Schritt4" ;
+                                            ag:dp_hasVariableType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_ProduktionMitStoerung_D3_Zwischen
+ag:Var_FB_ProduktionMitStoerung_D3_Zwischen rdf:type owl:NamedIndividual ,
+                                                     ag:class_Variable ;
+                                            ag:dp_hasVariableName "Zwischen" ;
+                                            ag:dp_hasVariableType "string" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_ProduktionMitStoerung_D3_dbg_Stoerung_Manuell
+ag:Var_FB_ProduktionMitStoerung_D3_dbg_Stoerung_Manuell rdf:type owl:NamedIndividual ,
+                                                                 ag:class_Variable ;
+                                                        ag:dp_hasVariableName "dbg_Stoerung_Manuell" ;
+                                                        ag:dp_hasVariableType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_ProduktionMitStoerung_D3_lastSkillIsOne
+ag:Var_FB_ProduktionMitStoerung_D3_lastSkillIsOne rdf:type owl:NamedIndividual ,
+                                                           ag:class_Variable ;
+                                                  ag:dp_hasVariableName "lastSkillIsOne" ;
+                                                  ag:dp_hasVariableType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_ProduktionMitStoerung_D3_pPer
+ag:Var_FB_ProduktionMitStoerung_D3_pPer rdf:type owl:NamedIndividual ,
+                                                 ag:class_Variable ;
+                                        ag:op_representsFBInstance ag:FBInst_FB_ProduktionMitStoerung_D3_pPer ;
+                                        ag:dp_hasVariableName "pPer" ;
+                                        ag:dp_hasVariableType "TP" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_ProduktionMitStoerung_D3_perEn
+ag:Var_FB_ProduktionMitStoerung_D3_perEn rdf:type owl:NamedIndividual ,
+                                                  ag:class_Variable ;
+                                         ag:dp_hasVariableName "perEn" ;
+                                         ag:dp_hasVariableType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_ProduktionMitStoerung_D3_rPer
+ag:Var_FB_ProduktionMitStoerung_D3_rPer rdf:type owl:NamedIndividual ,
+                                                 ag:class_Variable ;
+                                        ag:op_representsFBInstance ag:FBInst_FB_ProduktionMitStoerung_D3_rPer ;
+                                        ag:dp_hasVariableName "rPer" ;
+                                        ag:dp_hasVariableType "R_TRIG" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_ProduktionMitStoerung_D3_rStart
+ag:Var_FB_ProduktionMitStoerung_D3_rStart rdf:type owl:NamedIndividual ,
+                                                   ag:class_Variable ;
+                                          ag:op_representsFBInstance ag:FBInst_FB_ProduktionMitStoerung_D3_rStart ;
+                                          ag:dp_hasVariableName "rStart" ;
+                                          ag:dp_hasVariableType "R_TRIG" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_ProduktionMitStoerung_D3_rStep1
+ag:Var_FB_ProduktionMitStoerung_D3_rStep1 rdf:type owl:NamedIndividual ,
+                                                   ag:class_Variable ;
+                                          ag:op_representsFBInstance ag:FBInst_FB_ProduktionMitStoerung_D3_rStep1 ;
+                                          ag:dp_hasVariableName "rStep1" ;
+                                          ag:dp_hasVariableType "R_TRIG" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_ProduktionMitStoerung_D3_rtStoer
+ag:Var_FB_ProduktionMitStoerung_D3_rtStoer rdf:type owl:NamedIndividual ,
+                                                    ag:class_Variable ;
+                                           ag:op_representsFBInstance ag:FBInst_FB_ProduktionMitStoerung_D3_rtStoer ;
+                                           ag:dp_hasVariableName "rtStoer" ;
+                                           ag:dp_hasVariableType "R_TRIG" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_ProduktionMitStoerung_D3_tPer
+ag:Var_FB_ProduktionMitStoerung_D3_tPer rdf:type owl:NamedIndividual ,
+                                                 ag:class_Variable ;
+                                        ag:op_representsFBInstance ag:FBInst_FB_ProduktionMitStoerung_D3_tPer ;
+                                        ag:dp_hasVariableName "tPer" ;
+                                        ag:dp_hasVariableType "TON" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_ProduktionMitStoerung_D3_tSchritt3
+ag:Var_FB_ProduktionMitStoerung_D3_tSchritt3 rdf:type owl:NamedIndividual ,
+                                                      ag:class_Variable ;
+                                             ag:op_representsFBInstance ag:FBInst_FB_ProduktionMitStoerung_D3_tSchritt3 ;
+                                             ag:dp_hasVariableName "tSchritt3" ;
+                                             ag:dp_hasVariableType "TON" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_ProduktionMitStoerung_D3_tSchritt4
+ag:Var_FB_ProduktionMitStoerung_D3_tSchritt4 rdf:type owl:NamedIndividual ,
+                                                      ag:class_Variable ;
+                                             ag:op_representsFBInstance ag:FBInst_FB_ProduktionMitStoerung_D3_tSchritt4 ;
+                                             ag:dp_hasVariableName "tSchritt4" ;
+                                             ag:dp_hasVariableType "TON" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_ProduktionMitStoerung_D3_tpRestart
+ag:Var_FB_ProduktionMitStoerung_D3_tpRestart rdf:type owl:NamedIndividual ,
+                                                      ag:class_Variable ;
+                                             ag:dp_hasVariableName "tpRestart" ;
+                                             ag:dp_hasVariableType "INT" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_FB_ProduktionMitStoerung_D3_z
+ag:Var_FB_ProduktionMitStoerung_D3_z rdf:type owl:NamedIndividual ,
+                                              ag:class_Variable ;
+                                     ag:dp_hasVariableName "z" ;
+                                     ag:dp_hasVariableType "INT" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MAIN_A2_angefordert
+ag:Var_MAIN_A2_angefordert rdf:type owl:NamedIndividual ,
+                                    ag:class_Variable ;
+                           ag:dp_hasVariableName "A2_angefordert" ;
+                           ag:dp_hasVariableType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MAIN_D3_angefordert
+ag:Var_MAIN_D3_angefordert rdf:type owl:NamedIndividual ,
+                                    ag:class_Variable ;
+                           ag:dp_hasVariableName "D3_angefordert" ;
+                           ag:dp_hasVariableType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MAIN_Init_erreicht
+ag:Var_MAIN_Init_erreicht rdf:type owl:NamedIndividual ,
+                                   ag:class_Variable ;
+                          ag:dp_hasVariableName "Init_erreicht" ;
+                          ag:dp_hasVariableType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MAIN_Init_start
+ag:Var_MAIN_Init_start rdf:type owl:NamedIndividual ,
+                                ag:class_Variable ;
+                       ag:dp_hasVariableName "Init_start" ;
+                       ag:dp_hasVariableType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MAIN_Start_eff
+ag:Var_MAIN_Start_eff rdf:type owl:NamedIndividual ,
+                               ag:class_Variable ;
+                      ag:dp_hasVariableName "Start_eff" ;
+                      ag:dp_hasVariableType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MAIN_Weiter_eff
+ag:Var_MAIN_Weiter_eff rdf:type owl:NamedIndividual ,
+                                ag:class_Variable ;
+                       ag:dp_hasVariableName "Weiter_eff" ;
+                       ag:dp_hasVariableType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MAIN_Zyklus_beendet
+ag:Var_MAIN_Zyklus_beendet rdf:type owl:NamedIndividual ,
+                                    ag:class_Variable ;
+                           ag:dp_hasVariableName "Zyklus_beendet" ;
+                           ag:dp_hasVariableType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MAIN_alt_abort
+ag:Var_MAIN_alt_abort rdf:type owl:NamedIndividual ,
+                               ag:class_Variable ;
+                      ag:dp_hasVariableName "alt_abort" ;
+                      ag:dp_hasVariableType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MAIN_alt_found
+ag:Var_MAIN_alt_found rdf:type owl:NamedIndividual ,
+                               ag:class_Variable ;
+                      ag:dp_hasVariableName "alt_found" ;
+                      ag:dp_hasVariableType "BOOL" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MAIN_edgeDone
+ag:Var_MAIN_edgeDone rdf:type owl:NamedIndividual ,
+                              ag:class_Variable ;
+                     ag:op_representsFBInstance ag:FBInst_MAIN_edgeDone ;
+                     ag:dp_hasVariableName "edgeDone" ;
+                     ag:dp_hasVariableType "R_TRIG" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MAIN_edgeF1
+ag:Var_MAIN_edgeF1 rdf:type owl:NamedIndividual ,
+                            ag:class_Variable ;
+                   ag:op_representsFBInstance ag:FBInst_MAIN_edgeF1 ;
+                   ag:dp_hasVariableName "edgeF1" ;
+                   ag:dp_hasVariableType "R_TRIG" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MAIN_fbAuto
+ag:Var_MAIN_fbAuto rdf:type owl:NamedIndividual ,
+                            ag:class_Variable ;
+                   ag:op_representsFBInstance ag:FBInst_MAIN_fbAuto ;
+                   ag:dp_hasVariableName "fbAuto" ;
+                   ag:dp_hasVariableType "FB_Automatikbetrieb_F1" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MAIN_fbBA
+ag:Var_MAIN_fbBA rdf:type owl:NamedIndividual ,
+                          ag:class_Variable ;
+                 ag:op_representsFBInstance ag:FBInst_MAIN_fbBA ;
+                 ag:dp_hasVariableName "fbBA" ;
+                 ag:dp_hasVariableType "FB_Betriebsarten" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MAIN_fbDiag
+ag:Var_MAIN_fbDiag rdf:type owl:NamedIndividual ,
+                            ag:class_Variable ;
+                   ag:op_representsFBInstance ag:FBInst_MAIN_fbDiag ;
+                   ag:dp_hasVariableName "fbDiag" ;
+                   ag:dp_hasVariableType "FB_Diagnose_D2" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MAIN_fbInit
+ag:Var_MAIN_fbInit rdf:type owl:NamedIndividual ,
+                            ag:class_Variable ;
+                   ag:op_representsFBInstance ag:FBInst_MAIN_fbInit ;
+                   ag:dp_hasVariableName "fbInit" ;
+                   ag:dp_hasVariableType "FB_InitFahrt_A6_A2" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MAIN_fbJob
+ag:Var_MAIN_fbJob rdf:type owl:NamedIndividual ,
+                           ag:class_Variable ;
+                  ag:op_representsFBInstance ag:FBInst_MAIN_fbJob ;
+                  ag:dp_hasVariableName "fbJob" ;
+                  ag:dp_hasVariableType "FB_Methode1Job" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MAIN_fbNot
+ag:Var_MAIN_fbNot rdf:type owl:NamedIndividual ,
+                           ag:class_Variable ;
+                  ag:op_representsFBInstance ag:FBInst_MAIN_fbNot ;
+                  ag:dp_hasVariableName "fbNot" ;
+                  ag:dp_hasVariableType "FB_Notaus_D1" .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/Var_MAIN_fbProStoer
+ag:Var_MAIN_fbProStoer rdf:type owl:NamedIndividual ,
+                                ag:class_Variable ;
+                       ag:op_representsFBInstance ag:FBInst_MAIN_fbProStoer ;
+                       ag:dp_hasVariableName "fbProStoer" ;
+                       ag:dp_hasVariableType "FB_ProduktionMitStoerung_D3" .
+
+
+###  Generated by the OWL API (version 4.5.29.2024-05-13T12:11:03Z) https://github.com/owlcs/owlapi

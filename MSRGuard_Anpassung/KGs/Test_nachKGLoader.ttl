@@ -1,0 +1,2491 @@
+@prefix ag: <http://www.semanticweb.org/AgentProgramParams/> .
+@prefix dp: <http://www.semanticweb.org/AgentProgramParams/dp_> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+ag: a owl:Ontology .
+
+ag:GVLList_GVL a ag:class_GlobalVariableList ;
+    dp:hasGlobalVariableListName "GVL" ;
+    ag:op_listsGlobalVariable ag:GVL__dot__DiagnoseRequested,
+        ag:GVL__dot__Fehler,
+        ag:GVL__dot__NotStopp,
+        ag:GVL__dot__Start,
+        ag:GVL__dot__Stopp,
+        ag:GVL__dot__Weiter .
+
+ag:GVLList_OPCUA a ag:class_GlobalVariableList ;
+    dp:hasGlobalVariableListName "OPCUA" ;
+    ag:op_listsGlobalVariable ag:OPCUA__dot__Alt_abort,
+        ag:OPCUA__dot__Alt_found,
+        ag:OPCUA__dot__DiagnoseFinished,
+        ag:OPCUA__dot__M1,
+        ag:OPCUA__dot__M2,
+        ag:OPCUA__dot__M3,
+        ag:OPCUA__dot__TriggerD1,
+        ag:OPCUA__dot__TriggerD2,
+        ag:OPCUA__dot__TriggerD3,
+        ag:OPCUA__dot__Z1,
+        ag:OPCUA__dot__Z2,
+        ag:OPCUA__dot__Z3,
+        ag:OPCUA__dot__bool1,
+        ag:OPCUA__dot__bool2,
+        ag:OPCUA__dot__bool3,
+        ag:OPCUA__dot__lastExecutedProcess,
+        ag:OPCUA__dot__lastExecutedSkill .
+
+ag:PLCProject__Proj1 a ag:class_PLCProject ;
+    dp:hasPLCProjectName "Proj1" ;
+    ag:op_consistsOfPOU ag:FBType_FB_Automatikbetrieb_F1,
+        ag:FBType_FB_Betriebsarten,
+        ag:FBType_FB_Diagnose_D2,
+        ag:FBType_FB_InitFahrt_A6_A2,
+        ag:FBType_FB_Methode1Job,
+        ag:FBType_FB_Notaus_D1,
+        ag:FBType_FB_ProduktionMitStoerung_D3,
+        ag:Program_MAIN .
+
+ag:StandardFBType_CTD a ag:class_FBType,
+        ag:class_StandardFBType,
+        owl:NamedIndividual ;
+    dp:hasPOULanguage "ST" ;
+    dp:hasPOUName "CTD" ;
+    dp:hasPOUType "FunctionBlock" ;
+    ag:op_hasPort ag:Port_CTD_CD,
+        ag:Port_CTD_CV,
+        ag:Port_CTD_LD,
+        ag:Port_CTD_PV,
+        ag:Port_CTD_Q .
+
+ag:StandardFBType_CTU a ag:class_FBType,
+        ag:class_StandardFBType,
+        owl:NamedIndividual ;
+    dp:hasPOULanguage "ST" ;
+    dp:hasPOUName "CTU" ;
+    dp:hasPOUType "FunctionBlock" ;
+    ag:op_hasPort ag:Port_CTU_CU,
+        ag:Port_CTU_CV,
+        ag:Port_CTU_PV,
+        ag:Port_CTU_Q,
+        ag:Port_CTU_R .
+
+ag:StandardFBType_CTUD a ag:class_FBType,
+        ag:class_StandardFBType,
+        owl:NamedIndividual ;
+    dp:hasPOULanguage "ST" ;
+    dp:hasPOUName "CTUD" ;
+    dp:hasPOUType "FunctionBlock" ;
+    ag:op_hasPort ag:Port_CTUD_CD,
+        ag:Port_CTUD_CU,
+        ag:Port_CTUD_CV,
+        ag:Port_CTUD_LD,
+        ag:Port_CTUD_PV,
+        ag:Port_CTUD_QD,
+        ag:Port_CTUD_QU,
+        ag:Port_CTUD_R .
+
+ag:StandardFBType_F_TRIG a ag:class_FBType,
+        ag:class_StandardFBType,
+        owl:NamedIndividual ;
+    dp:hasPOULanguage "ST" ;
+    dp:hasPOUName "F_TRIG" ;
+    dp:hasPOUType "FunctionBlock" ;
+    ag:op_hasPort ag:Port_F_TRIG_CLK,
+        ag:Port_F_TRIG_Q .
+
+ag:StandardFBType_SR a ag:class_FBType,
+        ag:class_StandardFBType,
+        owl:NamedIndividual ;
+    dp:hasPOULanguage "ST" ;
+    dp:hasPOUName "SR" ;
+    dp:hasPOUType "FunctionBlock" ;
+    ag:op_hasPort ag:Port_SR_Q1,
+        ag:Port_SR_R,
+        ag:Port_SR_S1 .
+
+ag:StandardFBType_TOF a ag:class_FBType,
+        ag:class_StandardFBType,
+        owl:NamedIndividual ;
+    dp:hasPOULanguage "ST" ;
+    dp:hasPOUName "TOF" ;
+    dp:hasPOUType "FunctionBlock" ;
+    ag:op_hasPort ag:Port_TOF_ET,
+        ag:Port_TOF_IN,
+        ag:Port_TOF_PT,
+        ag:Port_TOF_Q .
+
+ag:class_CustomFBType a owl:Class ;
+    rdfs:subClassOf ag:class_FBType .
+
+dp:hasConsistencyReport a owl:DatatypeProperty ;
+    rdfs:domain ag:class_POU ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf dp:hasPOUAttribute .
+
+dp:hasDescription a owl:DatatypeProperty ;
+    rdfs:domain ag:class_Variable ;
+    rdfs:range xsd:string .
+
+dp:hasGlobalVariableListName a owl:DatatypeProperty ;
+    rdfs:domain ag:class_GlobalVariableList ;
+    rdfs:range xsd:string .
+
+dp:hasHardwareAddress a owl:DatatypeProperty ;
+    rdfs:domain ag:class_Variable ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf owl:topDataProperty .
+
+dp:hasPLCProjectName a owl:DatatypeProperty ;
+    rdfs:domain ag:class_PLCProject ;
+    rdfs:range xsd:string .
+
+dp:hasPOUCode a owl:DatatypeProperty ;
+    rdfs:domain ag:class_POU ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf dp:hasPOUAttribute .
+
+dp:hasPOUCodeDescription a owl:DatatypeProperty ;
+    rdfs:domain ag:class_POU ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf dp:hasPOUAttribute .
+
+dp:hasPOULanguage a owl:DatatypeProperty ;
+    rdfs:domain ag:class_POU ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf dp:hasPOUAttribute .
+
+dp:hasPOUName a owl:DatatypeProperty ;
+    rdfs:domain ag:class_POU ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf dp:hasPOUAttribute .
+
+dp:hasPOUType a owl:DatatypeProperty ;
+    rdfs:domain ag:class_POU ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf dp:hasPOUAttribute .
+
+dp:hasPortDirection a owl:DatatypeProperty ;
+    rdfs:domain ag:class_Port ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf dp:hasPortAttribute .
+
+dp:hasPortName a owl:DatatypeProperty ;
+    rdfs:domain ag:class_Port ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf dp:hasPortAttribute .
+
+dp:hasPortType a owl:DatatypeProperty ;
+    rdfs:domain ag:class_Port ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf dp:hasPortAttribute .
+
+dp:hasVariableName a owl:DatatypeProperty ;
+    rdfs:domain ag:class_Variable ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf dp:hasVariableAttribute .
+
+dp:hasVariableScope a owl:DatatypeProperty ;
+    rdfs:range [ a rdfs:Datatype ;
+            owl:oneOf [ a rdf:List ;
+                    rdf:first "global" ;
+                    rdf:rest [ a rdf:List ;
+                            rdf:first "input" ;
+                            rdf:rest [ a rdf:List ;
+                                    rdf:first "local" ;
+                                    rdf:rest [ a rdf:List ;
+                                            rdf:first "output" ;
+                                            rdf:rest () ] ] ] ] ] ;
+    rdfs:subPropertyOf dp:hasVariableAttribute .
+
+dp:hasVariableType a owl:DatatypeProperty ;
+    rdfs:domain ag:class_Variable ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf dp:hasVariableAttribute .
+
+dp:ioRawXml a owl:DatatypeProperty ;
+    rdfs:domain ag:class_Variable ;
+    rdfs:range xsd:string .
+
+dp:isUnusedPort a owl:DatatypeProperty ;
+    rdfs:domain ag:class_Port ;
+    rdfs:range xsd:boolean ;
+    rdfs:subPropertyOf dp:isUnused .
+
+dp:isUnusedVar a owl:DatatypeProperty ;
+    rdfs:domain ag:class_Variable ;
+    rdfs:range xsd:boolean ;
+    rdfs:subPropertyOf dp:isUnused .
+
+ag:op_assignsFrom a owl:ObjectProperty ;
+    rdfs:comment "# 2. Woher kommt das Signal? Hier ist die Signal-Quelle bei Funktionsaufruf" ;
+    rdfs:domain ag:class_ParameterAssignment ;
+    rdfs:range ag:class_SignalSource .
+
+ag:op_assignsToPort a owl:ObjectProperty ;
+    rdfs:comment "# 1. Wohin geht das Signal? (Zum Port \"CLK\" definiert im Typ R_TRIG)" ;
+    rdfs:domain ag:class_ParameterAssignment ;
+    rdfs:range ag:class_Port .
+
+ag:op_callsPOU a owl:ObjectProperty ;
+    rdfs:domain ag:class_POUCall ;
+    rdfs:range ag:class_POU .
+
+ag:op_consistsOfPOU a owl:ObjectProperty ;
+    rdfs:domain ag:class_PLCProject ;
+    rdfs:range ag:class_POU .
+
+ag:op_containsPOUCall a owl:ObjectProperty ;
+    rdfs:domain ag:class_POU ;
+    rdfs:range ag:class_POUCall .
+
+ag:op_hasAssignment a owl:ObjectProperty ;
+    rdfs:domain ag:class_POUCall ;
+    rdfs:range ag:class_ParameterAssignment .
+
+ag:op_hasCallerVariable a owl:ObjectProperty ;
+    rdfs:domain ag:class_POUCall ;
+    rdfs:range ag:class_Variable .
+
+ag:op_hasInfluenceOnVariable a owl:ObjectProperty ;
+    rdfs:domain ag:class_Variable ;
+    rdfs:range ag:class_Variable .
+
+ag:op_hasPort a owl:ObjectProperty ;
+    rdfs:domain ag:class_FBType ;
+    rdfs:range ag:class_Port .
+
+ag:op_implementsPort a owl:ObjectProperty ;
+    rdfs:comment "Verbindet eine interne Variable eines FBs mit dem Port, den sie repräsentiert" ;
+    rdfs:domain ag:class_Variable ;
+    rdfs:range ag:class_Port .
+
+ag:op_instantiatesPort a owl:ObjectProperty ;
+    rdfs:domain ag:class_PortInstance ;
+    rdfs:range ag:class_Port .
+
+ag:op_isBoundToChannel a owl:ObjectProperty ;
+    rdfs:domain ag:class_Variable ;
+    rdfs:range ag:class_IOChannel .
+
+ag:op_isBoundToPort a owl:ObjectProperty ;
+    rdfs:domain ag:class_Variable ;
+    rdfs:range ag:class_Port .
+
+ag:op_isInstanceOfFBType a owl:ObjectProperty ;
+    rdfs:domain ag:class_FBInstance ;
+    rdfs:range ag:class_FBType .
+
+ag:op_isInstanceOfPort a owl:ObjectProperty ;
+    rdfs:domain ag:class_PortInstance ;
+    rdfs:range ag:class_Port .
+
+ag:op_isMappedToPOU a owl:ObjectProperty ;
+    rdfs:domain ag:class_Variable ;
+    rdfs:range ag:class_POU .
+
+ag:op_isMappedToVariable a owl:ObjectProperty ;
+    rdfs:domain ag:class_Variable ;
+    rdfs:range ag:class_Variable .
+
+ag:op_isPortOfInstance a owl:ObjectProperty ;
+    rdfs:domain ag:class_PortInstance ;
+    rdfs:range ag:class_FBInstance .
+
+ag:op_isSubProgramOf a owl:ObjectProperty ;
+    rdfs:domain ag:class_Program ;
+    rdfs:range ag:class_Program .
+
+ag:op_listsGlobalVariable a owl:ObjectProperty ;
+    rdfs:domain ag:class_GlobalVariableList ;
+    rdfs:range ag:class_Variable .
+
+ag:op_representsFBInstance a owl:ObjectProperty ;
+    rdfs:domain ag:class_Variable ;
+    rdfs:range ag:class_FBInstance .
+
+ag:op_usesLiteral a owl:ObjectProperty ;
+    rdfs:domain ag:class_POU ;
+    rdfs:range ag:class_SourceLiteral .
+
+ag:op_usesPort a owl:ObjectProperty ;
+    rdfs:domain ag:class_Variable ;
+    rdfs:range ag:class_Port .
+
+ag:op_usesVariable a owl:ObjectProperty ;
+    rdfs:domain ag:class_POU ;
+    rdfs:range ag:class_Variable .
+
+ag:FBInst_FB_Automatikbetrieb_F1_pPer a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_TP .
+
+ag:FBInst_FB_Automatikbetrieb_F1_rPer a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+ag:FBInst_FB_Automatikbetrieb_F1_rStart a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+ag:FBInst_FB_Automatikbetrieb_F1_rStep1 a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+ag:FBInst_FB_Automatikbetrieb_F1_rtStoer a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+ag:FBInst_FB_Automatikbetrieb_F1_tPer a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_TON .
+
+ag:FBInst_FB_Automatikbetrieb_F1_tSchritt1 a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_TON .
+
+ag:FBInst_FB_Automatikbetrieb_F1_tSchritt2 a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_TON .
+
+ag:FBInst_FB_Betriebsarten_RS_A1 a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_RS .
+
+ag:FBInst_FB_Betriebsarten_RS_A2 a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_RS .
+
+ag:FBInst_FB_Betriebsarten_RS_A5 a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_RS .
+
+ag:FBInst_FB_Betriebsarten_RS_A6 a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_RS .
+
+ag:FBInst_FB_Betriebsarten_RS_AutomaticOperationMode a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_RS .
+
+ag:FBInst_FB_Betriebsarten_RS_CycleEnded a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_RS .
+
+ag:FBInst_FB_Betriebsarten_RS_D1 a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_RS .
+
+ag:FBInst_FB_Betriebsarten_RS_D2 a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_RS .
+
+ag:FBInst_FB_Betriebsarten_RS_D3 a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_RS .
+
+ag:FBInst_FB_Betriebsarten_RS_F1 a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_RS .
+
+ag:FBInst_FB_Betriebsarten_RS_InitialDrive a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_RS .
+
+ag:FBInst_FB_Betriebsarten_RS_InitialState a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_RS .
+
+ag:FBInst_FB_Betriebsarten_RS_ManualOperationMode a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_RS .
+
+ag:FBInst_FB_Betriebsarten_R_TRIG_Automatic a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+ag:FBInst_FB_Betriebsarten_R_TRIG_CycleEnded a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+ag:FBInst_FB_Betriebsarten_R_TRIG_Init a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+ag:FBInst_FB_Betriebsarten_R_TRIG_InitialDrive a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+ag:FBInst_FB_Betriebsarten_R_TRIG_Manual a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+ag:FBInst_FB_Diagnose_D2_rtAck a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+ag:FBInst_FB_Diagnose_D2_rtD3 a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+ag:FBInst_FB_Diagnose_D2_rtFinished a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+ag:FBInst_FB_Diagnose_D2_rtReq a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+ag:FBInst_FB_Diagnose_D2_tpPulse a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_TP .
+
+ag:FBInst_FB_InitFahrt_A6_A2_tInit a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_TON .
+
+ag:FBInst_FB_Methode1Job_t20s a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_TON .
+
+ag:FBInst_FB_Notaus_D1_ton5s a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_TON .
+
+ag:FBInst_FB_ProduktionMitStoerung_D3_pPer a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_TP .
+
+ag:FBInst_FB_ProduktionMitStoerung_D3_rPer a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+ag:FBInst_FB_ProduktionMitStoerung_D3_rStart a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+ag:FBInst_FB_ProduktionMitStoerung_D3_rStep1 a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+ag:FBInst_FB_ProduktionMitStoerung_D3_rtStoer a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+ag:FBInst_FB_ProduktionMitStoerung_D3_tPer a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_TON .
+
+ag:FBInst_FB_ProduktionMitStoerung_D3_tSchritt3 a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_TON .
+
+ag:FBInst_FB_ProduktionMitStoerung_D3_tSchritt4 a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_TON .
+
+ag:FBInst_MAIN_edgeDone a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+ag:FBInst_MAIN_edgeF1 a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+ag:FBInst_MAIN_fbAuto a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:FBType_FB_Automatikbetrieb_F1 .
+
+ag:FBInst_MAIN_fbBA a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:FBType_FB_Betriebsarten .
+
+ag:FBInst_MAIN_fbDiag a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:FBType_FB_Diagnose_D2 .
+
+ag:FBInst_MAIN_fbInit a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:FBType_FB_InitFahrt_A6_A2 .
+
+ag:FBInst_MAIN_fbJob a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:FBType_FB_Methode1Job .
+
+ag:FBInst_MAIN_fbNot a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:FBType_FB_Notaus_D1 .
+
+ag:FBInst_MAIN_fbProStoer a ag:class_FBInstance ;
+    ag:op_isInstanceOfFBType ag:FBType_FB_ProduktionMitStoerung_D3 .
+
+ag:GVL__dot__DiagnoseRequested a ag:class_Variable ;
+    dp:hasVariableName "DiagnoseRequested",
+        "GVL.DiagnoseRequested" ;
+    dp:hasVariableType "BOOL" .
+
+ag:GVL__dot__Fehler a ag:class_Variable ;
+    dp:hasVariableName "Fehler",
+        "GVL.Fehler" ;
+    dp:hasVariableScope "global" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_isBoundToPort ag:Port_FB_Betriebsarten_Fehler .
+
+ag:GVL__dot__NotStopp a ag:class_Variable ;
+    dp:hasInitialValue "TRUE" ;
+    dp:hasVariableName "GVL.NotStopp",
+        "NotStopp" ;
+    dp:hasVariableType "BOOL" .
+
+ag:GVL__dot__Start a ag:class_Variable ;
+    dp:hasVariableName "GVL.Start",
+        "Start" ;
+    dp:hasVariableScope "global" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_isBoundToPort ag:Port_FB_Betriebsarten_Start .
+
+ag:GVL__dot__Stopp a ag:class_Variable ;
+    dp:hasInitialValue "FALSE" ;
+    dp:hasVariableName "GVL.Stopp",
+        "Stopp" ;
+    dp:hasVariableType "BOOL" .
+
+ag:GVL__dot__Weiter a ag:class_Variable ;
+    dp:hasVariableName "GVL.Weiter",
+        "Weiter" ;
+    dp:hasVariableScope "global" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_isBoundToPort ag:Port_FB_Betriebsarten_Weiter .
+
+ag:OPCUA__dot__Alt_abort a ag:class_Variable ;
+    dp:hasInitialValue "FALSE" ;
+    dp:hasVariableName "Alt_abort",
+        "OPCUA.Alt_abort" ;
+    dp:hasVariableType "BOOL" .
+
+ag:OPCUA__dot__Alt_found a ag:class_Variable ;
+    dp:hasInitialValue "FALSE" ;
+    dp:hasVariableName "Alt_found",
+        "OPCUA.Alt_found" ;
+    dp:hasVariableType "BOOL" .
+
+ag:OPCUA__dot__DiagnoseFinished a ag:class_Variable ;
+    dp:hasInitialValue "FALSE" ;
+    dp:hasVariableName "DiagnoseFinished",
+        "OPCUA.DiagnoseFinished" ;
+    dp:hasVariableType "BOOL" .
+
+ag:OPCUA__dot__M1 a ag:class_Variable ;
+    dp:hasInitialValue "0" ;
+    dp:hasVariableName "M1",
+        "OPCUA.M1" ;
+    dp:hasVariableType "INT" .
+
+ag:OPCUA__dot__M2 a ag:class_Variable ;
+    dp:hasInitialValue "0" ;
+    dp:hasVariableName "M2",
+        "OPCUA.M2" ;
+    dp:hasVariableType "INT" .
+
+ag:OPCUA__dot__M3 a ag:class_Variable ;
+    dp:hasInitialValue "0" ;
+    dp:hasVariableName "M3",
+        "OPCUA.M3" ;
+    dp:hasVariableType "INT" .
+
+ag:OPCUA__dot__TriggerD1 a ag:class_Variable ;
+    dp:hasInitialValue "FALSE" ;
+    dp:hasVariableName "OPCUA.TriggerD1",
+        "TriggerD1" ;
+    dp:hasVariableType "BOOL" .
+
+ag:OPCUA__dot__TriggerD2 a ag:class_Variable ;
+    dp:hasInitialValue "FALSE" ;
+    dp:hasVariableName "OPCUA.TriggerD2",
+        "TriggerD2" ;
+    dp:hasVariableType "BOOL" .
+
+ag:OPCUA__dot__TriggerD3 a ag:class_Variable ;
+    dp:hasInitialValue "FALSE" ;
+    dp:hasVariableName "OPCUA.TriggerD3",
+        "TriggerD3" ;
+    dp:hasVariableType "BOOL" .
+
+ag:OPCUA__dot__Z1 a ag:class_Variable ;
+    dp:hasInitialValue "0" ;
+    dp:hasVariableName "OPCUA.Z1",
+        "Z1" ;
+    dp:hasVariableType "INT" .
+
+ag:OPCUA__dot__Z2 a ag:class_Variable ;
+    dp:hasInitialValue "0" ;
+    dp:hasVariableName "OPCUA.Z2",
+        "Z2" ;
+    dp:hasVariableType "INT" .
+
+ag:OPCUA__dot__Z3 a ag:class_Variable ;
+    dp:hasInitialValue "0" ;
+    dp:hasVariableName "OPCUA.Z3",
+        "Z3" ;
+    dp:hasVariableType "INT" .
+
+ag:OPCUA__dot__bool1 a ag:class_Variable ;
+    dp:hasInitialValue "FALSE" ;
+    dp:hasVariableName "OPCUA.bool1",
+        "bool1" ;
+    dp:hasVariableType "BOOL" .
+
+ag:OPCUA__dot__bool2 a ag:class_Variable ;
+    dp:hasInitialValue "FALSE" ;
+    dp:hasVariableName "OPCUA.bool2",
+        "bool2" ;
+    dp:hasVariableType "BOOL" .
+
+ag:OPCUA__dot__bool3 a ag:class_Variable ;
+    dp:hasInitialValue "FALSE" ;
+    dp:hasVariableName "OPCUA.bool3",
+        "bool3" ;
+    dp:hasVariableType "BOOL" .
+
+ag:OPCUA__dot__lastExecutedProcess a ag:class_Variable ;
+    dp:hasInitialValue "''" ;
+    dp:hasVariableName "OPCUA.lastExecutedProcess",
+        "lastExecutedProcess" ;
+    dp:hasVariableType "STRING" .
+
+ag:OPCUA__dot__lastExecutedSkill a ag:class_Variable ;
+    dp:hasInitialValue "''" ;
+    dp:hasVariableName "OPCUA.lastExecutedSkill",
+        "lastExecutedSkill" ;
+    dp:hasVariableType "STRING" .
+
+ag:Port_CTD_CD a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "CD" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_CTD_CV a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "CV" ;
+    dp:hasPortType "INT" .
+
+ag:Port_CTD_LD a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "LD" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_CTD_PV a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "PV" ;
+    dp:hasPortType "INT" .
+
+ag:Port_CTD_Q a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "Q" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_CTUD_CD a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "CD" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_CTUD_CU a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "CU" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_CTUD_CV a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "CV" ;
+    dp:hasPortType "INT" .
+
+ag:Port_CTUD_LD a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "LD" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_CTUD_PV a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "PV" ;
+    dp:hasPortType "INT" .
+
+ag:Port_CTUD_QD a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "QD" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_CTUD_QU a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "QU" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_CTUD_R a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "R" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_CTU_CU a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "CU" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_CTU_CV a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "CV" ;
+    dp:hasPortType "INT" .
+
+ag:Port_CTU_PV a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "PV" ;
+    dp:hasPortType "INT" .
+
+ag:Port_CTU_Q a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "Q" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_CTU_R a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "R" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_F_TRIG_CLK a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "CLK" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_F_TRIG_Q a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "Q" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_RS_Q1 a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "Q1" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_RS_R1 a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "R1" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_RS_S a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "S" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_R_TRIG_CLK a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "CLK" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_R_TRIG_Q a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "Q" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_SR_Q1 a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "Q1" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_SR_R a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "R" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_SR_S1 a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "S1" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_TOF_ET a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "ET" ;
+    dp:hasPortType "TIME" .
+
+ag:Port_TOF_IN a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "IN" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_TOF_PT a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "PT" ;
+    dp:hasPortType "TIME" .
+
+ag:Port_TOF_Q a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "Q" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_TON_ET a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "ET" ;
+    dp:hasPortType "TIME" .
+
+ag:Port_TON_IN a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "IN" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_TON_PT a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "PT" ;
+    dp:hasPortType "TIME" .
+
+ag:Port_TON_Q a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "Q" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_TP_ET a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "ET" ;
+    dp:hasPortType "TIME" .
+
+ag:Port_TP_IN a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "IN" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_TP_PT a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "PT" ;
+    dp:hasPortType "TIME" .
+
+ag:Port_TP_Q a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "Q" ;
+    dp:hasPortType "BOOL" .
+
+ag:Program_MAIN a ag:class_Program ;
+    dp:hasPOUCode """// POU MAIN body
+edgeDone(CLK := fbDiag.Diagnose_beendet);
+
+
+Start_eff  := GVL.Start  OR edgeDone.Q;
+Weiter_eff := GVL.Weiter OR edgeDone.Q;
+
+
+fbBA(
+    Start         := Start_eff,
+    NotStop       := GVL.NotStopp,
+    Weiter        := Weiter_eff,
+    Fehler        := GVL.Fehler,
+	Start_Init 	  := Init_Start,                  
+    Auto_Fertig   := fbAuto.Automatikbetrieb_Fertig,
+    Auto_Stoerung := fbAuto.Stoerung_erkannt,
+	A2_Requested := A2_angefordert,
+	Alt_abort := alt_abort,
+	Alt_found := alt_found,
+	D3_Requested := D3_angefordert,
+	Init_reached := Init_erreicht,
+	Cycle_ended := Zyklus_beendet
+);
+
+
+edgeF1(CLK := fbBA.F1);
+fbAuto(Automatikbetrieb_Starten := edgeF1.Q);
+
+fbNot(D1 := fbBA.D1);
+GVL.DiagnoseRequested := fbNot.Diagnose_gefordert;
+
+fbProStoer(ProduktionMitStoerung_Starten := fbBA.D3);
+alt_abort := fbProStoer.Stoerung_erkannt;
+
+
+fbInit(A6 := fbBA.A6, A2 := fbBA.A2);
+Init_erreicht := fbInit.Init_erreicht;
+
+
+fbDiag(Diagnose_gefordert := fbBA.D2);
+alt_found := fbDiag.Alt_gefunden;""" ;
+    dp:hasPOULanguage "ST" ;
+    dp:hasPOUName "MAIN" ;
+    dp:hasProgramName "MAIN" ;
+    ag:op_hasInternalVariable ag:Var_MAIN_A2_angefordert,
+        ag:Var_MAIN_D3_angefordert,
+        ag:Var_MAIN_Init_erreicht,
+        ag:Var_MAIN_Init_start,
+        ag:Var_MAIN_Start_eff,
+        ag:Var_MAIN_Weiter_eff,
+        ag:Var_MAIN_Zyklus_beendet,
+        ag:Var_MAIN_alt_abort,
+        ag:Var_MAIN_alt_found,
+        ag:Var_MAIN_edgeDone,
+        ag:Var_MAIN_edgeF1,
+        ag:Var_MAIN_fbAuto,
+        ag:Var_MAIN_fbBA,
+        ag:Var_MAIN_fbDiag,
+        ag:Var_MAIN_fbInit,
+        ag:Var_MAIN_fbJob,
+        ag:Var_MAIN_fbNot,
+        ag:Var_MAIN_fbProStoer ;
+    ag:op_usesVariable ag:Var_MAIN_A2_angefordert,
+        ag:Var_MAIN_D3_angefordert,
+        ag:Var_MAIN_Init_erreicht,
+        ag:Var_MAIN_Init_start,
+        ag:Var_MAIN_Start_eff,
+        ag:Var_MAIN_Weiter_eff,
+        ag:Var_MAIN_Zyklus_beendet,
+        ag:Var_MAIN_alt_abort,
+        ag:Var_MAIN_alt_found,
+        ag:Var_MAIN_edgeDone,
+        ag:Var_MAIN_edgeF1,
+        ag:Var_MAIN_fbAuto,
+        ag:Var_MAIN_fbBA,
+        ag:Var_MAIN_fbDiag,
+        ag:Var_MAIN_fbInit,
+        ag:Var_MAIN_fbJob,
+        ag:Var_MAIN_fbNot,
+        ag:Var_MAIN_fbProStoer .
+
+ag:class_IOChannel a owl:Class .
+
+ag:class_SourceLiteral a owl:Class ;
+    rdfs:subClassOf ag:class_SignalSource .
+
+ag:FBType_FB_Automatikbetrieb_F1 a ag:class_FBType ;
+    dp:hasPOUCode """// POU FB_Automatikbetrieb_F1 body
+IF GVL.Start THEN
+	AutoRestartEnable := TRUE;
+END_IF
+
+rStart(CLK := Automatikbetrieb_Starten);
+rStep1(CLK := Schritt1);
+
+
+IF (AutoRestartEnable AND NOT (Schritt1 OR Schritt2)) OR (Stoerung_erkannt AND GVL.Weiter) THEN
+    
+    Automatikbetrieb_Fertig := FALSE;
+    Stoerung_erkannt        := FALSE;
+	GVL.Weiter := FALSE;
+    
+    Schritt1 := TRUE;
+	OPCUA.lastExecutedProcess := 'ExTechnProcess1';
+    Schritt2 := FALSE;
+END_IF
+
+
+tSchritt1(IN := Schritt1, PT := T#55S);
+tSchritt2(IN := Schritt2, PT := T#55S);
+
+IF rStep1.Q THEN
+    lastSkillIsOne := NOT lastSkillIsOne;
+    IF lastSkillIsOne THEN
+        OPCUA.lastExecutedSkill := 'TestSkill1';
+    ELSE
+        OPCUA.lastExecutedSkill := 'TestSkill1';
+    END_IF
+END_IF
+
+IF rStart.Q AND NOT (Schritt1 OR Schritt2) THEN
+    Automatikbetrieb_Fertig := FALSE;
+    Stoerung_erkannt := FALSE;
+    GVL.Weiter := FALSE;
+    Schritt1 := TRUE;
+    Schritt2 := FALSE;
+    OPCUA.lastExecutedProcess := 'ExTechnProcess1';
+END_IF
+
+
+IF NOT Stoerung_erkannt THEN
+    
+    IF Schritt1 AND tSchritt1.Q THEN
+        Schritt1 := FALSE;
+        Schritt2 := TRUE;
+		OPCUA.lastExecutedSkill := 'TestSkill1';
+    END_IF
+
+    
+    IF Schritt2 AND tSchritt2.Q THEN
+        Schritt2 := FALSE;
+        Automatikbetrieb_Fertig := TRUE;
+        
+    END_IF
+END_IF
+
+
+IF rtStoer.Q THEN
+    Stoerung_erkannt := TRUE;
+END_IF
+
+
+tPer(IN := NOT tPer.Q, PT := PeriodicFaultPeriod);  
+
+
+rPer(CLK := tPer.Q);
+pPer(IN := rPer.Q, PT := FaultPulse);                
+
+
+IF (Schritt1 OR Schritt2) AND pPer.Q THEN
+    Stoerung_erkannt := TRUE;
+	GVL.Fehler := TRUE;
+END_IF""" ;
+    dp:hasPOULanguage "ST" ;
+    dp:hasPOUName "FB_Automatikbetrieb_F1" ;
+    ag:op_hasInternalVariable ag:Var_FB_Automatikbetrieb_F1_AutoRestartEnable,
+        ag:Var_FB_Automatikbetrieb_F1_Automatikbetrieb_Fertig,
+        ag:Var_FB_Automatikbetrieb_F1_Automatikbetrieb_Starten,
+        ag:Var_FB_Automatikbetrieb_F1_FaultPulse,
+        ag:Var_FB_Automatikbetrieb_F1_PeriodicFaultEnable,
+        ag:Var_FB_Automatikbetrieb_F1_PeriodicFaultPeriod,
+        ag:Var_FB_Automatikbetrieb_F1_RestartPulseLength,
+        ag:Var_FB_Automatikbetrieb_F1_Schritt1,
+        ag:Var_FB_Automatikbetrieb_F1_Schritt2,
+        ag:Var_FB_Automatikbetrieb_F1_Stoerung_erkannt,
+        ag:Var_FB_Automatikbetrieb_F1_Zwischen,
+        ag:Var_FB_Automatikbetrieb_F1_dbg_Stoerung_Manuell,
+        ag:Var_FB_Automatikbetrieb_F1_lastSkillIsOne,
+        ag:Var_FB_Automatikbetrieb_F1_pPer,
+        ag:Var_FB_Automatikbetrieb_F1_perEn,
+        ag:Var_FB_Automatikbetrieb_F1_rPer,
+        ag:Var_FB_Automatikbetrieb_F1_rStart,
+        ag:Var_FB_Automatikbetrieb_F1_rStep1,
+        ag:Var_FB_Automatikbetrieb_F1_rtStoer,
+        ag:Var_FB_Automatikbetrieb_F1_tPer,
+        ag:Var_FB_Automatikbetrieb_F1_tSchritt1,
+        ag:Var_FB_Automatikbetrieb_F1_tSchritt2,
+        ag:Var_FB_Automatikbetrieb_F1_tpRestart ;
+    ag:op_hasPort ag:Port_FB_Automatikbetrieb_F1_AutoRestartEnable,
+        ag:Port_FB_Automatikbetrieb_F1_Automatikbetrieb_Fertig,
+        ag:Port_FB_Automatikbetrieb_F1_Automatikbetrieb_Starten,
+        ag:Port_FB_Automatikbetrieb_F1_FaultPulse,
+        ag:Port_FB_Automatikbetrieb_F1_PeriodicFaultEnable,
+        ag:Port_FB_Automatikbetrieb_F1_PeriodicFaultPeriod,
+        ag:Port_FB_Automatikbetrieb_F1_Stoerung_erkannt ;
+    ag:op_usesVariable ag:Var_FB_Automatikbetrieb_F1_AutoRestartEnable,
+        ag:Var_FB_Automatikbetrieb_F1_Automatikbetrieb_Fertig,
+        ag:Var_FB_Automatikbetrieb_F1_Automatikbetrieb_Starten,
+        ag:Var_FB_Automatikbetrieb_F1_FaultPulse,
+        ag:Var_FB_Automatikbetrieb_F1_PeriodicFaultEnable,
+        ag:Var_FB_Automatikbetrieb_F1_PeriodicFaultPeriod,
+        ag:Var_FB_Automatikbetrieb_F1_RestartPulseLength,
+        ag:Var_FB_Automatikbetrieb_F1_Schritt1,
+        ag:Var_FB_Automatikbetrieb_F1_Schritt2,
+        ag:Var_FB_Automatikbetrieb_F1_Stoerung_erkannt,
+        ag:Var_FB_Automatikbetrieb_F1_Zwischen,
+        ag:Var_FB_Automatikbetrieb_F1_dbg_Stoerung_Manuell,
+        ag:Var_FB_Automatikbetrieb_F1_lastSkillIsOne,
+        ag:Var_FB_Automatikbetrieb_F1_pPer,
+        ag:Var_FB_Automatikbetrieb_F1_perEn,
+        ag:Var_FB_Automatikbetrieb_F1_rPer,
+        ag:Var_FB_Automatikbetrieb_F1_rStart,
+        ag:Var_FB_Automatikbetrieb_F1_rStep1,
+        ag:Var_FB_Automatikbetrieb_F1_rtStoer,
+        ag:Var_FB_Automatikbetrieb_F1_tPer,
+        ag:Var_FB_Automatikbetrieb_F1_tSchritt1,
+        ag:Var_FB_Automatikbetrieb_F1_tSchritt2,
+        ag:Var_FB_Automatikbetrieb_F1_tpRestart .
+
+ag:FBType_FB_Betriebsarten a ag:class_FBType ;
+    dp:hasPOUCode """import time
+
+def FB_Betriebsarten(V_10000000001: bool, D2: bool, A5: bool, GVL.Start: bool, A1: bool, D1: bool, D3: bool, V_30000000002: bool, V_30000000005: bool, GVL.Weiter: bool, GVL.NotStopp, A6, V_30000000011: bool, Auto_Stoerung, F1, GVL.DiagnoseRequested, Alt_abort, V_40000000012: bool, Alt_found, D3_Requested, A2, Init_reached, Cycle_ended, A2_Requested, Start_Init):
+    \"\"\"Auto-generated from PLCopen XML (vereinfachte Semantik).\"\"\"
+
+    def OR_1(V_10000000002, V_10000000003):
+        result = D2 or A5
+        return result
+    V_10000000004 = OR_1(D2, A5)
+
+    def RS_1(V_10000000001, V_10000000004):
+        result = V_10000000004
+        return result
+    V_10000000005 = RS_1(V_10000000001, V_10000000004)
+
+    def AND_1(V_20000000000, V_20000000001):
+        result = GVL.Start and A1
+        return result
+    V_20000000002 = AND_1(GVL.Start, A1)
+
+    def OR_2(V_20000000003, V_20000000004, V_20000000005):
+        result = D2 or D1 or D3
+        return result
+    V_20000000006 = OR_2(D2, D1, D3)
+
+    def RS_2(V_20000000002, V_20000000006):
+        result = V_20000000006
+        return result
+    V_20000000007 = RS_2(V_20000000002, V_20000000006)
+
+    def AND_2(V_30000000001, V_30000000002):
+        result = D1 and V_30000000002
+        return result
+    V_30000000003 = AND_2(D1, V_30000000002)
+
+    def OR_3(V_30000000000, V_30000000003):
+        result = D2 or V_30000000003
+        return result
+    V_30000000004 = OR_3(D2, V_30000000003)
+
+    def AND_3(V_30000000004, V_30000000005, V_30000000006, V_30000000007):
+        result = V_30000000004 and V_30000000005 and GVL.Weiter and GVL.NotStopp
+        return result
+    V_30000000008 = AND_3(V_30000000004, V_30000000005, GVL.Weiter, GVL.NotStopp)
+
+    def AND_4(V_30000000010, V_30000000011):
+        result = D1 and V_30000000011
+        return result
+    V_30000000012 = AND_4(D1, V_30000000011)
+
+    def OR_4(V_30000000009, V_30000000012):
+        result = A6 or V_30000000012
+        return result
+    V_30000000013 = OR_4(A6, V_30000000012)
+
+    def RS_3(V_30000000008, V_30000000013):
+        result = V_30000000013
+        return result
+    V_30000000014 = RS_3(V_30000000008, V_30000000013)
+
+    def AND_5(V_40000000000, V_40000000001):
+        result = Auto_Stoerung and F1
+        return result
+    V_40000000002 = AND_5(Auto_Stoerung, F1)
+
+    def AND_6(V_40000000003, V_40000000004, V_40000000005):
+        result = GVL.DiagnoseRequested and D1 and GVL.NotStopp
+        return result
+    V_40000000006 = AND_6(GVL.DiagnoseRequested, D1, GVL.NotStopp)
+
+    def AND_7(V_40000000007, V_40000000008):
+        result = D3 and Alt_abort
+        return result
+    V_40000000009 = AND_7(D3, Alt_abort)
+
+    def OR_5(V_40000000002, V_40000000006, V_40000000009):
+        result = V_40000000002 or V_40000000006 or V_40000000009
+        return result
+    V_40000000010 = OR_5(V_40000000002, V_40000000006, V_40000000009)
+
+    def AND_8(V_40000000011, V_40000000012):
+        result = D1 and V_40000000012
+        return result
+    V_40000000013 = AND_8(D1, V_40000000012)
+
+    def OR_6(V_40000000013, V_40000000014, V_40000000015):
+        result = V_40000000013 or D3 or A5
+        return result
+    V_40000000016 = OR_6(V_40000000013, D3, A5)
+
+    def RS_4(V_40000000010, V_40000000016):
+        result = V_40000000016
+        return result
+    V_40000000017 = RS_4(V_40000000010, V_40000000016)
+
+    def AND_9(V_50000000000, V_50000000001):
+        result = D2 and Alt_found
+        return result
+    V_50000000002 = AND_9(D2, Alt_found)
+
+    def AND_10(V_50000000003, V_50000000004):
+        result = F1 and D3_Requested
+        return result
+    V_50000000005 = AND_10(F1, D3_Requested)
+
+    def OR_7(V_50000000002, V_50000000005):
+        result = V_50000000002 or V_50000000005
+        return result
+    V_50000000006 = OR_7(V_50000000002, V_50000000005)
+
+    def OR_8(V_50000000007, V_50000000008, V_50000000009):
+        result = A2 or D1 or D2
+        return result
+    V_50000000010 = OR_8(A2, D1, D2)
+
+    def RS_5(V_50000000006, V_50000000010):
+        result = V_50000000010
+        return result
+    V_50000000011 = RS_5(V_50000000006, V_50000000010)
+
+    def AND_11(V_60000000000, V_60000000001):
+        result = A6 and Init_reached
+        return result
+    V_60000000002 = AND_11(A6, Init_reached)
+
+    def AND_12(V_60000000003, V_60000000004, V_60000000005):
+        result = A2 and Init_reached and Cycle_ended
+        return result
+    V_60000000006 = AND_12(A2, Init_reached, Cycle_ended)
+
+    def OR_9(V_60000000002, V_60000000006):
+        result = V_60000000002 or V_60000000006
+        return result
+    V_60000000007 = OR_9(V_60000000002, V_60000000006)
+
+    def OR_10(V_60000000008, V_60000000009):
+        result = F1 or D1
+        return result
+    V_60000000010 = OR_10(F1, D1)
+
+    def RS_6(V_60000000007, V_60000000010):
+        result = V_60000000010
+        return result
+    V_60000000011 = RS_6(V_60000000007, V_60000000010)
+
+    def AND_13(V_70000000000, V_70000000001):
+        result = D3 and A2_Requested
+        return result
+    V_70000000002 = AND_13(D3, A2_Requested)
+
+    def OR_11(V_70000000003, V_70000000004):
+        result = A1 or D1
+        return result
+    V_70000000005 = OR_11(A1, D1)
+
+    def RS_7(V_70000000002, V_70000000005):
+        result = V_70000000005
+        return result
+    V_70000000006 = RS_7(V_70000000002, V_70000000005)
+
+    def R_TRIG(V_80000000000):
+        result = Start_Init
+        return result
+    V_80000000001 = R_TRIG(Start_Init)
+
+    def OR_12(V_80000000001, V_80000000002):
+        result = V_80000000001 or A5
+        return result
+    V_80000000003 = OR_12(V_80000000001, A5)
+
+    def OR_13(V_80000000004, V_80000000005):
+        result = A1 or D1
+        return result
+    V_80000000006 = OR_13(A1, D1)
+
+    def RS_8(V_80000000003, V_80000000006):
+        result = V_80000000006
+        return result
+    V_80000000007 = RS_8(V_80000000003, V_80000000006)
+    D1 = V_10000000005
+    print('Value of D1:', D1)
+    F1 = V_20000000007
+    print('Value of F1:', F1)
+    A5 = V_30000000014
+    print('Value of A5:', A5)
+    D2 = V_40000000017
+    print('Value of D2:', D2)
+    D3 = V_50000000011
+    print('Value of D3:', D3)
+    A1 = V_60000000011
+    print('Value of A1:', A1)
+    A2 = V_70000000006
+    print('Value of A2:', A2)
+    A6 = V_80000000007
+    print('Value of A6:', A6)
+    return {'D1': D1, 'F1': F1, 'A5': A5, 'D2': D2, 'D3': D3, 'A1': A1, 'A2': A2, 'A6': A6}""" ;
+    dp:hasPOULanguage "FBD" ;
+    dp:hasPOUName "FB_Betriebsarten" ;
+    ag:op_hasInternalVariable ag:Var_FB_Betriebsarten_A1,
+        ag:Var_FB_Betriebsarten_A2,
+        ag:Var_FB_Betriebsarten_A2_Requested,
+        ag:Var_FB_Betriebsarten_A5,
+        ag:Var_FB_Betriebsarten_A6,
+        ag:Var_FB_Betriebsarten_Alt_abort,
+        ag:Var_FB_Betriebsarten_Alt_found,
+        ag:Var_FB_Betriebsarten_Auto_Fertig,
+        ag:Var_FB_Betriebsarten_Auto_Stoerung,
+        ag:Var_FB_Betriebsarten_Cycle_ended,
+        ag:Var_FB_Betriebsarten_D1,
+        ag:Var_FB_Betriebsarten_D2,
+        ag:Var_FB_Betriebsarten_D3,
+        ag:Var_FB_Betriebsarten_D3_Requested,
+        ag:Var_FB_Betriebsarten_F1,
+        ag:Var_FB_Betriebsarten_F4,
+        ag:Var_FB_Betriebsarten_Fehler,
+        ag:Var_FB_Betriebsarten_Init_reached,
+        ag:Var_FB_Betriebsarten_NotStop,
+        ag:Var_FB_Betriebsarten_RS_A1,
+        ag:Var_FB_Betriebsarten_RS_A2,
+        ag:Var_FB_Betriebsarten_RS_A5,
+        ag:Var_FB_Betriebsarten_RS_A6,
+        ag:Var_FB_Betriebsarten_RS_AutomaticOperationMode,
+        ag:Var_FB_Betriebsarten_RS_CycleEnded,
+        ag:Var_FB_Betriebsarten_RS_D1,
+        ag:Var_FB_Betriebsarten_RS_D2,
+        ag:Var_FB_Betriebsarten_RS_D3,
+        ag:Var_FB_Betriebsarten_RS_F1,
+        ag:Var_FB_Betriebsarten_RS_InitialDrive,
+        ag:Var_FB_Betriebsarten_RS_InitialState,
+        ag:Var_FB_Betriebsarten_RS_ManualOperationMode,
+        ag:Var_FB_Betriebsarten_R_TRIG_Automatic,
+        ag:Var_FB_Betriebsarten_R_TRIG_CycleEnded,
+        ag:Var_FB_Betriebsarten_R_TRIG_Init,
+        ag:Var_FB_Betriebsarten_R_TRIG_InitialDrive,
+        ag:Var_FB_Betriebsarten_R_TRIG_Manual,
+        ag:Var_FB_Betriebsarten_Start,
+        ag:Var_FB_Betriebsarten_Start_Init,
+        ag:Var_FB_Betriebsarten_Weiter,
+        ag:Var_FB_Betriebsarten_bFirstScan ;
+    ag:op_hasPort ag:Port_FB_Betriebsarten_A1,
+        ag:Port_FB_Betriebsarten_A2,
+        ag:Port_FB_Betriebsarten_A2_Requested,
+        ag:Port_FB_Betriebsarten_A5,
+        ag:Port_FB_Betriebsarten_A6,
+        ag:Port_FB_Betriebsarten_Alt_abort,
+        ag:Port_FB_Betriebsarten_Alt_found,
+        ag:Port_FB_Betriebsarten_Auto_Fertig,
+        ag:Port_FB_Betriebsarten_Auto_Stoerung,
+        ag:Port_FB_Betriebsarten_Cycle_ended,
+        ag:Port_FB_Betriebsarten_D1,
+        ag:Port_FB_Betriebsarten_D2,
+        ag:Port_FB_Betriebsarten_D3,
+        ag:Port_FB_Betriebsarten_D3_Requested,
+        ag:Port_FB_Betriebsarten_F1,
+        ag:Port_FB_Betriebsarten_F4,
+        ag:Port_FB_Betriebsarten_Fehler,
+        ag:Port_FB_Betriebsarten_Init_reached,
+        ag:Port_FB_Betriebsarten_NotStop,
+        ag:Port_FB_Betriebsarten_Start,
+        ag:Port_FB_Betriebsarten_Start_Init,
+        ag:Port_FB_Betriebsarten_Weiter ;
+    ag:op_usesVariable ag:Var_FB_Betriebsarten_A1,
+        ag:Var_FB_Betriebsarten_A2,
+        ag:Var_FB_Betriebsarten_A2_Requested,
+        ag:Var_FB_Betriebsarten_A5,
+        ag:Var_FB_Betriebsarten_A6,
+        ag:Var_FB_Betriebsarten_Alt_abort,
+        ag:Var_FB_Betriebsarten_Alt_found,
+        ag:Var_FB_Betriebsarten_Auto_Fertig,
+        ag:Var_FB_Betriebsarten_Auto_Stoerung,
+        ag:Var_FB_Betriebsarten_Cycle_ended,
+        ag:Var_FB_Betriebsarten_D1,
+        ag:Var_FB_Betriebsarten_D2,
+        ag:Var_FB_Betriebsarten_D3,
+        ag:Var_FB_Betriebsarten_D3_Requested,
+        ag:Var_FB_Betriebsarten_F1,
+        ag:Var_FB_Betriebsarten_F4,
+        ag:Var_FB_Betriebsarten_Fehler,
+        ag:Var_FB_Betriebsarten_Init_reached,
+        ag:Var_FB_Betriebsarten_NotStop,
+        ag:Var_FB_Betriebsarten_RS_A1,
+        ag:Var_FB_Betriebsarten_RS_A2,
+        ag:Var_FB_Betriebsarten_RS_A5,
+        ag:Var_FB_Betriebsarten_RS_A6,
+        ag:Var_FB_Betriebsarten_RS_AutomaticOperationMode,
+        ag:Var_FB_Betriebsarten_RS_CycleEnded,
+        ag:Var_FB_Betriebsarten_RS_D1,
+        ag:Var_FB_Betriebsarten_RS_D2,
+        ag:Var_FB_Betriebsarten_RS_D3,
+        ag:Var_FB_Betriebsarten_RS_F1,
+        ag:Var_FB_Betriebsarten_RS_InitialDrive,
+        ag:Var_FB_Betriebsarten_RS_InitialState,
+        ag:Var_FB_Betriebsarten_RS_ManualOperationMode,
+        ag:Var_FB_Betriebsarten_R_TRIG_Automatic,
+        ag:Var_FB_Betriebsarten_R_TRIG_CycleEnded,
+        ag:Var_FB_Betriebsarten_R_TRIG_Init,
+        ag:Var_FB_Betriebsarten_R_TRIG_InitialDrive,
+        ag:Var_FB_Betriebsarten_R_TRIG_Manual,
+        ag:Var_FB_Betriebsarten_Start,
+        ag:Var_FB_Betriebsarten_Start_Init,
+        ag:Var_FB_Betriebsarten_Weiter,
+        ag:Var_FB_Betriebsarten_bFirstScan .
+
+ag:FBType_FB_Diagnose_D2 a ag:class_FBType ;
+    dp:hasPOUCode """// POU FB_Diagnose_D2 body
+rtReq(CLK := Diagnose_gefordert);
+
+
+IF rtReq.Q AND NOT Busy THEN
+    Busy := TRUE;
+	Alt_gefunden := FALSE;
+	OPCUA.TriggerD2 := TRUE; 
+	OPCUA.bool1 := TRUE;
+END_IF
+
+  
+
+
+
+rtAck(CLK := OPCUA.DiagnoseFinished);
+rtD3(CLK := OPCUA.Alt_found);
+IF rtAck.Q OR rtD3.Q THEN
+    Diagnose_beendet := TRUE;
+    GVL.Weiter := TRUE;
+    Busy := FALSE;
+    OPCUA.TriggerD2 := FALSE;
+	OPCUA.bool2 := FALSE;
+    GVL.Fehler := FALSE;
+    Diagnose_gefordert := FALSE;
+	GVL.DiagnoseRequested := FALSE;
+END_IF
+IF rtD3.Q THEN
+	Alt_gefunden := TRUE;
+END_IF""" ;
+    dp:hasPOULanguage "ST" ;
+    dp:hasPOUName "FB_Diagnose_D2" ;
+    ag:op_hasInternalVariable ag:Var_FB_Diagnose_D2_Alt_gefunden,
+        ag:Var_FB_Diagnose_D2_Busy,
+        ag:Var_FB_Diagnose_D2_Diagnose_beendet,
+        ag:Var_FB_Diagnose_D2_Diagnose_gefordert,
+        ag:Var_FB_Diagnose_D2_rtAck,
+        ag:Var_FB_Diagnose_D2_rtD3,
+        ag:Var_FB_Diagnose_D2_rtFinished,
+        ag:Var_FB_Diagnose_D2_rtReq,
+        ag:Var_FB_Diagnose_D2_tpPulse ;
+    ag:op_hasPort ag:Port_FB_Diagnose_D2_Alt_gefunden,
+        ag:Port_FB_Diagnose_D2_Diagnose_beendet,
+        ag:Port_FB_Diagnose_D2_Diagnose_gefordert ;
+    ag:op_usesVariable ag:Var_FB_Diagnose_D2_Alt_gefunden,
+        ag:Var_FB_Diagnose_D2_Busy,
+        ag:Var_FB_Diagnose_D2_Diagnose_beendet,
+        ag:Var_FB_Diagnose_D2_Diagnose_gefordert,
+        ag:Var_FB_Diagnose_D2_rtAck,
+        ag:Var_FB_Diagnose_D2_rtD3,
+        ag:Var_FB_Diagnose_D2_rtFinished,
+        ag:Var_FB_Diagnose_D2_rtReq,
+        ag:Var_FB_Diagnose_D2_tpPulse .
+
+ag:FBType_FB_InitFahrt_A6_A2 a ag:class_FBType ;
+    dp:hasPOUCode """// POU FB_InitFahrt_A6_A2 body
+IF A6 THEN
+	tInit(IN := A6, PT := T#3S);
+ELSIF A2 THEN
+	tInit(IN := A2, PT := T#5S);
+END_IF
+
+IF tInit.Q THEN
+	Init_erreicht := TRUE;
+ELSE
+	Init_erreicht := FALSE;
+END_IF""" ;
+    dp:hasPOULanguage "ST" ;
+    dp:hasPOUName "FB_InitFahrt_A6_A2" ;
+    ag:op_hasInternalVariable ag:Var_FB_InitFahrt_A6_A2_A2,
+        ag:Var_FB_InitFahrt_A6_A2_A6,
+        ag:Var_FB_InitFahrt_A6_A2_Init_erreicht,
+        ag:Var_FB_InitFahrt_A6_A2_tInit ;
+    ag:op_hasPort ag:Port_FB_InitFahrt_A6_A2_A2,
+        ag:Port_FB_InitFahrt_A6_A2_A6,
+        ag:Port_FB_InitFahrt_A6_A2_Init_erreicht ;
+    ag:op_usesVariable ag:Var_FB_InitFahrt_A6_A2_A2,
+        ag:Var_FB_InitFahrt_A6_A2_A6,
+        ag:Var_FB_InitFahrt_A6_A2_Init_erreicht,
+        ag:Var_FB_InitFahrt_A6_A2_tInit .
+
+ag:FBType_FB_Methode1Job a ag:class_FBType ;
+    dp:hasPOUCode """// METHOD Abort of FB_Methode1Job
+running := FALSE;
+Abort := 0;
+
+// METHOD CheckState of FB_Methode1Job
+IF running THEN
+	
+    
+    
+        
+    
+	reached := TRUE;
+
+    
+    t20s(IN := reached, PT := T#9S);
+
+    IF reached AND t20s.Q THEN
+        y := 119;
+        running := FALSE;
+    END_IF
+END_IF
+
+bBusy := running;
+yOut  := y;
+CheckState := 0;
+
+// METHOD Start of FB_Methode1Job
+counter := x;
+reached := FALSE;
+running := TRUE;
+t20s(IN := FALSE, PT := T#9S);   
+hdl := 0;                         
+Start := 0;""" ;
+    dp:hasPOULanguage "ST" ;
+    dp:hasPOUName "FB_Methode1Job" ;
+    ag:op_hasInternalVariable ag:Var_FB_Methode1Job_counter,
+        ag:Var_FB_Methode1Job_reached,
+        ag:Var_FB_Methode1Job_running,
+        ag:Var_FB_Methode1Job_t20s,
+        ag:Var_FB_Methode1Job_y ;
+    ag:op_usesVariable ag:Var_FB_Methode1Job_counter,
+        ag:Var_FB_Methode1Job_reached,
+        ag:Var_FB_Methode1Job_running,
+        ag:Var_FB_Methode1Job_t20s,
+        ag:Var_FB_Methode1Job_y .
+
+ag:FBType_FB_Notaus_D1 a ag:class_FBType ;
+    dp:hasPOUCode """// POU FB_Notaus_D1 body
+IF D1 THEN
+    OPCUA.TriggerD1 := TRUE;         
+    ton5s(IN := TRUE, PT := T#5S);
+ELSE
+    ton5s(IN := FALSE, PT := T#5S);
+END_IF;
+
+IF ton5s.Q THEN
+    OPCUA.TriggerD1 := FALSE;
+    Diagnose_gefordert := FALSE;
+    GVL.NotStopp := TRUE;
+    GVL.Fehler := FALSE;
+    GVL.Weiter := TRUE;
+END_IF;""" ;
+    dp:hasPOULanguage "ST" ;
+    dp:hasPOUName "FB_Notaus_D1" ;
+    ag:op_hasInternalVariable ag:Var_FB_Notaus_D1_D1,
+        ag:Var_FB_Notaus_D1_Diagnose_gefordert,
+        ag:Var_FB_Notaus_D1_Notaus_Entriegelt,
+        ag:Var_FB_Notaus_D1_ton5s ;
+    ag:op_hasPort ag:Port_FB_Notaus_D1_D1,
+        ag:Port_FB_Notaus_D1_Diagnose_gefordert,
+        ag:Port_FB_Notaus_D1_Notaus_Entriegelt ;
+    ag:op_usesVariable ag:Var_FB_Notaus_D1_D1,
+        ag:Var_FB_Notaus_D1_Diagnose_gefordert,
+        ag:Var_FB_Notaus_D1_Notaus_Entriegelt,
+        ag:Var_FB_Notaus_D1_ton5s .
+
+ag:FBType_FB_ProduktionMitStoerung_D3 a ag:class_FBType ;
+    dp:hasPOUCode """// POU FB_ProduktionMitStoerung_D3 body
+rStart(CLK := ProduktionMitStoerung_Starten);
+IF rStart.Q THEN
+	z := 0;
+END_IF
+
+IF ProduktionMitStoerung_Starten AND NOT (Schritt3 OR Schritt4) AND NOT Stoerung_erkannt THEN
+	Fertig := FALSE;
+	Schritt3 := TRUE;
+	OPCUA.lastExecutedSkill := 'TestSkill3';
+	OPCUA.lastExecutedProcess := 'D3Process';
+	Schritt4 := FALSE;
+END_IF
+
+tSchritt3(IN := Schritt3, PT:=T#10S);
+tSchritt4(IN := Schritt4, PT:=T#10S);
+
+IF tSchritt3.Q THEN
+	Schritt3 := FALSE;
+	z := z+1;
+	IF z > 2 THEN
+		Stoerung_erkannt := TRUE;
+		OPCUA.Alt_abort := TRUE;
+	END_IF
+	IF NOT Stoerung_erkannt THEN
+		Schritt4 := TRUE;
+		OPCUA.lastExecutedSkill := 'TestSkill4';
+	END_IF
+END_IF
+
+IF tSchritt4.Q THEN
+	Schritt4 := FALSE;
+	Schritt3 := TRUE;
+	OPCUA.lastExecutedSkill := 'TestSkill3';
+END_IF""" ;
+    dp:hasPOULanguage "ST" ;
+    dp:hasPOUName "FB_ProduktionMitStoerung_D3" ;
+    ag:op_hasInternalVariable ag:Var_FB_ProduktionMitStoerung_D3_Fertig,
+        ag:Var_FB_ProduktionMitStoerung_D3_ProduktionMitStoerung_Starten,
+        ag:Var_FB_ProduktionMitStoerung_D3_RestartPulseLength,
+        ag:Var_FB_ProduktionMitStoerung_D3_Schritt3,
+        ag:Var_FB_ProduktionMitStoerung_D3_Schritt4,
+        ag:Var_FB_ProduktionMitStoerung_D3_Stoerung_erkannt,
+        ag:Var_FB_ProduktionMitStoerung_D3_Zwischen,
+        ag:Var_FB_ProduktionMitStoerung_D3_dbg_Stoerung_Manuell,
+        ag:Var_FB_ProduktionMitStoerung_D3_lastSkillIsOne,
+        ag:Var_FB_ProduktionMitStoerung_D3_pPer,
+        ag:Var_FB_ProduktionMitStoerung_D3_perEn,
+        ag:Var_FB_ProduktionMitStoerung_D3_rPer,
+        ag:Var_FB_ProduktionMitStoerung_D3_rStart,
+        ag:Var_FB_ProduktionMitStoerung_D3_rStep1,
+        ag:Var_FB_ProduktionMitStoerung_D3_rtStoer,
+        ag:Var_FB_ProduktionMitStoerung_D3_tPer,
+        ag:Var_FB_ProduktionMitStoerung_D3_tSchritt3,
+        ag:Var_FB_ProduktionMitStoerung_D3_tSchritt4,
+        ag:Var_FB_ProduktionMitStoerung_D3_tpRestart,
+        ag:Var_FB_ProduktionMitStoerung_D3_z ;
+    ag:op_hasPort ag:Port_FB_ProduktionMitStoerung_D3_Fertig,
+        ag:Port_FB_ProduktionMitStoerung_D3_ProduktionMitStoerung_Starten,
+        ag:Port_FB_ProduktionMitStoerung_D3_Stoerung_erkannt ;
+    ag:op_usesVariable ag:Var_FB_ProduktionMitStoerung_D3_Fertig,
+        ag:Var_FB_ProduktionMitStoerung_D3_ProduktionMitStoerung_Starten,
+        ag:Var_FB_ProduktionMitStoerung_D3_RestartPulseLength,
+        ag:Var_FB_ProduktionMitStoerung_D3_Schritt3,
+        ag:Var_FB_ProduktionMitStoerung_D3_Schritt4,
+        ag:Var_FB_ProduktionMitStoerung_D3_Stoerung_erkannt,
+        ag:Var_FB_ProduktionMitStoerung_D3_Zwischen,
+        ag:Var_FB_ProduktionMitStoerung_D3_dbg_Stoerung_Manuell,
+        ag:Var_FB_ProduktionMitStoerung_D3_lastSkillIsOne,
+        ag:Var_FB_ProduktionMitStoerung_D3_pPer,
+        ag:Var_FB_ProduktionMitStoerung_D3_perEn,
+        ag:Var_FB_ProduktionMitStoerung_D3_rPer,
+        ag:Var_FB_ProduktionMitStoerung_D3_rStart,
+        ag:Var_FB_ProduktionMitStoerung_D3_rStep1,
+        ag:Var_FB_ProduktionMitStoerung_D3_rtStoer,
+        ag:Var_FB_ProduktionMitStoerung_D3_tPer,
+        ag:Var_FB_ProduktionMitStoerung_D3_tSchritt3,
+        ag:Var_FB_ProduktionMitStoerung_D3_tSchritt4,
+        ag:Var_FB_ProduktionMitStoerung_D3_tpRestart,
+        ag:Var_FB_ProduktionMitStoerung_D3_z .
+
+ag:Port_FB_Automatikbetrieb_F1_AutoRestartEnable a ag:class_Port ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "AutoRestartEnable" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_FB_Automatikbetrieb_F1_Automatikbetrieb_Fertig a ag:class_Port ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "Automatikbetrieb_Fertig" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_FB_Automatikbetrieb_F1_Automatikbetrieb_Starten a ag:class_Port ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "Automatikbetrieb_Starten" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_FB_Automatikbetrieb_F1_FaultPulse a ag:class_Port ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "FaultPulse" ;
+    dp:hasPortType "TIME" .
+
+ag:Port_FB_Automatikbetrieb_F1_PeriodicFaultEnable a ag:class_Port ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "PeriodicFaultEnable" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_FB_Automatikbetrieb_F1_PeriodicFaultPeriod a ag:class_Port ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "PeriodicFaultPeriod" ;
+    dp:hasPortType "TIME" .
+
+ag:Port_FB_Automatikbetrieb_F1_Stoerung_erkannt a ag:class_Port ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "Stoerung_erkannt" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_FB_Betriebsarten_A1 a ag:class_Port ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "A1" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_FB_Betriebsarten_A2 a ag:class_Port ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "A2" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_FB_Betriebsarten_A2_Requested a ag:class_Port ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "A2_Requested" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_FB_Betriebsarten_A5 a ag:class_Port ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "A5" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_FB_Betriebsarten_A6 a ag:class_Port ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "A6" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_FB_Betriebsarten_Alt_abort a ag:class_Port ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "Alt_abort" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_FB_Betriebsarten_Alt_found a ag:class_Port ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "Alt_found" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_FB_Betriebsarten_Auto_Fertig a ag:class_Port ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "Auto_Fertig" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_FB_Betriebsarten_Auto_Stoerung a ag:class_Port ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "Auto_Stoerung" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_FB_Betriebsarten_Cycle_ended a ag:class_Port ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "Cycle_ended" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_FB_Betriebsarten_D1 a ag:class_Port ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "D1" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_FB_Betriebsarten_D2 a ag:class_Port ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "D2" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_FB_Betriebsarten_D3 a ag:class_Port ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "D3" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_FB_Betriebsarten_D3_Requested a ag:class_Port ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "D3_Requested" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_FB_Betriebsarten_F1 a ag:class_Port ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "F1" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_FB_Betriebsarten_F4 a ag:class_Port ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "F4" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_FB_Betriebsarten_Init_reached a ag:class_Port ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "Init_reached" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_FB_Betriebsarten_NotStop a ag:class_Port ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "NotStop" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_FB_Betriebsarten_Start_Init a ag:class_Port ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "Start_Init" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_FB_Diagnose_D2_Alt_gefunden a ag:class_Port ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "Alt_gefunden" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_FB_Diagnose_D2_Diagnose_beendet a ag:class_Port ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "Diagnose_beendet" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_FB_Diagnose_D2_Diagnose_gefordert a ag:class_Port ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "Diagnose_gefordert" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_FB_InitFahrt_A6_A2_A2 a ag:class_Port ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "A2" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_FB_InitFahrt_A6_A2_A6 a ag:class_Port ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "A6" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_FB_InitFahrt_A6_A2_Init_erreicht a ag:class_Port ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "Init_erreicht" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_FB_Notaus_D1_D1 a ag:class_Port ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "D1" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_FB_Notaus_D1_Diagnose_gefordert a ag:class_Port ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "Diagnose_gefordert" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_FB_Notaus_D1_Notaus_Entriegelt a ag:class_Port ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "Notaus_Entriegelt" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_FB_ProduktionMitStoerung_D3_Fertig a ag:class_Port ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "Fertig" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_FB_ProduktionMitStoerung_D3_ProduktionMitStoerung_Starten a ag:class_Port ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "ProduktionMitStoerung_Starten" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_FB_ProduktionMitStoerung_D3_Stoerung_erkannt a ag:class_Port ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "Stoerung_erkannt" ;
+    dp:hasPortType "BOOL" .
+
+ag:Var_FB_Automatikbetrieb_F1_AutoRestartEnable a ag:class_Variable ;
+    dp:hasVariableName "AutoRestartEnable" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_Automatikbetrieb_F1_AutoRestartEnable .
+
+ag:Var_FB_Automatikbetrieb_F1_Automatikbetrieb_Fertig a ag:class_Variable ;
+    dp:hasVariableName "Automatikbetrieb_Fertig" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_Automatikbetrieb_F1_Automatikbetrieb_Fertig .
+
+ag:Var_FB_Automatikbetrieb_F1_Automatikbetrieb_Starten a ag:class_Variable ;
+    dp:hasVariableName "Automatikbetrieb_Starten" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_Automatikbetrieb_F1_Automatikbetrieb_Starten .
+
+ag:Var_FB_Automatikbetrieb_F1_FaultPulse a ag:class_Variable ;
+    dp:hasVariableName "FaultPulse" ;
+    dp:hasVariableType "TIME" ;
+    ag:op_implementsPort ag:Port_FB_Automatikbetrieb_F1_FaultPulse .
+
+ag:Var_FB_Automatikbetrieb_F1_PeriodicFaultEnable a ag:class_Variable ;
+    dp:hasVariableName "PeriodicFaultEnable" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_Automatikbetrieb_F1_PeriodicFaultEnable .
+
+ag:Var_FB_Automatikbetrieb_F1_PeriodicFaultPeriod a ag:class_Variable ;
+    dp:hasVariableName "PeriodicFaultPeriod" ;
+    dp:hasVariableType "TIME" ;
+    ag:op_implementsPort ag:Port_FB_Automatikbetrieb_F1_PeriodicFaultPeriod .
+
+ag:Var_FB_Automatikbetrieb_F1_RestartPulseLength a ag:class_Variable ;
+    dp:hasVariableName "RestartPulseLength" ;
+    dp:hasVariableType "INT" .
+
+ag:Var_FB_Automatikbetrieb_F1_Schritt1 a ag:class_Variable ;
+    dp:hasVariableName "Schritt1" ;
+    dp:hasVariableType "BOOL" .
+
+ag:Var_FB_Automatikbetrieb_F1_Schritt2 a ag:class_Variable ;
+    dp:hasVariableName "Schritt2" ;
+    dp:hasVariableType "BOOL" .
+
+ag:Var_FB_Automatikbetrieb_F1_Stoerung_erkannt a ag:class_Variable ;
+    dp:hasVariableName "Stoerung_erkannt" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_Automatikbetrieb_F1_Stoerung_erkannt .
+
+ag:Var_FB_Automatikbetrieb_F1_Zwischen a ag:class_Variable ;
+    dp:hasVariableName "Zwischen" ;
+    dp:hasVariableType "string" .
+
+ag:Var_FB_Automatikbetrieb_F1_dbg_Stoerung_Manuell a ag:class_Variable ;
+    dp:hasVariableName "dbg_Stoerung_Manuell" ;
+    dp:hasVariableType "BOOL" .
+
+ag:Var_FB_Automatikbetrieb_F1_lastSkillIsOne a ag:class_Variable ;
+    dp:hasVariableName "lastSkillIsOne" ;
+    dp:hasVariableType "BOOL" .
+
+ag:Var_FB_Automatikbetrieb_F1_pPer a ag:class_Variable ;
+    dp:hasVariableName "pPer" ;
+    dp:hasVariableType "TP" ;
+    ag:op_representsFBInstance ag:FBInst_FB_Automatikbetrieb_F1_pPer .
+
+ag:Var_FB_Automatikbetrieb_F1_perEn a ag:class_Variable ;
+    dp:hasVariableName "perEn" ;
+    dp:hasVariableType "BOOL" .
+
+ag:Var_FB_Automatikbetrieb_F1_rPer a ag:class_Variable ;
+    dp:hasVariableName "rPer" ;
+    dp:hasVariableType "R_TRIG" ;
+    ag:op_representsFBInstance ag:FBInst_FB_Automatikbetrieb_F1_rPer .
+
+ag:Var_FB_Automatikbetrieb_F1_rStart a ag:class_Variable ;
+    dp:hasVariableName "rStart" ;
+    dp:hasVariableType "R_TRIG" ;
+    ag:op_representsFBInstance ag:FBInst_FB_Automatikbetrieb_F1_rStart .
+
+ag:Var_FB_Automatikbetrieb_F1_rStep1 a ag:class_Variable ;
+    dp:hasVariableName "rStep1" ;
+    dp:hasVariableType "R_TRIG" ;
+    ag:op_representsFBInstance ag:FBInst_FB_Automatikbetrieb_F1_rStep1 .
+
+ag:Var_FB_Automatikbetrieb_F1_rtStoer a ag:class_Variable ;
+    dp:hasVariableName "rtStoer" ;
+    dp:hasVariableType "R_TRIG" ;
+    ag:op_representsFBInstance ag:FBInst_FB_Automatikbetrieb_F1_rtStoer .
+
+ag:Var_FB_Automatikbetrieb_F1_tPer a ag:class_Variable ;
+    dp:hasVariableName "tPer" ;
+    dp:hasVariableType "TON" ;
+    ag:op_representsFBInstance ag:FBInst_FB_Automatikbetrieb_F1_tPer .
+
+ag:Var_FB_Automatikbetrieb_F1_tSchritt1 a ag:class_Variable ;
+    dp:hasVariableName "tSchritt1" ;
+    dp:hasVariableType "TON" ;
+    ag:op_representsFBInstance ag:FBInst_FB_Automatikbetrieb_F1_tSchritt1 .
+
+ag:Var_FB_Automatikbetrieb_F1_tSchritt2 a ag:class_Variable ;
+    dp:hasVariableName "tSchritt2" ;
+    dp:hasVariableType "TON" ;
+    ag:op_representsFBInstance ag:FBInst_FB_Automatikbetrieb_F1_tSchritt2 .
+
+ag:Var_FB_Automatikbetrieb_F1_tpRestart a ag:class_Variable ;
+    dp:hasVariableName "tpRestart" ;
+    dp:hasVariableType "INT" .
+
+ag:Var_FB_Betriebsarten_A1 a ag:class_Variable ;
+    dp:hasVariableName "A1" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_Betriebsarten_A1 .
+
+ag:Var_FB_Betriebsarten_A2 a ag:class_Variable ;
+    dp:hasVariableName "A2" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_Betriebsarten_A2 .
+
+ag:Var_FB_Betriebsarten_A2_Requested a ag:class_Variable ;
+    dp:hasVariableName "A2_Requested" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_Betriebsarten_A2_Requested .
+
+ag:Var_FB_Betriebsarten_A5 a ag:class_Variable ;
+    dp:hasVariableName "A5" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_Betriebsarten_A5 .
+
+ag:Var_FB_Betriebsarten_A6 a ag:class_Variable ;
+    dp:hasVariableName "A6" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_Betriebsarten_A6 .
+
+ag:Var_FB_Betriebsarten_Alt_abort a ag:class_Variable ;
+    dp:hasVariableName "Alt_abort" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_Betriebsarten_Alt_abort .
+
+ag:Var_FB_Betriebsarten_Alt_found a ag:class_Variable ;
+    dp:hasVariableName "Alt_found" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_Betriebsarten_Alt_found .
+
+ag:Var_FB_Betriebsarten_Auto_Fertig a ag:class_Variable ;
+    dp:hasVariableName "Auto_Fertig" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_Betriebsarten_Auto_Fertig .
+
+ag:Var_FB_Betriebsarten_Auto_Stoerung a ag:class_Variable ;
+    dp:hasVariableName "Auto_Stoerung" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_Betriebsarten_Auto_Stoerung .
+
+ag:Var_FB_Betriebsarten_Cycle_ended a ag:class_Variable ;
+    dp:hasVariableName "Cycle_ended" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_Betriebsarten_Cycle_ended .
+
+ag:Var_FB_Betriebsarten_D1 a ag:class_Variable ;
+    dp:hasVariableName "D1" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_Betriebsarten_D1 .
+
+ag:Var_FB_Betriebsarten_D2 a ag:class_Variable ;
+    dp:hasVariableName "D2" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_Betriebsarten_D2 .
+
+ag:Var_FB_Betriebsarten_D3 a ag:class_Variable ;
+    dp:hasVariableName "D3" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_Betriebsarten_D3 .
+
+ag:Var_FB_Betriebsarten_D3_Requested a ag:class_Variable ;
+    dp:hasVariableName "D3_Requested" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_Betriebsarten_D3_Requested .
+
+ag:Var_FB_Betriebsarten_F1 a ag:class_Variable ;
+    dp:hasVariableName "F1" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_Betriebsarten_F1 .
+
+ag:Var_FB_Betriebsarten_F4 a ag:class_Variable ;
+    dp:hasVariableName "F4" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_Betriebsarten_F4 .
+
+ag:Var_FB_Betriebsarten_Fehler a ag:class_Variable ;
+    dp:hasVariableName "Fehler" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_Betriebsarten_Fehler .
+
+ag:Var_FB_Betriebsarten_Init_reached a ag:class_Variable ;
+    dp:hasVariableName "Init_reached" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_Betriebsarten_Init_reached .
+
+ag:Var_FB_Betriebsarten_NotStop a ag:class_Variable ;
+    dp:hasVariableName "NotStop" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_Betriebsarten_NotStop .
+
+ag:Var_FB_Betriebsarten_RS_A1 a ag:class_Variable ;
+    dp:hasVariableName "RS_A1" ;
+    dp:hasVariableType "RS" ;
+    ag:op_representsFBInstance ag:FBInst_FB_Betriebsarten_RS_A1 .
+
+ag:Var_FB_Betriebsarten_RS_A2 a ag:class_Variable ;
+    dp:hasVariableName "RS_A2" ;
+    dp:hasVariableType "RS" ;
+    ag:op_representsFBInstance ag:FBInst_FB_Betriebsarten_RS_A2 .
+
+ag:Var_FB_Betriebsarten_RS_A5 a ag:class_Variable ;
+    dp:hasVariableName "RS_A5" ;
+    dp:hasVariableType "RS" ;
+    ag:op_representsFBInstance ag:FBInst_FB_Betriebsarten_RS_A5 .
+
+ag:Var_FB_Betriebsarten_RS_A6 a ag:class_Variable ;
+    dp:hasVariableName "RS_A6" ;
+    dp:hasVariableType "RS" ;
+    ag:op_representsFBInstance ag:FBInst_FB_Betriebsarten_RS_A6 .
+
+ag:Var_FB_Betriebsarten_RS_AutomaticOperationMode a ag:class_Variable ;
+    dp:hasVariableName "RS_AutomaticOperationMode" ;
+    dp:hasVariableType "RS" ;
+    ag:op_representsFBInstance ag:FBInst_FB_Betriebsarten_RS_AutomaticOperationMode .
+
+ag:Var_FB_Betriebsarten_RS_CycleEnded a ag:class_Variable ;
+    dp:hasVariableName "RS_CycleEnded" ;
+    dp:hasVariableType "RS" ;
+    ag:op_representsFBInstance ag:FBInst_FB_Betriebsarten_RS_CycleEnded .
+
+ag:Var_FB_Betriebsarten_RS_D1 a ag:class_Variable ;
+    dp:hasVariableName "RS_D1" ;
+    dp:hasVariableType "RS" ;
+    ag:op_representsFBInstance ag:FBInst_FB_Betriebsarten_RS_D1 .
+
+ag:Var_FB_Betriebsarten_RS_D2 a ag:class_Variable ;
+    dp:hasVariableName "RS_D2" ;
+    dp:hasVariableType "RS" ;
+    ag:op_representsFBInstance ag:FBInst_FB_Betriebsarten_RS_D2 .
+
+ag:Var_FB_Betriebsarten_RS_D3 a ag:class_Variable ;
+    dp:hasVariableName "RS_D3" ;
+    dp:hasVariableType "RS" ;
+    ag:op_representsFBInstance ag:FBInst_FB_Betriebsarten_RS_D3 .
+
+ag:Var_FB_Betriebsarten_RS_F1 a ag:class_Variable ;
+    dp:hasVariableName "RS_F1" ;
+    dp:hasVariableType "RS" ;
+    ag:op_representsFBInstance ag:FBInst_FB_Betriebsarten_RS_F1 .
+
+ag:Var_FB_Betriebsarten_RS_InitialDrive a ag:class_Variable ;
+    dp:hasVariableName "RS_InitialDrive" ;
+    dp:hasVariableType "RS" ;
+    ag:op_representsFBInstance ag:FBInst_FB_Betriebsarten_RS_InitialDrive .
+
+ag:Var_FB_Betriebsarten_RS_InitialState a ag:class_Variable ;
+    dp:hasVariableName "RS_InitialState" ;
+    dp:hasVariableType "RS" ;
+    ag:op_representsFBInstance ag:FBInst_FB_Betriebsarten_RS_InitialState .
+
+ag:Var_FB_Betriebsarten_RS_ManualOperationMode a ag:class_Variable ;
+    dp:hasVariableName "RS_ManualOperationMode" ;
+    dp:hasVariableType "RS" ;
+    ag:op_representsFBInstance ag:FBInst_FB_Betriebsarten_RS_ManualOperationMode .
+
+ag:Var_FB_Betriebsarten_R_TRIG_Automatic a ag:class_Variable ;
+    dp:hasVariableName "R_TRIG_Automatic" ;
+    dp:hasVariableType "R_TRIG" ;
+    ag:op_representsFBInstance ag:FBInst_FB_Betriebsarten_R_TRIG_Automatic .
+
+ag:Var_FB_Betriebsarten_R_TRIG_CycleEnded a ag:class_Variable ;
+    dp:hasVariableName "R_TRIG_CycleEnded" ;
+    dp:hasVariableType "R_TRIG" ;
+    ag:op_representsFBInstance ag:FBInst_FB_Betriebsarten_R_TRIG_CycleEnded .
+
+ag:Var_FB_Betriebsarten_R_TRIG_Init a ag:class_Variable ;
+    dp:hasVariableName "R_TRIG_Init" ;
+    dp:hasVariableType "R_TRIG" ;
+    ag:op_representsFBInstance ag:FBInst_FB_Betriebsarten_R_TRIG_Init .
+
+ag:Var_FB_Betriebsarten_R_TRIG_InitialDrive a ag:class_Variable ;
+    dp:hasVariableName "R_TRIG_InitialDrive" ;
+    dp:hasVariableType "R_TRIG" ;
+    ag:op_representsFBInstance ag:FBInst_FB_Betriebsarten_R_TRIG_InitialDrive .
+
+ag:Var_FB_Betriebsarten_R_TRIG_Manual a ag:class_Variable ;
+    dp:hasVariableName "R_TRIG_Manual" ;
+    dp:hasVariableType "R_TRIG" ;
+    ag:op_representsFBInstance ag:FBInst_FB_Betriebsarten_R_TRIG_Manual .
+
+ag:Var_FB_Betriebsarten_Start a ag:class_Variable ;
+    dp:hasVariableName "Start" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_Betriebsarten_Start .
+
+ag:Var_FB_Betriebsarten_Start_Init a ag:class_Variable ;
+    dp:hasVariableName "Start_Init" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_Betriebsarten_Start_Init .
+
+ag:Var_FB_Betriebsarten_Weiter a ag:class_Variable ;
+    dp:hasVariableName "Weiter" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_Betriebsarten_Weiter .
+
+ag:Var_FB_Betriebsarten_bFirstScan a ag:class_Variable ;
+    dp:hasVariableName "bFirstScan" ;
+    dp:hasVariableType "BOOL" .
+
+ag:Var_FB_Diagnose_D2_Alt_gefunden a ag:class_Variable ;
+    dp:hasVariableName "Alt_gefunden" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_Diagnose_D2_Alt_gefunden .
+
+ag:Var_FB_Diagnose_D2_Busy a ag:class_Variable ;
+    dp:hasVariableName "Busy" ;
+    dp:hasVariableType "BOOL" .
+
+ag:Var_FB_Diagnose_D2_Diagnose_beendet a ag:class_Variable ;
+    dp:hasVariableName "Diagnose_beendet" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_Diagnose_D2_Diagnose_beendet .
+
+ag:Var_FB_Diagnose_D2_Diagnose_gefordert a ag:class_Variable ;
+    dp:hasVariableName "Diagnose_gefordert" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_Diagnose_D2_Diagnose_gefordert .
+
+ag:Var_FB_Diagnose_D2_rtAck a ag:class_Variable ;
+    dp:hasVariableName "rtAck" ;
+    dp:hasVariableType "R_TRIG" ;
+    ag:op_representsFBInstance ag:FBInst_FB_Diagnose_D2_rtAck .
+
+ag:Var_FB_Diagnose_D2_rtD3 a ag:class_Variable ;
+    dp:hasVariableName "rtD3" ;
+    dp:hasVariableType "R_TRIG" ;
+    ag:op_representsFBInstance ag:FBInst_FB_Diagnose_D2_rtD3 .
+
+ag:Var_FB_Diagnose_D2_rtFinished a ag:class_Variable ;
+    dp:hasVariableName "rtFinished" ;
+    dp:hasVariableType "R_TRIG" ;
+    ag:op_representsFBInstance ag:FBInst_FB_Diagnose_D2_rtFinished .
+
+ag:Var_FB_Diagnose_D2_rtReq a ag:class_Variable ;
+    dp:hasVariableName "rtReq" ;
+    dp:hasVariableType "R_TRIG" ;
+    ag:op_representsFBInstance ag:FBInst_FB_Diagnose_D2_rtReq .
+
+ag:Var_FB_Diagnose_D2_tpPulse a ag:class_Variable ;
+    dp:hasVariableName "tpPulse" ;
+    dp:hasVariableType "TP" ;
+    ag:op_representsFBInstance ag:FBInst_FB_Diagnose_D2_tpPulse .
+
+ag:Var_FB_InitFahrt_A6_A2_A2 a ag:class_Variable ;
+    dp:hasVariableName "A2" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_InitFahrt_A6_A2_A2 .
+
+ag:Var_FB_InitFahrt_A6_A2_A6 a ag:class_Variable ;
+    dp:hasVariableName "A6" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_InitFahrt_A6_A2_A6 .
+
+ag:Var_FB_InitFahrt_A6_A2_Init_erreicht a ag:class_Variable ;
+    dp:hasVariableName "Init_erreicht" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_InitFahrt_A6_A2_Init_erreicht .
+
+ag:Var_FB_InitFahrt_A6_A2_tInit a ag:class_Variable ;
+    dp:hasVariableName "tInit" ;
+    dp:hasVariableType "TON" ;
+    ag:op_representsFBInstance ag:FBInst_FB_InitFahrt_A6_A2_tInit .
+
+ag:Var_FB_Methode1Job_counter a ag:class_Variable ;
+    dp:hasVariableName "counter" ;
+    dp:hasVariableType "DINT" .
+
+ag:Var_FB_Methode1Job_reached a ag:class_Variable ;
+    dp:hasVariableName "reached" ;
+    dp:hasVariableType "BOOL" .
+
+ag:Var_FB_Methode1Job_running a ag:class_Variable ;
+    dp:hasVariableName "running" ;
+    dp:hasVariableType "BOOL" .
+
+ag:Var_FB_Methode1Job_t20s a ag:class_Variable ;
+    dp:hasVariableName "t20s" ;
+    dp:hasVariableType "TON" ;
+    ag:op_representsFBInstance ag:FBInst_FB_Methode1Job_t20s .
+
+ag:Var_FB_Methode1Job_y a ag:class_Variable ;
+    dp:hasVariableName "y" ;
+    dp:hasVariableType "DINT" .
+
+ag:Var_FB_Notaus_D1_D1 a ag:class_Variable ;
+    dp:hasVariableName "D1" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_Notaus_D1_D1 .
+
+ag:Var_FB_Notaus_D1_Diagnose_gefordert a ag:class_Variable ;
+    dp:hasVariableName "Diagnose_gefordert" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_Notaus_D1_Diagnose_gefordert .
+
+ag:Var_FB_Notaus_D1_Notaus_Entriegelt a ag:class_Variable ;
+    dp:hasVariableName "Notaus_Entriegelt" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_Notaus_D1_Notaus_Entriegelt .
+
+ag:Var_FB_Notaus_D1_ton5s a ag:class_Variable ;
+    dp:hasVariableName "ton5s" ;
+    dp:hasVariableType "TON" ;
+    ag:op_representsFBInstance ag:FBInst_FB_Notaus_D1_ton5s .
+
+ag:Var_FB_ProduktionMitStoerung_D3_Fertig a ag:class_Variable ;
+    dp:hasVariableName "Fertig" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_ProduktionMitStoerung_D3_Fertig .
+
+ag:Var_FB_ProduktionMitStoerung_D3_ProduktionMitStoerung_Starten a ag:class_Variable ;
+    dp:hasVariableName "ProduktionMitStoerung_Starten" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_ProduktionMitStoerung_D3_ProduktionMitStoerung_Starten .
+
+ag:Var_FB_ProduktionMitStoerung_D3_RestartPulseLength a ag:class_Variable ;
+    dp:hasVariableName "RestartPulseLength" ;
+    dp:hasVariableType "INT" .
+
+ag:Var_FB_ProduktionMitStoerung_D3_Schritt3 a ag:class_Variable ;
+    dp:hasVariableName "Schritt3" ;
+    dp:hasVariableType "BOOL" .
+
+ag:Var_FB_ProduktionMitStoerung_D3_Schritt4 a ag:class_Variable ;
+    dp:hasVariableName "Schritt4" ;
+    dp:hasVariableType "BOOL" .
+
+ag:Var_FB_ProduktionMitStoerung_D3_Stoerung_erkannt a ag:class_Variable ;
+    dp:hasVariableName "Stoerung_erkannt" ;
+    dp:hasVariableType "BOOL" ;
+    ag:op_implementsPort ag:Port_FB_ProduktionMitStoerung_D3_Stoerung_erkannt .
+
+ag:Var_FB_ProduktionMitStoerung_D3_Zwischen a ag:class_Variable ;
+    dp:hasVariableName "Zwischen" ;
+    dp:hasVariableType "string" .
+
+ag:Var_FB_ProduktionMitStoerung_D3_dbg_Stoerung_Manuell a ag:class_Variable ;
+    dp:hasVariableName "dbg_Stoerung_Manuell" ;
+    dp:hasVariableType "BOOL" .
+
+ag:Var_FB_ProduktionMitStoerung_D3_lastSkillIsOne a ag:class_Variable ;
+    dp:hasVariableName "lastSkillIsOne" ;
+    dp:hasVariableType "BOOL" .
+
+ag:Var_FB_ProduktionMitStoerung_D3_pPer a ag:class_Variable ;
+    dp:hasVariableName "pPer" ;
+    dp:hasVariableType "TP" ;
+    ag:op_representsFBInstance ag:FBInst_FB_ProduktionMitStoerung_D3_pPer .
+
+ag:Var_FB_ProduktionMitStoerung_D3_perEn a ag:class_Variable ;
+    dp:hasVariableName "perEn" ;
+    dp:hasVariableType "BOOL" .
+
+ag:Var_FB_ProduktionMitStoerung_D3_rPer a ag:class_Variable ;
+    dp:hasVariableName "rPer" ;
+    dp:hasVariableType "R_TRIG" ;
+    ag:op_representsFBInstance ag:FBInst_FB_ProduktionMitStoerung_D3_rPer .
+
+ag:Var_FB_ProduktionMitStoerung_D3_rStart a ag:class_Variable ;
+    dp:hasVariableName "rStart" ;
+    dp:hasVariableType "R_TRIG" ;
+    ag:op_representsFBInstance ag:FBInst_FB_ProduktionMitStoerung_D3_rStart .
+
+ag:Var_FB_ProduktionMitStoerung_D3_rStep1 a ag:class_Variable ;
+    dp:hasVariableName "rStep1" ;
+    dp:hasVariableType "R_TRIG" ;
+    ag:op_representsFBInstance ag:FBInst_FB_ProduktionMitStoerung_D3_rStep1 .
+
+ag:Var_FB_ProduktionMitStoerung_D3_rtStoer a ag:class_Variable ;
+    dp:hasVariableName "rtStoer" ;
+    dp:hasVariableType "R_TRIG" ;
+    ag:op_representsFBInstance ag:FBInst_FB_ProduktionMitStoerung_D3_rtStoer .
+
+ag:Var_FB_ProduktionMitStoerung_D3_tPer a ag:class_Variable ;
+    dp:hasVariableName "tPer" ;
+    dp:hasVariableType "TON" ;
+    ag:op_representsFBInstance ag:FBInst_FB_ProduktionMitStoerung_D3_tPer .
+
+ag:Var_FB_ProduktionMitStoerung_D3_tSchritt3 a ag:class_Variable ;
+    dp:hasVariableName "tSchritt3" ;
+    dp:hasVariableType "TON" ;
+    ag:op_representsFBInstance ag:FBInst_FB_ProduktionMitStoerung_D3_tSchritt3 .
+
+ag:Var_FB_ProduktionMitStoerung_D3_tSchritt4 a ag:class_Variable ;
+    dp:hasVariableName "tSchritt4" ;
+    dp:hasVariableType "TON" ;
+    ag:op_representsFBInstance ag:FBInst_FB_ProduktionMitStoerung_D3_tSchritt4 .
+
+ag:Var_FB_ProduktionMitStoerung_D3_tpRestart a ag:class_Variable ;
+    dp:hasVariableName "tpRestart" ;
+    dp:hasVariableType "INT" .
+
+ag:Var_FB_ProduktionMitStoerung_D3_z a ag:class_Variable ;
+    dp:hasVariableName "z" ;
+    dp:hasVariableType "INT" .
+
+ag:Var_MAIN_A2_angefordert a ag:class_Variable ;
+    dp:hasVariableName "A2_angefordert" ;
+    dp:hasVariableType "BOOL" .
+
+ag:Var_MAIN_D3_angefordert a ag:class_Variable ;
+    dp:hasVariableName "D3_angefordert" ;
+    dp:hasVariableType "BOOL" .
+
+ag:Var_MAIN_Init_erreicht a ag:class_Variable ;
+    dp:hasVariableName "Init_erreicht" ;
+    dp:hasVariableType "BOOL" .
+
+ag:Var_MAIN_Init_start a ag:class_Variable ;
+    dp:hasVariableName "Init_start" ;
+    dp:hasVariableType "BOOL" .
+
+ag:Var_MAIN_Start_eff a ag:class_Variable ;
+    dp:hasVariableName "Start_eff" ;
+    dp:hasVariableType "BOOL" .
+
+ag:Var_MAIN_Weiter_eff a ag:class_Variable ;
+    dp:hasVariableName "Weiter_eff" ;
+    dp:hasVariableType "BOOL" .
+
+ag:Var_MAIN_Zyklus_beendet a ag:class_Variable ;
+    dp:hasVariableName "Zyklus_beendet" ;
+    dp:hasVariableType "BOOL" .
+
+ag:Var_MAIN_alt_abort a ag:class_Variable ;
+    dp:hasVariableName "alt_abort" ;
+    dp:hasVariableType "BOOL" .
+
+ag:Var_MAIN_alt_found a ag:class_Variable ;
+    dp:hasVariableName "alt_found" ;
+    dp:hasVariableType "BOOL" .
+
+ag:Var_MAIN_edgeDone a ag:class_Variable ;
+    dp:hasVariableName "edgeDone" ;
+    dp:hasVariableType "R_TRIG" ;
+    ag:op_representsFBInstance ag:FBInst_MAIN_edgeDone .
+
+ag:Var_MAIN_edgeF1 a ag:class_Variable ;
+    dp:hasVariableName "edgeF1" ;
+    dp:hasVariableType "R_TRIG" ;
+    ag:op_representsFBInstance ag:FBInst_MAIN_edgeF1 .
+
+ag:Var_MAIN_fbAuto a ag:class_Variable ;
+    dp:hasVariableName "fbAuto" ;
+    dp:hasVariableType "FB_Automatikbetrieb_F1" ;
+    ag:op_representsFBInstance ag:FBInst_MAIN_fbAuto .
+
+ag:Var_MAIN_fbBA a ag:class_Variable ;
+    dp:hasVariableName "fbBA" ;
+    dp:hasVariableType "FB_Betriebsarten" ;
+    ag:op_representsFBInstance ag:FBInst_MAIN_fbBA .
+
+ag:Var_MAIN_fbDiag a ag:class_Variable ;
+    dp:hasVariableName "fbDiag" ;
+    dp:hasVariableType "FB_Diagnose_D2" ;
+    ag:op_representsFBInstance ag:FBInst_MAIN_fbDiag .
+
+ag:Var_MAIN_fbInit a ag:class_Variable ;
+    dp:hasVariableName "fbInit" ;
+    dp:hasVariableType "FB_InitFahrt_A6_A2" ;
+    ag:op_representsFBInstance ag:FBInst_MAIN_fbInit .
+
+ag:Var_MAIN_fbJob a ag:class_Variable ;
+    dp:hasVariableName "fbJob" ;
+    dp:hasVariableType "FB_Methode1Job" ;
+    ag:op_representsFBInstance ag:FBInst_MAIN_fbJob .
+
+ag:Var_MAIN_fbNot a ag:class_Variable ;
+    dp:hasVariableName "fbNot" ;
+    dp:hasVariableType "FB_Notaus_D1" ;
+    ag:op_representsFBInstance ag:FBInst_MAIN_fbNot .
+
+ag:Var_MAIN_fbProStoer a ag:class_Variable ;
+    dp:hasVariableName "fbProStoer" ;
+    dp:hasVariableType "FB_ProduktionMitStoerung_D3" ;
+    ag:op_representsFBInstance ag:FBInst_MAIN_fbProStoer .
+
+dp:isUnused a owl:DatatypeProperty .
+
+ag:Port_FB_Betriebsarten_Fehler a ag:class_Port ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "Fehler" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_FB_Betriebsarten_Start a ag:class_Port ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "Start" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_FB_Betriebsarten_Weiter a ag:class_Port ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "Weiter" ;
+    dp:hasPortType "BOOL" .
+
+ag:StandardFBType_TP a ag:class_FBType,
+        ag:class_StandardFBType,
+        owl:NamedIndividual ;
+    dp:hasPOULanguage "ST" ;
+    dp:hasPOUName "TP" ;
+    dp:hasPOUType "FunctionBlock" ;
+    ag:op_hasPort ag:Port_TP_ET,
+        ag:Port_TP_IN,
+        ag:Port_TP_PT,
+        ag:Port_TP_Q .
+
+ag:class_PLCProject a owl:Class .
+
+ag:class_ParameterAssignment a owl:Class .
+
+ag:class_PortInstance a owl:Class ;
+    rdfs:subClassOf ag:class_SignalSource .
+
+ag:class_Program a owl:Class ;
+    rdfs:subClassOf ag:class_POU .
+
+dp:hasPortAttribute a owl:DatatypeProperty .
+
+dp:hasVariableAttribute a owl:DatatypeProperty .
+
+ag:class_GlobalVariableList a owl:Class .
+
+ag:class_POUCall a owl:Class .
+
+ag:class_SignalSource a owl:Class .
+
+dp:hasPOUAttribute a owl:DatatypeProperty ;
+    rdfs:domain ag:class_POU .
+
+ag:StandardFBType_TON a ag:class_FBType,
+        ag:class_StandardFBType,
+        owl:NamedIndividual ;
+    dp:hasPOULanguage "ST" ;
+    dp:hasPOUName "TON" ;
+    dp:hasPOUType "FunctionBlock" ;
+    ag:op_hasPort ag:Port_TON_ET,
+        ag:Port_TON_IN,
+        ag:Port_TON_PT,
+        ag:Port_TON_Q .
+
+ag:class_StandardFBType a owl:Class ;
+    rdfs:subClassOf ag:class_FBType .
+
+ag:StandardFBType_RS a ag:class_FBType,
+        ag:class_StandardFBType,
+        owl:NamedIndividual ;
+    dp:hasPOULanguage "ST" ;
+    dp:hasPOUName "RS" ;
+    dp:hasPOUType "FunctionBlock" ;
+    ag:op_hasPort ag:Port_RS_Q1,
+        ag:Port_RS_R1,
+        ag:Port_RS_S .
+
+ag:class_POU a owl:Class .
+
+ag:StandardFBType_R_TRIG a ag:class_FBType,
+        ag:class_StandardFBType,
+        owl:NamedIndividual ;
+    dp:hasPOULanguage "ST" ;
+    dp:hasPOUName "R_TRIG" ;
+    dp:hasPOUType "FunctionBlock" ;
+    ag:op_hasPort ag:Port_R_TRIG_CLK,
+        ag:Port_R_TRIG_Q .
+
+ag:class_FBType a owl:Class ;
+    rdfs:subClassOf ag:class_POU .
+
+ag:class_FBInstance a owl:Class .
+
+ag:class_Port a owl:Class .
+
+ag:class_Variable a owl:Class ;
+    rdfs:subClassOf ag:class_SignalSource .
+

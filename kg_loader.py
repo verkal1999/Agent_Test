@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Dict, Tuple, List, Optional, Any
 
 import json
-from rdflib import Graph, Namespace, RDF, URIRef, Literal
+from rdflib import Graph, Namespace, RDF, URIRef, Literal, OWL
 from rdflib.namespace import XSD
 
 
@@ -261,6 +261,9 @@ class KGLoader:
     def ingest_programs_from_mapping_json(self) -> None:
         prog_data = json.loads(self.config.prog_io_mappings_path.read_text(encoding="utf-8"))
 
+        # NEUE Property definieren (Sicherstellen, dass sie existiert)
+        self.kg.add((self.OP.implementsPort, RDF.type, OWL.ObjectProperty))
+
         for entry in prog_data:
             prog_name = entry.get("Programm_Name")
             if not prog_name: continue
@@ -277,6 +280,7 @@ class KGLoader:
             else:
                 pou_uri = self.get_program_uri(prog_name)
 
+            self.kg.add((pou_uri, self.DP.hasPOUName, Literal(prog_name)))
             if pou_uri is None: continue
 
             project_name = entry.get("PLCProject_Name")
@@ -284,13 +288,14 @@ class KGLoader:
                 project_uri = self.get_or_create_plc_project(project_name)
                 self.kg.add((project_uri, self.OP.consistsOfPOU, pou_uri))
 
-            # A. PORTS
+            # A. PORTS & INTERNE VARIABLEN (Inputs / Outputs)
             for sec in ("inputs", "outputs"):
                 direction = "Input" if sec == "inputs" else "Output"
                 for var in entry.get(sec, []):
                     vname = self._pick_var(var)
                     if not vname: continue
                     
+                    # 1. Der Port (Schnittstelle nach außen)
                     port_uri = self.get_port_uri(prog_name, vname)
                     self.kg.add((port_uri, RDF.type, self.AG.class_Port))
                     self.kg.add((port_uri, self.DP.hasPortName, Literal(vname)))
@@ -301,6 +306,20 @@ class KGLoader:
                     if vtype:
                         self.kg.add((port_uri, self.DP.hasPortType, Literal(vtype)))
 
+                    # 2. Die interne Variable (Implementierung für den Code)
+                    # Name: Var_<POU>_<PortName>
+                    internal_var_uri = self.get_local_var_uri(prog_name, vname)
+                    self.kg.add((pou_uri, self.OP.usesVariable, internal_var_uri)) # FB nutzt diese Variable intern
+                    self.kg.add((pou_uri, self.OP.hasInternalVariable, internal_var_uri))
+                    
+                    # Verknüpfung: Variable implementiert Port
+                    self.kg.add((internal_var_uri, self.OP.implementsPort, port_uri))
+                    
+                    if vtype:
+                        self.kg.add((internal_var_uri, self.DP.hasVariableType, Literal(vtype)))
+
+                    # Mappings (External - Bindings im MAIN etc.)
+                    # Das Binding gehört eigentlich zum Port, aber oft wird es im JSON an die Variable gehängt.
                     external = var.get("external")
                     if external:
                         target_uri = self._get_ext_var_uri(external, prog_name)
@@ -309,13 +328,14 @@ class KGLoader:
                             clean_ext = self._clean_expression(external)
                             self.pending_ext_hw_links.append((target_uri, clean_ext))
 
-            # B. VARIABLES & INSTANCES
+            # B. TEMPS (Lokale Variablen, keine Ports)
             for temp in entry.get("temps", []):
                 vname = temp.get("name")
                 if not vname: continue
                 
                 v_uri = self.get_local_var_uri(prog_name, vname)
                 self.kg.add((pou_uri, self.OP.usesVariable, v_uri))
+                self.kg.add((pou_uri, self.OP.hasInternalVariable, v_uri))
                 
                 ttype = temp.get("type")
                 if ttype:
@@ -326,10 +346,8 @@ class KGLoader:
                         self.kg.add((fb_inst_uri, RDF.type, self.AG.class_FBInstance))
                         self.kg.add((v_uri, self.OP.representsFBInstance, fb_inst_uri))
                         
-                        # get_fb_uri liefert jetzt sicher StandardFBType_TON mit Ports
                         fb_type_uri = self.get_fb_uri(ttype) 
                         self.kg.add((fb_inst_uri, self.OP.isInstanceOfFBType, fb_type_uri))
-
             # Code
             code = entry.get("program_code")
             lang = entry.get("programming_lang")
@@ -386,7 +404,7 @@ class KGLoader:
         for gvl in gvl_data:
             gvl_name = gvl["name"]
             list_uri = self.make_uri(f"GVLList_{gvl_name}")
-            self.kg.add((list_uri, RDF.type, self.AG.class_GobalVariableList))
+            self.kg.add((list_uri, RDF.type, self.AG.class_GlobalVariableList))
             self.kg.add((list_uri, self.DP.hasGlobalVariableListName, Literal(gvl_name)))
             for gv in gvl.get("globals", []):
                 base_name = gv["name"]

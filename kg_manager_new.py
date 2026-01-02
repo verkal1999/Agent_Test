@@ -450,5 +450,5 @@ class KGManager:
         return uri.rstrip("/").rsplit("/", 1)[-1].split("#")[-1]
 
     def _make_uri(self, name: str) -> URIRef:
-        safe = name.replace("^", "__dach__").replace(".", "__dot__").replace(" ", "__leerz__").replace("'", "")
+        safe = name.replace("^", "__dach__").replace(".", "__dot__").replace(" ", "__leerz__").replace("'", "").replace("<", "").replace(">", "")
         return URIRef(AG + safe)

@@ -1,0 +1,3 @@
+Ok, danke. Das klingt sehr gut. Welche Klassen bräuchte ich in Python dafür und wie implementiere ich das ganze sauber? Schaue bitte mal in meine GitHub-Repo herein, wie dort die Python-Bridge für die anderen Funktionen verwendet wird. Beim Agenten soll jetzt folgendes passieren:
+1.) Unbekannter Fehler wird erkannt und vom ReactionManager wird der Agent zur hilfe gerufen, der das Event mit dem Payload erhält
+2.) Der Agent analysiert zunächst den Code, den er mithilfe von Test_filled.ttl analysiert, in dem ich dort ein LLM frage, ob 

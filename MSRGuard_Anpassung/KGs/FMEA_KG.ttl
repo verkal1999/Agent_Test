@@ -6,6 +6,164 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
+<http://www.semanticweb.org/AgentProgramParams/GVL_HRL__dot__HRL_Enc_horizontal_I1> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_HRL__dot__HRL_Enc_horizontal_I2> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_HRL__dot__HRL_Enc_vertikal_I1> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_HRL__dot__HRL_Enc_vertikal_I2> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_HRL__dot__HRL_K1_1_Zaehler_Zuruecksetzen> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_HRL__dot__HRL_K1_2_Zaehler_Zuruecksetzen> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_HRL__dot__HRL_LS_aussen> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_HRL__dot__HRL_LS_innen> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_HRL__dot__HRL_MOT_Ausleger_rueckwaerts> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_HRL__dot__HRL_MOT_Ausleger_vorwaerts> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_HRL__dot__HRL_MOT_Foerderband_rueckwaerts> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_HRL__dot__HRL_MOT_Foerderband_vorwaerts> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_HRL__dot__HRL_MOT_horizontal_zum_Foerderband> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_HRL__dot__HRL_MOT_horizontal_zum_Regal> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_HRL__dot__HRL_MOT_vertikal_hoch> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_HRL__dot__HRL_MOT_vertikal_runter> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_HRL__dot__HRL_Ref_Taster_Ausleger_hinten> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_HRL__dot__HRL_Ref_Taster_Ausleger_vorne> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_HRL__dot__HRL_Ref_Taster_horizontal> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_HRL__dot__HRL_Ref_Taster_vertikal> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_HRL__dot__HRL_Spursensor_1_unten> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_HRL__dot__HRL_Spursensor_2_oben> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_MBS__dot__MBS_Kompressor> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_MBS__dot__MBS_LS_Ende_Foerderband> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_MBS__dot__MBS_LS_Ofen> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_MBS__dot__MBS_Leuchte_Ofen> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_MBS__dot__MBS_MOT_DK_CCW> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_MBS__dot__MBS_MOT_DK_CW> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_MBS__dot__MBS_MOT_Foerderband_vorwaerts> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_MBS__dot__MBS_MOT_Ofenschieber_ausfahren> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_MBS__dot__MBS_MOT_Ofenschieber_einfahren> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_MBS__dot__MBS_MOT_Saege> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_MBS__dot__MBS_MOT_Sauger_zum_DK> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_MBS__dot__MBS_MOT_Sauger_zum_Ofen> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_MBS__dot__MBS_MV_Ofentuer> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_MBS__dot__MBS_MV_Schieber> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_MBS__dot__MBS_MV_Vakuum> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_MBS__dot__MBS_MV_senken> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_MBS__dot__MBS_Ref_Taster_DK_Pos_Foerderband> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_MBS__dot__MBS_Ref_Taster_DK_Pos_Saege> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_MBS__dot__MBS_Ref_Taster_DK_Pos_Sauger> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_MBS__dot__MBS_Ref_Taster_Ofenschieber_aussen> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_MBS__dot__MBS_Ref_Taster_Ofenschieber_innen> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_MBS__dot__MBS_Ref_Taster_Sauger_Pos_DK> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_MBS__dot__MBS_Ref_Taster_Sauger_Pos_Ofen> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_SST__dot__SST_Farbsensor> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_SST__dot__SST_Impulstaster> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_SST__dot__SST_Kompressor> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_SST__dot__SST_LS_Eingang> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_SST__dot__SST_LS_blau> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_SST__dot__SST_LS_nach_Farbsensor> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_SST__dot__SST_LS_rot> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_SST__dot__SST_LS_weiss> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_SST__dot__SST_MOT_Foerderband> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_SST__dot__SST_MV_blau> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_SST__dot__SST_MV_rot> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_SST__dot__SST_MV_weiss> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_VSG__dot__VSG_Enc_drehen_I1> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_VSG__dot__VSG_Enc_drehen_I2> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_VSG__dot__VSG_Enc_horizontal_I1> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_VSG__dot__VSG_Enc_horizontal_I2> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_VSG__dot__VSG_Enc_vertikal_I1> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_VSG__dot__VSG_Enc_vertikal_I2> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_VSG__dot__VSG_K1_3_Zaehler_Zuruecksetzen> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_VSG__dot__VSG_K1_4_Zaehler_Zuruecksetzen> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_VSG__dot__VSG_K1_5_Zaehler_Zuruecksetzen> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_VSG__dot__VSG_Kompressor> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_VSG__dot__VSG_MOT_drehen_CCW> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_VSG__dot__VSG_MOT_drehen_CW> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_VSG__dot__VSG_MOT_horizontal_rueckwaerts> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_VSG__dot__VSG_MOT_horizontal_vorwaerts> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_VSG__dot__VSG_MOT_vertikal_hoch> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_VSG__dot__VSG_MOT_vertikal_runter> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_VSG__dot__VSG_MV_Vakuum> a cl:Actors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_VSG__dot__VSG_Ref_Schalter_drehen> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_VSG__dot__VSG_Ref_Schalter_horizontal> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL_VSG__dot__VSG_Ref_Schalter_vertikal> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL__dot__diNotAus_Kanal_A> a cl:Sensors .
+
+<http://www.semanticweb.org/AgentProgramParams/GVL__dot__diNotAus_Kanal_B> a cl:Sensors .
+
 <http://www.semanticweb.org/FMEA_VDA_AIAG_2021> a owl:Ontology .
 
 <http://www.semanticweb.org/FMEA_VDA_AIAG_2021/CSkill_PunchingProcess> a cl:Function,
@@ -13,13 +171,13 @@
 
 <http://www.semanticweb.org/FMEA_VDA_AIAG_2021/Ex_MonitoringAction> a cl:MonitoringAction,
         owl:NamedIndividual ;
-    dp:hasMonActParams """{
-  "rows": [
-    { "step": 0, "g": "meta", "k": "jobId", "t": "nodeId", "v": "MAIN.fbJob" },
-    { "step": 0, "g": "method", "k": "methodId", "t": "nodeId", "v": "MAIN.fbJob.M_Methode1" },
-    { "step": 0, "g": "input",  "k": "x", "i": 0, "t": "int32", "v": 0},
-    { "step": 0, "g": "output",  "k": "yOut", "i": 0, "t": "int32", "v": "119"}
-  ]
+    dp:hasMonActParams """{\r
+  "rows": [\r
+    { "step": 0, "g": "meta", "k": "jobId", "t": "nodeId", "v": "MAIN.fbJob" },\r
+    { "step": 0, "g": "method", "k": "methodId", "t": "nodeId", "v": "MAIN.fbJob.M_Methode1" },\r
+    { "step": 0, "g": "input",  "k": "x", "i": 0, "t": "int32", "v": 0},\r
+    { "step": 0, "g": "output",  "k": "yOut", "i": 0, "t": "int32", "v": "119"}\r
+  ]\r
 }""" ;
     op:hasMExecutionStamp <http://www.semanticweb.org/FMEA_VDA_AIAG_2021/M_evD2-1116713611445800_2025-09-18_12-43-03_1>,
         <http://www.semanticweb.org/FMEA_VDA_AIAG_2021/M_evD2-1116833669500100_2025-09-18_12-45-03_1>,
@@ -64,13 +222,13 @@
 <http://www.semanticweb.org/FMEA_VDA_AIAG_2021/Ex_Sysreact1> a cl:Action,
         cl:SystemReaction,
         owl:NamedIndividual ;
-    dp:hasSysReactParams """{
-  "rows": [
-    { "step": 0, "g": "meta", "k": "jobId", "t": "nodeId", "v": "MAIN.fbJob" },
-    { "step": 0, "g": "method", "k": "methodId", "t": "nodeId", "v": "MAIN.fbJob.M_Methode1" },
-    { "step": 0, "g": "input",  "k": "x", "i": 0, "t": "int32", "v": 0},
-    { "step": 0, "g": "output",  "k": "yOut", "i": 0, "t": "int32", "v": "119"}
-  ]
+    dp:hasSysReactParams """{\r
+  "rows": [\r
+    { "step": 0, "g": "meta", "k": "jobId", "t": "nodeId", "v": "MAIN.fbJob" },\r
+    { "step": 0, "g": "method", "k": "methodId", "t": "nodeId", "v": "MAIN.fbJob.M_Methode1" },\r
+    { "step": 0, "g": "input",  "k": "x", "i": 0, "t": "int32", "v": 0},\r
+    { "step": 0, "g": "output",  "k": "yOut", "i": 0, "t": "int32", "v": "119"}\r
+  ]\r
 }""" ;
     op:hasSRExecutionStamp <http://www.semanticweb.org/FMEA_VDA_AIAG_2021/SR_evD2-1116353534575000_2025-09-18_12-37-03>,
         <http://www.semanticweb.org/FMEA_VDA_AIAG_2021/SR_evD2-1116773627893800_2025-09-18_12-44-03>,
@@ -777,9 +935,6 @@ cl:4MElementMaterial a owl:Class ;
 cl:4MElementMethod a owl:Class ;
     rdfs:subClassOf cl:ProcessElement .
 
-cl:Actors a owl:Class ;
-    rdfs:subClassOf cl:4MElementMachine .
-
 cl:DFMEA-MSR a owl:Class ;
     rdfs:subClassOf cl:DFMEA .
 
@@ -864,14 +1019,14 @@ dp:hasFailureModeDescription a owl:DatatypeProperty ;
     rdfs:range xsd:string .
 
 dp:hasFailureModeParams a owl:DatatypeProperty ;
-    rdfs:comment """Braucht das Format wie dort angegeben. Hier soll ein Sensorsnapshot entstehen, sodass alles vergleichen weden kann. Wird nur ein Wert so wie hier angegeben, wird auch nur dieser mit den Standardwerten im Programm verglichen.
-Späterer Plan ist, dass das mit den Default-Werten der einizelnen Skills befüllt wid, den diese FailureMode verhindert, wenn per se nichts drin ist.
-
-Format: 
-{
-  "rows": [
-    { "id": "ns=4;s=OPCUA.bool1",  "t": "bool", "v": true }
-  ]
+    rdfs:comment """Braucht das Format wie dort angegeben. Hier soll ein Sensorsnapshot entstehen, sodass alles vergleichen weden kann. Wird nur ein Wert so wie hier angegeben, wird auch nur dieser mit den Standardwerten im Programm verglichen.\r
+Späterer Plan ist, dass das mit den Default-Werten der einizelnen Skills befüllt wid, den diese FailureMode verhindert, wenn per se nichts drin ist.\r
+\r
+Format: \r
+{\r
+  "rows": [\r
+    { "id": "ns=4;s=OPCUA.bool1",  "t": "bool", "v": true }\r
+  ]\r
 }""" ;
     rdfs:domain cl:FailureMode ;
     rdfs:range xsd:string .
@@ -923,14 +1078,14 @@ dp:hasMonActObjId a owl:DatatypeProperty ;
     rdfs:subPropertyOf dp:hasObjId .
 
 dp:hasMonActParams a owl:DatatypeProperty ;
-    rdfs:comment """Schreibweise:
-{
-  "rows": [
-    { "step": 0, "g": "meta", "k": "jobId", "t": "nodeId", "v": MAIN.fbJob" },
-    { "step": 0, "g": "method", "k": "methodId", "t": "nodeId", "v": "MAIN.fbJob.M_Methode1" },
-    { "step": 0, "g": "input",  "k": "x", "i": 0, "t": "int32", "v": 0},
-    { "step": 0, "g": "output",  "k": "yOut", "i": 0, "t": "int32", "v": "calc"}
-  ]
+    rdfs:comment """Schreibweise:\r
+{\r
+  "rows": [\r
+    { "step": 0, "g": "meta", "k": "jobId", "t": "nodeId", "v": MAIN.fbJob" },\r
+    { "step": 0, "g": "method", "k": "methodId", "t": "nodeId", "v": "MAIN.fbJob.M_Methode1" },\r
+    { "step": 0, "g": "input",  "k": "x", "i": 0, "t": "int32", "v": 0},\r
+    { "step": 0, "g": "output",  "k": "yOut", "i": 0, "t": "int32", "v": "calc"}\r
+  ]\r
 }""" ;
     rdfs:domain cl:MonitoringAction ;
     rdfs:range xsd:string .
@@ -1004,55 +1159,55 @@ dp:hasSysReactObjId a owl:DatatypeProperty ;
     rdfs:subPropertyOf dp:hasObjId .
 
 dp:hasSysReactParams a owl:DatatypeProperty ;
-    rdfs:comment """Buchstaben:
-- g: Gruppe, eine von meta, method, input, output
-
-- k: Schlüssel oder Parametername, z. B. speed, status
-
-- i: optionale Positionsnummer des Parameters, damit Reihenfolgen stabil sind
-
-- id: NodeId der zugehörigen OPC UA Variable oder Methode, wenn zutreffend
-
- - t: Datentyp als String, z. B. bool, int32, double, string, nodeid, json
-
-- v: Wert in passendem JSON Typ
-
-- step: Ganzzahl 0..N-1 für die Reihenfolge der Methodenaufrufe in der Systemreaktion
-
-- seq: strikt monotone Ganzzahl (0,1,2,…) über alle Rows, damit du die exakte Ereignisreihenfolge rekonstruierst
-
-- callId: stabile ID (z. B. "0", "1" oder UUID) pro einzelner Methoden-Invocation innerhalb eines Steps (hilfreich, falls Retrys oder Teil-Events geloggt werden sollen)
-
-!!!Minimalregeln!!!!
-
-- Alle Rows, die zu einem Methodenaufruf gehören, teilen sich denselben step und callId.
-
-- seq steigt für jede Row; zum Re-Play einfach nach seq sortieren.
-
-- Pro Call mindestens:
-
-- eine method-Row mit der methodId
-
-- 0..n input-Rows
-
-- 0..m output-Rows
-
-- optionale meta-Rows (Start/Ende, ok/Fehler, Dauer)
-{
-  "rows": [
-    { "seq": 0,  "step": 0, "callId": "0", "g": "meta",   "k": "jobId",    "t": "string", "v": "c1a7..." },
-    { "seq": 1,  "step": 0, "callId": "0", "g": "method", "k": "methodId", "t": "nodeid", "id": "ns=4;s=OPCUA.MyUaMethodA", "v": "ns=4;s=OPCUA.MyUaMethodA" },
-    { "seq": 2,  "step": 0, "callId": "0", "g": "input",  "k": "speed",    "i": 0, "id": "ns=4;s=OPCUA.speed", "t": "int32", "v": 120, "uom": "rpm" },
-    { "seq": 3,  "step": 0, "callId": "0", "g": "input",  "k": "dir",      "i": 1, "id": "ns=4;s=OPCUA.dir",   "t": "int32", "v": 1 },
-    { "seq": 4,  "step": 0, "callId": "0", "g": "output", "k": "status",   "i": 0, "id": "ns=4;s=OPCUA.status","t": "bool",  "v": true },
-    { "seq": 5,  "step": 0, "callId": "0", "g": "meta",   "k": "ok",                     "t": "bool",   "v": true },
-    { "seq": 6,  "step": 0, "callId": "0", "g": "meta",   "k": "duration_ms",           "t": "uint32", "v": 37 },
-
-    { "seq": 7,  "step": 1, "callId": "0", "g": "method", "k": "methodId", "t": "nodeid", "id": "ns=4;s=OPCUA.MyUaMethodB", "v": "ns=4;s=OPCUA.MyUaMethodB" },
-    { "seq": 8,  "step": 1, "callId": "0", "g": "input",  "k": "timeout",  "i": 0, "id": "ns=4;s=OPCUA.timeout","t": "uint32","v": 5000 },
-    { "seq": 9,  "step": 1, "callId": "0", "g": "output", "k": "errorCode","i": 0, "id": "ns=4;s=OPCUA.err",    "t": "uint16","v": 0 },
-    { "seq": 10, "step": 1, "callId": "0", "g": "meta",   "k": "ok",                     "t": "bool",   "v": true }
-  ]
+    rdfs:comment """Buchstaben:\r
+- g: Gruppe, eine von meta, method, input, output\r
+\r
+- k: Schlüssel oder Parametername, z. B. speed, status\r
+\r
+- i: optionale Positionsnummer des Parameters, damit Reihenfolgen stabil sind\r
+\r
+- id: NodeId der zugehörigen OPC UA Variable oder Methode, wenn zutreffend\r
+\r
+ - t: Datentyp als String, z. B. bool, int32, double, string, nodeid, json\r
+\r
+- v: Wert in passendem JSON Typ\r
+\r
+- step: Ganzzahl 0..N-1 für die Reihenfolge der Methodenaufrufe in der Systemreaktion\r
+\r
+- seq: strikt monotone Ganzzahl (0,1,2,…) über alle Rows, damit du die exakte Ereignisreihenfolge rekonstruierst\r
+\r
+- callId: stabile ID (z. B. "0", "1" oder UUID) pro einzelner Methoden-Invocation innerhalb eines Steps (hilfreich, falls Retrys oder Teil-Events geloggt werden sollen)\r
+\r
+!!!Minimalregeln!!!!\r
+\r
+- Alle Rows, die zu einem Methodenaufruf gehören, teilen sich denselben step und callId.\r
+\r
+- seq steigt für jede Row; zum Re-Play einfach nach seq sortieren.\r
+\r
+- Pro Call mindestens:\r
+\r
+- eine method-Row mit der methodId\r
+\r
+- 0..n input-Rows\r
+\r
+- 0..m output-Rows\r
+\r
+- optionale meta-Rows (Start/Ende, ok/Fehler, Dauer)\r
+{\r
+  "rows": [\r
+    { "seq": 0,  "step": 0, "callId": "0", "g": "meta",   "k": "jobId",    "t": "string", "v": "c1a7..." },\r
+    { "seq": 1,  "step": 0, "callId": "0", "g": "method", "k": "methodId", "t": "nodeid", "id": "ns=4;s=OPCUA.MyUaMethodA", "v": "ns=4;s=OPCUA.MyUaMethodA" },\r
+    { "seq": 2,  "step": 0, "callId": "0", "g": "input",  "k": "speed",    "i": 0, "id": "ns=4;s=OPCUA.speed", "t": "int32", "v": 120, "uom": "rpm" },\r
+    { "seq": 3,  "step": 0, "callId": "0", "g": "input",  "k": "dir",      "i": 1, "id": "ns=4;s=OPCUA.dir",   "t": "int32", "v": 1 },\r
+    { "seq": 4,  "step": 0, "callId": "0", "g": "output", "k": "status",   "i": 0, "id": "ns=4;s=OPCUA.status","t": "bool",  "v": true },\r
+    { "seq": 5,  "step": 0, "callId": "0", "g": "meta",   "k": "ok",                     "t": "bool",   "v": true },\r
+    { "seq": 6,  "step": 0, "callId": "0", "g": "meta",   "k": "duration_ms",           "t": "uint32", "v": 37 },\r
+\r
+    { "seq": 7,  "step": 1, "callId": "0", "g": "method", "k": "methodId", "t": "nodeid", "id": "ns=4;s=OPCUA.MyUaMethodB", "v": "ns=4;s=OPCUA.MyUaMethodB" },\r
+    { "seq": 8,  "step": 1, "callId": "0", "g": "input",  "k": "timeout",  "i": 0, "id": "ns=4;s=OPCUA.timeout","t": "uint32","v": 5000 },\r
+    { "seq": 9,  "step": 1, "callId": "0", "g": "output", "k": "errorCode","i": 0, "id": "ns=4;s=OPCUA.err",    "t": "uint16","v": 0 },\r
+    { "seq": 10, "step": 1, "callId": "0", "g": "meta",   "k": "ok",                     "t": "bool",   "v": true }\r
+  ]\r
 }""" ;
     rdfs:domain cl:SystemReaction ;
     rdfs:range xsd:string .
@@ -1250,10 +1405,10 @@ op:reactsOnFailureMode a owl:ObjectProperty ;
 
 <http://www.semanticweb.org/FMEA_VDA_AIAG_2021/ÜÜÜ> a cl:FailureMode,
         owl:NamedIndividual ;
-    dp:hasFailureModeParams """{
-  "rows": [
-    { "id": "ns=4;s=OPCUA.Z1",  "t": "Int16", "v": 27 }
-  ]
+    dp:hasFailureModeParams """{\r
+  "rows": [\r
+    { "id": "ns=4;s=OPCUA.Z1",  "t": "Int16", "v": 27 }\r
+  ]\r
 }""" ;
     op:preventsFunction <http://www.semanticweb.org/FMEA_VDA_AIAG_2021/TestSkill1> .
 
@@ -2048,9 +2203,6 @@ cl:DetectionAction a owl:Class ;
 cl:Occurence a owl:Class ;
     rdfs:subClassOf cl:RiskAssessment .
 
-cl:Sensors a owl:Class ;
-    rdfs:subClassOf cl:4MElementMachine .
-
 op:enablesFunction a owl:ObjectProperty ;
     rdfs:domain cl:Function ;
     rdfs:range cl:Function .
@@ -2071,10 +2223,10 @@ cl:Monitoring a owl:Class ;
 cl:Action a owl:Class .
 
 cl:DetectionCriterion a owl:Class ;
-    rdfs:comment """Beinhaltet Kriterien für die Detektion von Fehlern wie bspw. Sensorwerte. Es wird angenommen, dass jedes Kriterium durch einen Sensor gemessen werden muss, aus diesem Grund wird der SystemTimer hier auch als Sensor modelliert, der die Zeit misst.
-
-Logik: Detection Actions, die zu Systemreaktionen führen sollen und daher automatisiert ablaufen, müssen zwangsläufig Kriterien besitzen, mit denen sie den Fehler mithilfe von Sensorwerten messen.
-
+    rdfs:comment """Beinhaltet Kriterien für die Detektion von Fehlern wie bspw. Sensorwerte. Es wird angenommen, dass jedes Kriterium durch einen Sensor gemessen werden muss, aus diesem Grund wird der SystemTimer hier auch als Sensor modelliert, der die Zeit misst.\r
+\r
+Logik: Detection Actions, die zu Systemreaktionen führen sollen und daher automatisiert ablaufen, müssen zwangsläufig Kriterien besitzen, mit denen sie den Fehler mithilfe von Sensorwerten messen.\r
+\r
 Diese sind sehr wichtig, um die richitge Systemreaktion im Falle eines Fehlers zu ermitteln.""",
         "Wwird nur eingesetzt, sobald ein kritischer Fehler auftaucht, aber noch keine Fehlerreaktion vorhanden ist. Hier werden alle möglichen Detektionsmerkmale und wie (durch welche Sensoren/Aktoren und welche OPCUA-Werte) sie getestet werden können, aufgeführt." .
 
@@ -2112,10 +2264,10 @@ cl:Function a owl:Class .
 
 <http://www.semanticweb.org/FMEA_VDA_AIAG_2021/ExFailureMode2> a cl:FailureMode,
         owl:NamedIndividual ;
-    dp:hasFailureModeParams """{
-  "rows": [
-    { "id": "ns=4;s=OPCUA.Z1",  "t": "Int16", "v": 0 }
-  ]
+    dp:hasFailureModeParams """{\r
+  "rows": [\r
+    { "id": "ns=4;s=OPCUA.Z1",  "t": "Int16", "v": 0 }\r
+  ]\r
 }""" ;
     op:hasFailureEffectForOwnPlant <http://www.semanticweb.org/FMEA_VDA_AIAG_2021/ExFailureModeProcessFail> ;
     op:hasWorstFEForOwnPlantAfterSR <http://www.semanticweb.org/FMEA_VDA_AIAG_2021/ExFailureModeStepFail> ;
@@ -2127,10 +2279,10 @@ cl:ExecutedMonAct a owl:Class ;
 
 <http://www.semanticweb.org/FMEA_VDA_AIAG_2021/ExFailureMode1> a cl:FailureMode,
         owl:NamedIndividual ;
-    dp:hasFailureModeParams """{
-  "rows": [
-    { "id": "ns=4;s=OPCUA.bool1",  "t": "bool", "v": true }
-  ]
+    dp:hasFailureModeParams """{\r
+  "rows": [\r
+    { "id": "ns=4;s=OPCUA.bool1",  "t": "bool", "v": true }\r
+  ]\r
 }""" ;
     op:createsRisk <http://www.semanticweb.org/FMEA_VDA_AIAG_2021/Risk1> ;
     op:hasFailureEffectForOwnPlant <http://www.semanticweb.org/FMEA_VDA_AIAG_2021/ExFailureMode2> ;
@@ -2138,6 +2290,12 @@ cl:ExecutedMonAct a owl:Class ;
 
 cl:ExecutedSR a owl:Class ;
     rdfs:subClassOf cl:SystemReaction .
+
+cl:Actors a owl:Class ;
+    rdfs:subClassOf cl:4MElementMachine .
+
+cl:Sensors a owl:Class ;
+    rdfs:subClassOf cl:4MElementMachine .
 
 <http://www.semanticweb.org/FMEA_VDA_AIAG_2021/TestSkill2> a cl:Function,
         owl:NamedIndividual ;

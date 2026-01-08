@@ -1,0 +1,669 @@
+[
+  {
+    "is_skill": true,
+    "capability_name_realworld": "Zahl multiplizieren",
+    "skill_name": "Multiply",
+    "service_interface": "OpcUa",
+    "real_world_effect_guess": "Zwei Zahlen werden multipliziert.",
+    "actuators_guess": [],
+    "sensors_guess": [],
+    "reason_short": "Keine physische Wirkung, nur Berechnung.",
+    "evidence": [
+      "Multiply := a * b;",
+      "Keine Ausgabe an Aktoren.",
+      "Keine Eingabe von Sensordaten."
+    ],
+    "inputs_guess": [
+      "a",
+      "b"
+    ],
+    "outputs_guess": [
+      "a * b"
+    ],
+    "_pou_iri": "http://www.semanticweb.org/AgentProgramParams/FBType_FB_MyOpcUaMethod",
+    "_pou_lang": "ST"
+  },
+  {
+    "is_skill": true,
+    "capability_name_realworld": "Vertikalachse encodergeführt bewegen",
+    "skill_name": "JobMethode_Schablone",
+    "service_interface": "ST",
+    "real_world_effect_guess": "Die Vertikalachse wird encodergeführt bewegt.",
+    "actuators_guess": [
+      "Motor_Ansteuerung01"
+    ],
+    "sensors_guess": [
+      "LightSensor_01",
+      "LightSensor_02",
+      "TS_Endschalter_01",
+      "TS_Endschalter_02",
+      "TS_EndschalterEntlastung"
+    ],
+    "reason_short": "Die POU JobMethode_Schablone enthält Ausgabesignale für Motor_Ansteuerung01 und Eingabesignale für LightSensor_01, LightSensor_02, TS_Endschalter_01, TS_Endschalter_02 und TS_EndschalterEntlastung.",
+    "evidence": [
+      "Motor_Ansteuerung01 := JobMethode_Name.Motor_Direction01;",
+      "IF DirectionPointA := TRUE THEN DirectionPointB := FALSE; END_IF",
+      "IF DirectionPointB := TRUE THEN DirectionPointA := FALSE; END_IF",
+      "jobRunning := TRUE;",
+      "Motor_Ansteuerung01 ist ein Ausgabesignal für die Motorsteuerung."
+    ],
+    "inputs_guess": [
+      "Direction_01",
+      "Direction_02",
+      "MethodCall_Name"
+    ],
+    "outputs_guess": [
+      "Motor_Ansteuerung01",
+      "CheckState",
+      "bBusy"
+    ],
+    "_pou_iri": "http://www.semanticweb.org/AgentProgramParams/FBType_JobMethode_Schablone",
+    "_pou_lang": "ST"
+  },
+  {
+    "is_skill": true,
+    "capability_name_realworld": "Horizontalachse encodergeführt bewegen",
+    "skill_name": "MBS_CB_AS_HorizontalMove",
+    "service_interface": "ST",
+    "real_world_effect_guess": "Die Horizontalachse wird encodergeführt bewegt.",
+    "actuators_guess": [
+      "DO_MovingHorizontalCB_01"
+    ],
+    "sensors_guess": [
+      "TouchSensor_01",
+      "LightSensor_01"
+    ],
+    "reason_short": "Implementierung einer Horizontalachse Bewegung",
+    "evidence": [
+      "DO_MovingHorizontalCB_01 := MBS_CB_HorizontalMove.DigitalOutputControl_01;",
+      "jobRunning := TRUE;",
+      "Start := 0;",
+      "MethodCall_HorizontalMove := MethodCall;",
+      "DirectionHorizontal := DirectionPoint;"
+    ],
+    "inputs_guess": [],
+    "outputs_guess": [
+      "DO_MovingHorizontalCB_01"
+    ],
+    "_pou_iri": "http://www.semanticweb.org/AgentProgramParams/FBType_MBS_CB_AS_HorizontalMove",
+    "_pou_lang": "ST"
+  },
+  {
+    "is_skill": true,
+    "capability_name_realworld": "Horizontalachse encodergeführt bewegen",
+    "skill_name": "MBS_DmPD_AS_HorizontalMove",
+    "service_interface": "ST",
+    "real_world_effect_guess": "Die Horizontalachse wird encodergeführt bewegt.",
+    "actuators_guess": [
+      "DO_ControlCompressorDmPD_01"
+    ],
+    "sensors_guess": [
+      "TouchSensor_01",
+      "EncoderStart01",
+      "EncoderStart02",
+      "EncoderStart03",
+      "EncoderStart04",
+      "EncoderStart05",
+      "EncoderStart06",
+      "EncoderTarget01",
+      "EncoderTarget02",
+      "EncoderTarget03",
+      "EncoderTarget04",
+      "EncoderTarget05",
+      "EncoderTarget06"
+    ],
+    "reason_short": "Die POU MBS_DmPD_AS_HorizontalMove implementiert die Capability Horizontalachse encodergeführt bewegen.",
+    "evidence": [
+      "DO_ControlCompressorDmPD_01 := MBS_DmPD_VerticalMove.DigitalOutputControl_01;",
+      "jobRunning := TRUE;",
+      "MethodCall_CompressorControl := MethodCall;",
+      "DestinationVertical := DestinationPoint;"
+    ],
+    "inputs_guess": [],
+    "outputs_guess": [],
+    "_pou_iri": "http://www.semanticweb.org/AgentProgramParams/FBType_MBS_DmPD_AS_HorizontalMove",
+    "_pou_lang": "ST"
+  },
+  {
+    "is_skill": true,
+    "capability_name_realworld": "Vertikalachse encodergeführt bewegen",
+    "skill_name": "MBS_MR01_AS_HardeningProcess",
+    "service_interface": "ST",
+    "real_world_effect_guess": "Die Vertikalachse wird encodergeführt bewegt.",
+    "actuators_guess": [
+      "DO_HardeningProcessControlMR01"
+    ],
+    "sensors_guess": [
+      "LightSensor_01"
+    ],
+    "reason_short": "Implementierung einer Hardening-Prozess-Funktion",
+    "evidence": [
+      "DO_HardeningProcessControlMR01 := MBS_MR01_HardeningProcess.DigitalOutputControl_01;",
+      "IF NOT jobFinished THEN bBusy := TRUE; CheckState := 0; ELSE bBusy := FALSE; CheckState := 0; jobFinished := FALSE;",
+      "jobRunning := TRUE;"
+    ],
+    "inputs_guess": [],
+    "outputs_guess": [
+      "DO_HardeningProcessControlMR01"
+    ],
+    "_pou_iri": "http://www.semanticweb.org/AgentProgramParams/FBType_MBS_MR01_AS_HardeningProcess",
+    "_pou_lang": "ST"
+  },
+  {
+    "is_skill": true,
+    "capability_name_realworld": "Vertikalachse encodergeführt bewegen",
+    "skill_name": "MBS_MR02_AS_CuttingProcess",
+    "service_interface": "ST",
+    "real_world_effect_guess": "Die Vertikalachse wird encodergeführt bewegt.",
+    "actuators_guess": [
+      "DO_CuttingProcessControlMR02"
+    ],
+    "sensors_guess": [
+      "TouchSensor_01"
+    ],
+    "reason_short": "Die POU beschreibt ein ausführbares Verhalten.",
+    "evidence": [
+      "DO_CuttingProcessControlMR02 := MBS_MR02_CuttingProcess.DigitalOutputControl_01;",
+      "jobRunning := TRUE;",
+      "Start := 0;",
+      "MethodCall_CuttingProcess := MethodCall;",
+      "ProcessingTime_CuttingProcess := ProcessingTime;"
+    ],
+    "inputs_guess": [],
+    "outputs_guess": [
+      "DO_CuttingProcessControlMR02"
+    ],
+    "_pou_iri": "http://www.semanticweb.org/AgentProgramParams/FBType_MBS_MR02_AS_CuttingProcess",
+    "_pou_lang": "ST"
+  },
+  {
+    "is_skill": true,
+    "capability_name_realworld": "Vertikalachse encodergeführt bewegen",
+    "skill_name": "MBS_VSG_AS_VerticalMove",
+    "service_interface": "ST",
+    "real_world_effect_guess": "Die Vertikalachse wird encodergeführt bewegt.",
+    "actuators_guess": [
+      "DO_ControlCompressorVerticalMoveVSG_01"
+    ],
+    "sensors_guess": [
+      "TouchSensor_01",
+      "EncoderStart01",
+      "EncoderStart02",
+      "EncoderStart03",
+      "EncoderStart04",
+      "EncoderStart05",
+      "EncoderStart06",
+      "EncoderTarget01",
+      "EncoderTarget02",
+      "EncoderTarget03",
+      "EncoderTarget04",
+      "EncoderTarget05",
+      "EncoderTarget06"
+    ],
+    "reason_short": "Implementierung einer vertikalen Bewegung der Alschse",
+    "evidence": [
+      "DO_ControlCompressorVerticalMoveVSG_01 := MBS_VSG_VerticalMove.DigitalOutputControl_01;",
+      "jobRunning := TRUE;",
+      "MethodCall_CompressorControl := MethodCall;",
+      "DestinationVertical := DestinationPoint;"
+    ],
+    "inputs_guess": [],
+    "outputs_guess": [],
+    "_pou_iri": "http://www.semanticweb.org/AgentProgramParams/FBType_MBS_VSG_AS_VerticalMove",
+    "_pou_lang": "ST"
+  },
+  {
+    "is_skill": true,
+    "capability_name_realworld": "Farbcode erkennen",
+    "skill_name": "SST_CS_AS_ColorDetection",
+    "service_interface": "ST",
+    "real_world_effect_guess": "Der Farbcode wird erkannt.",
+    "actuators_guess": [],
+    "sensors_guess": [
+      "Color_Sensor"
+    ],
+    "reason_short": "Die POU erkennnt den Farbcode.",
+    "evidence": [
+      "Color_White := SST_Auto_ColorDetection.Color_1;",
+      "jobRunning := TRUE;",
+      "MethodCall_ColorDetection := MethodCall;",
+      "ColorSensor := Color_Sensor;"
+    ],
+    "inputs_guess": [
+      "ColorCode_1",
+      "ColorCode_2",
+      "ColorCode_3"
+    ],
+    "outputs_guess": [
+      "Color_White"
+    ],
+    "_pou_iri": "http://www.semanticweb.org/AgentProgramParams/FBType_SST_CS_AS_ColorDetection",
+    "_pou_lang": "ST"
+  },
+  {
+    "is_skill": true,
+    "capability_name_realworld": "Vertikalachse encodergeführt bewegen",
+    "skill_name": "VSG_AS_CompressorControl",
+    "service_interface": "ST",
+    "real_world_effect_guess": "Die Vertikalachse wird encodergeführt bewegt.",
+    "actuators_guess": [
+      "DO_CompressorVSG"
+    ],
+    "sensors_guess": [
+      "EncoderStartPosition01",
+      "EncoderStartPosition02",
+      "EncoderStartPosition03",
+      "EncoderStartPosition04",
+      "EncoderStartPosition05",
+      "EncoderStartPosition06",
+      "EncoderTargetPosition01",
+      "EncoderTargetPosition02",
+      "EncoderTargetPosition03",
+      "EncoderTargetPosition04",
+      "EncoderTargetPosition05",
+      "EncoderTargetPosition06"
+    ],
+    "reason_short": "Die POU verwendet MBS_VSG_VerticalMove, um die Vertikalachse zu bewegen.",
+    "evidence": [
+      "MBS_VSG_VerticalMove(MethodCall := MethodCall_CompressorControl, ...);",
+      "DO_CompressorVSG := MBS_VSG_VerticalMove.DigitalOutputControl_01;",
+      "EncoderTargetPosition_01 := EncoderTargetPosition01;",
+      "jobRunning := TRUE;"
+    ],
+    "inputs_guess": [],
+    "outputs_guess": [],
+    "_pou_iri": "http://www.semanticweb.org/AgentProgramParams/FBType_VSG_AS_CompressorControl",
+    "_pou_lang": "ST"
+  },
+  {
+    "is_skill": true,
+    "capability_name_realworld": "Horizontalachse encodergeführt bewegen",
+    "skill_name": "HRL_CB_AS_HorizontalMoveSensors",
+    "service_interface": "ST",
+    "real_world_effect_guess": "Die Horizontalachse wird encodergeführt bewegt.",
+    "actuators_guess": [
+      "DO_MovingConveyorBelt"
+    ],
+    "sensors_guess": [
+      "LightBarrierSensor_01",
+      "LightBarrierSensor_02"
+    ],
+    "reason_short": "Implementierung einer Horizontalachse mit encodergeführter Bewegung.",
+    "evidence": [
+      "DO_MovingConveyorBelt := HRL_CB_HorizontalMove.DigitalOutputControl_01;",
+      "IF NOT jobFinished THEN bBusy := TRUE;",
+      "MethodCall_HorizontalMove := MethodCall;",
+      "jobRunning := TRUE;"
+    ],
+    "inputs_guess": [],
+    "outputs_guess": [],
+    "_pou_iri": "http://www.semanticweb.org/AgentProgramParams/FBType_HRL_CB_AS_HorizontalMoveSensors",
+    "_pou_lang": "ST"
+  },
+  {
+    "is_skill": true,
+    "capability_name_realworld": "Vertikalachse encodergeführt bewegen",
+    "skill_name": "HRL_RGB_AS_HorizontalMoveEncoders",
+    "service_interface": "ST",
+    "real_world_effect_guess": "Die RGB-Vertikalachse wird encodergeführt bewegt.",
+    "actuators_guess": [
+      "DO_MovingHorizontalRGB_01"
+    ],
+    "sensors_guess": [
+      "TouchSensor01",
+      "EncoderStartPosition01",
+      "EncoderTargetPosition01",
+      "EncoderStartPosition02",
+      "EncoderTargetPosition02",
+      "TouchSensorRelief"
+    ],
+    "reason_short": "Implementierung einer Capability zur Bewegung der RGB-Vertikalachse.",
+    "evidence": [
+      "DO_MovingHorizontalRGB_01 := HRL_RGB_HorizontalMoveWithEncoder.DigitalOutputControl_01;",
+      "jobRunning := TRUE;",
+      "EncoderTargetPosition01 := EncoderPositionHorizontal_01;",
+      "EncoderTargetPosition02 := EncoderPositionHorizontal_02;"
+    ],
+    "inputs_guess": [],
+    "outputs_guess": [
+      "DO_MovingHorizontalRGB_01"
+    ],
+    "_pou_iri": "http://www.semanticweb.org/AgentProgramParams/FBType_HRL_RGB_AS_HorizontalMoveEncoders",
+    "_pou_lang": "ST"
+  },
+  {
+    "is_skill": true,
+    "capability_name_realworld": "Vertikalachse encodergeführt bewegen",
+    "skill_name": "HRL_RGB_AS_HorizontalMoveSensors",
+    "service_interface": "ST",
+    "real_world_effect_guess": "Die RGB-LEDs werden horizontal bewegt.",
+    "actuators_guess": [
+      "DO_MovingHorizontalRGB_01"
+    ],
+    "sensors_guess": [
+      "TouchSensor01",
+      "TouchSensor02",
+      "TOF_Time_TSR"
+    ],
+    "reason_short": "Implementierung einer horizontalen Bewegung der RGB-LEDs.",
+    "evidence": [
+      "DO_MovingHorizontalRGB_01 := HRL_RGB_HorizontalMove.DigitalOutputControl_01;",
+      "jobRunning := TRUE;",
+      "MovementDirection := DirectionHorizontal;",
+      "TouchSensorRelief := TSR;"
+    ],
+    "inputs_guess": [],
+    "outputs_guess": [
+      "DO_MovingHorizontalRGB_01"
+    ],
+    "_pou_iri": "http://www.semanticweb.org/AgentProgramParams/FBType_HRL_RGB_AS_HorizontalMoveSensors",
+    "_pou_lang": "ST"
+  },
+  {
+    "is_skill": true,
+    "capability_name_realworld": "Vertikalachse encodergeführt bewegen",
+    "skill_name": "HRL_RGB_AS_VerticalMoveEncoders",
+    "service_interface": "ST",
+    "real_world_effect_guess": "Die Vertikalachse wird encodergeführt bewegt.",
+    "actuators_guess": [
+      "DO_MovingVerticalRGB_01"
+    ],
+    "sensors_guess": [
+      "TouchSensor01",
+      "EncoderStartPosition01",
+      "EncoderTargetPosition01",
+      "EncoderStartPosition02",
+      "EncoderTargetPosition02",
+      "TouchSensorRelief"
+    ],
+    "reason_short": "Die POU implementiert eine vertikale Bewegung der Alche mit Encodersteuerung.",
+    "evidence": [
+      "DO_MovingVerticalRGB_01 := HRL_RGB_VerticalMoveWithEncoder.DigitalOutputControl_01;",
+      "jobRunning := TRUE;",
+      "EncoderTargetPosition01 := EncoderPositionVertical_01;",
+      "EncoderTargetPosition02 := EncoderPositionVertical_02;"
+    ],
+    "inputs_guess": [],
+    "outputs_guess": [
+      "DO_MovingVerticalRGB_01"
+    ],
+    "_pou_iri": "http://www.semanticweb.org/AgentProgramParams/FBType_HRL_RGB_AS_VerticalMoveEncoders",
+    "_pou_lang": "ST"
+  },
+  {
+    "is_skill": true,
+    "capability_name_realworld": "Horizontalachse encodergeführt bewegen",
+    "skill_name": "MBS_MR01_AS_HorizontalMoveSensors",
+    "service_interface": "ST",
+    "real_world_effect_guess": "Die Horizontalachse wird encodergeführt bewegt.",
+    "actuators_guess": [
+      "DO_MovingHorizontalMR01_01"
+    ],
+    "sensors_guess": [
+      "TouchSensor_01",
+      "TouchSensor_02",
+      "TOF_Time_TSR"
+    ],
+    "reason_short": "Implementierung einer Horizontalachse Bewegung",
+    "evidence": [
+      "DO_MovingHorizontalMR01_01 := MBS_MR01_HorizontalMove.DigitalOutputControl_01;",
+      "jobRunning := TRUE;",
+      "Start := 0;",
+      "MethodCall_HardeningProcess := MethodCall;",
+      "ProcessingTime_HardeningProcess := ProcessingTime;"
+    ],
+    "inputs_guess": [],
+    "outputs_guess": [
+      "DO_MovingHorizontalMR01_01"
+    ],
+    "_pou_iri": "http://www.semanticweb.org/AgentProgramParams/FBType_MBS_MR01_AS_HorizontalMoveSensors",
+    "_pou_lang": "ST"
+  },
+  {
+    "is_skill": true,
+    "capability_name_realworld": "Horizontalachse encodergeführt bewegen",
+    "skill_name": "MBS_VSG_AS_HorizontalMove",
+    "service_interface": "ST",
+    "real_world_effect_guess": "Die Horizontalachse wird encodergeführt bewegt.",
+    "actuators_guess": [
+      "DO_HorizontalMoveVSG_01"
+    ],
+    "sensors_guess": [
+      "TouchSensor_01",
+      "TouchSensor_02",
+      "TOF_Time_TSR",
+      "TSR"
+    ],
+    "reason_short": "Implementierung einer Horizontalachse Bewegung",
+    "evidence": [
+      "DO_HorizontalMoveVSG_01 := MBS_VSG_HorizontalMove.DigitalOutputControl_01;",
+      "jobRunning := TRUE;",
+      "MethodCall_HorizontalMove := MethodCall;",
+      "DirectionHorizontal := DirectionPoint;"
+    ],
+    "inputs_guess": [],
+    "outputs_guess": [
+      "DO_HorizontalMoveVSG_01"
+    ],
+    "_pou_iri": "http://www.semanticweb.org/AgentProgramParams/FBType_MBS_VSG_AS_HorizontalMove",
+    "_pou_lang": "ST"
+  },
+  {
+    "is_skill": true,
+    "capability_name_realworld": "Vertikalachse encodergeführt bewegen",
+    "skill_name": "MBS_VSG_AS_SuctionProcess",
+    "service_interface": "ST",
+    "real_world_effect_guess": "Die Vertikalachse wird encodergeführt bewegt.",
+    "actuators_guess": [
+      "DO_ControlCompressorSuctionProcessVSG_01"
+    ],
+    "sensors_guess": [
+      "TouchSensor_01",
+      "TouchSensor_02",
+      "EncoderStart01",
+      "EncoderStart02",
+      "EncoderStart03",
+      "EncoderStart04",
+      "EncoderStart05",
+      "EncoderStart06",
+      "EncoderTarget01",
+      "EncoderTarget02",
+      "EncoderTarget03",
+      "EncoderTarget04",
+      "EncoderTarget05",
+      "EncoderTarget06"
+    ],
+    "reason_short": "Die POU MBS_VSG_AS_SuctionProcess enthält eine Implementierung einer Funktion, die eine Vertikalachse encodergeführt bewegt.",
+    "evidence": [
+      "DO_ControlCompressorSuctionProcessVSG_01 := MBS_VSG_SuctionProcess.DigitalOutputControl_01;",
+      "jobRunning := TRUE;",
+      "MethodCall_CompressorControl := MethodCall;",
+      "Destination := DestinationPoint;"
+    ],
+    "inputs_guess": [],
+    "outputs_guess": [
+      "DO_ControlCompressorSuctionProcessVSG_01"
+    ],
+    "_pou_iri": "http://www.semanticweb.org/AgentProgramParams/FBType_MBS_VSG_AS_SuctionProcess",
+    "_pou_lang": "ST"
+  },
+  {
+    "is_skill": true,
+    "capability_name_realworld": "Horizontalachse encodergeführt bewegen",
+    "skill_name": "VSG_AS_HorizontalMoveEncoder",
+    "service_interface": "ST",
+    "real_world_effect_guess": "Die Horizontalachse wird encodergeführt bewegt.",
+    "actuators_guess": [
+      "DO_MovingHorizontalVSG_01"
+    ],
+    "sensors_guess": [
+      "TouchSensor01",
+      "EncoderStartPosition01",
+      "EncoderTargetPosition01",
+      "EncoderStartPosition02",
+      "EncoderTargetPosition02",
+      "TouchSensorRelief"
+    ],
+    "reason_short": "Implementiert die Funktion Horizontalachse encodergeführt bewegen.",
+    "evidence": [
+      "DO_MovingHorizontalVSG_01 := HRL_RGB_HorizontalMoveWithEncoder.DigitalOutputControl_01;",
+      "jobRunning := TRUE;",
+      "EncoderTargetPosition01 := EncoderPositionHorizontal_01;",
+      "EncoderTargetPosition02 := EncoderPositionHorizontal_02;"
+    ],
+    "inputs_guess": [],
+    "outputs_guess": [
+      "DO_MovingHorizontalVSG_01"
+    ],
+    "_pou_iri": "http://www.semanticweb.org/AgentProgramParams/FBType_VSG_AS_HorizontalMoveEncoder",
+    "_pou_lang": "ST"
+  },
+  {
+    "is_skill": true,
+    "capability_name_realworld": "Vertikalachse encodergeführt bewegen",
+    "skill_name": "VSG_AS_RotationMoveEncoder",
+    "service_interface": "ST",
+    "real_world_effect_guess": "Die Vertikalachse wird encodergeführt bewegt.",
+    "actuators_guess": [
+      "DO_MovingRotationVSG_01"
+    ],
+    "sensors_guess": [
+      "TouchSensor01",
+      "EncoderStartPosition01",
+      "EncoderTargetPosition01",
+      "EncoderStartPosition02",
+      "EncoderTargetPosition02",
+      "TouchSensorRelief"
+    ],
+    "reason_short": "Die POU implementiert eine Funktion, die eine Vertikalachse encodergeführt bewegt.",
+    "evidence": [
+      "DO_MovingRotationVSG_01 := HRL_RGB_VerticalMoveWithEncoder.DigitalOutputControl_01;",
+      "jobRunning := TRUE;",
+      "EncoderTargetPosition01 := EncoderPositionRotation_01;",
+      "EncoderTargetPosition02 := EncoderPositionRotation_02;"
+    ],
+    "inputs_guess": [],
+    "outputs_guess": [
+      "DO_MovingRotationVSG_01"
+    ],
+    "_pou_iri": "http://www.semanticweb.org/AgentProgramParams/FBType_VSG_AS_RotationMoveEncoder",
+    "_pou_lang": "ST"
+  },
+  {
+    "is_skill": true,
+    "capability_name_realworld": "Vertikalachse encodergeführt bewegen",
+    "skill_name": "VSG_AS_VerticalMoveEncoder",
+    "service_interface": "ST",
+    "real_world_effect_guess": "Die Vertikalachse wird encodergeführt bewegt.",
+    "actuators_guess": [
+      "DO_MovingVerticalVSG_01"
+    ],
+    "sensors_guess": [
+      "TouchSensor01",
+      "EncoderStartPosition01",
+      "EncoderTargetPosition01",
+      "EncoderStartPosition02",
+      "EncoderTargetPosition02",
+      "TouchSensorRelief"
+    ],
+    "reason_short": "Implementierung einer vertikalen Bewegung der Alche mit Encodersteuerung.",
+    "evidence": [
+      "DO_MovingVerticalVSG_01 := HRL_RGB_VerticalMoveWithEncoder.DigitalOutputControl_01;",
+      "jobRunning := TRUE;",
+      "EncoderTargetPosition01 := EncoderPositionVertical_01;",
+      "EncoderTargetPosition02 := EncoderPositionVertical_02;"
+    ],
+    "inputs_guess": [],
+    "outputs_guess": [
+      "DO_MovingVerticalVSG_01"
+    ],
+    "_pou_iri": "http://www.semanticweb.org/AgentProgramParams/FBType_VSG_AS_VerticalMoveEncoder",
+    "_pou_lang": "ST"
+  },
+  {
+    "is_skill": true,
+    "capability_name_realworld": "Horizontalachse encodergeführt bewegen",
+    "skill_name": "SST_PD_AS_HorizontalMove",
+    "service_interface": "ST",
+    "real_world_effect_guess": "Die Horizontalachse wird encodergeführt bewegt.",
+    "actuators_guess": [
+      "DO_ControlCompressorPD_01"
+    ],
+    "sensors_guess": [
+      "LightSensor_01",
+      "LightSensor_02"
+    ],
+    "reason_short": "Implementierung einer Horizontalachse Bewegung",
+    "evidence": [
+      "DO_ControlCompressorPD_01 := MBS_VSG_HorizontalMove.DigitalOutputControl_01;",
+      "jobRunning := TRUE;",
+      "Start := 0;",
+      "MethodCall_CompressorControl := MethodCall;",
+      "DestinationHorizontal := DestinationPoint;"
+    ],
+    "inputs_guess": [],
+    "outputs_guess": [],
+    "_pou_iri": "http://www.semanticweb.org/AgentProgramParams/FBType_SST_PD_AS_HorizontalMove",
+    "_pou_lang": "ST"
+  },
+  {
+    "is_skill": true,
+    "capability_name_realworld": "Horizontalachse encodergeführt bewegen",
+    "skill_name": "SST_CB_AS_HorizontalMove",
+    "service_interface": "ST",
+    "real_world_effect_guess": "Die Horizontalachse wird encodergeführt bewegt.",
+    "actuators_guess": [
+      "DO_MovingConveyorBelt"
+    ],
+    "sensors_guess": [
+      "DI01",
+      "DI02",
+      "TouchSensorRelief"
+    ],
+    "reason_short": "Implementierung einer Horizontalachse",
+    "evidence": [
+      "DO_MovingConveyorBelt := SST_CB_HorizontalMove.DigitalOutputControl_01;",
+      "jobRunning := TRUE;",
+      "Start := 0;",
+      "MethodCall_HorizontalMove := MethodCall;",
+      "DirectionHorizontal := DirectionPoint;"
+    ],
+    "inputs_guess": [
+      "DirectionHorizontal",
+      "InitStateDrive_Input"
+    ],
+    "outputs_guess": [
+      "DO_MovingConveyorBelt"
+    ],
+    "_pou_iri": "http://www.semanticweb.org/AgentProgramParams/FBType_SST_CB_AS_HorizontalMove",
+    "_pou_lang": "ST"
+  },
+  {
+    "is_skill": true,
+    "capability_name_realworld": "Vertikalachse encodergeführt bewegen",
+    "skill_name": "MBS_DmPD_AS_RotationMove",
+    "service_interface": "ST",
+    "real_world_effect_guess": "Die Vertikalachse wird encodergeführt bewegt.",
+    "actuators_guess": [
+      "DO_MovingRotationPmPD_01"
+    ],
+    "sensors_guess": [
+      "TouchSensor_01",
+      "TouchSensor_02"
+    ],
+    "reason_short": "Implementierung eines Jobs zur Bewegung der Vertikalachse.",
+    "evidence": [
+      "DO_MovingRotationPmPD_01 := MBS_DmPD_RotationMove.DigitalOutputControl_01;",
+      "jobRunning := TRUE;",
+      "Start := 0;",
+      "MethodCall_RotationMove := MethodCall;",
+      "DirectionRotation := DirectionPoint;"
+    ],
+    "inputs_guess": [],
+    "outputs_guess": [
+      "DO_MovingRotationPmPD_01"
+    ],
+    "_pou_iri": "http://www.semanticweb.org/AgentProgramParams/FBType_MBS_DmPD_AS_RotationMove",
+    "_pou_lang": "ST"
+  }
+]

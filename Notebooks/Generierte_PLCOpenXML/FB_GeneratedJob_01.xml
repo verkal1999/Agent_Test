@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='utf-8'?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200" xmlns:xhtml="http://www.w3.org/1999/xhtml"><fileHeader companyName="GeneratedByPython" productName="TwinCAT PLC Control" productVersion="3.5.x" creationDateTime="2026-01-21T07:07:40" /><contentHeader name="Proj1" modificationDateTime="2026-01-21T07:07:40"><coordinateInfo><fbd><scaling x="1" y="1" /></fbd><ld><scaling x="1" y="1" /></ld><sfc><scaling x="1" y="1" /></sfc></coordinateInfo><addData><data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation"><ProjectInformation /></data></addData></contentHeader><types><dataTypes /><pous><pou name="FB_GeneratedJob_01" pouType="functionBlock"><interface><localVars><variable name="eState"><type><INT /></type></variable><variable name="bFinished"><type><BOOL /></type></variable><variable name="nCounter"><type><INT /></type></variable><variable name="fResult"><type><LREAL /></type></variable></localVars></interface><body><ST><xhtml:xhtml>// Haupt-Body des FBs - ruft State Machine Logik auf
+// Hier könnte auch zyklischer Code stehen</xhtml:xhtml></ST></body><addData><data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation"><Method name="JobStart" ObjectId="b9339563-095a-4733-b785-c5777a4b20c6"><interface><returnType><BOOL /></returnType></interface><body><ST><xhtml:xhtml>// Methode: JobStart
+eState := 1;
+bFinished := FALSE;
+nCounter := 0;
+fResult := 0.0;
+JobStart := TRUE;</xhtml:xhtml></ST></body></Method></data><data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation"><Method name="Abort" ObjectId="8c3ba7b6-ea79-42c4-a8c4-992149b11e03"><interface><returnType><BOOL /></returnType></interface><body><ST><xhtml:xhtml>// Methode: Abort
+eState := 4;
+bFinished := FALSE;
+Abort := TRUE;</xhtml:xhtml></ST></body></Method></data><data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation"><Method name="CheckState" ObjectId="75c23255-74bb-45a4-a426-e566f1a548c8"><interface><returnType><INT /></returnType></interface><body><ST><xhtml:xhtml>// Methode: CheckState (Zyklisch aufgerufen)
+CASE eState OF
+    0:
+        ; // Warten auf Start
+
+    1:
+        // --- HIER KOMMT DEIN GENERIERTER CODE REIN ---
+        
+// Dies ist der Code, den wir vorher generiert haben
+nCounter := nCounter + 1;
+fResult := SQRT(REAL_TO_LREAL(nCounter));
+
+IF nCounter &gt; 100 THEN
+    bFinished := TRUE;
+END_IF
+
+        // ---------------------------------------------
+
+        IF bFinished THEN
+            eState := 2;
+        END_IF
+
+    2:
+        ; // Fertig
+
+    3:
+        ; // Fehlerbehandlung
+
+    4:
+        eState := 0; // Reset nach Abort
+END_CASE
+CheckState := eState;</xhtml:xhtml></ST></body></Method></data></addData></pou></pous></types><instances><configurations /></instances></project>

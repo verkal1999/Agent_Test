@@ -1,856 +1,621 @@
-@prefix : <http://www.semanticweb.org/AgentProgramParams/> .
 @prefix ag: <http://www.semanticweb.org/AgentProgramParams/> .
 @prefix dp: <http://www.semanticweb.org/AgentProgramParams/dp_> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix xml: <http://www.w3.org/XML/1998/namespace> .
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@base <http://www.semanticweb.org/AgentProgramParams/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+ag: a owl:Ontology .
+
+ag:StandardFBType_CTD a ag:class_FBType,
+        ag:class_StandardFBType,
+        owl:NamedIndividual ;
+    dp:hasPOULanguage "ST" ;
+    dp:hasPOUName "CTD" ;
+    dp:hasPOUType "FunctionBlock" ;
+    ag:op_hasPort ag:Port_CTD_CD,
+        ag:Port_CTD_CV,
+        ag:Port_CTD_LD,
+        ag:Port_CTD_PV,
+        ag:Port_CTD_Q .
+
+ag:StandardFBType_CTU a ag:class_FBType,
+        ag:class_StandardFBType,
+        owl:NamedIndividual ;
+    dp:hasPOULanguage "ST" ;
+    dp:hasPOUName "CTU" ;
+    dp:hasPOUType "FunctionBlock" ;
+    ag:op_hasPort ag:Port_CTU_CU,
+        ag:Port_CTU_CV,
+        ag:Port_CTU_PV,
+        ag:Port_CTU_Q,
+        ag:Port_CTU_R .
+
+ag:StandardFBType_CTUD a ag:class_FBType,
+        ag:class_StandardFBType,
+        owl:NamedIndividual ;
+    dp:hasPOULanguage "ST" ;
+    dp:hasPOUName "CTUD" ;
+    dp:hasPOUType "FunctionBlock" ;
+    ag:op_hasPort ag:Port_CTUD_CD,
+        ag:Port_CTUD_CU,
+        ag:Port_CTUD_CV,
+        ag:Port_CTUD_LD,
+        ag:Port_CTUD_PV,
+        ag:Port_CTUD_QD,
+        ag:Port_CTUD_QU,
+        ag:Port_CTUD_R .
+
+ag:StandardFBType_F_TRIG a ag:class_FBType,
+        ag:class_StandardFBType,
+        owl:NamedIndividual ;
+    dp:hasPOULanguage "ST" ;
+    dp:hasPOUName "F_TRIG" ;
+    dp:hasPOUType "FunctionBlock" ;
+    ag:op_hasPort ag:Port_F_TRIG_CLK,
+        ag:Port_F_TRIG_Q .
+
+ag:StandardFBType_RS a ag:class_FBType,
+        ag:class_StandardFBType,
+        owl:NamedIndividual ;
+    dp:hasPOULanguage "ST" ;
+    dp:hasPOUName "RS" ;
+    dp:hasPOUType "FunctionBlock" ;
+    ag:op_hasPort ag:Port_RS_Q1,
+        ag:Port_RS_R1,
+        ag:Port_RS_S .
+
+ag:StandardFBType_R_TRIG a ag:class_FBType,
+        ag:class_StandardFBType,
+        owl:NamedIndividual ;
+    dp:hasPOULanguage "ST" ;
+    dp:hasPOUName "R_TRIG" ;
+    dp:hasPOUType "FunctionBlock" ;
+    ag:op_hasPort ag:Port_R_TRIG_CLK,
+        ag:Port_R_TRIG_Q .
+
+ag:StandardFBType_SR a ag:class_FBType,
+        ag:class_StandardFBType,
+        owl:NamedIndividual ;
+    dp:hasPOULanguage "ST" ;
+    dp:hasPOUName "SR" ;
+    dp:hasPOUType "FunctionBlock" ;
+    ag:op_hasPort ag:Port_SR_Q1,
+        ag:Port_SR_R,
+        ag:Port_SR_S1 .
+
+ag:StandardFBType_TOF a ag:class_FBType,
+        ag:class_StandardFBType,
+        owl:NamedIndividual ;
+    dp:hasPOULanguage "ST" ;
+    dp:hasPOUName "TOF" ;
+    dp:hasPOUType "FunctionBlock" ;
+    ag:op_hasPort ag:Port_TOF_ET,
+        ag:Port_TOF_IN,
+        ag:Port_TOF_PT,
+        ag:Port_TOF_Q .
+
+ag:StandardFBType_TON a ag:class_FBType,
+        ag:class_StandardFBType,
+        owl:NamedIndividual ;
+    dp:hasPOULanguage "ST" ;
+    dp:hasPOUName "TON" ;
+    dp:hasPOUType "FunctionBlock" ;
+    ag:op_hasPort ag:Port_TON_ET,
+        ag:Port_TON_IN,
+        ag:Port_TON_PT,
+        ag:Port_TON_Q .
+
+ag:StandardFBType_TP a ag:class_FBType,
+        ag:class_StandardFBType,
+        owl:NamedIndividual ;
+    dp:hasPOULanguage "ST" ;
+    dp:hasPOUName "TP" ;
+    dp:hasPOUType "FunctionBlock" ;
+    ag:op_hasPort ag:Port_TP_ET,
+        ag:Port_TP_IN,
+        ag:Port_TP_PT,
+        ag:Port_TP_Q .
+
+ag:class_CustomFBType a owl:Class ;
+    rdfs:comment "Diese Klasse kennzeichnet Function Block Typen, die projekt spezifisch implementiert wurden und nicht aus einer Standardbibliothek stammen. Sie dient dazu, benutzerdefinierte Logikbausteine semantisch von generischen Standardfunktionen zu trennen, damit Analysen gezielter durchgeführt werden können. CustomFBTypes bilden häufig die eigentlichen Skills oder spezifische Steuerungslogik ab, zum Beispiel Bewegungen einer Achse, Prozessschritte oder die Abbildung einer Stationsfunktion. Im Knowledge Graph ist die Klasse hilfreich, um Abhängigkeiten zwischen Skills zu identifizieren, Schnittstellen zu vergleichen und zentrale Bausteine zu priorisieren. Aus PLCopen XML lassen sich solche Typen meist daran erkennen, dass sie als eigene POU Definitionen im Projekt auftauchen und keinen eindeutigen Standardnamen wie TON, TOF oder RS besitzen. In späteren Auswertungen kann diese Unterscheidung genutzt werden, um automatisiert eine Liste relevanter Skills zu extrahieren und Standardkomponenten wie Timer oder Trigger auszublenden. Insgesamt unterstützt class_CustomFBType somit die fachliche Strukturierung der Projektlogik und erleichtert die Dokumentation, weil projektbezogene Funktionen klar markiert werden."@de ;
+    rdfs:subClassOf ag:class_FBType .
+
+dp:hasConsistencyReport a owl:DatatypeProperty ;
+    rdfs:domain ag:class_POU ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf dp:hasPOUAttribute .
+
+dp:hasDescription a owl:DatatypeProperty ;
+    rdfs:domain ag:class_Variable ;
+    rdfs:range xsd:string .
+
+dp:hasGlobalVariableListName a owl:DatatypeProperty ;
+    rdfs:domain ag:class_GlobalVariableList ;
+    rdfs:range xsd:string .
+
+dp:hasHardwareAddress a owl:DatatypeProperty ;
+    rdfs:domain ag:class_Variable ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf owl:topDataProperty .
+
+dp:hasPLCProjectName a owl:DatatypeProperty ;
+    rdfs:domain ag:class_PLCProject ;
+    rdfs:range xsd:string .
+
+dp:hasPOUCode a owl:DatatypeProperty ;
+    rdfs:domain ag:class_POU ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf dp:hasPOUAttribute .
+
+dp:hasPOUCodeDescription a owl:DatatypeProperty ;
+    rdfs:domain ag:class_POU ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf dp:hasPOUAttribute .
+
+dp:hasPOULanguage a owl:DatatypeProperty ;
+    rdfs:domain ag:class_POU ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf dp:hasPOUAttribute .
+
+dp:hasPOUName a owl:DatatypeProperty ;
+    rdfs:domain ag:class_POU ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf dp:hasPOUAttribute .
+
+dp:hasPOUType a owl:DatatypeProperty ;
+    rdfs:domain ag:class_POU ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf dp:hasPOUAttribute .
+
+dp:hasPortDirection a owl:DatatypeProperty ;
+    rdfs:domain ag:class_Port ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf dp:hasPortAttribute .
+
+dp:hasPortName a owl:DatatypeProperty ;
+    rdfs:domain ag:class_Port ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf dp:hasPortAttribute .
+
+dp:hasPortType a owl:DatatypeProperty ;
+    rdfs:domain ag:class_Port ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf dp:hasPortAttribute .
+
+dp:hasVariableName a owl:DatatypeProperty ;
+    rdfs:domain ag:class_Variable ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf dp:hasVariableAttribute .
+
+dp:hasVariableScope a owl:DatatypeProperty ;
+    rdfs:range [ a rdfs:Datatype ;
+            owl:oneOf [ a rdf:List ;
+                    rdf:first "global" ;
+                    rdf:rest [ a rdf:List ;
+                            rdf:first "input" ;
+                            rdf:rest [ a rdf:List ;
+                                    rdf:first "local" ;
+                                    rdf:rest [ a rdf:List ;
+                                            rdf:first "output" ;
+                                            rdf:rest () ] ] ] ] ] ;
+    rdfs:subPropertyOf dp:hasVariableAttribute .
+
+dp:hasVariableType a owl:DatatypeProperty ;
+    rdfs:domain ag:class_Variable ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf dp:hasVariableAttribute .
+
+dp:ioRawXml a owl:DatatypeProperty ;
+    rdfs:domain ag:class_Variable ;
+    rdfs:range xsd:string .
+
+dp:isUnusedPort a owl:DatatypeProperty ;
+    rdfs:domain ag:class_Port ;
+    rdfs:range xsd:boolean ;
+    rdfs:subPropertyOf dp:isUnused .
+
+dp:isUnusedVar a owl:DatatypeProperty ;
+    rdfs:domain ag:class_Variable ;
+    rdfs:range xsd:boolean ;
+    rdfs:subPropertyOf dp:isUnused .
+
+ag:op_assignsFrom a owl:ObjectProperty ;
+    rdfs:comment "# 2. Woher kommt das Signal? Hier ist die Signal-Quelle bei Funktionsaufruf" ;
+    rdfs:domain ag:class_ParameterAssignment ;
+    rdfs:range ag:class_SignalSource .
+
+ag:op_assignsToPort a owl:ObjectProperty ;
+    rdfs:comment "# 1. Wohin geht das Signal? (Zum Port \"CLK\" definiert im Typ R_TRIG)" ;
+    rdfs:domain ag:class_ParameterAssignment ;
+    rdfs:range ag:class_Port .
+
+ag:op_callsPOU a owl:ObjectProperty ;
+    rdfs:domain ag:class_POUCall ;
+    rdfs:range ag:class_POU .
+
+ag:op_consistsOfPOU a owl:ObjectProperty ;
+    rdfs:domain ag:class_PLCProject ;
+    rdfs:range ag:class_POU .
+
+ag:op_containsPOUCall a owl:ObjectProperty ;
+    rdfs:domain ag:class_POU ;
+    rdfs:range ag:class_POUCall .
+
+ag:op_hasAssignment a owl:ObjectProperty ;
+    rdfs:domain ag:class_POUCall ;
+    rdfs:range ag:class_ParameterAssignment .
+
+ag:op_hasCallerVariable a owl:ObjectProperty ;
+    rdfs:domain ag:class_POUCall ;
+    rdfs:range ag:class_Variable .
+
+ag:op_hasInfluenceOnVariable a owl:ObjectProperty ;
+    rdfs:domain ag:class_Variable ;
+    rdfs:range ag:class_Variable .
+
+ag:op_hasPort a owl:ObjectProperty ;
+    rdfs:domain ag:class_FBType ;
+    rdfs:range ag:class_Port .
+
+ag:op_implementsPort a owl:ObjectProperty ;
+    rdfs:comment "Verbindet eine interne Variable eines FBs mit dem Port, den sie repräsentiert" ;
+    rdfs:domain ag:class_Variable ;
+    rdfs:range ag:class_Port .
+
+ag:op_instantiatesPort a owl:ObjectProperty ;
+    rdfs:domain ag:class_PortInstance ;
+    rdfs:range ag:class_Port .
+
+ag:op_isBoundToChannel a owl:ObjectProperty ;
+    rdfs:domain ag:class_Variable ;
+    rdfs:range ag:class_IOChannel .
+
+ag:op_isBoundToPort a owl:ObjectProperty ;
+    rdfs:domain ag:class_Variable ;
+    rdfs:range ag:class_Port .
+
+ag:op_isInstanceOfFBType a owl:ObjectProperty ;
+    rdfs:domain ag:class_FBInstance ;
+    rdfs:range ag:class_FBType .
+
+ag:op_isInstanceOfPort a owl:ObjectProperty ;
+    rdfs:domain ag:class_PortInstance ;
+    rdfs:range ag:class_Port .
+
+ag:op_isMappedToPOU a owl:ObjectProperty ;
+    rdfs:domain ag:class_Variable ;
+    rdfs:range ag:class_POU .
+
+ag:op_isMappedToVariable a owl:ObjectProperty ;
+    rdfs:domain ag:class_Variable ;
+    rdfs:range ag:class_Variable .
+
+ag:op_isPortOfInstance a owl:ObjectProperty ;
+    rdfs:domain ag:class_PortInstance ;
+    rdfs:range ag:class_FBInstance .
+
+ag:op_isSubProgramOf a owl:ObjectProperty ;
+    rdfs:domain ag:class_Program ;
+    rdfs:range ag:class_Program .
+
+ag:op_listsGlobalVariable a owl:ObjectProperty ;
+    rdfs:domain ag:class_GlobalVariableList ;
+    rdfs:range ag:class_Variable .
+
+ag:op_representsFBInstance a owl:ObjectProperty ;
+    rdfs:domain ag:class_Variable ;
+    rdfs:range ag:class_FBInstance .
+
+ag:op_usesLiteral a owl:ObjectProperty ;
+    rdfs:domain ag:class_POU ;
+    rdfs:range ag:class_SourceLiteral .
+
+ag:op_usesPort a owl:ObjectProperty ;
+    rdfs:domain ag:class_Variable ;
+    rdfs:range ag:class_Port .
+
+ag:op_usesVariable a owl:ObjectProperty ;
+    rdfs:domain ag:class_POU ;
+    rdfs:range ag:class_Variable .
+
+ag:Port_CTD_CD a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "CD" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_CTD_CV a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "CV" ;
+    dp:hasPortType "INT" .
+
+ag:Port_CTD_LD a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "LD" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_CTD_PV a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "PV" ;
+    dp:hasPortType "INT" .
+
+ag:Port_CTD_Q a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "Q" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_CTUD_CD a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "CD" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_CTUD_CU a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "CU" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_CTUD_CV a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "CV" ;
+    dp:hasPortType "INT" .
+
+ag:Port_CTUD_LD a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "LD" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_CTUD_PV a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "PV" ;
+    dp:hasPortType "INT" .
+
+ag:Port_CTUD_QD a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "QD" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_CTUD_QU a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "QU" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_CTUD_R a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "R" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_CTU_CU a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "CU" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_CTU_CV a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "CV" ;
+    dp:hasPortType "INT" .
+
+ag:Port_CTU_PV a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "PV" ;
+    dp:hasPortType "INT" .
+
+ag:Port_CTU_Q a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "Q" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_CTU_R a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "R" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_F_TRIG_CLK a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "CLK" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_F_TRIG_Q a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "Q" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_RS_Q1 a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "Q1" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_RS_R1 a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "R1" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_RS_S a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "S" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_R_TRIG_CLK a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "CLK" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_R_TRIG_Q a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "Q" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_SR_Q1 a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "Q1" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_SR_R a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "R" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_SR_S1 a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "S1" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_TOF_ET a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "ET" ;
+    dp:hasPortType "TIME" .
+
+ag:Port_TOF_IN a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "IN" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_TOF_PT a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "PT" ;
+    dp:hasPortType "TIME" .
+
+ag:Port_TOF_Q a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "Q" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_TON_ET a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "ET" ;
+    dp:hasPortType "TIME" .
+
+ag:Port_TON_IN a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "IN" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_TON_PT a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "PT" ;
+    dp:hasPortType "TIME" .
+
+ag:Port_TON_Q a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "Q" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_TP_ET a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "ET" ;
+    dp:hasPortType "TIME" .
+
+ag:Port_TP_IN a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "IN" ;
+    dp:hasPortType "BOOL" .
+
+ag:Port_TP_PT a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Input" ;
+    dp:hasPortName "PT" ;
+    dp:hasPortType "TIME" .
+
+ag:Port_TP_Q a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "Q" ;
+    dp:hasPortType "BOOL" .
+
+ag:class_IOChannel a owl:Class ;
+    rdfs:comment "Diese Klasse repräsentiert einen Hardwarekanal, also einen physikalischen Ein oder Ausgang, der in der Steuerung adressiert und mit Variablen verbunden werden kann. Ein IOChannel bildet damit die Brücke zwischen der semantischen Logik im Knowledge Graph und der realen Peripherie, etwa Sensoren, Ventile, Motoren oder Signallampen. Im Knowledge Graph wird ein IOChannel häufig genutzt, um Variablen mit Hardwareadressen zu verknüpfen und dadurch nachvollziehbar zu machen, welcher Code welche reale Komponente beeinflusst. Aus PLCopen XML kann ein IOChannel entweder direkt aus Hardwarezuordnungen oder indirekt aus Rohinformationen des Exports rekonstruiert werden, abhängig davon, wie vollständig das Mapping exportiert wurde. Die Klasse ist besonders wertvoll für Analysen, die Skill Ausführung mit physikalischen Effekten verbinden, da so sichtbar wird, welche Ausgänge ein Skill setzt und welche Eingänge er überwacht. Außerdem unterstützt sie Plausibilitätsprüfungen, beispielsweise ob ein Ausgang nur von einem Skill kontrolliert wird oder ob Konflikte zwischen mehreren Bausteinen existieren. Insgesamt macht class_IOChannel den Knowledge Graph hardware nah und damit für reale Automatisierungsszenarien aussagekräftig."@de .
+
+ag:class_SourceLiteral a owl:Class ;
+    rdfs:comment "Diese Klasse repräsentiert konstante Literalwerte, die in einem SPS Netzwerk direkt als Eingangswerte verwendet werden, zum Beispiel TRUE, FALSE, 0 oder Zeitkonstanten. Sie wird im Knowledge Graph als spezielle Form einer Signalquelle modelliert, damit Parameterzuweisungen auch dann sauber abgebildet werden können, wenn kein Variablenname existiert. Literale sind in vielen Steuerungslogiken wichtig, etwa um Defaultwerte zu setzen, Zustandsautomaten zu initialisieren oder Zeitparameter für Timer vorzugeben. Aus PLCopen XML lassen sich solche Literale häufig aus Parameterbelegungen erkennen, wenn ein Eingang nicht verdrahtet ist oder explizit mit einem konstanten Wert verbunden wird. Die Klasse ermöglicht es, den Datenfluss vollständig zu rekonstruieren, da sonst ein Teil der Eingänge als undefiniert erscheinen würde. In Skill Analysen helfen SourceLiterals dabei, feste Konfigurationen sichtbar zu machen, zum Beispiel konstante Verfahrzeiten oder feste Betriebsartenparameter. Damit trägt class_SourceLiteral zur Vollständigkeit und Nachvollziehbarkeit der Modellierung bei."@de ;
+    rdfs:subClassOf ag:class_SignalSource .
+
+ag:class_GlobalVariableList a owl:Class ;
+    rdfs:comment "Diese Klasse beschreibt eine globale Variablenliste als Container, der projektweit zugängliche Variablen zusammenfasst. GlobalVariableLists werden in SPS Projekten verwendet, um gemeinsame Signale, Zustände oder Hardwarezuordnungen zentral zu verwalten und in mehreren Programmen oder Function Blocks nutzbar zu machen. Im Knowledge Graph ermöglicht diese Klasse eine klare Gruppierung der globalen Symbolik und erleichtert Abfragen, die sich auf globale Signale beziehen, etwa auf Safety Signale, Betriebsartenflags oder I O Variablen. Aus PLCopen XML wird eine solche Liste typischerweise aus GVL Bereichen abgeleitet, wobei jede enthaltene Variable separat als class_Variable modelliert wird. Die Klasse unterstützt außerdem die Nachvollziehbarkeit, weil sichtbar wird, welche Variablen tatsächlich global sind und welche nur lokal innerhalb eines Bausteins existieren. Für die Dokumentation ist class_GlobalVariableList hilfreich, um globale Schnittstellen der Anlage zu beschreiben und zentrale Signalgruppen systematisch zu erläutern. Außerdem lassen sich hieraus automatisch Listen für Hardwaremapping oder Schnittstellendokumente erzeugen."@de .
+
+ag:class_PLCProject a owl:Class ;
+    rdfs:comment "Diese Klasse beschreibt das gesamte SPS Projekt als oberste Container Entität im Knowledge Graph. Eine Instanz dieser Klasse fasst alle Inhalte zusammen, die aus einem PLCopen XML Export abgeleitet wurden, also Programme, Function Block Typen, globale Variablenlisten und die zugehörigen Verknüpfungen. Das Objekt dient als Einstiegspunkt, um das Modell strukturiert abzufragen und alle Substrukturen eindeutig einem Projekt zuzuordnen. Typischerweise besitzt ein PLCProject Beziehungen zu Programmen und zu globalen Variablenlisten, wodurch nachvollziehbar wird, welche Logik zyklisch ausgeführt wird und welche Variablen projektweit verfügbar sind. In der praktischen Nutzung ist das PLCProject besonders hilfreich, um mehrere Exporte oder Versionen getrennt zu verwalten und Vergleiche zwischen unterschiedlichen Projektständen durchführen zu können. Zusätzlich unterstützt diese Klasse die Nachvollziehbarkeit der Provenienz, da alle abgeleiteten Entitäten eindeutig als Teil eines konkreten Exports interpretiert werden."@de .
+
+ag:class_Program a owl:Class ;
+    rdfs:comment "Diese Klasse repräsentiert ein SPS Programm, das im Normalfall zyklisch von der Runtime ausgeführt wird und daher die oberste Ebene der Steuerungslogik bildet. Programme sind die Haupt Einstiegspunkte für die Ausführung, da sie typische Betriebsartenlogiken, Sequenzen oder Skill Orchestrierungen enthalten. Im Knowledge Graph dient diese Klasse dazu, die Gesamtabläufe sichtbar zu machen und die enthaltenen Aufrufe von Function Blocks als POUCalls explizit zu modellieren. Ein Programm besitzt in der Regel Beziehungen zu den aufgerufenen Bausteinen und deren Parameterzuweisungen, wodurch die Signalflüsse und Startbedingungen nachvollziehbar werden. Aus einem PLCopen XML Export entsteht diese Struktur aus den Program POUs, die häufig als zentrale Knoten für Skill Sets oder Stationslogik fungieren. Für Analysen ist class_Program besonders wichtig, weil hier häufig entschieden wird, welche Subsysteme wann aktiviert werden und welche Ausgänge überhaupt freigegeben werden dürfen. Damit ist die Klasse ideal, um Skill Trigger, Betriebsmodi und globale Abhängigkeiten im Gesamtprojekt zu verstehen."@de ;
+    rdfs:subClassOf ag:class_POU .
+
+dp:isUnused a owl:DatatypeProperty .
+
+ag:class_FBInstance a owl:Class ;
+    rdfs:comment "Diese Klasse beschreibt eine konkrete Instanz eines Function Block Typs innerhalb eines Programms oder eines anderen Bausteins. Während class_FBType den Bauplan liefert, stellt class_FBInstance das tatsächliche Objekt dar, das in einem Netzwerk verwendet wird und dessen interne Zustände während der Laufzeit existieren. Im Knowledge Graph ist diese Klasse entscheidend, um die echte Struktur des FBD Netzwerks abzubilden, weil ein Baustein mehrfach instanziiert werden kann, jeweils mit eigenen Parametern, eigenen Variablenzuordnungen und eigenem Zustand. Eine FBInstance ist über Beziehungen einem FBType zugeordnet und besitzt PortInstanzen, die die konkreten Pins dieser Instanz darstellen. Damit lassen sich Verdrahtungen und Signalwege nicht nur abstrakt, sondern real und vollständig nachvollziehen. In PLCopen XML entspricht dies dem Auftreten eines Baustein Blocks im Netzwerk, also einer konkreten Verwendung innerhalb des FBD. Für Skill Analysen ist class_FBInstance besonders wichtig, weil hier ersichtlich wird, welche spezifischen Sensoren, Aktoren oder Parameter an einen Skill angeschlossen sind und wie die Logik in einer konkreten Station konfiguriert wurde."@de .
+
+ag:class_ParameterAssignment a owl:Class ;
+    rdfs:comment "Diese Klasse repräsentiert eine konkrete Parameterzuweisung im Netzwerk und beschreibt damit die Verdrahtung eines Signals von einer Quelle zu einem Zielport. ParameterAssignments sind die zentrale Struktur, um den Datenfluss in einem FBD Modell vollständig abzubilden, da sie definieren, welcher Wert an welchem Eingang anliegt oder welche Variable mit einem Ausgang verbunden ist. Im Knowledge Graph verweist eine ParameterAssignment typischerweise auf eine SignalSource als Ursprung und auf eine PortInstance als Ziel, wodurch die Verbindung eindeutig und instanzbezogen beschrieben wird. Aus PLCopen XML entstehen Parameterzuweisungen aus den Verbindungsinformationen zwischen Block Pins und Variablen oder zwischen mehreren Bausteinen. Diese Klasse ist für Analysen besonders wichtig, weil darüber echte Signalpfade rekonstruiert werden können, beispielsweise vom Startsignal eines Skills über Triggerlogik bis zur Ansteuerung eines Aktors. Außerdem lassen sich darüber automatische Validierungen durchführen, etwa ob alle Pflichtparameter eines Bausteins beschaltet sind oder ob Datentypen konsistent verbunden wurden. Insgesamt ist class_ParameterAssignment die semantische Entsprechung einer Leitung im Schaltplan des FBD und damit eine Schlüsselklasse für jede Graphanalyse."@de .
+
+ag:class_PortInstance a owl:Class ;
+    rdfs:comment "Diese Klasse bildet die konkrete Ausprägung eines Ports innerhalb einer spezifischen Function Block Instanz ab und entspricht damit einem realen Pin in einem FBD Netzwerk. Während class_Port nur den abstrakten Parameter eines Typs beschreibt, ist die PortInstance der tatsächliche Anschluss, der im Netzwerk verdrahtet wird und Signale empfängt oder ausgibt. Im Knowledge Graph wird diese Klasse benötigt, weil Signalverbindungen immer an eine konkrete Instanz gebunden sind und nicht nur an den Typ. Eine PortInstance verweist einerseits auf die zugehörige FBInstance und andererseits auf den Port des zugrunde liegenden FBTypes, wodurch eine eindeutige Zuordnung möglich ist. Aus PLCopen XML ergibt sich dieses Konzept aus Block Pins und deren Verbindungen im FBD, die erst im Kontext der Instanz vollständig spezifiziert sind. PortInstanzen sind besonders wichtig für die Rekonstruktion von Signalflüssen, da Parameterzuweisungen genau diese Knoten als Ziel besitzen. Damit ermöglicht class_PortInstance eine vollständige Analyse, welche Variable oder welches Zwischensignal tatsächlich an welchen Bausteinpin angeschlossen ist."@de ;
+    rdfs:subClassOf ag:class_SignalSource .
+
+dp:hasPortAttribute a owl:DatatypeProperty .
+
+dp:hasVariableAttribute a owl:DatatypeProperty .
+
+ag:class_POUCall a owl:Class ;
+    rdfs:comment "Diese Klasse beschreibt einen konkreten Aufruf einer Program Organisation Unit innerhalb eines Programms oder eines Function Blocks. Ein POUCall macht sichtbar, dass ein bestimmter Baustein nicht nur als Typ existiert, sondern an einer konkreten Stelle tatsächlich verwendet wird. Im Knowledge Graph ist dies essenziell, um Abhängigkeitsstrukturen zu rekonstruieren, also welche Bausteine intern voneinander abhängen und wie tief verschachtelte Logik aufgebaut ist. Ein POUCall kann mit einer FBInstance und deren PortInstanzen verknüpft werden, sodass klar wird, welche konkrete Instanz eines Bausteintyps gemeint ist. Aus PLCopen XML ergibt sich ein POUCall aus einem Bausteinblock im FBD oder aus einem Funktionsaufruf in ST Code, je nach Darstellung. Für die Skill Analyse kann damit nachvollzogen werden, welche Standardbausteine ein Skill verwendet, beispielsweise Trigger, Speicher oder Timer, und welche Unterbausteine die eigentliche Prozesslogik realisieren. Insgesamt macht class_POUCall die Ausführungsstruktur explizit, wodurch sich Skill Ketten, Signalpfade und interne Architektur systematisch untersuchen lassen."@de .
+
+ag:class_SignalSource a owl:Class ;
+    rdfs:comment "Diese Klasse stellt eine abstrakte Signalquelle dar und dient als gemeinsamer Oberbegriff für unterschiedliche Ursprünge von Werten im FBD Netzwerk. Eine Signalquelle kann beispielsweise eine Variable sein, eine PortInstance eines Bausteins oder ein konstant definierter Literalwert. Im Knowledge Graph ist diese Abstraktion wichtig, weil Parameterzuweisungen immer nach dem gleichen Muster funktionieren, unabhängig davon, ob der Wert aus einer Variable oder aus einer Bausteinausgabe stammt. Dadurch können Signalflüsse einheitlich modelliert und abgefragt werden, ohne für jede Quelle unterschiedliche Datenstrukturen zu benötigen. Aus PLCopen XML entstehen Signalquellen aus Verdrahtungen, die entweder direkt auf Variablen verweisen oder die Ausgänge anderer Bausteine als Quelle verwenden. Die Klasse unterstützt komplexe Analysen wie Abhängigkeitsgraphen, Datenflussverfolgung oder die Ermittlung von Skill Vorbedingungen, da sich jede Eingangsbelegung auf eine SignalSource zurückführen lässt. Insgesamt sorgt class_SignalSource dafür, dass der Knowledge Graph die semantische Struktur des FBD Netzwerks vollständig und flexibel repräsentieren kann."@de .
+
+dp:hasPOUAttribute a owl:DatatypeProperty ;
+    rdfs:domain ag:class_POU .
+
+ag:class_StandardFBType a owl:Class ;
+    rdfs:comment "Diese Klasse beschreibt Standard Function Block Typen, die typischerweise aus der SPS Bibliothek oder dem IEC 61131 3 Standard stammen, zum Beispiel RS Speicher, Triggerbausteine oder Zeitfunktionen. Sie wird eingesetzt, um wiederkehrende Basiskomponenten gesondert zu behandeln und nicht mit den projekt spezifischen Skill Bausteinen zu vermischen. StandardFBTypes dienen häufig als Infrastruktur für Zustandsbildung, Flankenerkennung, Zeitverhalten und Zählfunktionen und sind daher in vielen CustomFBTypes als interne Aufrufe enthalten. Im Knowledge Graph ermöglicht diese Klasse eine robuste Erkennung typischer Muster, etwa dass ein Skill durch einen R_TRIG gestartet wird, durch einen RS gehalten wird und durch Timerbedingungen gestoppt wird. Für die Analyse des Signalflusses sind Standardbausteine besonders relevant, weil sie häufig die eigentlichen Zustandswechsel erzwingen, auch wenn sie fachlich nicht als eigener Skill gelten. Aus PLCopen XML werden sie als POUCalls sichtbar, die innerhalb eines Bausteins auf solche Standardtypen verweisen. Die explizite Modellierung als StandardFBType verbessert außerdem das Filtering in Abfragen, sodass sich beispielsweise reine Skill Graphen ohne Bibliothekslogik erzeugen lassen."@de ;
+    rdfs:subClassOf ag:class_FBType .
+
+ag:class_FBType a owl:Class ;
+    rdfs:comment "Diese Klasse beschreibt einen Function Block Typ als wiederverwendbaren Baustein mit fest definierter Schnittstelle und interner Logik. Ein FBType enthält typischerweise Eingänge, Ausgänge und interne Variablen sowie entweder ST Code oder eine aus dem FBD Netzwerk rekonstruierte Darstellung. Im Knowledge Graph wird der Baustein als Typ modelliert, damit einzelne Instanzen desselben Bausteins konsistent beschrieben und analysiert werden können. Die Ports eines FBType werden über class_Port repräsentiert und definieren Richtung und Datentyp der jeweiligen Parameter, wodurch eine saubere Typanalyse der Verdrahtung möglich ist. Darüber hinaus kann ein FBType selbst weitere POUs aufrufen, etwa Standardbausteine wie Trigger oder Timer, was über POUCalls nachvollzogen wird. Die Klasse ist zentral, um das Projekt modular zu verstehen, da sie die fachliche Logik kapselt, zum Beispiel Bewegungssteuerungen, Sensor Auswertungen oder Betriebsartenautomaten. Bei der Analyse von Skills ist class_FBType besonders wertvoll, weil sie die wiederkehrenden Muster einer Skill Implementierung sichtbar macht, etwa Start Trigger, Zustandsautomaten, Reset Mechanismen und Sicherheitsabfragen."@de ;
+    rdfs:subClassOf ag:class_POU .
+
+ag:class_POU a owl:Class ;
+    rdfs:comment "Diese Klasse bildet das allgemeine Konzept einer Program Organisation Unit ab und dient als Oberbegriff für Programme und Function Blocks im Sinne der IEC 61131 3 Struktur. Sie wird im Knowledge Graph verwendet, um eine gemeinsame Abstraktion für alle ausführbaren oder wiederverwendbaren Bausteine bereitzustellen, unabhängig davon, ob sie zyklisch laufen oder innerhalb anderer Bausteine aufgerufen werden. Dadurch lassen sich Analyseoperationen vereinheitlichen, zum Beispiel die Suche nach Aufrufbeziehungen, der Vergleich von Schnittstellen oder das Auffinden von internen Abhängigkeiten. In einem PLCopen XML Export entsprechen POUs typischerweise den Elementen, die eine Bausteindefinition samt Interface und Code oder Netzwerkstruktur enthalten. In diesem Modell ist class_POU vor allem eine semantische Klammer, die eine saubere Spezialisierung zu class_Program und class_FBType ermöglicht. In praktischen Abfragen wird diese Klasse häufig indirekt genutzt, um alle ausführbaren Einheiten zusammenzufassen und anschließend nach Typ oder Sprache zu filtern."@de .
+
+ag:class_Variable a owl:Class ;
+    rdfs:comment "Diese Klasse repräsentiert Variablen im SPS Projekt, unabhängig davon, ob es sich um globale Variablen, lokale Variablen, Ein und Ausgänge oder Instanzvariablen handelt. Variablen sind zentrale Träger von Zuständen und Signalen, da über sie Sensorwerte gelesen, Aktoren angesteuert und interne Zwischenergebnisse gespeichert werden. Im Knowledge Graph kann eine Variable zusätzlich Hardwareinformationen enthalten, beispielsweise eine physikalische Adresse oder eine Zuordnung zu einem IO Channel, wodurch die Verbindung zwischen Logik und Feldhardware sichtbar wird. Variablen können außerdem genutzt werden, um Function Block Instanzen abzubilden, da viele PLC Systeme Instanzen über benannte Variablen in der Symbolik repräsentieren. Aus PLCopen XML stammen Variablen aus den Deklarationsbereichen eines POUs, aus globalen Variablenlisten oder aus I O Mappings. Für Skill Analysen ist class_Variable besonders wertvoll, weil darüber erkennbar wird, welche realen Sensoren und Aktoren ein Skill verwendet und welche Parameter in die Skill Aufrufe einfließen. Zusätzlich erlaubt diese Klasse Konsistenzprüfungen, etwa ob eine Variable als BOOL modelliert ist und dennoch mit einem numerischen Port verbunden wurde."@de ;
+    rdfs:subClassOf ag:class_SignalSource .
+
+ag:class_Port a owl:Class ;
+    rdfs:comment "Diese Klasse repräsentiert einen Port als Bestandteil eines Function Block Typs und definiert damit die formale Schnittstelle eines Bausteins. Ein Port beschreibt, ob ein Parameter ein Eingang oder Ausgang ist und welchen Datentyp er besitzt, etwa BOOL, INT, TIME oder andere PLC Typen. Im Knowledge Graph ist diese Struktur notwendig, um Verdrahtungen formal korrekt abzubilden und später automatisiert zu prüfen, ob Signale kompatibel verbunden wurden. Ports existieren zunächst nur auf der Typ Ebene und werden erst durch PortInstanzen innerhalb einer konkreten FBInstance tatsächlich genutzt. Aus PLCopen XML lässt sich ein Port aus den Variablendeklarationen eines POUs ableiten oder aus der Pinbeschreibung eines Bausteinblocks rekonstruieren. Die Klasse unterstützt außerdem semantische Abfragen, zum Beispiel die Suche nach allen Skills, die einen bestimmten Eingang besitzen oder die Ausgabe eines bestimmten Statussignals bereitstellen. Insgesamt dient class_Port als zentraler Baustein, um das Schnittstellen Design der Steuerung explizit zu modellieren und als Grundlage für Skill Kopplung und Parametervalidierung zu verwenden."@de .
 
-<http://www.semanticweb.org/AgentProgramParams/> rdf:type owl:Ontology .
-
-#################################################################
-#    Object Properties
-#################################################################
-
-###  http://www.semanticweb.org/AgentProgramParams/op_assignsFrom
-ag:op_assignsFrom rdf:type owl:ObjectProperty ;
-                  rdfs:domain ag:class_ParameterAssignment ;
-                  rdfs:range ag:class_SignalSource ;
-                  rdfs:comment "# 2. Woher kommt das Signal? Hier ist die Signal-Quelle bei Funktionsaufruf" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/op_assignsToPort
-ag:op_assignsToPort rdf:type owl:ObjectProperty ;
-                    rdfs:domain ag:class_ParameterAssignment ;
-                    rdfs:range ag:class_Port ;
-                    rdfs:comment "# 1. Wohin geht das Signal? (Zum Port \"CLK\" definiert im Typ R_TRIG)" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/op_callsPOU
-ag:op_callsPOU rdf:type owl:ObjectProperty ;
-               rdfs:domain ag:class_POUCall ;
-               rdfs:range ag:class_POU .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/op_consistsOfPOU
-ag:op_consistsOfPOU rdf:type owl:ObjectProperty ;
-                    rdfs:domain ag:class_PLCProject ;
-                    rdfs:range ag:class_POU .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/op_containsPOUCall
-ag:op_containsPOUCall rdf:type owl:ObjectProperty ;
-                      rdfs:domain ag:class_POU ;
-                      rdfs:range ag:class_POUCall .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/op_hasAssignment
-ag:op_hasAssignment rdf:type owl:ObjectProperty ;
-                    rdfs:domain ag:class_POUCall ;
-                    rdfs:range ag:class_ParameterAssignment .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/op_hasCallerVariable
-ag:op_hasCallerVariable rdf:type owl:ObjectProperty ;
-                        rdfs:domain ag:class_POUCall ;
-                        rdfs:range ag:class_Variable .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/op_hasInfluenceOnVariable
-ag:op_hasInfluenceOnVariable rdf:type owl:ObjectProperty ;
-                             rdfs:domain ag:class_Variable ;
-                             rdfs:range ag:class_Variable .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/op_hasPort
-ag:op_hasPort rdf:type owl:ObjectProperty ;
-              rdfs:domain ag:class_FBType ;
-              rdfs:range ag:class_Port .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/op_implementsPort
-ag:op_implementsPort rdf:type owl:ObjectProperty ;
-                     rdfs:domain ag:class_Variable ;
-                     rdfs:range ag:class_Port ;
-                     rdfs:comment "Verbindet eine interne Variable eines FBs mit dem Port, den sie repräsentiert" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/op_instantiatesPort
-ag:op_instantiatesPort rdf:type owl:ObjectProperty ;
-                       rdfs:domain ag:class_PortInstance ;
-                       rdfs:range ag:class_Port .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/op_isBoundToChannel
-ag:op_isBoundToChannel rdf:type owl:ObjectProperty ;
-                       rdfs:domain ag:class_Variable ;
-                       rdfs:range ag:class_IOChannel .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/op_isBoundToPort
-ag:op_isBoundToPort rdf:type owl:ObjectProperty ;
-                    rdfs:domain ag:class_Variable ;
-                    rdfs:range ag:class_Port .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/op_isInstanceOfFBType
-ag:op_isInstanceOfFBType rdf:type owl:ObjectProperty ;
-                         rdfs:domain ag:class_FBInstance ;
-                         rdfs:range ag:class_FBType .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/op_isInstanceOfPort
-ag:op_isInstanceOfPort rdf:type owl:ObjectProperty ;
-                       rdfs:domain ag:class_PortInstance ;
-                       rdfs:range ag:class_Port .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/op_isMappedToPOU
-ag:op_isMappedToPOU rdf:type owl:ObjectProperty ;
-                    rdfs:domain ag:class_Variable ;
-                    rdfs:range ag:class_POU .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/op_isMappedToVariable
-ag:op_isMappedToVariable rdf:type owl:ObjectProperty ;
-                         rdfs:domain ag:class_Variable ;
-                         rdfs:range ag:class_Variable .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/op_isPortOfInstance
-ag:op_isPortOfInstance rdf:type owl:ObjectProperty ;
-                       rdfs:domain ag:class_PortInstance ;
-                       rdfs:range ag:class_FBInstance .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/op_isSubProgramOf
-ag:op_isSubProgramOf rdf:type owl:ObjectProperty ;
-                     rdfs:domain ag:class_Program ;
-                     rdfs:range ag:class_Program .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/op_listsGlobalVariable
-ag:op_listsGlobalVariable rdf:type owl:ObjectProperty ;
-                          rdfs:domain ag:class_GlobalVariableList ;
-                          rdfs:range ag:class_Variable .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/op_representsFBInstance
-ag:op_representsFBInstance rdf:type owl:ObjectProperty ;
-                           rdfs:domain ag:class_Variable ;
-                           rdfs:range ag:class_FBInstance .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/op_usesLiteral
-ag:op_usesLiteral rdf:type owl:ObjectProperty ;
-                  rdfs:domain ag:class_POU ;
-                  rdfs:range ag:class_SourceLiteral .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/op_usesPort
-ag:op_usesPort rdf:type owl:ObjectProperty ;
-               rdfs:domain ag:class_Variable ;
-               rdfs:range ag:class_Port .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/op_usesVariable
-ag:op_usesVariable rdf:type owl:ObjectProperty ;
-                   rdfs:domain ag:class_POU ;
-                   rdfs:range ag:class_Variable .
-
-
-#################################################################
-#    Data properties
-#################################################################
-
-###  http://www.semanticweb.org/AgentProgramParams/dp_hasConsistencyReport
-ag:dp_hasConsistencyReport rdf:type owl:DatatypeProperty ;
-                           rdfs:subPropertyOf ag:dp_hasPOUAttribute ;
-                           rdfs:domain ag:class_POU ;
-                           rdfs:range xsd:string .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/dp_hasDescription
-ag:dp_hasDescription rdf:type owl:DatatypeProperty ;
-                     rdfs:domain ag:class_Variable ;
-                     rdfs:range xsd:string .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/dp_hasGlobalVariableListName
-ag:dp_hasGlobalVariableListName rdf:type owl:DatatypeProperty ;
-                                rdfs:domain ag:class_GlobalVariableList ;
-                                rdfs:range xsd:string .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/dp_hasHardwareAddress
-ag:dp_hasHardwareAddress rdf:type owl:DatatypeProperty ;
-                         rdfs:subPropertyOf owl:topDataProperty ;
-                         rdfs:domain ag:class_Variable ;
-                         rdfs:range xsd:string .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/dp_hasPLCProjectName
-ag:dp_hasPLCProjectName rdf:type owl:DatatypeProperty ;
-                        rdfs:domain ag:class_PLCProject ;
-                        rdfs:range xsd:string .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/dp_hasPOUAttribute
-ag:dp_hasPOUAttribute rdf:type owl:DatatypeProperty ;
-                      rdfs:domain ag:class_POU .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/dp_hasPOUCode
-ag:dp_hasPOUCode rdf:type owl:DatatypeProperty ;
-                 rdfs:subPropertyOf ag:dp_hasPOUAttribute ;
-                 rdfs:domain ag:class_POU ;
-                 rdfs:range xsd:string .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/dp_hasPOUCodeDescription
-ag:dp_hasPOUCodeDescription rdf:type owl:DatatypeProperty ;
-                            rdfs:subPropertyOf ag:dp_hasPOUAttribute ;
-                            rdfs:domain ag:class_POU ;
-                            rdfs:range xsd:string .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/dp_hasPOULanguage
-ag:dp_hasPOULanguage rdf:type owl:DatatypeProperty ;
-                     rdfs:subPropertyOf ag:dp_hasPOUAttribute ;
-                     rdfs:domain ag:class_POU ;
-                     rdfs:range xsd:string .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/dp_hasPOUName
-ag:dp_hasPOUName rdf:type owl:DatatypeProperty ;
-                 rdfs:subPropertyOf ag:dp_hasPOUAttribute ;
-                 rdfs:domain ag:class_POU ;
-                 rdfs:range xsd:string .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/dp_hasPOUType
-ag:dp_hasPOUType rdf:type owl:DatatypeProperty ;
-                 rdfs:subPropertyOf ag:dp_hasPOUAttribute ;
-                 rdfs:domain ag:class_POU ;
-                 rdfs:range xsd:string .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/dp_hasPortAttribute
-ag:dp_hasPortAttribute rdf:type owl:DatatypeProperty .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/dp_hasPortDirection
-ag:dp_hasPortDirection rdf:type owl:DatatypeProperty ;
-                       rdfs:subPropertyOf ag:dp_hasPortAttribute ;
-                       rdfs:domain ag:class_Port ;
-                       rdfs:range xsd:string .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/dp_hasPortName
-ag:dp_hasPortName rdf:type owl:DatatypeProperty ;
-                  rdfs:subPropertyOf ag:dp_hasPortAttribute ;
-                  rdfs:domain ag:class_Port ;
-                  rdfs:range xsd:string .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/dp_hasPortType
-ag:dp_hasPortType rdf:type owl:DatatypeProperty ;
-                  rdfs:subPropertyOf ag:dp_hasPortAttribute ;
-                  rdfs:domain ag:class_Port ;
-                  rdfs:range xsd:string .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/dp_hasVariableAttribute
-ag:dp_hasVariableAttribute rdf:type owl:DatatypeProperty .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/dp_hasVariableName
-ag:dp_hasVariableName rdf:type owl:DatatypeProperty ;
-                      rdfs:subPropertyOf ag:dp_hasVariableAttribute ;
-                      rdfs:domain ag:class_Variable ;
-                      rdfs:range xsd:string .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/dp_hasVariableScope
-ag:dp_hasVariableScope rdf:type owl:DatatypeProperty ;
-                       rdfs:subPropertyOf ag:dp_hasVariableAttribute ;
-                       rdfs:range [ rdf:type rdfs:Datatype ;
-                                    owl:oneOf [ rdf:type rdf:List ;
-                                                rdf:first "global" ;
-                                                rdf:rest [ rdf:type rdf:List ;
-                                                           rdf:first "input" ;
-                                                           rdf:rest [ rdf:type rdf:List ;
-                                                                      rdf:first "local" ;
-                                                                      rdf:rest [ rdf:type rdf:List ;
-                                                                                 rdf:first "output" ;
-                                                                                 rdf:rest rdf:nil
-                                                                               ]
-                                                                    ]
-                                                         ]
-                                              ]
-                                  ] .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/dp_hasVariableType
-ag:dp_hasVariableType rdf:type owl:DatatypeProperty ;
-                      rdfs:subPropertyOf ag:dp_hasVariableAttribute ;
-                      rdfs:domain ag:class_Variable ;
-                      rdfs:range xsd:string .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/dp_ioRawXml
-ag:dp_ioRawXml rdf:type owl:DatatypeProperty ;
-               rdfs:domain ag:class_Variable ;
-               rdfs:range xsd:string .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/dp_isUnused
-ag:dp_isUnused rdf:type owl:DatatypeProperty .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/dp_isUnusedPort
-ag:dp_isUnusedPort rdf:type owl:DatatypeProperty ;
-                   rdfs:subPropertyOf ag:dp_isUnused ;
-                   rdfs:domain ag:class_Port ;
-                   rdfs:range xsd:boolean .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/dp_isUnusedVar
-ag:dp_isUnusedVar rdf:type owl:DatatypeProperty ;
-                  rdfs:subPropertyOf ag:dp_isUnused ;
-                  rdfs:domain ag:class_Variable ;
-                  rdfs:range xsd:boolean .
-
-
-#################################################################
-#    Classes
-#################################################################
-
-###  http://www.semanticweb.org/AgentProgramParams/class_CustomFBType
-ag:class_CustomFBType rdf:type owl:Class ;
-                      rdfs:subClassOf ag:class_FBType .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/class_FBInstance
-ag:class_FBInstance rdf:type owl:Class .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/class_FBType
-ag:class_FBType rdf:type owl:Class ;
-                rdfs:subClassOf ag:class_POU .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/class_GlobalVariableList
-ag:class_GlobalVariableList rdf:type owl:Class .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/class_IOChannel
-ag:class_IOChannel rdf:type owl:Class .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/class_PLCProject
-ag:class_PLCProject rdf:type owl:Class .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/class_POU
-ag:class_POU rdf:type owl:Class .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/class_POUCall
-ag:class_POUCall rdf:type owl:Class .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/class_ParameterAssignment
-ag:class_ParameterAssignment rdf:type owl:Class .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/class_Port
-ag:class_Port rdf:type owl:Class .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/class_PortInstance
-ag:class_PortInstance rdf:type owl:Class ;
-                      rdfs:subClassOf ag:class_SignalSource .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/class_Program
-ag:class_Program rdf:type owl:Class ;
-                 rdfs:subClassOf ag:class_POU .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/class_SignalSource
-ag:class_SignalSource rdf:type owl:Class .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/class_SourceLiteral
-ag:class_SourceLiteral rdf:type owl:Class ;
-                       rdfs:subClassOf ag:class_SignalSource .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/class_StandardFBType
-ag:class_StandardFBType rdf:type owl:Class ;
-                        rdfs:subClassOf ag:class_FBType .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/class_Variable
-ag:class_Variable rdf:type owl:Class ;
-                  rdfs:subClassOf ag:class_SignalSource .
-
-
-#################################################################
-#    Individuals
-#################################################################
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_CTD_CD
-ag:Port_CTD_CD rdf:type owl:NamedIndividual ,
-                        ag:class_Port ;
-               ag:dp_hasPortDirection "Input" ;
-               ag:dp_hasPortName "CD" ;
-               ag:dp_hasPortType "BOOL" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_CTD_CV
-ag:Port_CTD_CV rdf:type owl:NamedIndividual ,
-                        ag:class_Port ;
-               ag:dp_hasPortDirection "Output" ;
-               ag:dp_hasPortName "CV" ;
-               ag:dp_hasPortType "INT" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_CTD_LD
-ag:Port_CTD_LD rdf:type owl:NamedIndividual ,
-                        ag:class_Port ;
-               ag:dp_hasPortDirection "Input" ;
-               ag:dp_hasPortName "LD" ;
-               ag:dp_hasPortType "BOOL" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_CTD_PV
-ag:Port_CTD_PV rdf:type owl:NamedIndividual ,
-                        ag:class_Port ;
-               ag:dp_hasPortDirection "Input" ;
-               ag:dp_hasPortName "PV" ;
-               ag:dp_hasPortType "INT" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_CTD_Q
-ag:Port_CTD_Q rdf:type owl:NamedIndividual ,
-                       ag:class_Port ;
-              ag:dp_hasPortDirection "Output" ;
-              ag:dp_hasPortName "Q" ;
-              ag:dp_hasPortType "BOOL" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_CTUD_CD
-ag:Port_CTUD_CD rdf:type owl:NamedIndividual ,
-                         ag:class_Port ;
-                ag:dp_hasPortDirection "Input" ;
-                ag:dp_hasPortName "CD" ;
-                ag:dp_hasPortType "BOOL" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_CTUD_CU
-ag:Port_CTUD_CU rdf:type owl:NamedIndividual ,
-                         ag:class_Port ;
-                ag:dp_hasPortDirection "Input" ;
-                ag:dp_hasPortName "CU" ;
-                ag:dp_hasPortType "BOOL" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_CTUD_CV
-ag:Port_CTUD_CV rdf:type owl:NamedIndividual ,
-                         ag:class_Port ;
-                ag:dp_hasPortDirection "Output" ;
-                ag:dp_hasPortName "CV" ;
-                ag:dp_hasPortType "INT" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_CTUD_LD
-ag:Port_CTUD_LD rdf:type owl:NamedIndividual ,
-                         ag:class_Port ;
-                ag:dp_hasPortDirection "Input" ;
-                ag:dp_hasPortName "LD" ;
-                ag:dp_hasPortType "BOOL" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_CTUD_PV
-ag:Port_CTUD_PV rdf:type owl:NamedIndividual ,
-                         ag:class_Port ;
-                ag:dp_hasPortDirection "Input" ;
-                ag:dp_hasPortName "PV" ;
-                ag:dp_hasPortType "INT" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_CTUD_QD
-ag:Port_CTUD_QD rdf:type owl:NamedIndividual ,
-                         ag:class_Port ;
-                ag:dp_hasPortDirection "Output" ;
-                ag:dp_hasPortName "QD" ;
-                ag:dp_hasPortType "BOOL" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_CTUD_QU
-ag:Port_CTUD_QU rdf:type owl:NamedIndividual ,
-                         ag:class_Port ;
-                ag:dp_hasPortDirection "Output" ;
-                ag:dp_hasPortName "QU" ;
-                ag:dp_hasPortType "BOOL" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_CTUD_R
-ag:Port_CTUD_R rdf:type owl:NamedIndividual ,
-                        ag:class_Port ;
-               ag:dp_hasPortDirection "Input" ;
-               ag:dp_hasPortName "R" ;
-               ag:dp_hasPortType "BOOL" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_CTU_CU
-ag:Port_CTU_CU rdf:type owl:NamedIndividual ,
-                        ag:class_Port ;
-               ag:dp_hasPortDirection "Input" ;
-               ag:dp_hasPortName "CU" ;
-               ag:dp_hasPortType "BOOL" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_CTU_CV
-ag:Port_CTU_CV rdf:type owl:NamedIndividual ,
-                        ag:class_Port ;
-               ag:dp_hasPortDirection "Output" ;
-               ag:dp_hasPortName "CV" ;
-               ag:dp_hasPortType "INT" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_CTU_PV
-ag:Port_CTU_PV rdf:type owl:NamedIndividual ,
-                        ag:class_Port ;
-               ag:dp_hasPortDirection "Input" ;
-               ag:dp_hasPortName "PV" ;
-               ag:dp_hasPortType "INT" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_CTU_Q
-ag:Port_CTU_Q rdf:type owl:NamedIndividual ,
-                       ag:class_Port ;
-              ag:dp_hasPortDirection "Output" ;
-              ag:dp_hasPortName "Q" ;
-              ag:dp_hasPortType "BOOL" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_CTU_R
-ag:Port_CTU_R rdf:type owl:NamedIndividual ,
-                       ag:class_Port ;
-              ag:dp_hasPortDirection "Input" ;
-              ag:dp_hasPortName "R" ;
-              ag:dp_hasPortType "BOOL" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_F_TRIG_CLK
-ag:Port_F_TRIG_CLK rdf:type owl:NamedIndividual ,
-                            ag:class_Port ;
-                   ag:dp_hasPortDirection "Input" ;
-                   ag:dp_hasPortName "CLK" ;
-                   ag:dp_hasPortType "BOOL" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_F_TRIG_Q
-ag:Port_F_TRIG_Q rdf:type owl:NamedIndividual ,
-                          ag:class_Port ;
-                 ag:dp_hasPortDirection "Output" ;
-                 ag:dp_hasPortName "Q" ;
-                 ag:dp_hasPortType "BOOL" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_RS_Q1
-ag:Port_RS_Q1 rdf:type owl:NamedIndividual ,
-                       ag:class_Port ;
-              ag:dp_hasPortDirection "Output" ;
-              ag:dp_hasPortName "Q1" ;
-              ag:dp_hasPortType "BOOL" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_RS_R1
-ag:Port_RS_R1 rdf:type owl:NamedIndividual ,
-                       ag:class_Port ;
-              ag:dp_hasPortDirection "Input" ;
-              ag:dp_hasPortName "R1" ;
-              ag:dp_hasPortType "BOOL" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_RS_S
-ag:Port_RS_S rdf:type owl:NamedIndividual ,
-                      ag:class_Port ;
-             ag:dp_hasPortDirection "Input" ;
-             ag:dp_hasPortName "S" ;
-             ag:dp_hasPortType "BOOL" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_R_TRIG_CLK
-ag:Port_R_TRIG_CLK rdf:type owl:NamedIndividual ,
-                            ag:class_Port ;
-                   ag:dp_hasPortDirection "Input" ;
-                   ag:dp_hasPortName "CLK" ;
-                   ag:dp_hasPortType "BOOL" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_R_TRIG_Q
-ag:Port_R_TRIG_Q rdf:type owl:NamedIndividual ,
-                          ag:class_Port ;
-                 ag:dp_hasPortDirection "Output" ;
-                 ag:dp_hasPortName "Q" ;
-                 ag:dp_hasPortType "BOOL" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_SR_Q1
-ag:Port_SR_Q1 rdf:type owl:NamedIndividual ,
-                       ag:class_Port ;
-              ag:dp_hasPortDirection "Output" ;
-              ag:dp_hasPortName "Q1" ;
-              ag:dp_hasPortType "BOOL" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_SR_R
-ag:Port_SR_R rdf:type owl:NamedIndividual ,
-                      ag:class_Port ;
-             ag:dp_hasPortDirection "Input" ;
-             ag:dp_hasPortName "R" ;
-             ag:dp_hasPortType "BOOL" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_SR_S1
-ag:Port_SR_S1 rdf:type owl:NamedIndividual ,
-                       ag:class_Port ;
-              ag:dp_hasPortDirection "Input" ;
-              ag:dp_hasPortName "S1" ;
-              ag:dp_hasPortType "BOOL" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_TOF_ET
-ag:Port_TOF_ET rdf:type owl:NamedIndividual ,
-                        ag:class_Port ;
-               ag:dp_hasPortDirection "Output" ;
-               ag:dp_hasPortName "ET" ;
-               ag:dp_hasPortType "TIME" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_TOF_IN
-ag:Port_TOF_IN rdf:type owl:NamedIndividual ,
-                        ag:class_Port ;
-               ag:dp_hasPortDirection "Input" ;
-               ag:dp_hasPortName "IN" ;
-               ag:dp_hasPortType "BOOL" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_TOF_PT
-ag:Port_TOF_PT rdf:type owl:NamedIndividual ,
-                        ag:class_Port ;
-               ag:dp_hasPortDirection "Input" ;
-               ag:dp_hasPortName "PT" ;
-               ag:dp_hasPortType "TIME" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_TOF_Q
-ag:Port_TOF_Q rdf:type owl:NamedIndividual ,
-                       ag:class_Port ;
-              ag:dp_hasPortDirection "Output" ;
-              ag:dp_hasPortName "Q" ;
-              ag:dp_hasPortType "BOOL" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_TON_ET
-ag:Port_TON_ET rdf:type owl:NamedIndividual ,
-                        ag:class_Port ;
-               ag:dp_hasPortDirection "Output" ;
-               ag:dp_hasPortName "ET" ;
-               ag:dp_hasPortType "TIME" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_TON_IN
-ag:Port_TON_IN rdf:type owl:NamedIndividual ,
-                        ag:class_Port ;
-               ag:dp_hasPortDirection "Input" ;
-               ag:dp_hasPortName "IN" ;
-               ag:dp_hasPortType "BOOL" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_TON_PT
-ag:Port_TON_PT rdf:type owl:NamedIndividual ,
-                        ag:class_Port ;
-               ag:dp_hasPortDirection "Input" ;
-               ag:dp_hasPortName "PT" ;
-               ag:dp_hasPortType "TIME" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_TON_Q
-ag:Port_TON_Q rdf:type owl:NamedIndividual ,
-                       ag:class_Port ;
-              ag:dp_hasPortDirection "Output" ;
-              ag:dp_hasPortName "Q" ;
-              ag:dp_hasPortType "BOOL" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_TP_ET
-ag:Port_TP_ET rdf:type owl:NamedIndividual ,
-                       ag:class_Port ;
-              ag:dp_hasPortDirection "Output" ;
-              ag:dp_hasPortName "ET" ;
-              ag:dp_hasPortType "TIME" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_TP_IN
-ag:Port_TP_IN rdf:type owl:NamedIndividual ,
-                       ag:class_Port ;
-              ag:dp_hasPortDirection "Input" ;
-              ag:dp_hasPortName "IN" ;
-              ag:dp_hasPortType "BOOL" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_TP_PT
-ag:Port_TP_PT rdf:type owl:NamedIndividual ,
-                       ag:class_Port ;
-              ag:dp_hasPortDirection "Input" ;
-              ag:dp_hasPortName "PT" ;
-              ag:dp_hasPortType "TIME" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/Port_TP_Q
-ag:Port_TP_Q rdf:type owl:NamedIndividual ,
-                      ag:class_Port ;
-             ag:dp_hasPortDirection "Output" ;
-             ag:dp_hasPortName "Q" ;
-             ag:dp_hasPortType "BOOL" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_CTD
-ag:StandardFBType_CTD rdf:type owl:NamedIndividual ,
-                               ag:class_FBType ,
-                               ag:class_StandardFBType ;
-                      ag:op_hasPort ag:Port_CTD_CD ,
-                                    ag:Port_CTD_CV ,
-                                    ag:Port_CTD_LD ,
-                                    ag:Port_CTD_PV ,
-                                    ag:Port_CTD_Q ;
-                      ag:dp_hasPOULanguage "ST" ;
-                      ag:dp_hasPOUName "CTD" ;
-                      ag:dp_hasPOUType "FunctionBlock" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_CTU
-ag:StandardFBType_CTU rdf:type owl:NamedIndividual ,
-                               ag:class_FBType ,
-                               ag:class_StandardFBType ;
-                      ag:op_hasPort ag:Port_CTU_CU ,
-                                    ag:Port_CTU_CV ,
-                                    ag:Port_CTU_PV ,
-                                    ag:Port_CTU_Q ,
-                                    ag:Port_CTU_R ;
-                      ag:dp_hasPOULanguage "ST" ;
-                      ag:dp_hasPOUName "CTU" ;
-                      ag:dp_hasPOUType "FunctionBlock" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_CTUD
-ag:StandardFBType_CTUD rdf:type owl:NamedIndividual ,
-                                ag:class_FBType ,
-                                ag:class_StandardFBType ;
-                       ag:op_hasPort ag:Port_CTUD_CD ,
-                                     ag:Port_CTUD_CU ,
-                                     ag:Port_CTUD_CV ,
-                                     ag:Port_CTUD_LD ,
-                                     ag:Port_CTUD_PV ,
-                                     ag:Port_CTUD_QD ,
-                                     ag:Port_CTUD_QU ,
-                                     ag:Port_CTUD_R ;
-                       ag:dp_hasPOULanguage "ST" ;
-                       ag:dp_hasPOUName "CTUD" ;
-                       ag:dp_hasPOUType "FunctionBlock" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_F_TRIG
-ag:StandardFBType_F_TRIG rdf:type owl:NamedIndividual ,
-                                  ag:class_FBType ,
-                                  ag:class_StandardFBType ;
-                         ag:op_hasPort ag:Port_F_TRIG_CLK ,
-                                       ag:Port_F_TRIG_Q ;
-                         ag:dp_hasPOULanguage "ST" ;
-                         ag:dp_hasPOUName "F_TRIG" ;
-                         ag:dp_hasPOUType "FunctionBlock" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_RS
-ag:StandardFBType_RS rdf:type owl:NamedIndividual ,
-                              ag:class_FBType ,
-                              ag:class_StandardFBType ;
-                     ag:op_hasPort ag:Port_RS_Q1 ,
-                                   ag:Port_RS_R1 ,
-                                   ag:Port_RS_S ;
-                     ag:dp_hasPOULanguage "ST" ;
-                     ag:dp_hasPOUName "RS" ;
-                     ag:dp_hasPOUType "FunctionBlock" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_R_TRIG
-ag:StandardFBType_R_TRIG rdf:type owl:NamedIndividual ,
-                                  ag:class_FBType ,
-                                  ag:class_StandardFBType ;
-                         ag:op_hasPort ag:Port_R_TRIG_CLK ,
-                                       ag:Port_R_TRIG_Q ;
-                         ag:dp_hasPOULanguage "ST" ;
-                         ag:dp_hasPOUName "R_TRIG" ;
-                         ag:dp_hasPOUType "FunctionBlock" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_SR
-ag:StandardFBType_SR rdf:type owl:NamedIndividual ,
-                              ag:class_FBType ,
-                              ag:class_StandardFBType ;
-                     ag:op_hasPort ag:Port_SR_Q1 ,
-                                   ag:Port_SR_R ,
-                                   ag:Port_SR_S1 ;
-                     ag:dp_hasPOULanguage "ST" ;
-                     ag:dp_hasPOUName "SR" ;
-                     ag:dp_hasPOUType "FunctionBlock" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_TOF
-ag:StandardFBType_TOF rdf:type owl:NamedIndividual ,
-                               ag:class_FBType ,
-                               ag:class_StandardFBType ;
-                      ag:op_hasPort ag:Port_TOF_ET ,
-                                    ag:Port_TOF_IN ,
-                                    ag:Port_TOF_PT ,
-                                    ag:Port_TOF_Q ;
-                      ag:dp_hasPOULanguage "ST" ;
-                      ag:dp_hasPOUName "TOF" ;
-                      ag:dp_hasPOUType "FunctionBlock" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_TON
-ag:StandardFBType_TON rdf:type owl:NamedIndividual ,
-                               ag:class_FBType ,
-                               ag:class_StandardFBType ;
-                      ag:op_hasPort ag:Port_TON_ET ,
-                                    ag:Port_TON_IN ,
-                                    ag:Port_TON_PT ,
-                                    ag:Port_TON_Q ;
-                      ag:dp_hasPOULanguage "ST" ;
-                      ag:dp_hasPOUName "TON" ;
-                      ag:dp_hasPOUType "FunctionBlock" .
-
-
-###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_TP
-ag:StandardFBType_TP rdf:type owl:NamedIndividual ,
-                              ag:class_FBType ,
-                              ag:class_StandardFBType ;
-                     ag:op_hasPort ag:Port_TP_ET ,
-                                   ag:Port_TP_IN ,
-                                   ag:Port_TP_PT ,
-                                   ag:Port_TP_Q ;
-                     ag:dp_hasPOULanguage "ST" ;
-                     ag:dp_hasPOUName "TP" ;
-                     ag:dp_hasPOUType "FunctionBlock" .
-
-
-###  Generated by the OWL API (version 4.5.29.2024-05-13T12:11:03Z) https://github.com/owlcs/owlapi

@@ -42,6 +42,7 @@ ag:PLCProject__Proj1 a ag:class_PLCProject ;
     op:consistsOfPOU ag:FBType_FB_Automatikbetrieb_F1,
         ag:FBType_FB_Betriebsarten,
         ag:FBType_FB_Diagnose_D2,
+        ag:FBType_FB_GeneratedJob_01,
         ag:FBType_FB_InitFahrt_A6_A2,
         ag:FBType_FB_Methode1Job,
         ag:FBType_FB_Notaus_D1,
@@ -118,6 +119,7 @@ ag:StandardFBType_TOF a ag:class_FBType,
         ag:Port_TOF_Q .
 
 ag:class_CustomFBType a owl:Class ;
+    rdfs:comment "Diese Klasse kennzeichnet Function Block Typen, die projekt spezifisch implementiert wurden und nicht aus einer Standardbibliothek stammen. Sie dient dazu, benutzerdefinierte Logikbausteine semantisch von generischen Standardfunktionen zu trennen, damit Analysen gezielter durchgeführt werden können. CustomFBTypes bilden häufig die eigentlichen Skills oder spezifische Steuerungslogik ab, zum Beispiel Bewegungen einer Achse, Prozessschritte oder die Abbildung einer Stationsfunktion. Im Knowledge Graph ist die Klasse hilfreich, um Abhängigkeiten zwischen Skills zu identifizieren, Schnittstellen zu vergleichen und zentrale Bausteine zu priorisieren. Aus PLCopen XML lassen sich solche Typen meist daran erkennen, dass sie als eigene POU Definitionen im Projekt auftauchen und keinen eindeutigen Standardnamen wie TON, TOF oder RS besitzen. In späteren Auswertungen kann diese Unterscheidung genutzt werden, um automatisiert eine Liste relevanter Skills zu extrahieren und Standardkomponenten wie Timer oder Trigger auszublenden. Insgesamt unterstützt class_CustomFBType somit die fachliche Strukturierung der Projektlogik und erleichtert die Dokumentation, weil projektbezogene Funktionen klar markiert werden."@de ;
     rdfs:subClassOf ag:class_FBType .
 
 dp:hasConsistencyReport a owl:DatatypeProperty ;
@@ -613,6 +615,9 @@ ag:FBInst_FB_Diagnose_D2_rtReq a ag:class_FBInstance ;
 ag:FBInst_FB_Diagnose_D2_tpPulse a ag:class_FBInstance ;
     op:isInstanceOfFBType ag:StandardFBType_TP .
 
+ag:FBInst_FB_GeneratedJob_01_eState a ag:class_FBInstance ;
+    op:isInstanceOfFBType ag:FBType_Implicit_Enum__FB_GeneratedJob_01__eState .
+
 ag:FBInst_FB_InitFahrt_A6_A2_tInit a ag:class_FBInstance ;
     op:isInstanceOfFBType ag:StandardFBType_TON .
 
@@ -660,6 +665,63 @@ ag:FBInst_MAIN_fbNot a ag:class_FBInstance ;
 
 ag:FBInst_MAIN_fbProStoer a ag:class_FBInstance ;
     op:isInstanceOfFBType ag:FBType_FB_ProduktionMitStoerung_D3 .
+
+ag:FBType_FB_GeneratedJob_01 a ag:class_FBType ;
+    dp:hasConsistencyReport "Baustein: FB_GeneratedJob_01" ;
+    dp:hasPOUCode """// METHOD Abort of FB_GeneratedJob_01
+eState := ABORTED;
+bFinished := FALSE;
+
+// METHOD CheckState of FB_GeneratedJob_01
+CASE eState OF
+    IDLE:
+        ; 
+
+    RUNNING:
+        
+        
+
+nCounter := nCounter + 1;
+fResult := SQRT(REAL_TO_LREAL(nCounter));
+
+IF nCounter > 100 THEN
+    bFinished := TRUE;
+END_IF
+
+        
+
+        IF bFinished THEN
+            eState := DONE;
+        END_IF
+
+    DONE:
+        ; 
+
+    ERROR:
+        ; 
+
+    ABORTED:
+        eState := IDLE; 
+END_CASE
+
+// METHOD JobStart of FB_GeneratedJob_01
+eState := RUNNING;
+bFinished := FALSE;
+nCounter := 0;
+fResult := 0.0;""" ;
+    dp:hasPOULanguage "ST" ;
+    dp:hasPOUName "FB_GeneratedJob_01" ;
+    op:hasInternalVariable ag:Var_FB_GeneratedJob_01_bFinished,
+        ag:Var_FB_GeneratedJob_01_eState,
+        ag:Var_FB_GeneratedJob_01_fResult,
+        ag:Var_FB_GeneratedJob_01_nCounter ;
+    op:usesVariable ag:Var_FB_GeneratedJob_01_bFinished,
+        ag:Var_FB_GeneratedJob_01_eState,
+        ag:Var_FB_GeneratedJob_01_fResult,
+        ag:Var_FB_GeneratedJob_01_nCounter .
+
+ag:FBType_Implicit_Enum__FB_GeneratedJob_01__eState a ag:class_FBType ;
+    dp:hasConsistencyReport "Baustein: FBType_Implicit_Enum__FB_GeneratedJob_01__eState" .
 
 ag:GVL__dot__DiagnoseRequested a ag:class_Variable ;
     dp:hasVariableName "DiagnoseRequested",
@@ -1210,7 +1272,7 @@ fbBA(
     NotStop       := GVL.NotStopp,
     Weiter        := Weiter_eff,
     Fehler        := GVL.Fehler,
-	Start_Init 	  := Init_Start,                  
+	Start_Init 	  := Init_start,                  
     Auto_Fertig   := fbAuto.Automatikbetrieb_Fertig,
     Auto_Stoerung := fbAuto.Stoerung_erkannt,
 	A2_Requested := A2_angefordert,
@@ -1286,7 +1348,8 @@ alt_found := fbDiag.Alt_gefunden;""" ;
         ag:Var_MAIN_fbNot,
         ag:Var_MAIN_fbProStoer .
 
-ag:class_IOChannel a owl:Class .
+ag:class_IOChannel a owl:Class ;
+    rdfs:comment "Diese Klasse repräsentiert einen Hardwarekanal, also einen physikalischen Ein oder Ausgang, der in der Steuerung adressiert und mit Variablen verbunden werden kann. Ein IOChannel bildet damit die Brücke zwischen der semantischen Logik im Knowledge Graph und der realen Peripherie, etwa Sensoren, Ventile, Motoren oder Signallampen. Im Knowledge Graph wird ein IOChannel häufig genutzt, um Variablen mit Hardwareadressen zu verknüpfen und dadurch nachvollziehbar zu machen, welcher Code welche reale Komponente beeinflusst. Aus PLCopen XML kann ein IOChannel entweder direkt aus Hardwarezuordnungen oder indirekt aus Rohinformationen des Exports rekonstruiert werden, abhängig davon, wie vollständig das Mapping exportiert wurde. Die Klasse ist besonders wertvoll für Analysen, die Skill Ausführung mit physikalischen Effekten verbinden, da so sichtbar wird, welche Ausgänge ein Skill setzt und welche Eingänge er überwacht. Außerdem unterstützt sie Plausibilitätsprüfungen, beispielsweise ob ein Ausgang nur von einem Skill kontrolliert wird oder ob Konflikte zwischen mehreren Bausteinen existieren. Insgesamt macht class_IOChannel den Knowledge Graph hardware nah und damit für reale Automatisierungsszenarien aussagekräftig."@de .
 
 ag:FBInst_FB_Automatikbetrieb_F1_rPer a ag:class_FBInstance ;
     op:isInstanceOfFBType ag:StandardFBType_R_TRIG .
@@ -1788,6 +1851,23 @@ ag:Var_FB_Diagnose_D2_tpPulse a ag:class_Variable ;
     dp:hasVariableType "TP" ;
     dp:isUnusedVar true ;
     op:representsFBInstance ag:FBInst_FB_Diagnose_D2_tpPulse .
+
+ag:Var_FB_GeneratedJob_01_bFinished a ag:class_Variable ;
+    dp:hasVariableName "bFinished" ;
+    dp:hasVariableType "BOOL" .
+
+ag:Var_FB_GeneratedJob_01_eState a ag:class_Variable ;
+    dp:hasVariableName "eState" ;
+    dp:hasVariableType "Implicit_Enum__FB_GeneratedJob_01__eState" ;
+    op:representsFBInstance ag:FBInst_FB_GeneratedJob_01_eState .
+
+ag:Var_FB_GeneratedJob_01_fResult a ag:class_Variable ;
+    dp:hasVariableName "fResult" ;
+    dp:hasVariableType "LREAL" .
+
+ag:Var_FB_GeneratedJob_01_nCounter a ag:class_Variable ;
+    dp:hasVariableName "nCounter" ;
+    dp:hasVariableType "INT" .
 
 ag:Var_FB_InitFahrt_A6_A2_Init_erreicht a ag:class_Variable ;
     dp:hasVariableName "Init_erreicht" ;
@@ -2889,9 +2969,11 @@ ag:Var_MAIN_fbProStoer a ag:class_Variable ;
     dp:hasVariableType "FB_ProduktionMitStoerung_D3" ;
     op:representsFBInstance ag:FBInst_MAIN_fbProStoer .
 
-ag:class_PLCProject a owl:Class .
+ag:class_PLCProject a owl:Class ;
+    rdfs:comment "Diese Klasse beschreibt das gesamte SPS Projekt als oberste Container Entität im Knowledge Graph. Eine Instanz dieser Klasse fasst alle Inhalte zusammen, die aus einem PLCopen XML Export abgeleitet wurden, also Programme, Function Block Typen, globale Variablenlisten und die zugehörigen Verknüpfungen. Das Objekt dient als Einstiegspunkt, um das Modell strukturiert abzufragen und alle Substrukturen eindeutig einem Projekt zuzuordnen. Typischerweise besitzt ein PLCProject Beziehungen zu Programmen und zu globalen Variablenlisten, wodurch nachvollziehbar wird, welche Logik zyklisch ausgeführt wird und welche Variablen projektweit verfügbar sind. In der praktischen Nutzung ist das PLCProject besonders hilfreich, um mehrere Exporte oder Versionen getrennt zu verwalten und Vergleiche zwischen unterschiedlichen Projektständen durchführen zu können. Zusätzlich unterstützt diese Klasse die Nachvollziehbarkeit der Provenienz, da alle abgeleiteten Entitäten eindeutig als Teil eines konkreten Exports interpretiert werden."@de .
 
 ag:class_Program a owl:Class ;
+    rdfs:comment "Diese Klasse repräsentiert ein SPS Programm, das im Normalfall zyklisch von der Runtime ausgeführt wird und daher die oberste Ebene der Steuerungslogik bildet. Programme sind die Haupt Einstiegspunkte für die Ausführung, da sie typische Betriebsartenlogiken, Sequenzen oder Skill Orchestrierungen enthalten. Im Knowledge Graph dient diese Klasse dazu, die Gesamtabläufe sichtbar zu machen und die enthaltenen Aufrufe von Function Blocks als POUCalls explizit zu modellieren. Ein Programm besitzt in der Regel Beziehungen zu den aufgerufenen Bausteinen und deren Parameterzuweisungen, wodurch die Signalflüsse und Startbedingungen nachvollziehbar werden. Aus einem PLCopen XML Export entsteht diese Struktur aus den Program POUs, die häufig als zentrale Knoten für Skill Sets oder Stationslogik fungieren. Für Analysen ist class_Program besonders wichtig, weil hier häufig entschieden wird, welche Subsysteme wann aktiviert werden und welche Ausgänge überhaupt freigegeben werden dürfen. Damit ist die Klasse ideal, um Skill Trigger, Betriebsmodi und globale Abhängigkeiten im Gesamtprojekt zu verstehen."@de ;
     rdfs:subClassOf ag:class_POU .
 
 dp:hasPortAttribute a owl:DatatypeProperty .
@@ -2946,7 +3028,8 @@ ag:Var_FB_Notaus_D1_ton5s a ag:class_Variable ;
     dp:hasVariableType "TON" ;
     op:representsFBInstance ag:FBInst_FB_Notaus_D1_ton5s .
 
-ag:class_GlobalVariableList a owl:Class .
+ag:class_GlobalVariableList a owl:Class ;
+    rdfs:comment "Diese Klasse beschreibt eine globale Variablenliste als Container, der projektweit zugängliche Variablen zusammenfasst. GlobalVariableLists werden in SPS Projekten verwendet, um gemeinsame Signale, Zustände oder Hardwarezuordnungen zentral zu verwalten und in mehreren Programmen oder Function Blocks nutzbar zu machen. Im Knowledge Graph ermöglicht diese Klasse eine klare Gruppierung der globalen Symbolik und erleichtert Abfragen, die sich auf globale Signale beziehen, etwa auf Safety Signale, Betriebsartenflags oder I O Variablen. Aus PLCopen XML wird eine solche Liste typischerweise aus GVL Bereichen abgeleitet, wobei jede enthaltene Variable separat als class_Variable modelliert wird. Die Klasse unterstützt außerdem die Nachvollziehbarkeit, weil sichtbar wird, welche Variablen tatsächlich global sind und welche nur lokal innerhalb eines Bausteins existieren. Für die Dokumentation ist class_GlobalVariableList hilfreich, um globale Schnittstellen der Anlage zu beschreiben und zentrale Signalgruppen systematisch zu erläutern. Außerdem lassen sich hieraus automatisch Listen für Hardwaremapping oder Schnittstellendokumente erzeugen."@de .
 
 dp:hasPOUAttribute a owl:DatatypeProperty ;
     rdfs:domain ag:class_POU .
@@ -2955,6 +3038,7 @@ ag:FBInst_MAIN_fbBA a ag:class_FBInstance ;
     op:isInstanceOfFBType ag:FBType_FB_Betriebsarten .
 
 ag:class_SourceLiteral a owl:Class ;
+    rdfs:comment "Diese Klasse repräsentiert konstante Literalwerte, die in einem SPS Netzwerk direkt als Eingangswerte verwendet werden, zum Beispiel TRUE, FALSE, 0 oder Zeitkonstanten. Sie wird im Knowledge Graph als spezielle Form einer Signalquelle modelliert, damit Parameterzuweisungen auch dann sauber abgebildet werden können, wenn kein Variablenname existiert. Literale sind in vielen Steuerungslogiken wichtig, etwa um Defaultwerte zu setzen, Zustandsautomaten zu initialisieren oder Zeitparameter für Timer vorzugeben. Aus PLCopen XML lassen sich solche Literale häufig aus Parameterbelegungen erkennen, wenn ein Eingang nicht verdrahtet ist oder explizit mit einem konstanten Wert verbunden wird. Die Klasse ermöglicht es, den Datenfluss vollständig zu rekonstruieren, da sonst ein Teil der Eingänge als undefiniert erscheinen würde. In Skill Analysen helfen SourceLiterals dabei, feste Konfigurationen sichtbar zu machen, zum Beispiel konstante Verfahrzeiten oder feste Betriebsartenparameter. Damit trägt class_SourceLiteral zur Vollständigkeit und Nachvollziehbarkeit der Modellierung bei."@de ;
     rdfs:subClassOf ag:class_SignalSource .
 
 ag:Port_R_TRIG_CLK a ag:class_Port,
@@ -2964,6 +3048,7 @@ ag:Port_R_TRIG_CLK a ag:class_Port,
     dp:hasPortType "BOOL" .
 
 ag:class_StandardFBType a owl:Class ;
+    rdfs:comment "Diese Klasse beschreibt Standard Function Block Typen, die typischerweise aus der SPS Bibliothek oder dem IEC 61131 3 Standard stammen, zum Beispiel RS Speicher, Triggerbausteine oder Zeitfunktionen. Sie wird eingesetzt, um wiederkehrende Basiskomponenten gesondert zu behandeln und nicht mit den projekt spezifischen Skill Bausteinen zu vermischen. StandardFBTypes dienen häufig als Infrastruktur für Zustandsbildung, Flankenerkennung, Zeitverhalten und Zählfunktionen und sind daher in vielen CustomFBTypes als interne Aufrufe enthalten. Im Knowledge Graph ermöglicht diese Klasse eine robuste Erkennung typischer Muster, etwa dass ein Skill durch einen R_TRIG gestartet wird, durch einen RS gehalten wird und durch Timerbedingungen gestoppt wird. Für die Analyse des Signalflusses sind Standardbausteine besonders relevant, weil sie häufig die eigentlichen Zustandswechsel erzwingen, auch wenn sie fachlich nicht als eigener Skill gelten. Aus PLCopen XML werden sie als POUCalls sichtbar, die innerhalb eines Bausteins auf solche Standardtypen verweisen. Die explizite Modellierung als StandardFBType verbessert außerdem das Filtering in Abfragen, sodass sich beispielsweise reine Skill Graphen ohne Bibliothekslogik erzeugen lassen."@de ;
     rdfs:subClassOf ag:class_FBType .
 
 ag:Port_TON_IN a ag:class_Port,
@@ -2988,9 +3073,11 @@ ag:StandardFBType_RS a ag:class_FBType,
         ag:Port_RS_R1,
         ag:Port_RS_S .
 
-ag:class_POU a owl:Class .
+ag:class_POU a owl:Class ;
+    rdfs:comment "Diese Klasse bildet das allgemeine Konzept einer Program Organisation Unit ab und dient als Oberbegriff für Programme und Function Blocks im Sinne der IEC 61131 3 Struktur. Sie wird im Knowledge Graph verwendet, um eine gemeinsame Abstraktion für alle ausführbaren oder wiederverwendbaren Bausteine bereitzustellen, unabhängig davon, ob sie zyklisch laufen oder innerhalb anderer Bausteine aufgerufen werden. Dadurch lassen sich Analyseoperationen vereinheitlichen, zum Beispiel die Suche nach Aufrufbeziehungen, der Vergleich von Schnittstellen oder das Auffinden von internen Abhängigkeiten. In einem PLCopen XML Export entsprechen POUs typischerweise den Elementen, die eine Bausteindefinition samt Interface und Code oder Netzwerkstruktur enthalten. In diesem Modell ist class_POU vor allem eine semantische Klammer, die eine saubere Spezialisierung zu class_Program und class_FBType ermöglicht. In praktischen Abfragen wird diese Klasse häufig indirekt genutzt, um alle ausführbaren Einheiten zusammenzufassen und anschließend nach Typ oder Sprache zu filtern."@de .
 
 ag:class_PortInstance a owl:Class ;
+    rdfs:comment "Diese Klasse bildet die konkrete Ausprägung eines Ports innerhalb einer spezifischen Function Block Instanz ab und entspricht damit einem realen Pin in einem FBD Netzwerk. Während class_Port nur den abstrakten Parameter eines Typs beschreibt, ist die PortInstance der tatsächliche Anschluss, der im Netzwerk verdrahtet wird und Signale empfängt oder ausgibt. Im Knowledge Graph wird diese Klasse benötigt, weil Signalverbindungen immer an eine konkrete Instanz gebunden sind und nicht nur an den Typ. Eine PortInstance verweist einerseits auf die zugehörige FBInstance und andererseits auf den Port des zugrunde liegenden FBTypes, wodurch eine eindeutige Zuordnung möglich ist. Aus PLCopen XML ergibt sich dieses Konzept aus Block Pins und deren Verbindungen im FBD, die erst im Kontext der Instanz vollständig spezifiziert sind. PortInstanzen sind besonders wichtig für die Rekonstruktion von Signalflüssen, da Parameterzuweisungen genau diese Knoten als Ziel besitzen. Damit ermöglicht class_PortInstance eine vollständige Analyse, welche Variable oder welches Zwischensignal tatsächlich an welchen Bausteinpin angeschlossen ist."@de ;
     rdfs:subClassOf ag:class_SignalSource .
 
 ag:StandardFBType_TON a ag:class_FBType,
@@ -3005,9 +3092,11 @@ ag:StandardFBType_TON a ag:class_FBType,
         ag:Port_TON_Q .
 
 ag:class_FBType a owl:Class ;
+    rdfs:comment "Diese Klasse beschreibt einen Function Block Typ als wiederverwendbaren Baustein mit fest definierter Schnittstelle und interner Logik. Ein FBType enthält typischerweise Eingänge, Ausgänge und interne Variablen sowie entweder ST Code oder eine aus dem FBD Netzwerk rekonstruierte Darstellung. Im Knowledge Graph wird der Baustein als Typ modelliert, damit einzelne Instanzen desselben Bausteins konsistent beschrieben und analysiert werden können. Die Ports eines FBType werden über class_Port repräsentiert und definieren Richtung und Datentyp der jeweiligen Parameter, wodurch eine saubere Typanalyse der Verdrahtung möglich ist. Darüber hinaus kann ein FBType selbst weitere POUs aufrufen, etwa Standardbausteine wie Trigger oder Timer, was über POUCalls nachvollzogen wird. Die Klasse ist zentral, um das Projekt modular zu verstehen, da sie die fachliche Logik kapselt, zum Beispiel Bewegungssteuerungen, Sensor Auswertungen oder Betriebsartenautomaten. Bei der Analyse von Skills ist class_FBType besonders wertvoll, weil sie die wiederkehrenden Muster einer Skill Implementierung sichtbar macht, etwa Start Trigger, Zustandsautomaten, Reset Mechanismen und Sicherheitsabfragen."@de ;
     rdfs:subClassOf ag:class_POU .
 
-ag:class_SignalSource a owl:Class .
+ag:class_SignalSource a owl:Class ;
+    rdfs:comment "Diese Klasse stellt eine abstrakte Signalquelle dar und dient als gemeinsamer Oberbegriff für unterschiedliche Ursprünge von Werten im FBD Netzwerk. Eine Signalquelle kann beispielsweise eine Variable sein, eine PortInstance eines Bausteins oder ein konstant definierter Literalwert. Im Knowledge Graph ist diese Abstraktion wichtig, weil Parameterzuweisungen immer nach dem gleichen Muster funktionieren, unabhängig davon, ob der Wert aus einer Variable oder aus einer Bausteinausgabe stammt. Dadurch können Signalflüsse einheitlich modelliert und abgefragt werden, ohne für jede Quelle unterschiedliche Datenstrukturen zu benötigen. Aus PLCopen XML entstehen Signalquellen aus Verdrahtungen, die entweder direkt auf Variablen verweisen oder die Ausgänge anderer Bausteine als Quelle verwenden. Die Klasse unterstützt komplexe Analysen wie Abhängigkeitsgraphen, Datenflussverfolgung oder die Ermittlung von Skill Vorbedingungen, da sich jede Eingangsbelegung auf eine SignalSource zurückführen lässt. Insgesamt sorgt class_SignalSource dafür, dass der Knowledge Graph die semantische Struktur des FBD Netzwerks vollständig und flexibel repräsentieren kann."@de .
 
 ag:StandardFBType_R_TRIG a ag:class_FBType,
         ag:class_StandardFBType,
@@ -3018,14 +3107,19 @@ ag:StandardFBType_R_TRIG a ag:class_FBType,
     op:hasPort ag:Port_R_TRIG_CLK,
         ag:Port_R_TRIG_Q .
 
-ag:class_POUCall a owl:Class .
+ag:class_POUCall a owl:Class ;
+    rdfs:comment "Diese Klasse beschreibt einen konkreten Aufruf einer Program Organisation Unit innerhalb eines Programms oder eines Function Blocks. Ein POUCall macht sichtbar, dass ein bestimmter Baustein nicht nur als Typ existiert, sondern an einer konkreten Stelle tatsächlich verwendet wird. Im Knowledge Graph ist dies essenziell, um Abhängigkeitsstrukturen zu rekonstruieren, also welche Bausteine intern voneinander abhängen und wie tief verschachtelte Logik aufgebaut ist. Ein POUCall kann mit einer FBInstance und deren PortInstanzen verknüpft werden, sodass klar wird, welche konkrete Instanz eines Bausteintyps gemeint ist. Aus PLCopen XML ergibt sich ein POUCall aus einem Bausteinblock im FBD oder aus einem Funktionsaufruf in ST Code, je nach Darstellung. Für die Skill Analyse kann damit nachvollzogen werden, welche Standardbausteine ein Skill verwendet, beispielsweise Trigger, Speicher oder Timer, und welche Unterbausteine die eigentliche Prozesslogik realisieren. Insgesamt macht class_POUCall die Ausführungsstruktur explizit, wodurch sich Skill Ketten, Signalpfade und interne Architektur systematisch untersuchen lassen."@de .
 
-ag:class_FBInstance a owl:Class .
+ag:class_FBInstance a owl:Class ;
+    rdfs:comment "Diese Klasse beschreibt eine konkrete Instanz eines Function Block Typs innerhalb eines Programms oder eines anderen Bausteins. Während class_FBType den Bauplan liefert, stellt class_FBInstance das tatsächliche Objekt dar, das in einem Netzwerk verwendet wird und dessen interne Zustände während der Laufzeit existieren. Im Knowledge Graph ist diese Klasse entscheidend, um die echte Struktur des FBD Netzwerks abzubilden, weil ein Baustein mehrfach instanziiert werden kann, jeweils mit eigenen Parametern, eigenen Variablenzuordnungen und eigenem Zustand. Eine FBInstance ist über Beziehungen einem FBType zugeordnet und besitzt PortInstanzen, die die konkreten Pins dieser Instanz darstellen. Damit lassen sich Verdrahtungen und Signalwege nicht nur abstrakt, sondern real und vollständig nachvollziehen. In PLCopen XML entspricht dies dem Auftreten eines Baustein Blocks im Netzwerk, also einer konkreten Verwendung innerhalb des FBD. Für Skill Analysen ist class_FBInstance besonders wichtig, weil hier ersichtlich wird, welche spezifischen Sensoren, Aktoren oder Parameter an einen Skill angeschlossen sind und wie die Logik in einer konkreten Station konfiguriert wurde."@de .
 
-ag:class_ParameterAssignment a owl:Class .
+ag:class_ParameterAssignment a owl:Class ;
+    rdfs:comment "Diese Klasse repräsentiert eine konkrete Parameterzuweisung im Netzwerk und beschreibt damit die Verdrahtung eines Signals von einer Quelle zu einem Zielport. ParameterAssignments sind die zentrale Struktur, um den Datenfluss in einem FBD Modell vollständig abzubilden, da sie definieren, welcher Wert an welchem Eingang anliegt oder welche Variable mit einem Ausgang verbunden ist. Im Knowledge Graph verweist eine ParameterAssignment typischerweise auf eine SignalSource als Ursprung und auf eine PortInstance als Ziel, wodurch die Verbindung eindeutig und instanzbezogen beschrieben wird. Aus PLCopen XML entstehen Parameterzuweisungen aus den Verbindungsinformationen zwischen Block Pins und Variablen oder zwischen mehreren Bausteinen. Diese Klasse ist für Analysen besonders wichtig, weil darüber echte Signalpfade rekonstruiert werden können, beispielsweise vom Startsignal eines Skills über Triggerlogik bis zur Ansteuerung eines Aktors. Außerdem lassen sich darüber automatische Validierungen durchführen, etwa ob alle Pflichtparameter eines Bausteins beschaltet sind oder ob Datentypen konsistent verbunden wurden. Insgesamt ist class_ParameterAssignment die semantische Entsprechung einer Leitung im Schaltplan des FBD und damit eine Schlüsselklasse für jede Graphanalyse."@de .
 
-ag:class_Port a owl:Class .
+ag:class_Port a owl:Class ;
+    rdfs:comment "Diese Klasse repräsentiert einen Port als Bestandteil eines Function Block Typs und definiert damit die formale Schnittstelle eines Bausteins. Ein Port beschreibt, ob ein Parameter ein Eingang oder Ausgang ist und welchen Datentyp er besitzt, etwa BOOL, INT, TIME oder andere PLC Typen. Im Knowledge Graph ist diese Struktur notwendig, um Verdrahtungen formal korrekt abzubilden und später automatisiert zu prüfen, ob Signale kompatibel verbunden wurden. Ports existieren zunächst nur auf der Typ Ebene und werden erst durch PortInstanzen innerhalb einer konkreten FBInstance tatsächlich genutzt. Aus PLCopen XML lässt sich ein Port aus den Variablendeklarationen eines POUs ableiten oder aus der Pinbeschreibung eines Bausteinblocks rekonstruieren. Die Klasse unterstützt außerdem semantische Abfragen, zum Beispiel die Suche nach allen Skills, die einen bestimmten Eingang besitzen oder die Ausgabe eines bestimmten Statussignals bereitstellen. Insgesamt dient class_Port als zentraler Baustein, um das Schnittstellen Design der Steuerung explizit zu modellieren und als Grundlage für Skill Kopplung und Parametervalidierung zu verwenden."@de .
 
 ag:class_Variable a owl:Class ;
+    rdfs:comment "Diese Klasse repräsentiert Variablen im SPS Projekt, unabhängig davon, ob es sich um globale Variablen, lokale Variablen, Ein und Ausgänge oder Instanzvariablen handelt. Variablen sind zentrale Träger von Zuständen und Signalen, da über sie Sensorwerte gelesen, Aktoren angesteuert und interne Zwischenergebnisse gespeichert werden. Im Knowledge Graph kann eine Variable zusätzlich Hardwareinformationen enthalten, beispielsweise eine physikalische Adresse oder eine Zuordnung zu einem IO Channel, wodurch die Verbindung zwischen Logik und Feldhardware sichtbar wird. Variablen können außerdem genutzt werden, um Function Block Instanzen abzubilden, da viele PLC Systeme Instanzen über benannte Variablen in der Symbolik repräsentieren. Aus PLCopen XML stammen Variablen aus den Deklarationsbereichen eines POUs, aus globalen Variablenlisten oder aus I O Mappings. Für Skill Analysen ist class_Variable besonders wertvoll, weil darüber erkennbar wird, welche realen Sensoren und Aktoren ein Skill verwendet und welche Parameter in die Skill Aufrufe einfließen. Zusätzlich erlaubt diese Klasse Konsistenzprüfungen, etwa ob eine Variable als BOOL modelliert ist und dennoch mit einem numerischen Port verbunden wurde."@de ;
     rdfs:subClassOf ag:class_SignalSource .
 

@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Optional, Dict, List, Tuple, Set
 
 from rdflib import Graph, Literal, Namespace, URIRef
-from rdflib.namespace import RDF, OWL, XSD
+from rdflib.namespace import RDF, OWL, XSD, RDFS
 
 # --------------------------------------------------------------------------- #
 # Namespaces
@@ -148,7 +148,7 @@ class KGManager:
         return valid_tokens
 
     # ----------------------------------------------------------------------- #
-    # Unused Detection Logic (NEU)
+    # Unused Detection Logic
     # ----------------------------------------------------------------------- #
     def analyze_unused_elements(self) -> None:
         print("Analysiere ungenutzte Variablen und Ports...")
@@ -251,13 +251,148 @@ class KGManager:
             
         print("Reports generiert.")
 
+    
     # ----------------------------------------------------------------------- #
-    # Haupt-Logik: Call Analyse (Unverändert gut)
+    # Hinzufügen von GEMMA-Logik und Custom FBs
+    # ----------------------------------------------------------------------- #
+    def _ensure_bool_flag_property(self, prop_uri: URIRef) -> None:
+        """
+        Stellt sicher, dass dp-Property als DatatypeProperty existiert.
+        """
+        self.graph.add((prop_uri, RDF.type, OWL.DatatypeProperty))
+        self.graph.add((prop_uri, RDFS.subPropertyOf, DP.hasPOUAttribute))
+        self.graph.add((prop_uri, RDFS.range, XSD.boolean))
+        # Domain optional, aber hilfreich:
+        self.graph.add((prop_uri, RDFS.domain, AG.class_POU))
+
+
+    def mark_custom_fbtypes(self) -> None:
+        """
+        Alle FBTypes, die nicht StandardFBType sind, zusätzlich als CustomFBType markieren.
+        """
+        fbtypes = set(self.graph.subjects(RDF.type, AG.class_FBType))
+        standards = set(self.graph.subjects(RDF.type, AG.class_StandardFBType))
+
+        for fb in (fbtypes - standards):
+            self.graph.add((fb, RDF.type, AG.class_CustomFBType))
+
+
+    def _gemma_state_name(self, name: str) -> bool:
+        """
+        GEMMA-Zustände: A1.., F1.., D1.. etc.
+        """
+        return bool(re.match(r"^[AFD]\d+$", name.strip(), flags=re.I))
+
+
+    def _get_ports_by_dir(self, pou_uri: URIRef):
+        """
+        Hilfsfunktion: Ports als (name, dir) Listen zurückgeben.
+        """
+        out = []
+        for port_uri in self.graph.objects(pou_uri, OP.hasPort):
+            pname = self._get_name(port_uri, DP.hasPortName)
+            pdir = self._get_name(port_uri, DP.hasPortDirection)
+            out.append((pname, pdir))
+        return out
+
+
+    def _count_output_assignments_to_ports(self, code: str, output_port_names_norm: set[str]) -> int:
+        """
+        Heuristik für OutputLayer:
+        zählt Zuweisungen wie  X := ...  bei denen X ein Output-Port ist.
+        """
+        if not code:
+            return 0
+
+        # ST-Zuweisungen: <lhs> := <rhs>
+        assign_re = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_\.]*)\s*:=\s*", flags=re.M)
+        hits = 0
+        for m in assign_re.finditer(code):
+            lhs = m.group(1).strip()
+            lhs_last = lhs.split(".")[-1]  # falls irgendwas wie Instanz.Port auftaucht
+            if self._normalize_name(lhs_last) in output_port_names_norm:
+                hits += 1
+        return hits
+
+
+    def mark_gemma_layers(self) -> None:
+        """
+        Markiert:
+        - dp:isGEMMAStateMachine TRUE für OperatingModes Layer
+        - dp:isGEMMAOutputLayer TRUE für ControlOfOutputs Layer
+
+        Nutzt Ports + Code-Heuristiken.
+        Markiert primär FBTypes, die im Programm tatsächlich vorkommen (über FBInstance->FBType).
+        """
+        # Properties definieren (falls noch nicht im KG)
+        self._ensure_bool_flag_property(DP.isGEMMAStateMachine)
+        self._ensure_bool_flag_property(DP.isGEMMAOutputLayer)
+
+        # "im Programm ist" => FBTypes die tatsächlich instanziert sind
+        used_types = set(self.graph.objects(None, OP.isInstanceOfFBType))
+
+        for fb_type_uri in used_types:
+            # Skip Standard FBTypes
+            if (fb_type_uri, RDF.type, AG.class_StandardFBType) in self.graph:
+                continue
+
+            name = self._get_name(fb_type_uri, [DP.hasPOUName, DP.hasProgramName])
+            name_norm = self._normalize_name(name)
+
+            ports = self._get_ports_by_dir(fb_type_uri)
+
+            gemma_out_states = 0
+            gemma_in_states = 0
+            out_nonstate_ports = 0
+
+            output_port_names_norm = set()
+
+            for pname, pdir in ports:
+                pname_norm = self._normalize_name(pname)
+                if "Output" in str(pdir):
+                    output_port_names_norm.add(pname_norm)
+
+                if self._gemma_state_name(pname):
+                    if "Output" in str(pdir):
+                        gemma_out_states += 1
+                    elif "Input" in str(pdir):
+                        gemma_in_states += 1
+                else:
+                    if "Output" in str(pdir):
+                        out_nonstate_ports += 1
+
+            code = next(self.graph.objects(fb_type_uri, DP.hasPOUCode), None)
+            code_str = str(code) if code else ""
+
+            assigned_outputs = self._count_output_assignments_to_ports(code_str, output_port_names_norm)
+
+            # --- Muster 1: OperatingModes (StateMachine Layer) ---
+            is_operating_modes = (
+                ("operatingmodes" in name_norm) or
+                (gemma_out_states >= 3)  # Zustände als Outputs ist sehr typisch für OperatingModes
+            )
+
+            # --- Muster 2: ControlOfOutputs (Output Layer) ---
+            is_control_of_outputs = (
+                ("controlofoutputs" in name_norm) or
+                (gemma_in_states >= 3 and out_nonstate_ports >= 3) or
+                (assigned_outputs >= 3)
+            )
+
+            if is_operating_modes:
+                self.graph.add((fb_type_uri, DP.isGEMMAStateMachine, Literal(True, datatype=XSD.boolean)))
+
+            if is_control_of_outputs:
+                self.graph.add((fb_type_uri, DP.isGEMMAOutputLayer, Literal(True, datatype=XSD.boolean)))
+
+    # ----------------------------------------------------------------------- #
+    # Haupt-Logik: Call Analyse
     # ----------------------------------------------------------------------- #
     def analyze_calls(self) -> None:
         if not self.graph: self.load()
         self._clean_previous_analysis()
-        
+        self.mark_custom_fbtypes()
+        self.mark_gemma_layers()
         # 1. Calls analysieren
         print(f"Starte POU Call Analyse (Case Sensitive: {self.case_sensitive})...")
         call_re = re.compile(r"([A-Za-z_0-9\.]+)\s*\(([^;]*?)\);", re.S)

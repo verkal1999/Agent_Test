@@ -222,8 +222,7 @@ ag:StandardFBType_TP a ag:class_FBType,
 
 <http://www.semanticweb.org/AgentProgramParams/Var_SecuringWorkpiece_TON_Time_Securing__leerz__+__leerz__T#0> op:representsFBInstance ag:FBInst_0 .
 
-ag:class_CustomFBType a owl:Class ;
-    rdfs:subClassOf ag:class_FBType .
+ag:class_Skill a owl:Class .
 
 dp:hasConsistencyReport a owl:DatatypeProperty ;
     rdfs:domain ag:class_POU ;
@@ -314,6 +313,18 @@ dp:ioRawXml a owl:DatatypeProperty ;
     rdfs:domain ag:class_Variable ;
     rdfs:range xsd:string .
 
+dp:isGEMMAOutputLayer a owl:DatatypeProperty ;
+    rdfs:domain ag:class_POU ;
+    rdfs:range xsd:boolean ;
+    rdfs:subPropertyOf dp:hasPOUAttribute,
+        dp:isSpecificLayer .
+
+dp:isGEMMAStateMachine a owl:DatatypeProperty ;
+    rdfs:domain ag:class_POU ;
+    rdfs:range xsd:boolean ;
+    rdfs:subPropertyOf dp:hasPOUAttribute,
+        dp:isSpecificLayer .
+
 dp:isUnusedPort a owl:DatatypeProperty ;
     rdfs:domain ag:class_Port ;
     rdfs:range xsd:boolean ;
@@ -356,6 +367,10 @@ op:hasCallerVariable a owl:ObjectProperty ;
 
 op:hasInfluenceOnVariable a owl:ObjectProperty ;
     rdfs:domain ag:class_Variable ;
+    rdfs:range ag:class_Variable .
+
+op:hasInternalVariable a owl:ObjectProperty ;
+    rdfs:domain ag:class_POU ;
     rdfs:range ag:class_Variable .
 
 op:hasPort a owl:ObjectProperty ;
@@ -4881,7 +4896,8 @@ ag:FBInst_VSG_SkillSet_VSG_Skill_VerticalMoveBackwards a ag:class_FBInstance ;
 ag:FBInst_VSG_SkillSet_VSG_Skill_VerticalMoveForwards a ag:class_FBInstance ;
     op:isInstanceOfFBType ag:FBType_VSG_AS_VerticalMoveEncoder .
 
-ag:FBType_FB_MyOpcUaMethod a ag:class_FBType ;
+ag:FBType_FB_MyOpcUaMethod a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: FB_MyOpcUaMethod | Inputs: in1 (INT), in2 (INT) | Outputs: result (INT) | UNGENUTZTE Variablen (3): in1, in2, result | UNGENUTZTE Ports (3): in1, in2, result" ;
     dp:hasPOUCode """// METHOD Multiply of FB_MyOpcUaMethod
 Multiply := a * b;""" ;
@@ -4897,7 +4913,8 @@ Multiply := a * b;""" ;
         ag:Var_FB_MyOpcUaMethod_in2,
         ag:Var_FB_MyOpcUaMethod_result .
 
-ag:FBType_JobMethode_Schablone a ag:class_FBType ;
+ag:FBType_JobMethode_Schablone a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: JobMethode_Schablone | Inputs: LightSensor_01 (BOOL), LightSensor_02 (BOOL), NotAusSignal (BOOL), TOF_Time_EndschalterEntlastung (TIME), TOF_Time_Motoransteuerung (TIME), TS_Endschalter_01 (BOOL), TS_Endschalter_02 (BOOL) | Outputs: Motor_Ansteuerung01 (BOOL), Motor_Ansteuerung02 (BOOL) | Ruft auf: AxisControl_MultipleInputSensors | UNGENUTZTE Variablen (2): AlwaysTrue, Motor_Ansteuerung02 | UNGENUTZTE Ports (1): Motor_Ansteuerung02" ;
     dp:hasPOUCode """// POU JobMethode_Schablone body
 JobMethode_Name(
@@ -5007,7 +5024,8 @@ Start := 0;""" ;
         ag:Var_JobMethode_Schablone_jobRunning,
         ag:Var_JobMethode_Schablone_state .
 
-ag:FBType_StampingProcess a ag:class_FBType ;
+ag:FBType_StampingProcess a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: StampingProcess | Inputs: DI01 (BOOL), EmergencyStopSignal (BOOL), InitStateDrive_Input (BOOL), MethodCall (BOOL), OperatingMode (BOOL), TOF_Time_StampingTime (TIME) | Outputs: DigitalOutputControl_01 (BOOL), ResetMethodCall (BOOL) | Ruft auf: RS, R_TRIG, TOF" ;
     dp:hasPOUCode """// POU StampingProcess body
 R_TRIG_MethodCall(CLK := MethodCall);
@@ -5324,39 +5342,35 @@ ag:GVL_SST__dot__SST_Kompressor a ag:class_Variable ;
     op:isBoundToChannel ag:IOChannel_TIID__dach__Device__leerz__1__leerz__\(EtherCAT\)__dach__Term__leerz__1__leerz__\(EK1200\)__dach__Term__leerz__10__leerz__\(EL2409\)__dach__Channel__leerz__16__dach__Output .
 
 ag:GVL_SST__dot__SST_MOT_Foerderband a ag:class_Variable ;
-    dp:hasHardwareAddress "%Q*",
-        "Q 114.6" ;
+    dp:hasHardwareAddress "%Q*" ;
     dp:hasVariableName "GVL_SST.SST_MOT_Foerderband",
         "SST_MOT_Foerderband" ;
     dp:hasVariableType "BOOL" ;
-    dp:ioRawXml "<?xml version=\"1.0\"?><TreeItem><ItemName>Output</ItemName><PathName>TIID^Device 1 (EtherCAT)^Term 1 (EK1200)^Term 10 (EL2409)^Channel 15^Output</PathName><ItemType>7</ItemType><ItemId>-131</ItemId><ChildCount>0</ChildCount><Disabled>false</Disabled><TreeImageId>18</TreeImageId><VarDef><VarType GUID=\"{18071995-0000-0000-0000-000000000010}\">BIT</VarType><VarBitSize>1</VarBitSize><VarBitAddr>918</VarBitAddr><VarInOut>1</VarInOut><VarFlags>#x0</VarFlags><AdsInfo><AmsAddress><AmsPort>11</AmsPort></AmsAddress><IndexGroup Hex=\"#x03040010\">50593808</IndexGroup><IndexOffset Hex=\"#xc1000396\">-1056963690</IndexOffset><Length Hex=\"#x00000001\">1</Length></AdsInfo><LinkedWith>TIPC^SPS_Demonstrator^SPS_Demonstrator Instance^PlcTask Outputs^GVL_SST.SST_MOT_Foerderband</LinkedWith></VarDef></TreeItem>"^^xsd:string ;
+    dp:ioRawXml "ERROR: LookupTreeItem.ProduceXml"^^xsd:string ;
     op:isBoundToChannel ag:IOChannel_TIID__dach__Device__leerz__1__leerz__\(EtherCAT\)__dach__Term__leerz__1__leerz__\(EK1200\)__dach__Term__leerz__10__leerz__\(EL2409\)__dach__Channel__leerz__15__dach__Output .
 
 ag:GVL_SST__dot__SST_MV_blau a ag:class_Variable ;
-    dp:hasHardwareAddress "%Q*",
-        "Q 115.2" ;
+    dp:hasHardwareAddress "%Q*" ;
     dp:hasVariableName "GVL_SST.SST_MV_blau",
         "SST_MV_blau" ;
     dp:hasVariableType "BOOL" ;
-    dp:ioRawXml "<?xml version=\"1.0\"?><TreeItem><ItemName>Output</ItemName><PathName>TIID^Device 1 (EtherCAT)^Term 1 (EK1200)^Term 11 (EL2008)^Channel 3^Output</PathName><ItemType>7</ItemType><ItemId>-136</ItemId><ChildCount>0</ChildCount><Disabled>false</Disabled><TreeImageId>18</TreeImageId><VarDef><VarType GUID=\"{18071995-0000-0000-0000-000000000010}\">BIT</VarType><VarBitSize>1</VarBitSize><VarBitAddr>922</VarBitAddr><VarInOut>1</VarInOut><VarFlags>#x0</VarFlags><AdsInfo><AmsAddress><AmsPort>11</AmsPort></AmsAddress><IndexGroup Hex=\"#x03040010\">50593808</IndexGroup><IndexOffset Hex=\"#xc100039a\">-1056963686</IndexOffset><Length Hex=\"#x00000001\">1</Length></AdsInfo><LinkedWith>TIPC^SPS_Demonstrator^SPS_Demonstrator Instance^PlcTask Outputs^GVL_SST.SST_MV_blau</LinkedWith></VarDef></TreeItem>"^^xsd:string ;
+    dp:ioRawXml "ERROR: (-2147418111, 'Aufruf wurde durch Aufgerufenen abgelehnt.', None, None)"^^xsd:string ;
     op:isBoundToChannel ag:IOChannel_TIID__dach__Device__leerz__1__leerz__\(EtherCAT\)__dach__Term__leerz__1__leerz__\(EK1200\)__dach__Term__leerz__11__leerz__\(EL2008\)__dach__Channel__leerz__3__dach__Output .
 
 ag:GVL_SST__dot__SST_MV_rot a ag:class_Variable ;
-    dp:hasHardwareAddress "%Q*",
-        "Q 115.1" ;
+    dp:hasHardwareAddress "%Q*" ;
     dp:hasVariableName "GVL_SST.SST_MV_rot",
         "SST_MV_rot" ;
     dp:hasVariableType "BOOL" ;
-    dp:ioRawXml "<?xml version=\"1.0\"?><TreeItem><ItemName>Output</ItemName><PathName>TIID^Device 1 (EtherCAT)^Term 1 (EK1200)^Term 11 (EL2008)^Channel 2^Output</PathName><ItemType>7</ItemType><ItemId>-135</ItemId><ChildCount>0</ChildCount><Disabled>false</Disabled><TreeImageId>18</TreeImageId><VarDef><VarType GUID=\"{18071995-0000-0000-0000-000000000010}\">BIT</VarType><VarBitSize>1</VarBitSize><VarBitAddr>921</VarBitAddr><VarInOut>1</VarInOut><VarFlags>#x0</VarFlags><AdsInfo><AmsAddress><AmsPort>11</AmsPort></AmsAddress><IndexGroup Hex=\"#x03040010\">50593808</IndexGroup><IndexOffset Hex=\"#xc1000399\">-1056963687</IndexOffset><Length Hex=\"#x00000001\">1</Length></AdsInfo><LinkedWith>TIPC^SPS_Demonstrator^SPS_Demonstrator Instance^PlcTask Outputs^GVL_SST.SST_MV_rot</LinkedWith></VarDef></TreeItem>"^^xsd:string ;
+    dp:ioRawXml "ERROR: (-2147418111, 'Aufruf wurde durch Aufgerufenen abgelehnt.', None, None)"^^xsd:string ;
     op:isBoundToChannel ag:IOChannel_TIID__dach__Device__leerz__1__leerz__\(EtherCAT\)__dach__Term__leerz__1__leerz__\(EK1200\)__dach__Term__leerz__11__leerz__\(EL2008\)__dach__Channel__leerz__2__dach__Output .
 
 ag:GVL_SST__dot__SST_MV_weiss a ag:class_Variable ;
-    dp:hasHardwareAddress "%Q*",
-        "Q 115.0" ;
+    dp:hasHardwareAddress "%Q*" ;
     dp:hasVariableName "GVL_SST.SST_MV_weiss",
         "SST_MV_weiss" ;
     dp:hasVariableType "BOOL" ;
-    dp:ioRawXml "<?xml version=\"1.0\"?><TreeItem><ItemName>Output</ItemName><PathName>TIID^Device 1 (EtherCAT)^Term 1 (EK1200)^Term 11 (EL2008)^Channel 1^Output</PathName><ItemType>7</ItemType><ItemId>-134</ItemId><ChildCount>0</ChildCount><Disabled>false</Disabled><TreeImageId>18</TreeImageId><VarDef><VarType GUID=\"{18071995-0000-0000-0000-000000000010}\">BIT</VarType><VarBitSize>1</VarBitSize><VarBitAddr>920</VarBitAddr><VarInOut>1</VarInOut><VarFlags>#x0</VarFlags><AdsInfo><AmsAddress><AmsPort>11</AmsPort></AmsAddress><IndexGroup Hex=\"#x03040010\">50593808</IndexGroup><IndexOffset Hex=\"#xc1000398\">-1056963688</IndexOffset><Length Hex=\"#x00000001\">1</Length></AdsInfo><LinkedWith>TIPC^SPS_Demonstrator^SPS_Demonstrator Instance^PlcTask Outputs^GVL_SST.SST_MV_weiss</LinkedWith></VarDef></TreeItem>"^^xsd:string ;
+    dp:ioRawXml "ERROR: (-2147418111, 'Aufruf wurde durch Aufgerufenen abgelehnt.', None, None)"^^xsd:string ;
     op:isBoundToChannel ag:IOChannel_TIID__dach__Device__leerz__1__leerz__\(EtherCAT\)__dach__Term__leerz__1__leerz__\(EK1200\)__dach__Term__leerz__11__leerz__\(EL2008\)__dach__Channel__leerz__1__dach__Output .
 
 ag:GVL_VSG__dot__VSG_K1_3_Zaehler_Zuruecksetzen a ag:class_Variable ;
@@ -5387,75 +5401,67 @@ ag:GVL_VSG__dot__VSG_K1_5_Zaehler_Zuruecksetzen a ag:class_Variable ;
     op:isBoundToChannel ag:IOChannel_TIID__dach__Device__leerz__1__leerz__\(EtherCAT\)__dach__Term__leerz__1__leerz__\(EK1200\)__dach__Term__leerz__6__leerz__\(EL1512\)__dach__CNT__leerz__Outputs__leerz__Channel__leerz__1__dach__Control__dach__Set__leerz__counter .
 
 ag:GVL_VSG__dot__VSG_Kompressor a ag:class_Variable ;
-    dp:hasHardwareAddress "%Q*",
-        "Q 114.4" ;
+    dp:hasHardwareAddress "%Q*" ;
     dp:hasVariableName "GVL_VSG.VSG_Kompressor",
         "VSG_Kompressor" ;
     dp:hasVariableType "BOOL" ;
-    dp:ioRawXml "<?xml version=\"1.0\"?><TreeItem><ItemName>Output</ItemName><PathName>TIID^Device 1 (EtherCAT)^Term 1 (EK1200)^Term 10 (EL2409)^Channel 13^Output</PathName><ItemType>7</ItemType><ItemId>-129</ItemId><ChildCount>0</ChildCount><Disabled>false</Disabled><TreeImageId>18</TreeImageId><VarDef><VarType GUID=\"{18071995-0000-0000-0000-000000000010}\">BIT</VarType><VarBitSize>1</VarBitSize><VarBitAddr>916</VarBitAddr><VarInOut>1</VarInOut><VarFlags>#x0</VarFlags><AdsInfo><AmsAddress><AmsPort>11</AmsPort></AmsAddress><IndexGroup Hex=\"#x03040010\">50593808</IndexGroup><IndexOffset Hex=\"#xc1000394\">-1056963692</IndexOffset><Length Hex=\"#x00000001\">1</Length></AdsInfo><LinkedWith>TIPC^SPS_Demonstrator^SPS_Demonstrator Instance^PlcTask Outputs^GVL_VSG.VSG_Kompressor</LinkedWith></VarDef></TreeItem>"^^xsd:string ;
+    dp:ioRawXml "ERROR: (-2147418111, 'Aufruf wurde durch Aufgerufenen abgelehnt.', None, None)"^^xsd:string ;
     op:isBoundToChannel ag:IOChannel_TIID__dach__Device__leerz__1__leerz__\(EtherCAT\)__dach__Term__leerz__1__leerz__\(EK1200\)__dach__Term__leerz__10__leerz__\(EL2409\)__dach__Channel__leerz__13__dach__Output .
 
 ag:GVL_VSG__dot__VSG_MOT_drehen_CCW a ag:class_Variable ;
-    dp:hasHardwareAddress "%Q*",
-        "Q 114.3" ;
+    dp:hasHardwareAddress "%Q*" ;
     dp:hasVariableName "GVL_VSG.VSG_MOT_drehen_CCW",
         "VSG_MOT_drehen_CCW" ;
     dp:hasVariableType "BOOL" ;
-    dp:ioRawXml "<?xml version=\"1.0\"?><TreeItem><ItemName>Output</ItemName><PathName>TIID^Device 1 (EtherCAT)^Term 1 (EK1200)^Term 10 (EL2409)^Channel 12^Output</PathName><ItemType>7</ItemType><ItemId>-128</ItemId><ChildCount>0</ChildCount><Disabled>false</Disabled><TreeImageId>18</TreeImageId><VarDef><VarType GUID=\"{18071995-0000-0000-0000-000000000010}\">BIT</VarType><VarBitSize>1</VarBitSize><VarBitAddr>915</VarBitAddr><VarInOut>1</VarInOut><VarFlags>#x0</VarFlags><AdsInfo><AmsAddress><AmsPort>11</AmsPort></AmsAddress><IndexGroup Hex=\"#x03040010\">50593808</IndexGroup><IndexOffset Hex=\"#xc1000393\">-1056963693</IndexOffset><Length Hex=\"#x00000001\">1</Length></AdsInfo><LinkedWith>TIPC^SPS_Demonstrator^SPS_Demonstrator Instance^PlcTask Outputs^GVL_VSG.VSG_MOT_drehen_CCW</LinkedWith></VarDef></TreeItem>"^^xsd:string ;
+    dp:ioRawXml "ERROR: (-2147418111, 'Aufruf wurde durch Aufgerufenen abgelehnt.', None, None)"^^xsd:string ;
     op:isBoundToChannel ag:IOChannel_TIID__dach__Device__leerz__1__leerz__\(EtherCAT\)__dach__Term__leerz__1__leerz__\(EK1200\)__dach__Term__leerz__10__leerz__\(EL2409\)__dach__Channel__leerz__12__dach__Output .
 
 ag:GVL_VSG__dot__VSG_MOT_drehen_CW a ag:class_Variable ;
-    dp:hasHardwareAddress "%Q*",
-        "Q 114.2" ;
+    dp:hasHardwareAddress "%Q*" ;
     dp:hasVariableName "GVL_VSG.VSG_MOT_drehen_CW",
         "VSG_MOT_drehen_CW" ;
     dp:hasVariableType "BOOL" ;
-    dp:ioRawXml "<?xml version=\"1.0\"?><TreeItem><ItemName>Output</ItemName><PathName>TIID^Device 1 (EtherCAT)^Term 1 (EK1200)^Term 10 (EL2409)^Channel 11^Output</PathName><ItemType>7</ItemType><ItemId>-127</ItemId><ChildCount>0</ChildCount><Disabled>false</Disabled><TreeImageId>18</TreeImageId><VarDef><VarType GUID=\"{18071995-0000-0000-0000-000000000010}\">BIT</VarType><VarBitSize>1</VarBitSize><VarBitAddr>914</VarBitAddr><VarInOut>1</VarInOut><VarFlags>#x0</VarFlags><AdsInfo><AmsAddress><AmsPort>11</AmsPort></AmsAddress><IndexGroup Hex=\"#x03040010\">50593808</IndexGroup><IndexOffset Hex=\"#xc1000392\">-1056963694</IndexOffset><Length Hex=\"#x00000001\">1</Length></AdsInfo><LinkedWith>TIPC^SPS_Demonstrator^SPS_Demonstrator Instance^PlcTask Outputs^GVL_VSG.VSG_MOT_drehen_CW</LinkedWith></VarDef></TreeItem>"^^xsd:string ;
+    dp:ioRawXml "ERROR: (-2147418111, 'Aufruf wurde durch Aufgerufenen abgelehnt.', None, None)"^^xsd:string ;
     op:isBoundToChannel ag:IOChannel_TIID__dach__Device__leerz__1__leerz__\(EtherCAT\)__dach__Term__leerz__1__leerz__\(EK1200\)__dach__Term__leerz__10__leerz__\(EL2409\)__dach__Channel__leerz__11__dach__Output .
 
 ag:GVL_VSG__dot__VSG_MOT_horizontal_rueckwaerts a ag:class_Variable ;
-    dp:hasHardwareAddress "%Q*",
-        "Q 114.0" ;
+    dp:hasHardwareAddress "%Q*" ;
     dp:hasVariableName "GVL_VSG.VSG_MOT_horizontal_rueckwaerts",
         "VSG_MOT_horizontal_rueckwaerts" ;
     dp:hasVariableType "BOOL" ;
-    dp:ioRawXml "<?xml version=\"1.0\"?><TreeItem><ItemName>Output</ItemName><PathName>TIID^Device 1 (EtherCAT)^Term 1 (EK1200)^Term 10 (EL2409)^Channel 9^Output</PathName><ItemType>7</ItemType><ItemId>-125</ItemId><ChildCount>0</ChildCount><Disabled>false</Disabled><TreeImageId>18</TreeImageId><VarDef><VarType GUID=\"{18071995-0000-0000-0000-000000000010}\">BIT</VarType><VarBitSize>1</VarBitSize><VarBitAddr>912</VarBitAddr><VarInOut>1</VarInOut><VarFlags>#x0</VarFlags><AdsInfo><AmsAddress><AmsPort>11</AmsPort></AmsAddress><IndexGroup Hex=\"#x03040010\">50593808</IndexGroup><IndexOffset Hex=\"#xc1000390\">-1056963696</IndexOffset><Length Hex=\"#x00000001\">1</Length></AdsInfo><LinkedWith>TIPC^SPS_Demonstrator^SPS_Demonstrator Instance^PlcTask Outputs^GVL_VSG.VSG_MOT_horizontal_rueckwaerts</LinkedWith></VarDef></TreeItem>"^^xsd:string ;
+    dp:ioRawXml "ERROR: (-2147418111, 'Aufruf wurde durch Aufgerufenen abgelehnt.', None, None)"^^xsd:string ;
     op:isBoundToChannel ag:IOChannel_TIID__dach__Device__leerz__1__leerz__\(EtherCAT\)__dach__Term__leerz__1__leerz__\(EK1200\)__dach__Term__leerz__10__leerz__\(EL2409\)__dach__Channel__leerz__9__dach__Output .
 
 ag:GVL_VSG__dot__VSG_MOT_horizontal_vorwaerts a ag:class_Variable ;
-    dp:hasHardwareAddress "%Q*",
-        "Q 114.1" ;
+    dp:hasHardwareAddress "%Q*" ;
     dp:hasVariableName "GVL_VSG.VSG_MOT_horizontal_vorwaerts",
         "VSG_MOT_horizontal_vorwaerts" ;
     dp:hasVariableType "BOOL" ;
-    dp:ioRawXml "<?xml version=\"1.0\"?><TreeItem><ItemName>Output</ItemName><PathName>TIID^Device 1 (EtherCAT)^Term 1 (EK1200)^Term 10 (EL2409)^Channel 10^Output</PathName><ItemType>7</ItemType><ItemId>-126</ItemId><ChildCount>0</ChildCount><Disabled>false</Disabled><TreeImageId>18</TreeImageId><VarDef><VarType GUID=\"{18071995-0000-0000-0000-000000000010}\">BIT</VarType><VarBitSize>1</VarBitSize><VarBitAddr>913</VarBitAddr><VarInOut>1</VarInOut><VarFlags>#x0</VarFlags><AdsInfo><AmsAddress><AmsPort>11</AmsPort></AmsAddress><IndexGroup Hex=\"#x03040010\">50593808</IndexGroup><IndexOffset Hex=\"#xc1000391\">-1056963695</IndexOffset><Length Hex=\"#x00000001\">1</Length></AdsInfo><LinkedWith>TIPC^SPS_Demonstrator^SPS_Demonstrator Instance^PlcTask Outputs^GVL_VSG.VSG_MOT_horizontal_vorwaerts</LinkedWith></VarDef></TreeItem>"^^xsd:string ;
+    dp:ioRawXml "ERROR: (-2147418111, 'Aufruf wurde durch Aufgerufenen abgelehnt.', None, None)"^^xsd:string ;
     op:isBoundToChannel ag:IOChannel_TIID__dach__Device__leerz__1__leerz__\(EtherCAT\)__dach__Term__leerz__1__leerz__\(EK1200\)__dach__Term__leerz__10__leerz__\(EL2409\)__dach__Channel__leerz__10__dach__Output .
 
 ag:GVL_VSG__dot__VSG_MOT_vertikal_hoch a ag:class_Variable ;
-    dp:hasHardwareAddress "%Q*",
-        "Q 113.6" ;
+    dp:hasHardwareAddress "%Q*" ;
     dp:hasVariableName "GVL_VSG.VSG_MOT_vertikal_hoch",
         "VSG_MOT_vertikal_hoch" ;
     dp:hasVariableType "BOOL" ;
-    dp:ioRawXml "<?xml version=\"1.0\"?><TreeItem><ItemName>Output</ItemName><PathName>TIID^Device 1 (EtherCAT)^Term 1 (EK1200)^Term 10 (EL2409)^Channel 7^Output</PathName><ItemType>7</ItemType><ItemId>-123</ItemId><ChildCount>0</ChildCount><Disabled>false</Disabled><TreeImageId>18</TreeImageId><VarDef><VarType GUID=\"{18071995-0000-0000-0000-000000000010}\">BIT</VarType><VarBitSize>1</VarBitSize><VarBitAddr>910</VarBitAddr><VarInOut>1</VarInOut><VarFlags>#x0</VarFlags><AdsInfo><AmsAddress><AmsPort>11</AmsPort></AmsAddress><IndexGroup Hex=\"#x03040010\">50593808</IndexGroup><IndexOffset Hex=\"#xc100038e\">-1056963698</IndexOffset><Length Hex=\"#x00000001\">1</Length></AdsInfo><LinkedWith>TIPC^SPS_Demonstrator^SPS_Demonstrator Instance^PlcTask Outputs^GVL_VSG.VSG_MOT_vertikal_hoch</LinkedWith></VarDef></TreeItem>"^^xsd:string ;
+    dp:ioRawXml "ERROR: (-2147418111, 'Aufruf wurde durch Aufgerufenen abgelehnt.', None, None)"^^xsd:string ;
     op:isBoundToChannel ag:IOChannel_TIID__dach__Device__leerz__1__leerz__\(EtherCAT\)__dach__Term__leerz__1__leerz__\(EK1200\)__dach__Term__leerz__10__leerz__\(EL2409\)__dach__Channel__leerz__7__dach__Output .
 
 ag:GVL_VSG__dot__VSG_MOT_vertikal_runter a ag:class_Variable ;
-    dp:hasHardwareAddress "%Q*",
-        "Q 113.7" ;
+    dp:hasHardwareAddress "%Q*" ;
     dp:hasVariableName "GVL_VSG.VSG_MOT_vertikal_runter",
         "VSG_MOT_vertikal_runter" ;
     dp:hasVariableType "BOOL" ;
-    dp:ioRawXml "<?xml version=\"1.0\"?><TreeItem><ItemName>Output</ItemName><PathName>TIID^Device 1 (EtherCAT)^Term 1 (EK1200)^Term 10 (EL2409)^Channel 8^Output</PathName><ItemType>7</ItemType><ItemId>-124</ItemId><ChildCount>0</ChildCount><Disabled>false</Disabled><TreeImageId>18</TreeImageId><VarDef><VarType GUID=\"{18071995-0000-0000-0000-000000000010}\">BIT</VarType><VarBitSize>1</VarBitSize><VarBitAddr>911</VarBitAddr><VarInOut>1</VarInOut><VarFlags>#x0</VarFlags><AdsInfo><AmsAddress><AmsPort>11</AmsPort></AmsAddress><IndexGroup Hex=\"#x03040010\">50593808</IndexGroup><IndexOffset Hex=\"#xc100038f\">-1056963697</IndexOffset><Length Hex=\"#x00000001\">1</Length></AdsInfo><LinkedWith>TIPC^SPS_Demonstrator^SPS_Demonstrator Instance^PlcTask Outputs^GVL_VSG.VSG_MOT_vertikal_runter</LinkedWith></VarDef></TreeItem>"^^xsd:string ;
+    dp:ioRawXml "ERROR: (-2147418111, 'Aufruf wurde durch Aufgerufenen abgelehnt.', None, None)"^^xsd:string ;
     op:isBoundToChannel ag:IOChannel_TIID__dach__Device__leerz__1__leerz__\(EtherCAT\)__dach__Term__leerz__1__leerz__\(EK1200\)__dach__Term__leerz__10__leerz__\(EL2409\)__dach__Channel__leerz__8__dach__Output .
 
 ag:GVL_VSG__dot__VSG_MV_Vakuum a ag:class_Variable ;
-    dp:hasHardwareAddress "%Q*",
-        "Q 114.5" ;
+    dp:hasHardwareAddress "%Q*" ;
     dp:hasVariableName "GVL_VSG.VSG_MV_Vakuum",
         "VSG_MV_Vakuum" ;
     dp:hasVariableType "BOOL" ;
-    dp:ioRawXml "<?xml version=\"1.0\"?><TreeItem><ItemName>Output</ItemName><PathName>TIID^Device 1 (EtherCAT)^Term 1 (EK1200)^Term 10 (EL2409)^Channel 14^Output</PathName><ItemType>7</ItemType><ItemId>-130</ItemId><ChildCount>0</ChildCount><Disabled>false</Disabled><TreeImageId>18</TreeImageId><VarDef><VarType GUID=\"{18071995-0000-0000-0000-000000000010}\">BIT</VarType><VarBitSize>1</VarBitSize><VarBitAddr>917</VarBitAddr><VarInOut>1</VarInOut><VarFlags>#x0</VarFlags><AdsInfo><AmsAddress><AmsPort>11</AmsPort></AmsAddress><IndexGroup Hex=\"#x03040010\">50593808</IndexGroup><IndexOffset Hex=\"#xc1000395\">-1056963691</IndexOffset><Length Hex=\"#x00000001\">1</Length></AdsInfo><LinkedWith>TIPC^SPS_Demonstrator^SPS_Demonstrator Instance^PlcTask Outputs^GVL_VSG.VSG_MV_Vakuum</LinkedWith></VarDef></TreeItem>"^^xsd:string ;
+    dp:ioRawXml "ERROR: (-2147418111, 'Aufruf wurde durch Aufgerufenen abgelehnt.', None, None)"^^xsd:string ;
     op:isBoundToChannel ag:IOChannel_TIID__dach__Device__leerz__1__leerz__\(EtherCAT\)__dach__Term__leerz__1__leerz__\(EK1200\)__dach__Term__leerz__10__leerz__\(EL2409\)__dach__Channel__leerz__14__dach__Output .
 
 ag:GVL__dot__diNotAus_Kanal_A a ag:class_Variable ;
@@ -7775,6 +7781,14 @@ HRL_ControlOfOutputs(
     Init_RGB_HorizontalBackwards := Init_RGB_HorizontalBackwards
 );
 GVL_HRL.HRL_MOT_Foerderband_vorwaerts := HRL_ControlOfOutputs.ConveyorBeltForward;
+GVL_HRL.HRL_MOT_Foerderband_rueckwaerts := HRL_ControlOfOutputs.ConveyorBeltBackward;
+GVL_HRL.HRL_MOT_Ausleger_vorwaerts := HRL_ControlOfOutputs.RGB_Forwards;
+GVL_HRL.HRL_MOT_Ausleger_rueckwaerts := HRL_ControlOfOutputs.RGB_Backwards;
+GVL_HRL.HRL_MOT_vertikal_runter := HRL_ControlOfOutputs.RGB_VerticalDown;
+GVL_HRL.HRL_MOT_vertikal_hoch := HRL_ControlOfOutputs.RGB_VerticalUp;
+GVL_HRL.HRL_MOT_horizontal_zum_Regal := HRL_ControlOfOutputs.RGB_HorizontalForward;
+GVL_HRL.HRL_MOT_horizontal_zum_Foerderband := HRL_ControlOfOutputs.RGB_HorizontalBackward;
+
 HRL_RGB_InitialStateDrive(
     MethodCall_InitDrive := HRL_OperatingModes.MethodCall_InitStateDrive,
     ESS := ((GVL.diNotAus_Kanal_A) AND (GVL.diNotAus_Kanal_B)),
@@ -8732,6 +8746,7 @@ ag:StandardFBType_SR a ag:class_FBType,
         ag:Port_SR_S1 .
 
 ag:class_SourceLiteral a owl:Class ;
+    rdfs:comment "Diese Klasse repräsentiert konstante Literalwerte, die in einem SPS Netzwerk direkt als Eingangswerte verwendet werden, zum Beispiel TRUE, FALSE, 0 oder Zeitkonstanten. Sie wird im Knowledge Graph als spezielle Form einer Signalquelle modelliert, damit Parameterzuweisungen auch dann sauber abgebildet werden können, wenn kein Variablenname existiert. Literale sind in vielen Steuerungslogiken wichtig, etwa um Defaultwerte zu setzen, Zustandsautomaten zu initialisieren oder Zeitparameter für Timer vorzugeben. Aus PLCopen XML lassen sich solche Literale häufig aus Parameterbelegungen erkennen, wenn ein Eingang nicht verdrahtet ist oder explizit mit einem konstanten Wert verbunden wird. Die Klasse ermöglicht es, den Datenfluss vollständig zu rekonstruieren, da sonst ein Teil der Eingänge als undefiniert erscheinen würde. In Skill Analysen helfen SourceLiterals dabei, feste Konfigurationen sichtbar zu machen, zum Beispiel konstante Verfahrzeiten oder feste Betriebsartenparameter. Damit trägt class_SourceLiteral zur Vollständigkeit und Nachvollziehbarkeit der Modellierung bei."@de ;
     rdfs:subClassOf ag:class_SignalSource .
 
 ag:FBInst_0 a ag:class_FBInstance .
@@ -8784,7 +8799,8 @@ ag:FBInst_StampingProcess_R_TRIG_MethodCall a ag:class_FBInstance ;
 ag:FBInst_VSG_SkillSet_VSG_InitialStateDrive a ag:class_FBInstance ;
     op:isInstanceOfFBType ag:FBType_VSG_InitialStateDrive .
 
-ag:FBType_SecuringWorkpiece a ag:class_FBType ;
+ag:FBType_SecuringWorkpiece a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: SecuringWorkpiece | Inputs: DI01 (BOOL), EmergencyStopSignal (BOOL), InitStateDrive_Input (BOOL), MethodCall (BOOL), OperatingMode (BOOL), TON_Time_Securing (TIME), TON_Time_SecuringProcess (TIME) | Outputs: DigitalOutputControl_01 (BOOL), DigitalOutputControl_02 (BOOL), ResetMethodCall (BOOL) | Ruft auf: RS, R_TRIG, TON" ;
     dp:hasPOUCode """// POU SecuringWorkpiece body
 R_TRIG_MethodCall(CLK := MethodCall);
@@ -8802,6 +8818,7 @@ TON_SecuringTime_Valve(IN := RS_SecuringProcessCompressorOFF.Q1, PT := TON_Time_
 DigitalOutputControl_02 := TON_SecuringTime_Valve.Q;""" ;
     dp:hasPOULanguage "ST" ;
     dp:hasPOUName "SecuringWorkpiece" ;
+    dp:isGEMMAOutputLayer true ;
     op:containsPOUCall ag:POUCall_SecuringWorkpiece_RS_SecuringProcessCompressorOFF_1,
         ag:POUCall_SecuringWorkpiece_RS_SecuringProcessCompressorON_1,
         ag:POUCall_SecuringWorkpiece_R_TRIG_MethodCall_1,
@@ -12946,9 +12963,16 @@ ag:Var_VSG_OperatingModes_bFirstScan a ag:class_Variable ;
     dp:hasVariableName "bFirstScan" ;
     dp:hasVariableType "BOOL" .
 
+dp:isSpecificLayer a owl:DatatypeProperty ;
+    rdfs:comment "Hier wird gespeichert, ob etwas ein spezifisches Layer ist oder nicht. Damit wird insbesondere vom KGManager anhand des Programmcodes festgestellt, ob es sich bei diesem POU um ein GEMMA-Layer oder ein Output-Layer handelt, denn es wird von einer GEMMA-Steuerungsarchitektur ausgegangen, bei der es ein GEMMA-Layer als Steuerungsarchitektur gibt und ein Output-Layer,bei dem die Outputs in Abhängigkeit von den GEMMA-Zuständen ausgegeben werden." ;
+    rdfs:domain ag:class_POU ;
+    rdfs:range xsd:boolean ;
+    rdfs:subPropertyOf dp:hasPOUAttribute .
+
 dp:isUnused a owl:DatatypeProperty .
 
-ag:FBType_AutomaticColorDetection_nichtfertig a ag:class_FBType ;
+ag:FBType_AutomaticColorDetection_nichtfertig a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: AutomaticColorDetection_nichtfertig | Inputs: ColorCode_1 (INT), ColorCode_2 (INT), ColorCode_3 (INT), ColorSensor (INT), EmergencyStopSignal (BOOL), MethodCall (BOOL), OperatingMode (BOOL) | Outputs: Color_1 (BOOL), Color_2 (BOOL), Color_3 (BOOL) | UNGENUTZTE Variablen (4): ColorCode_3, EmergencyStopSignal, MethodCall, OperatingMode | UNGENUTZTE Ports (4): ColorCode_3, EmergencyStopSignal, MethodCall, OperatingMode" ;
     dp:hasPOUCode """// POU AutomaticColorDetection_nichtfertig body
 Color_1 := ((ColorSensor) = (ColorCode_1));
@@ -12956,6 +12980,7 @@ Color_2 := ((ColorSensor) = (ColorCode_2));
 Color_3 := ((ColorSensor) = (Color_3));""" ;
     dp:hasPOULanguage "ST" ;
     dp:hasPOUName "AutomaticColorDetection_nichtfertig" ;
+    dp:isGEMMAOutputLayer true ;
     op:hasInternalVariable ag:Var_AutomaticColorDetection_nichtfertig_ColorCode_1,
         ag:Var_AutomaticColorDetection_nichtfertig_ColorCode_2,
         ag:Var_AutomaticColorDetection_nichtfertig_ColorCode_3,
@@ -12987,7 +13012,8 @@ Color_3 := ((ColorSensor) = (Color_3));""" ;
         ag:Var_AutomaticColorDetection_nichtfertig_MethodCall,
         ag:Var_AutomaticColorDetection_nichtfertig_OperatingMode .
 
-ag:FBType_HRL_ControlOfOutputs a ag:class_FBType ;
+ag:FBType_HRL_ControlOfOutputs a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: HRL_ControlOfOutputs | Inputs: A1 (BOOL), A2 (BOOL), A6 (BOOL), CB_backwards (BOOL), CB_forwards (BOOL), F1 (BOOL), F4 (BOOL), Init_RGB_Backwards (BOOL), Init_RGB_Forwards (BOOL), Init_RGB_HorizontalBackwards (BOOL), Init_RGB_HorizontalForwads (BOOL), Init_RGB_VertikalDown (BOOL), Init_RGB_VertikalUp (BOOL), RGB_Backwards01 (BOOL), RGB_Backwards02 (BOOL), RGB_Forwards01 (BOOL), RGB_Forwards02 (BOOL), RGB_HorizontalBackwards01 (BOOL), RGB_HorizontalBackwards02 (BOOL), RGB_HorizontalForwards01 (BOOL), RGB_HorizontalForwards02 (BOOL), RGB_VertikalDown01 (BOOL), RGB_VertikalDown02 (BOOL), RGB_VertikalUp01 (BOOL), RGB_VertikalUp02 (BOOL), Start (BOOL) | Outputs: ConveyorBeltBackward (BOOL), ConveyorBeltForward (BOOL), Light_Q1 (BOOL), Light_Q2 (BOOL), Light_Q3 (BOOL), RGB_Backwards (BOOL), RGB_Forwards (BOOL), RGB_HorizontalBackward (BOOL), RGB_HorizontalForward (BOOL), RGB_VerticalDown (BOOL), RGB_VerticalUp (BOOL) | UNGENUTZTE Variablen (1): RGB_HorizontalForwards02 | UNGENUTZTE Ports (1): RGB_HorizontalForwards02" ;
     dp:hasPOUCode """// POU HRL_ControlOfOutputs body
 ConveyorBeltForward := ((((((F1) OR (A2))) AND (CB_Forwards))) OR (((Start) AND (F4))));
@@ -13003,6 +13029,7 @@ Light_Q2 := F4;
 Light_Q3 := A1;""" ;
     dp:hasPOULanguage "ST" ;
     dp:hasPOUName "HRL_ControlOfOutputs" ;
+    dp:isGEMMAOutputLayer true ;
     op:hasInternalVariable ag:Var_HRL_ControlOfOutputs_A1,
         ag:Var_HRL_ControlOfOutputs_A2,
         ag:Var_HRL_ControlOfOutputs_A6,
@@ -13115,7 +13142,8 @@ Light_Q3 := A1;""" ;
         ag:Var_HRL_ControlOfOutputs_RGB_VertikalUp02,
         ag:Var_HRL_ControlOfOutputs_Start .
 
-ag:FBType_HRL_OperatingModes a ag:class_FBType ;
+ag:FBType_HRL_OperatingModes a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: HRL_OperatingModes | Inputs: Alt_abort (BOOL), Alt_found (BOOL), Count1 (INT), Count2 (INT), Cycle_finished (BOOL), Diag_finished (BOOL), Err_detected (BOOL), Reset (BOOL), Schalter (BOOL), Schrittkette_GS (BOOL), Start (BOOL), Stop (BOOL) | Outputs: A1 (BOOL), A2 (BOOL), A5 (BOOL), A6 (BOOL), D1 (BOOL), D2 (BOOL), D3 (BOOL), F1 (BOOL), F4 (BOOL), InputVar_InitStateDrive (BOOL), MethodCall_InitStateDrive (BOOL) | UNGENUTZTE Variablen (17): NeverTrue, RS_A5, RS_AutomaticOperationMode, RS_CycleEnded, RS_D2, RS_D3, RS_InitialDrive, RS_InitialState, RS_InitialState11, RS_ManualOperationMode, R_TRIG_Automatic, R_TRIG_CycleEnded, R_TRIG_Init, R_TRIG_InitialDrive, R_TRIG_Manual, SR_D1, TestingVariable" ;
     dp:hasPOUCode """import time
 
@@ -13371,6 +13399,8 @@ bFirstScan := FALSE;\"\"\"
     return {'D1': D1, 'D2': D2, 'D3': D3, 'A5': A5, 'A6': A6, 'A1': A1, 'F4': F4, 'F1': F1, 'A2': A2}""" ;
     dp:hasPOULanguage "FBD" ;
     dp:hasPOUName "HRL_OperatingModes" ;
+    dp:isGEMMAOutputLayer true ;
+    dp:isGEMMAStateMachine true ;
     op:hasInternalVariable ag:Var_HRL_OperatingModes_A1,
         ag:Var_HRL_OperatingModes_A2,
         ag:Var_HRL_OperatingModes_A5,
@@ -13481,7 +13511,8 @@ bFirstScan := FALSE;\"\"\"
         ag:Var_HRL_OperatingModes_TestingVariable,
         ag:Var_HRL_OperatingModes_bFirstScan .
 
-ag:FBType_HRL_RGB_InitialStateDrive a ag:class_FBType ;
+ag:FBType_HRL_RGB_InitialStateDrive a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: HRL_RGB_InitialStateDrive | Inputs: ESS (BOOL), InitDriveMode (BOOL), InputInitDriveMode (BOOL), MethodCall_InitDrive (BOOL), TOF_Time_TSR (TIME), TouchSensor01_SRM (BOOL), TouchSensor02_RGB_vertical (BOOL), TouchSensor03_RGB_horizontal (BOOL) | Outputs: Count_SRM_MotorBackw (INT), Count_SRM_MotorForw (INT), RGB_HorizontalBackwards (BOOL), RGB_HorizontalForwards (BOOL), RGB_VerticalDown (BOOL), RGB_VerticalUp (BOOL), ResetMethodCall_RGB_Horizontal (BOOL), ResetMethodCall_RGB_Vertical (BOOL), ResetMethodCall_SRM (BOOL), SRM_MotorBackwards (BOOL), SRM_MotorForwards (BOOL) | Ruft auf: AxisControl_MultipleInputSensors | UNGENUTZTE Variablen (8): Count_SRM_MotorBackw, Count_SRM_MotorForw, RGB_HorizontalForwards, RGB_VerticalDown, ResetMethodCall_RGB_Horizontal, ResetMethodCall_RGB_Vertical, ResetMethodCall_SRM, SRM_MotorForwards | UNGENUTZTE Ports (8): Count_SRM_MotorBackw, Count_SRM_MotorForw, RGB_HorizontalForwards, RGB_VerticalDown, ResetMethodCall_RGB_Horizontal, ResetMethodCall_RGB_Vertical, ResetMethodCall_SRM, SRM_MotorForwards" ;
     dp:hasPOUCode """// POU HRL_RGB_InitialStateDrive body
 HRL_RGB_SRM_InitDrive(
@@ -13525,6 +13556,7 @@ HRL_RGB_Horizontal_InitDrive(
 RGB_HorizontalBackwards := HRL_RGB_Horizontal_InitDrive.DigitalOutputControl_01;""" ;
     dp:hasPOULanguage "ST" ;
     dp:hasPOUName "HRL_RGB_InitialStateDrive" ;
+    dp:isGEMMAOutputLayer true ;
     op:containsPOUCall ag:POUCall_HRL_RGB_InitialStateDrive_HRL_RGB_Horizontal_InitDrive_1,
         ag:POUCall_HRL_RGB_InitialStateDrive_HRL_RGB_SRM_InitDrive_1,
         ag:POUCall_HRL_RGB_InitialStateDrive_HRL_RGB_Vertical_InitDrive_1 ;
@@ -13600,7 +13632,8 @@ RGB_HorizontalBackwards := HRL_RGB_Horizontal_InitDrive.DigitalOutputControl_01;
         ag:Var_HRL_RGB_InitialStateDrive_TouchSensor02_RGB_vertical,
         ag:Var_HRL_RGB_InitialStateDrive_TouchSensor03_RGB_horizontal .
 
-ag:FBType_HardeningProcess a ag:class_FBType ;
+ag:FBType_HardeningProcess a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: HardeningProcess | Inputs: DI01 (BOOL), EmergencyStopSignal (BOOL), InitStateDrive_Input (BOOL), MethodCall (BOOL), OperatingMode (BOOL), TOF_Time_HardeningTime (TIME) | Outputs: DigitalOutputControl_01 (BOOL), ResetMethodCall (BOOL) | Ruft auf: RS, R_TRIG, TOF" ;
     dp:hasPOUCode """// POU HardeningProcess body
 R_TRIG_MethodCall(CLK := MethodCall);
@@ -13646,7 +13679,8 @@ DigitalOutputControl_01 := RS_HardeningProcess.Q1;""" ;
         ag:Var_HardeningProcess_TOF_HardeningTime,
         ag:Var_HardeningProcess_TOF_Time_HardeningTime .
 
-ag:FBType_MBS_CB_AS_HorizontalMove a ag:class_FBType ;
+ag:FBType_MBS_CB_AS_HorizontalMove a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: MBS_CB_AS_HorizontalMove | Inputs: AutomaticMode (BOOL), ESS (BOOL), LightSensor_01 (BOOL), TOF_Time_MotorControl (TIME), TouchSensor_01 (BOOL) | Outputs: DO_MovingHorizontalCB_01 (BOOL) | Ruft auf: AxisControl_MultipleInputSensors | UNGENUTZTE Variablen (1): AlwaysTrue" ;
     dp:hasPOUCode """// POU MBS_CB_AS_HorizontalMove body
 MBS_CB_HorizontalMove(
@@ -13731,7 +13765,8 @@ Start := 0;""" ;
         ag:Var_MBS_CB_AS_HorizontalMove_jobRunning,
         ag:Var_MBS_CB_AS_HorizontalMove_state .
 
-ag:FBType_MBS_ControlOfOutputs a ag:class_FBType ;
+ag:FBType_MBS_ControlOfOutputs a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: MBS_ControlOfOutputs | Inputs: A1 (BOOL), A2 (BOOL), A6 (BOOL), CB_Forwards (BOOL), DmPD_Compressor (BOOL), DmPD_RotateCCW_CBtoMR02 (BOOL), DmPD_RotateCCW_CBtoVSG (BOOL), DmPD_RotateCCW_MR02toVSG (BOOL), DmPD_RotateCW_MR02toCB (BOOL), DmPD_RotateCW_VSGtoCB (BOOL), DmPD_RotateCW_VSGtoMR02 (BOOL), DmPD_Valve (BOOL), F1 (BOOL), F4 (BOOL), Init_DmPD_RotateCCW (BOOL), Init_DmPD_RotateCW (BOOL), Init_MR01_HorizontalBackwards (BOOL), Init_MR01_HorizontalForwards (BOOL), Init_MR02_CuttingProcess (BOOL), Init_VSG_HorizontalBackwards (BOOL), Init_VSG_HorizontalForwards (BOOL), MR01_Compressor (BOOL), MR01_HardeningProcess (BOOL), MR01_HoritzontalBackwards (BOOL), MR01_HorizontalForwards (BOOL), MR01_Valve (BOOL), MR02_CuttingProcess (BOOL), Start (BOOL), VSG_Compressor_SuctionToDmPD (BOOL), VSG_Compressor_SuctionToMR01 (BOOL), VSG_Compressor_VerticalDown (BOOL), VSG_HorizontalBackwards (BOOL), VSG_HorizontalForwards (BOOL), VSG_Valve_SuctionToDmPD (BOOL), VSG_Valve_SuctionToMR01 (BOOL), VSG_Valve_VerticalDown (BOOL) | Outputs: CompressorON (BOOL), ConveyorBeltForward (BOOL), CuttingProcess_ON (BOOL), HardeningProcess (BOOL), Light_Q1 (BOOL), Light_Q2 (BOOL), Light_Q3 (BOOL), MoveVSGHorizontalBackwards (BOOL), MoveVSGHorizontalForwards (BOOL), RotateDmPD_CCW (BOOL), RotateDmPD_CW (BOOL), ValveDmPD_ON (BOOL), ValveMR01_ON (BOOL), ValveVSG_Suction_ON (BOOL), ValveVSG_VerticalDown_ON (BOOL), WorkpieceTableMoveHorizontalBackwards (BOOL), WorkpieceTableMoveHorizontalForwards (BOOL)" ;
     dp:hasPOUCode """// POU MBS_ControlOfOutputs body
 ConveyorBeltForward := ((((((F1) OR (A2))) AND (CB_Forwards))) OR (((Start) AND (F4))));
@@ -13753,6 +13788,7 @@ Light_Q2 := F4;
 Light_Q3 := A1;""" ;
     dp:hasPOULanguage "ST" ;
     dp:hasPOUName "MBS_ControlOfOutputs" ;
+    dp:isGEMMAOutputLayer true ;
     op:hasInternalVariable ag:Var_MBS_ControlOfOutputs_A1,
         ag:Var_MBS_ControlOfOutputs_A2,
         ag:Var_MBS_ControlOfOutputs_A6,
@@ -13913,7 +13949,8 @@ Light_Q3 := A1;""" ;
         ag:Var_MBS_ControlOfOutputs_WorkpieceTableMoveHorizontalBackwards,
         ag:Var_MBS_ControlOfOutputs_WorkpieceTableMoveHorizontalForwards .
 
-ag:FBType_MBS_DmPD_AS_HorizontalMove a ag:class_FBType ;
+ag:FBType_MBS_DmPD_AS_HorizontalMove a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: MBS_DmPD_AS_HorizontalMove | Inputs: AutomaticMode (BOOL), ESS (BOOL), TON_PowerOnDelay_Compressor (TIME), TON_PowerOnDelay_Valve (TIME), TouchSensor_01 (BOOL) | Outputs: DO_ControlCompressorDmPD_01 (BOOL), DO_ControlValveDmPD_02 (BOOL) | Ruft auf: CompressorControl | UNGENUTZTE Variablen (2): AlwaysTrue, DO_ControlValveDmPD_02 | UNGENUTZTE Ports (1): DO_ControlValveDmPD_02" ;
     dp:hasPOUCode """// POU MBS_DmPD_AS_HorizontalMove body
 MBS_DmPD_VerticalMove(
@@ -14020,7 +14057,8 @@ Start := 0;""" ;
         ag:Var_MBS_DmPD_AS_HorizontalMove_jobRunning,
         ag:Var_MBS_DmPD_AS_HorizontalMove_state .
 
-ag:FBType_MBS_DmPD_InitialStateDrive a ag:class_FBType ;
+ag:FBType_MBS_DmPD_InitialStateDrive a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: MBS_DmPD_InitialStateDrive | Inputs: DI01_CCW (BOOL), DI02_CCW (BOOL), DI02_CW (BOOL), ESS (BOOL), InitDriveMode (BOOL), InputInitialStateDrive (BOOL), MethodCall_InitDrive (BOOL) | Outputs: MotorControl_CCW (BOOL), MotorControl_CW (BOOL), ResetMethodCallRotateCCW (BOOL), ResetMethodCallRotateCW (BOOL) | Ruft auf: AxisControl_MultipleInputSensors | UNGENUTZTE Variablen (2): ResetMethodCallRotateCCW, ResetMethodCallRotateCW | UNGENUTZTE Ports (2): ResetMethodCallRotateCCW, ResetMethodCallRotateCW" ;
     dp:hasPOUCode """// POU MBS_DmPD_InitialStateDrive body
 MBS_DmPD_InitDrive_Rotate_CW(
@@ -14095,7 +14133,8 @@ MotorControl_CCW := MBS_DmPD_InitDrive_Rotate_CCW.DigitalOutputControl_01;""" ;
         ag:Var_MBS_DmPD_InitialStateDrive_ResetMethodCallRotateCCW,
         ag:Var_MBS_DmPD_InitialStateDrive_ResetMethodCallRotateCW .
 
-ag:FBType_MBS_MR01_AS_HardeningProcess a ag:class_FBType ;
+ag:FBType_MBS_MR01_AS_HardeningProcess a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: MBS_MR01_AS_HardeningProcess | Inputs: AutomaticMode (BOOL), ESS (BOOL), LightSensor_01 (BOOL) | Outputs: DO_HardeningProcessControlMR01 (BOOL) | Ruft auf: HardeningProcess | UNGENUTZTE Variablen (1): AlwaysTrue" ;
     dp:hasPOUCode """// POU MBS_MR01_AS_HardeningProcess body
 MBS_MR01_HardeningProcess(
@@ -14170,7 +14209,8 @@ Start := 0;""" ;
         ag:Var_MBS_MR01_AS_HardeningProcess_jobRunning,
         ag:Var_MBS_MR01_AS_HardeningProcess_state .
 
-ag:FBType_MBS_MR01_InitialStateDrive a ag:class_FBType ;
+ag:FBType_MBS_MR01_InitialStateDrive a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: MBS_MR01_InitialStateDrive | Inputs: ESS (BOOL), InitDriveMode (BOOL), InputInitStateDrive (BOOL), MethodCall_InitDrive (BOOL), TouchSensor01 (BOOL), TouchSensor02 (BOOL) | Outputs: MotorControlHorizontalBackwards (BOOL), MotorControlHorizontalForwards (BOOL), ResetMethodCallInitDriveMR01_Backwards (BOOL), ResetMethodCallInitDriveMR01_Forwards (BOOL) | Ruft auf: AxisControl_MultipleInputSensors | UNGENUTZTE Variablen (2): ResetMethodCallInitDriveMR01_Backwards, ResetMethodCallInitDriveMR01_Forwards | UNGENUTZTE Ports (2): ResetMethodCallInitDriveMR01_Backwards, ResetMethodCallInitDriveMR01_Forwards" ;
     dp:hasPOUCode """// POU MBS_MR01_InitialStateDrive body
 MBS_MR01_InitDrive_HorizontalBackwards(
@@ -14240,7 +14280,8 @@ MotorControlHorizontalForwards := MBS_MR01_InitDrive_HorizontalForwards.DigitalO
         ag:Var_MBS_MR01_InitialStateDrive_TouchSensor01,
         ag:Var_MBS_MR01_InitialStateDrive_TouchSensor02 .
 
-ag:FBType_MBS_MR02_AS_CuttingProcess a ag:class_FBType ;
+ag:FBType_MBS_MR02_AS_CuttingProcess a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: MBS_MR02_AS_CuttingProcess | Inputs: AutomaticMode (BOOL), ESS (BOOL), TouchSensor_01 (BOOL) | Outputs: DO_CuttingProcessControlMR02 (BOOL) | Ruft auf: CuttingProcess | UNGENUTZTE Variablen (1): AlwaysTrue" ;
     dp:hasPOUCode """// POU MBS_MR02_AS_CuttingProcess body
 MBS_MR02_CuttingProcess(
@@ -14315,7 +14356,8 @@ Start := 0;""" ;
         ag:Var_MBS_MR02_AS_CuttingProcess_jobRunning,
         ag:Var_MBS_MR02_AS_CuttingProcess_state .
 
-ag:FBType_MBS_MR02_InitialStateDrive a ag:class_FBType ;
+ag:FBType_MBS_MR02_InitialStateDrive a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: MBS_MR02_InitialStateDrive | Inputs: ESS (BOOL), InitDriveMode (BOOL), InputInitialStateDrive (BOOL), MethodCall_InitDrive (BOOL), TOF_Time_InitCuttingTime (TIME) | Outputs: CheckMR02MotorControl (BOOL), ResetMethodCallCuttingProcess (BOOL) | Ruft auf: CuttingProcess | UNGENUTZTE Variablen (1): ResetMethodCallCuttingProcess | UNGENUTZTE Ports (1): ResetMethodCallCuttingProcess" ;
     dp:hasPOUCode """// POU MBS_MR02_InitialStateDrive body
 MBS_MR02_InitDrive_CuttingProcess(
@@ -14354,7 +14396,8 @@ CheckMR02MotorControl := MBS_MR02_InitDrive_CuttingProcess.DigitalOutputControl_
         ag:Var_MBS_MR02_InitialStateDrive_ResetMethodCallCuttingProcess,
         ag:Var_MBS_MR02_InitialStateDrive_TOF_Time_InitCuttingTime .
 
-ag:FBType_MBS_OperatingModes a ag:class_FBType ;
+ag:FBType_MBS_OperatingModes a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: MBS_OperatingModes | Inputs: Reset (BOOL), Schalter (BOOL), Schrittkette_GS (BOOL), Start (BOOL), Stop (BOOL) | Outputs: A1 (BOOL), A2 (BOOL), A6 (BOOL), F1 (BOOL), F4 (BOOL) | Ruft auf: RS, R_TRIG" ;
     dp:hasPOUCode """// POU MBS_OperatingModes body
 R_TRIG_InitialDrive(CLK := RS_InitialDrive);
@@ -14379,6 +14422,8 @@ RS_CycleEnded(SET := ((R_TRIG_Automatic.Q) AND (((Schalter) OR (Stop)))), RESET1
 A2 := RS_CycleEnded.Q1;""" ;
     dp:hasPOULanguage "ST" ;
     dp:hasPOUName "MBS_OperatingModes" ;
+    dp:isGEMMAOutputLayer true ;
+    dp:isGEMMAStateMachine true ;
     op:containsPOUCall ag:POUCall_MBS_OperatingModes_RS_AutomaticOperationMode_1,
         ag:POUCall_MBS_OperatingModes_RS_CycleEnded_1,
         ag:POUCall_MBS_OperatingModes_RS_InitialDrive_1,
@@ -14447,7 +14492,8 @@ A2 := RS_CycleEnded.Q1;""" ;
         ag:Var_MBS_OperatingModes_Stop,
         ag:Var_MBS_OperatingModes_bFirstScan .
 
-ag:FBType_MBS_VSG_AS_VerticalMove a ag:class_FBType ;
+ag:FBType_MBS_VSG_AS_VerticalMove a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: MBS_VSG_AS_VerticalMove | Inputs: AutomaticMode (BOOL), ESS (BOOL), TON_PowerOnDelay_Compressor (TIME), TON_PowerOnDelay_Valve (TIME), TouchSensor_01 (BOOL) | Outputs: DO_ControlCompressorVerticalMoveVSG_01 (BOOL), DO_ControlValveVerticalMoveVSG_02 (BOOL) | Ruft auf: CompressorControl | UNGENUTZTE Variablen (2): AlwaysTrue, DO_ControlValveVerticalMoveVSG_02 | UNGENUTZTE Ports (1): DO_ControlValveVerticalMoveVSG_02" ;
     dp:hasPOUCode """// POU MBS_VSG_AS_VerticalMove body
 MBS_VSG_VerticalMove(
@@ -14554,7 +14600,8 @@ Start := 0;""" ;
         ag:Var_MBS_VSG_AS_VerticalMove_jobRunning,
         ag:Var_MBS_VSG_AS_VerticalMove_state .
 
-ag:FBType_MBS_VSG_InitialStateDrive a ag:class_FBType ;
+ag:FBType_MBS_VSG_InitialStateDrive a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: MBS_VSG_InitialStateDrive | Inputs: ESS (BOOL), InitDriveMode (BOOL), InputInitStateDrive (BOOL), MethodCall_InitDrive (BOOL), TOF_Time_TSR (TIME), TouchSensor01 (BOOL) | Outputs: DO_HorizontalMoveInitDriveVSG_01 (BOOL), DO_HorizontalMoveInitDriveVSG_02 (BOOL), ResetMethodCallInitDriveVSG (BOOL) | Ruft auf: AxisControl_MultipleInputSensors | UNGENUTZTE Variablen (2): DO_HorizontalMoveInitDriveVSG_02, ResetMethodCallInitDriveVSG | UNGENUTZTE Ports (2): DO_HorizontalMoveInitDriveVSG_02, ResetMethodCallInitDriveVSG" ;
     dp:hasPOUCode """// POU MBS_VSG_InitialStateDrive body
 MBS_VSG_InitDrive(
@@ -14607,7 +14654,8 @@ DO_HorizontalMoveInitDriveVSG_01 := MBS_VSG_InitDrive.DigitalOutputControl_01;""
         ag:Var_MBS_VSG_InitialStateDrive_TSR,
         ag:Var_MBS_VSG_InitialStateDrive_TouchSensor01 .
 
-ag:FBType_SST_CS_AS_ColorDetection a ag:class_FBType ;
+ag:FBType_SST_CS_AS_ColorDetection a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: SST_CS_AS_ColorDetection | Inputs: Color_Sensor (INT) | Outputs: Color_Blue (BOOL), Color_Red (BOOL), Color_White (BOOL) | Ruft auf: AutomaticColorDetection_nichtfertig | UNGENUTZTE Variablen (3): AlwaysTrue, Color_Blue, Color_Red | UNGENUTZTE Ports (2): Color_Blue, Color_Red" ;
     dp:hasPOUCode """// POU SST_CS_AS_ColorDetection body
 SST_Auto_ColorDetection(ColorSensor := Color_Sensor, ColorCode_1 := ColorCode1, ColorCode_2 := ColorCode2, ColorCode_3 := ColorCode3);
@@ -14678,7 +14726,8 @@ Start := 0;""" ;
         ag:Var_SST_CS_AS_ColorDetection_jobRunning,
         ag:Var_SST_CS_AS_ColorDetection_state .
 
-ag:FBType_SST_ControlOfOutputs a ag:class_FBType ;
+ag:FBType_SST_ControlOfOutputs a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: SST_ControlOfOutputs | Inputs: A1 (BOOL), A2 (BOOL), A6 (BOOL), CB_MoveForwardTillEnd (BOOL), CB_MoveForwardToPD01 (BOOL), CB_MoveForwardToPD02 (BOOL), CB_MoveForwardToPD03 (BOOL), F1 (BOOL), F4 (BOOL), Init_PD01_Compressor (BOOL), Init_PD01_Valve (BOOL), Init_PD02_Compressor (BOOL), Init_PD02_Valve (BOOL), Init_PD03_Compressor (BOOL), Init_PD03_Valve (BOOL), PD01_Compressor (BOOL), PD01_Valve (BOOL), PD02_Compressor (BOOL), PD02_Valve (BOOL), PD03_Compressor (BOOL), PD03_Valve (BOOL), Start (BOOL) | Outputs: CompressorON (BOOL), ConveyorBeltForward (BOOL), Light_Q1 (BOOL), Light_Q2 (BOOL), Light_Q3 (BOOL), ValvePD01_ON (BOOL), ValvePD02_ON (BOOL), ValvePD03_ON (BOOL) | UNGENUTZTE Variablen (1): A6 | UNGENUTZTE Ports (1): A6" ;
     dp:hasPOUCode """// POU SST_ControlOfOutputs body
 ConveyorBeltForward := ((((((F1) OR (A2))) AND (((CB_MoveForwardToPD01) OR (CB_MoveForwardToPD02) OR (CB_MoveForwardToPD03) OR (CB_MoveForwardTillEnd))))) OR (((Start) AND (F4))));
@@ -14691,6 +14740,7 @@ Light_Q2 := F4;
 Light_Q3 := A1;""" ;
     dp:hasPOULanguage "ST" ;
     dp:hasPOUName "SST_ControlOfOutputs" ;
+    dp:isGEMMAOutputLayer true ;
     op:hasInternalVariable ag:Var_SST_ControlOfOutputs_A1,
         ag:Var_SST_ControlOfOutputs_A2,
         ag:Var_SST_ControlOfOutputs_A6,
@@ -14782,7 +14832,8 @@ Light_Q3 := A1;""" ;
         ag:Var_SST_ControlOfOutputs_ValvePD02_ON,
         ag:Var_SST_ControlOfOutputs_ValvePD03_ON .
 
-ag:FBType_SST_OperatingModes a ag:class_FBType ;
+ag:FBType_SST_OperatingModes a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: SST_OperatingModes | Inputs: Reset (BOOL), Schalter (BOOL), Schrittkette_GS (BOOL), Start (BOOL), Stop (BOOL) | Outputs: A1 (BOOL), A2 (BOOL), A6 (BOOL), F1 (BOOL), F4 (BOOL) | Ruft auf: RS, R_TRIG" ;
     dp:hasPOUCode """// POU SST_OperatingModes body
 R_TRIG_InitialDrive(CLK := RS_InitialDrive);
@@ -14807,6 +14858,8 @@ RS_CycleEnded(SET := ((R_TRIG_Automatic.Q) AND (((Schalter) OR (Stop)))), RESET1
 A2 := RS_CycleEnded.Q1;""" ;
     dp:hasPOULanguage "ST" ;
     dp:hasPOUName "SST_OperatingModes" ;
+    dp:isGEMMAOutputLayer true ;
+    dp:isGEMMAStateMachine true ;
     op:containsPOUCall ag:POUCall_SST_OperatingModes_RS_AutomaticOperationMode_1,
         ag:POUCall_SST_OperatingModes_RS_CycleEnded_1,
         ag:POUCall_SST_OperatingModes_RS_InitialDrive_1,
@@ -14875,7 +14928,8 @@ A2 := RS_CycleEnded.Q1;""" ;
         ag:Var_SST_OperatingModes_Stop,
         ag:Var_SST_OperatingModes_bFirstScan .
 
-ag:FBType_SST_PD_InitialStateDrive a ag:class_FBType ;
+ag:FBType_SST_PD_InitialStateDrive a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: SST_PD_InitialStateDrive | Inputs: ESS (BOOL), InitDriveMode (BOOL), InputInitialStateDrive (BOOL), MethodCall_InitDrive (BOOL), TON_Time_PowerOFFSelfSet (TIME) | Outputs: MotorControl_PD01_Compressor (BOOL), MotorControl_PD01_Valve (BOOL), MotorControl_PD02_Compressor (BOOL), MotorControl_PD02_Valve (BOOL), MotorControl_PD03_Compressor (BOOL), MotorControl_PD03_Valve (BOOL), ResetMethodCallMovePD01 (BOOL), ResetMethodCallMovePD02 (BOOL), ResetMethodCallMovePD03 (BOOL) | Ruft auf: CompressorControl | UNGENUTZTE Variablen (7): InitDriveMode, MotorControl_PD01_Valve, MotorControl_PD02_Valve, MotorControl_PD03_Valve, ResetMethodCallMovePD01, ResetMethodCallMovePD02, ResetMethodCallMovePD03 | UNGENUTZTE Ports (7): InitDriveMode, MotorControl_PD01_Valve, MotorControl_PD02_Valve, MotorControl_PD03_Valve, ResetMethodCallMovePD01, ResetMethodCallMovePD02, ResetMethodCallMovePD03" ;
     dp:hasPOUCode """// POU SST_PD_InitialStateDrive body
 SST_PD01_InitDrive(
@@ -14958,6 +15012,7 @@ SST_PD03_InitDrive(
 MotorControl_PD03_Compressor := SST_PD03_InitDrive.DigitalOutputControl_01;""" ;
     dp:hasPOULanguage "ST" ;
     dp:hasPOUName "SST_PD_InitialStateDrive" ;
+    dp:isGEMMAOutputLayer true ;
     op:containsPOUCall ag:POUCall_SST_PD_InitialStateDrive_SST_PD01_InitDrive_1,
         ag:POUCall_SST_PD_InitialStateDrive_SST_PD02_InitDrive_1,
         ag:POUCall_SST_PD_InitialStateDrive_SST_PD03_InitDrive_1 ;
@@ -15014,7 +15069,8 @@ MotorControl_PD03_Compressor := SST_PD03_InitDrive.DigitalOutputControl_01;""" ;
         ag:Var_SST_PD_InitialStateDrive_SST_PD03_InitDrive,
         ag:Var_SST_PD_InitialStateDrive_TON_Time_PowerOFFSelfSet .
 
-ag:FBType_VSG_AS_CompressorControl a ag:class_FBType ;
+ag:FBType_VSG_AS_CompressorControl a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: VSG_AS_CompressorControl | Inputs: AutomaticMode (BOOL), ESS (BOOL), EncoderStartPosition01 (UDINT), EncoderStartPosition02 (UDINT), EncoderStartPosition03 (UDINT), EncoderStartPosition04 (UDINT), EncoderStartPosition05 (UDINT), EncoderStartPosition06 (UDINT) | Outputs: DO_CompressorVSG (BOOL), DO_ValveVSG (BOOL) | Ruft auf: CompressorControl | UNGENUTZTE Variablen (2): AlwaysTrue, DO_ValveVSG | UNGENUTZTE Ports (1): DO_ValveVSG" ;
     dp:hasPOUCode """// POU VSG_AS_CompressorControl body
 MBS_VSG_VerticalMove(
@@ -15147,7 +15203,8 @@ Start := 0;""" ;
         ag:Var_VSG_AS_CompressorControl_jobRunning,
         ag:Var_VSG_AS_CompressorControl_state .
 
-ag:FBType_VSG_ControlOfOutputs a ag:class_FBType ;
+ag:FBType_VSG_ControlOfOutputs a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: VSG_ControlOfOutputs | Inputs: A1 (BOOL), A2 (BOOL), A6 (BOOL), F1 (BOOL), F4 (BOOL), Init_VSG_HorizontalBackwards (BOOL), Init_VSG_HorizontalForwards (BOOL), Init_VSG_RotationCCW (BOOL), Init_VSG_RotationCW (BOOL), Init_VSG_VertikalDown (BOOL), Init_VSG_VertikalUp (BOOL), Start (BOOL), VSG_Compressor (BOOL), VSG_HorizontalBackwards01 (BOOL), VSG_HorizontalBackwards02 (BOOL), VSG_HorizontalForwards01 (BOOL), VSG_HorizontalForwards02 (BOOL), VSG_RotationCCW01 (BOOL), VSG_RotationCCW02 (BOOL), VSG_RotationCW01 (BOOL), VSG_RotationCW02 (BOOL), VSG_Valve (BOOL), VSG_VertikalDown01 (BOOL), VSG_VertikalDown02 (BOOL), VSG_VertikalUp01 (BOOL), VSG_VertikalUp02 (BOOL) | Outputs: CompressorON (BOOL), Light_Q1 (BOOL), Light_Q2 (BOOL), Light_Q3 (BOOL), MoveHorizontalBackwards (BOOL), MoveHorizontalForwards (BOOL), MoveRotationCCW (BOOL), MoveRotationCW (BOOL), MoveVerticalDown (BOOL), MoveVerticalUp (BOOL), ValveON (BOOL) | UNGENUTZTE Variablen (1): A6 | UNGENUTZTE Ports (1): A6" ;
     dp:hasPOUCode """// POU VSG_ControlOfOutputs body
 MoveVerticalDown := ((((((F1) OR (A2))) AND (((VSG_VertikalDown01) OR (VSG_VertikalDown02) OR (Init_VSG_VertikalDown))))) OR (((Start) AND (F4))));
@@ -15163,6 +15220,7 @@ Light_Q2 := F4;
 Light_Q3 := A1;""" ;
     dp:hasPOULanguage "ST" ;
     dp:hasPOUName "VSG_ControlOfOutputs" ;
+    dp:isGEMMAOutputLayer true ;
     op:hasInternalVariable ag:Var_VSG_ControlOfOutputs_A1,
         ag:Var_VSG_ControlOfOutputs_A2,
         ag:Var_VSG_ControlOfOutputs_A6,
@@ -15275,7 +15333,8 @@ Light_Q3 := A1;""" ;
         ag:Var_VSG_ControlOfOutputs_VSG_VertikalUp02,
         ag:Var_VSG_ControlOfOutputs_ValveON .
 
-ag:FBType_VSG_InitialStateDrive a ag:class_FBType ;
+ag:FBType_VSG_InitialStateDrive a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: VSG_InitialStateDrive | Inputs: ESS (BOOL), InitDriveMode (BOOL), InputInitDriveMode (BOOL), MethodCall_InitDrive (BOOL), TOF_Time_TSR (TIME), TouchSensor01_Rotation (BOOL), TouchSensor02_Vertical (BOOL), TouchSensor03_horizontal (BOOL) | Outputs: ResetMethodCall_RGB_Horizontal (BOOL), ResetMethodCall_RGB_Vertical (BOOL), ResetMethodCall_RotateCW (BOOL), VSG_Init_HorizontalBackwards (BOOL), VSG_Init_HorizontalForwards (BOOL), VSG_Init_RotateCCW (BOOL), VSG_Init_RotateCW (BOOL), VSG_Init_VerticalDown (BOOL), VSG_Init_VerticalUp (BOOL) | Ruft auf: AxisControl_MultipleInputSensors | UNGENUTZTE Variablen (6): ResetMethodCall_RGB_Horizontal, ResetMethodCall_RGB_Vertical, ResetMethodCall_RotateCW, VSG_Init_HorizontalBackwards, VSG_Init_RotateCCW, VSG_Init_VerticalDown | UNGENUTZTE Ports (6): ResetMethodCall_RGB_Horizontal, ResetMethodCall_RGB_Vertical, ResetMethodCall_RotateCW, VSG_Init_HorizontalBackwards, VSG_Init_RotateCCW, VSG_Init_VerticalDown" ;
     dp:hasPOUCode """// POU VSG_InitialStateDrive body
 VSG_InitDrive_Rotate_CW(
@@ -15319,6 +15378,7 @@ VSG_InitDrive_Horizontal_Backwards(
 VSG_Init_HorizontalForwards := VSG_InitDrive_Horizontal_Backwards.DigitalOutputControl_01;""" ;
     dp:hasPOULanguage "ST" ;
     dp:hasPOUName "VSG_InitialStateDrive" ;
+    dp:isGEMMAOutputLayer true ;
     op:containsPOUCall ag:POUCall_VSG_InitialStateDrive_VSG_InitDrive_Horizontal_Backwards_1,
         ag:POUCall_VSG_InitialStateDrive_VSG_InitDrive_Rotate_CW_1,
         ag:POUCall_VSG_InitialStateDrive_VSG_InitDrive_Vertical_Up_1 ;
@@ -15388,7 +15448,8 @@ VSG_Init_HorizontalForwards := VSG_InitDrive_Horizontal_Backwards.DigitalOutputC
         ag:Var_VSG_InitialStateDrive_VSG_Init_VerticalDown,
         ag:Var_VSG_InitialStateDrive_VSG_Init_VerticalUp .
 
-ag:FBType_VSG_OperatingModes a ag:class_FBType ;
+ag:FBType_VSG_OperatingModes a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: VSG_OperatingModes | Inputs: Reset (BOOL), Schalter (BOOL), Schrittkette_GS (BOOL), Start (BOOL), Stop (BOOL) | Outputs: A1 (BOOL), A2 (BOOL), A6 (BOOL), F1 (BOOL), F4 (BOOL) | UNGENUTZTE Variablen (5): R_TRIG_Automatic, R_TRIG_CycleEnded, R_TRIG_Init, R_TRIG_InitialDrive, R_TRIG_Manual" ;
     dp:hasPOUCode """import time
 
@@ -15549,6 +15610,7 @@ END_IF;\"\"\"
     return {'A6': A6, 'A1': A1, 'F4': F4, 'F1': F1, 'A2': A2}""" ;
     dp:hasPOULanguage "FBD" ;
     dp:hasPOUName "VSG_OperatingModes" ;
+    dp:isGEMMAStateMachine true ;
     op:hasInternalVariable ag:Var_VSG_OperatingModes_A1,
         ag:Var_VSG_OperatingModes_A2,
         ag:Var_VSG_OperatingModes_A6,
@@ -19123,7 +19185,8 @@ ag:Var_VSG_SkillSet_VSG_Valve a ag:class_Variable ;
     dp:hasVariableName "VSG_Valve" ;
     dp:hasVariableType "BOOL" .
 
-ag:class_PLCProject a owl:Class .
+ag:class_PLCProject a owl:Class ;
+    rdfs:comment "Diese Klasse beschreibt das gesamte SPS Projekt als oberste Container Entität im Knowledge Graph. Eine Instanz dieser Klasse fasst alle Inhalte zusammen, die aus einem PLCopen XML Export abgeleitet wurden, also Programme, Function Block Typen, globale Variablenlisten und die zugehörigen Verknüpfungen. Das Objekt dient als Einstiegspunkt, um das Modell strukturiert abzufragen und alle Substrukturen eindeutig einem Projekt zuzuordnen. Typischerweise besitzt ein PLCProject Beziehungen zu Programmen und zu globalen Variablenlisten, wodurch nachvollziehbar wird, welche Logik zyklisch ausgeführt wird und welche Variablen projektweit verfügbar sind. In der praktischen Nutzung ist das PLCProject besonders hilfreich, um mehrere Exporte oder Versionen getrennt zu verwalten und Vergleiche zwischen unterschiedlichen Projektständen durchführen zu können. Zusätzlich unterstützt diese Klasse die Nachvollziehbarkeit der Provenienz, da alle abgeleiteten Entitäten eindeutig als Teil eines konkreten Exports interpretiert werden."@de .
 
 dp:hasPortAttribute a owl:DatatypeProperty .
 
@@ -19132,7 +19195,8 @@ dp:hasVariableAttribute a owl:DatatypeProperty .
 ag:FBInst_HRL_SkillSet_HRL_RGB_InitialStateDrive a ag:class_FBInstance ;
     op:isInstanceOfFBType ag:FBType_HRL_RGB_InitialStateDrive .
 
-ag:FBType_MBS_MR01_AS_SecuringProcess a ag:class_FBType ;
+ag:FBType_MBS_MR01_AS_SecuringProcess a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: MBS_MR01_AS_SecuringProcess | Inputs: AutomaticMode (BOOL), ESS (BOOL), TouchSensor_01 (BOOL) | Outputs: DO_SecuringProcessCompressorMR01_01 (BOOL), DO_SecuringProcessValveMR01_02 (BOOL) | UNGENUTZTE Variablen (5): DO_SecuringProcessValveMR01_02, MBS_MR01_SecuringProcess, callCounterAbort, callCounterCheckState, callCounterStart | UNGENUTZTE Ports (1): DO_SecuringProcessValveMR01_02" ;
     dp:hasPOUCode """import time
 
@@ -19782,7 +19846,8 @@ ag:Var_StampingProcess_R_TRIG_MethodCall a ag:class_Variable ;
     dp:hasVariableType "R_TRIG" ;
     op:representsFBInstance ag:FBInst_StampingProcess_R_TRIG_MethodCall .
 
-ag:FBType_CuttingProcess a ag:class_FBType ;
+ag:FBType_CuttingProcess a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: CuttingProcess | Inputs: DI01 (BOOL), EmergencyStopSignal (BOOL), InitStateDrive_Input (BOOL), MethodCall (BOOL), OperatingMode (BOOL), TOF_Time_CuttingTime (TIME) | Outputs: DigitalOutputControl_01 (BOOL), ResetMethodCall (BOOL) | Ruft auf: RS, R_TRIG, TOF" ;
     dp:hasPOUCode """// POU CuttingProcess body
 R_TRIG_MethodCall(CLK := MethodCall);
@@ -19828,7 +19893,8 @@ DigitalOutputControl_01 := RS_CuttingProcess.Q1;""" ;
         ag:Var_CuttingProcess_TOF_CuttingTime,
         ag:Var_CuttingProcess_TOF_Time_CuttingTime .
 
-ag:FBType_HRL_CB_AS_HorizontalMoveSensors a ag:class_FBType ;
+ag:FBType_HRL_CB_AS_HorizontalMoveSensors a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: HRL_CB_AS_HorizontalMoveSensors | Inputs: AutomaticMode (BOOL), ESS (BOOL), LightBarrierSensor_01 (BOOL), LightBarrierSensor_02 (BOOL) | Outputs: DO_MovingConveyorBelt (BOOL) | Ruft auf: AxisControl_MultipleInputSensors | UNGENUTZTE Variablen (1): AlwaysTrue" ;
     dp:hasPOUCode """// POU HRL_CB_AS_HorizontalMoveSensors body
 HRL_CB_HorizontalMove(
@@ -19910,7 +19976,8 @@ Start := 0;""" ;
         ag:Var_HRL_CB_AS_HorizontalMoveSensors_jobRunning,
         ag:Var_HRL_CB_AS_HorizontalMoveSensors_state .
 
-ag:FBType_HRL_RGB_AS_HorizontalMoveEncoders a ag:class_FBType ;
+ag:FBType_HRL_RGB_AS_HorizontalMoveEncoders a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: HRL_RGB_AS_HorizontalMoveEncoders | Inputs: AutomaticMode (BOOL), ESS (BOOL), EncoderStartPosition01 (UDINT), EncoderStartPosition02 (UDINT), TOF_Time_TSR (TIME), TouchSensor01 (BOOL) | Outputs: DO_MovingHorizontalRGB_01 (BOOL), DO_MovingHorizontalRGB_02 (BOOL) | Ruft auf: AxisControl_Encoder | UNGENUTZTE Variablen (2): AlwaysTrue, DO_MovingHorizontalRGB_02 | UNGENUTZTE Ports (1): DO_MovingHorizontalRGB_02" ;
     dp:hasPOUCode """// POU HRL_RGB_AS_HorizontalMoveEncoders body
 HRL_RGB_HorizontalMoveWithEncoder(
@@ -20013,7 +20080,8 @@ Start := 0;""" ;
         ag:Var_HRL_RGB_AS_HorizontalMoveEncoders_jobRunning,
         ag:Var_HRL_RGB_AS_HorizontalMoveEncoders_state .
 
-ag:FBType_HRL_RGB_AS_HorizontalMoveSensors a ag:class_FBType ;
+ag:FBType_HRL_RGB_AS_HorizontalMoveSensors a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: HRL_RGB_AS_HorizontalMoveSensors | Inputs: AutomaticMode (BOOL), ESS (BOOL), TOF_Time_TSR (TIME), TouchSensor01 (BOOL), TouchSensor02 (BOOL) | Outputs: DO_MovingHorizontalRGB_01 (BOOL), DO_MovingHorizontalRGB_02 (BOOL) | Ruft auf: AxisControl_MultipleInputSensors | UNGENUTZTE Variablen (2): AlwaysTrue, DO_MovingHorizontalRGB_02 | UNGENUTZTE Ports (1): DO_MovingHorizontalRGB_02" ;
     dp:hasPOUCode """// POU HRL_RGB_AS_HorizontalMoveSensors body
 HRL_RGB_HorizontalMove(
@@ -20104,7 +20172,8 @@ Start := 0;""" ;
         ag:Var_HRL_RGB_AS_HorizontalMoveSensors_jobRunning,
         ag:Var_HRL_RGB_AS_HorizontalMoveSensors_state .
 
-ag:FBType_HRL_RGB_AS_VerticalMoveEncoders a ag:class_FBType ;
+ag:FBType_HRL_RGB_AS_VerticalMoveEncoders a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: HRL_RGB_AS_VerticalMoveEncoders | Inputs: AutomaticMode (BOOL), ESS (BOOL), EncoderStartPosition01 (UDINT), EncoderStartPosition02 (UDINT), TOF_TSR_TIME (TIME), TouchSensor01 (BOOL) | Outputs: DO_MovingVerticalRGB_01 (BOOL), DO_MovingVerticalRGB_02 (BOOL) | Ruft auf: AxisControl_Encoder | UNGENUTZTE Variablen (2): AlwaysTrue, DO_MovingVerticalRGB_02 | UNGENUTZTE Ports (1): DO_MovingVerticalRGB_02" ;
     dp:hasPOUCode """// POU HRL_RGB_AS_VerticalMoveEncoders body
 HRL_RGB_VerticalMoveWithEncoder(
@@ -20207,7 +20276,8 @@ Start := 0;""" ;
         ag:Var_HRL_RGB_AS_VerticalMoveEncoders_jobRunning,
         ag:Var_HRL_RGB_AS_VerticalMoveEncoders_state .
 
-ag:FBType_MBS_MR01_AS_HorizontalMoveSensors a ag:class_FBType ;
+ag:FBType_MBS_MR01_AS_HorizontalMoveSensors a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: MBS_MR01_AS_HorizontalMoveSensors | Inputs: AutomaticMode (BOOL), ESS (BOOL), TOF_Time_TSR (TIME), TouchSensor_01 (BOOL), TouchSensor_02 (BOOL) | Outputs: DO_MovingHorizontalMR01_01 (BOOL), DO_MovingHorizontalMR01_02 (BOOL) | Ruft auf: AxisControl_MultipleInputSensors | UNGENUTZTE Variablen (2): AlwaysTrue, DO_MovingHorizontalMR01_02 | UNGENUTZTE Ports (1): DO_MovingHorizontalMR01_02" ;
     dp:hasPOUCode """// POU MBS_MR01_AS_HorizontalMoveSensors body
 MBS_MR01_HorizontalMove(
@@ -20297,7 +20367,8 @@ Start := 0;""" ;
         ag:Var_MBS_MR01_AS_HorizontalMoveSensors_jobRunning,
         ag:Var_MBS_MR01_AS_HorizontalMoveSensors_state .
 
-ag:FBType_MBS_VSG_AS_HorizontalMove a ag:class_FBType ;
+ag:FBType_MBS_VSG_AS_HorizontalMove a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: MBS_VSG_AS_HorizontalMove | Inputs: AutomaticeMode (BOOL), ESS (BOOL), TOF_Time_TSR (TIME), TouchSensor_01 (BOOL), TouchSensor_02 (BOOL) | Outputs: DO_HorizontalMoveVSG_01 (BOOL), DO_HorizontalMoveVSG_02 (BOOL) | Ruft auf: AxisControl_MultipleInputSensors | UNGENUTZTE Variablen (2): AlwaysTrue, DO_HorizontalMoveVSG_02 | UNGENUTZTE Ports (1): DO_HorizontalMoveVSG_02" ;
     dp:hasPOUCode """// POU MBS_VSG_AS_HorizontalMove body
 MBS_VSG_HorizontalMove(
@@ -20388,7 +20459,8 @@ Start := 0;""" ;
         ag:Var_MBS_VSG_AS_HorizontalMove_jobRunning,
         ag:Var_MBS_VSG_AS_HorizontalMove_state .
 
-ag:FBType_MBS_VSG_AS_SuctionProcess a ag:class_FBType ;
+ag:FBType_MBS_VSG_AS_SuctionProcess a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: MBS_VSG_AS_SuctionProcess | Inputs: AutomaticMode (BOOL), ESS (BOOL), TON_PowerOnDelay_Compressor (TIME), TON_PowerOnDelay_Valve (TIME), TouchSensor_01 (BOOL), TouchSensor_02 (BOOL) | Outputs: DO_ControlCompressorSuctionProcessVSG_01 (BOOL), DO_ControlValveSuctionProcessVSG_02 (BOOL) | Ruft auf: CompressorControl | UNGENUTZTE Variablen (2): AlwaysTrue, DO_ControlValveSuctionProcessVSG_02 | UNGENUTZTE Ports (1): DO_ControlValveSuctionProcessVSG_02" ;
     dp:hasPOUCode """// POU MBS_VSG_AS_SuctionProcess body
 MBS_VSG_SuctionProcess(
@@ -20492,7 +20564,8 @@ Start := 0;""" ;
         ag:Var_MBS_VSG_AS_SuctionProcess_jobRunning,
         ag:Var_MBS_VSG_AS_SuctionProcess_state .
 
-ag:FBType_VSG_AS_HorizontalMoveEncoder a ag:class_FBType ;
+ag:FBType_VSG_AS_HorizontalMoveEncoder a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: VSG_AS_HorizontalMoveEncoder | Inputs: AutomaticMode (BOOL), ESS (BOOL), EncoderStartPosition01 (UDINT), EncoderStartPosition02 (UDINT), TOF_Time_TSR (TIME), TouchSensor01 (BOOL) | Outputs: DO_MovingHorizontalVSG_01 (BOOL), DO_MovingHorizontalVSG_02 (BOOL) | Ruft auf: AxisControl_Encoder | UNGENUTZTE Variablen (2): AlwaysTrue, DO_MovingHorizontalVSG_02 | UNGENUTZTE Ports (1): DO_MovingHorizontalVSG_02" ;
     dp:hasPOUCode """// POU VSG_AS_HorizontalMoveEncoder body
 HRL_RGB_HorizontalMoveWithEncoder(
@@ -20595,7 +20668,8 @@ Start := 0;""" ;
         ag:Var_VSG_AS_HorizontalMoveEncoder_jobRunning,
         ag:Var_VSG_AS_HorizontalMoveEncoder_state .
 
-ag:FBType_VSG_AS_RotationMoveEncoder a ag:class_FBType ;
+ag:FBType_VSG_AS_RotationMoveEncoder a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: VSG_AS_RotationMoveEncoder | Inputs: AutomaticMode (BOOL), ESS (BOOL), EncoderStartPosition01 (UDINT), EncoderStartPosition02 (UDINT), TOF_Time_TSR (TIME), TouchSensor01 (BOOL) | Outputs: DO_MovingRotationVSG_01 (BOOL), DO_MovingRotationVSG_02 (BOOL) | Ruft auf: AxisControl_Encoder | UNGENUTZTE Variablen (2): AlwaysTrue, DO_MovingRotationVSG_02 | UNGENUTZTE Ports (1): DO_MovingRotationVSG_02" ;
     dp:hasPOUCode """// POU VSG_AS_RotationMoveEncoder body
 HRL_RGB_VerticalMoveWithEncoder(
@@ -20698,7 +20772,8 @@ Start := 0;""" ;
         ag:Var_VSG_AS_RotationMoveEncoder_jobRunning,
         ag:Var_VSG_AS_RotationMoveEncoder_state .
 
-ag:FBType_VSG_AS_VerticalMoveEncoder a ag:class_FBType ;
+ag:FBType_VSG_AS_VerticalMoveEncoder a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: VSG_AS_VerticalMoveEncoder | Inputs: AutomaticMode (BOOL), ESS (BOOL), EncoderStartPosition01 (UDINT), EncoderStartPosition02 (UDINT), TOF_Time_TSR (TIME), TouchSensor01 (BOOL) | Outputs: DO_MovingVerticalVSG_01 (BOOL), DO_MovingVerticalVSG_02 (BOOL) | Ruft auf: AxisControl_Encoder | UNGENUTZTE Variablen (2): AlwaysTrue, DO_MovingVerticalVSG_02 | UNGENUTZTE Ports (1): DO_MovingVerticalVSG_02" ;
     dp:hasPOUCode """// POU VSG_AS_VerticalMoveEncoder body
 HRL_RGB_VerticalMoveWithEncoder(
@@ -21081,10 +21156,8 @@ ag:Var_SecuringWorkpiece_R_TRIG_MethodCall a ag:class_Variable ;
     op:representsFBInstance ag:FBInst_SecuringWorkpiece_R_TRIG_MethodCall .
 
 ag:class_Program a owl:Class ;
+    rdfs:comment "Diese Klasse repräsentiert ein SPS Programm, das im Normalfall zyklisch von der Runtime ausgeführt wird und daher die oberste Ebene der Steuerungslogik bildet. Programme sind die Haupt Einstiegspunkte für die Ausführung, da sie typische Betriebsartenlogiken, Sequenzen oder Skill Orchestrierungen enthalten. Im Knowledge Graph dient diese Klasse dazu, die Gesamtabläufe sichtbar zu machen und die enthaltenen Aufrufe von Function Blocks als POUCalls explizit zu modellieren. Ein Programm besitzt in der Regel Beziehungen zu den aufgerufenen Bausteinen und deren Parameterzuweisungen, wodurch die Signalflüsse und Startbedingungen nachvollziehbar werden. Aus einem PLCopen XML Export entsteht diese Struktur aus den Program POUs, die häufig als zentrale Knoten für Skill Sets oder Stationslogik fungieren. Für Analysen ist class_Program besonders wichtig, weil hier häufig entschieden wird, welche Subsysteme wann aktiviert werden und welche Ausgänge überhaupt freigegeben werden dürfen. Damit ist die Klasse ideal, um Skill Trigger, Betriebsmodi und globale Abhängigkeiten im Gesamtprojekt zu verstehen."@de ;
     rdfs:subClassOf ag:class_POU .
-
-dp:hasPOUAttribute a owl:DatatypeProperty ;
-    rdfs:domain ag:class_POU .
 
 ag:FBInst_MBS_SkillSet_MBS_OperatingModes a ag:class_FBInstance ;
     op:isInstanceOfFBType ag:FBType_MBS_OperatingModes .
@@ -21095,7 +21168,8 @@ ag:FBInst_SST_SkillSet_SST_OperatingModes a ag:class_FBInstance ;
 ag:FBInst_VSG_SkillSet_VSG_OperatingModes a ag:class_FBInstance ;
     op:isInstanceOfFBType ag:FBType_VSG_OperatingModes .
 
-ag:FBType_SST_PD_AS_HorizontalMove a ag:class_FBType ;
+ag:FBType_SST_PD_AS_HorizontalMove a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: SST_PD_AS_HorizontalMove | Inputs: AutomaticMode (BOOL), ESS (BOOL), LightSensor_01 (BOOL), LightSensor_02 (BOOL), PowerOnDelay_Compressor (TIME), PowerOnDelay_Valve (TIME) | Outputs: DO_ControlCompressorPD_01 (BOOL), DO_ControlValvePD_02 (BOOL) | Ruft auf: CompressorControl | UNGENUTZTE Variablen (2): AlwaysTrue, DO_ControlValvePD_02 | UNGENUTZTE Ports (1): DO_ControlValvePD_02" ;
     dp:hasPOUCode """// POU SST_PD_AS_HorizontalMove body
 MBS_VSG_HorizontalMove(
@@ -21333,7 +21407,8 @@ ag:Port_TON_PT a ag:class_Port,
 ag:FBInst_HRL_SkillSet_HRL_OperatingModes a ag:class_FBInstance ;
     op:isInstanceOfFBType ag:FBType_HRL_OperatingModes .
 
-ag:FBType_SST_CB_AS_HorizontalMove a ag:class_FBType ;
+ag:FBType_SST_CB_AS_HorizontalMove a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: SST_CB_AS_HorizontalMove | Inputs: AutomaticMode (BOOL), ESS (BOOL), LightSensor_01 (BOOL), LightSensor_02 (BOOL), TOF_Time_Motoransteuerung (TIME) | Outputs: DO_MovingConveyorBelt (BOOL) | Ruft auf: AxisControl_MultipleInputSensors | UNGENUTZTE Variablen (1): AlwaysTrue" ;
     dp:hasPOUCode """// POU SST_CB_AS_HorizontalMove body
 SST_CB_HorizontalMove(
@@ -21456,7 +21531,11 @@ ag:Var_VSG_SkillSet_TIME_TSR a ag:class_Variable ;
     dp:hasVariableName "TIME_TSR" ;
     dp:hasVariableType "TIME" .
 
-ag:class_GlobalVariableList a owl:Class .
+ag:class_GlobalVariableList a owl:Class ;
+    rdfs:comment "Diese Klasse beschreibt eine globale Variablenliste als Container, der projektweit zugängliche Variablen zusammenfasst. GlobalVariableLists werden in SPS Projekten verwendet, um gemeinsame Signale, Zustände oder Hardwarezuordnungen zentral zu verwalten und in mehreren Programmen oder Function Blocks nutzbar zu machen. Im Knowledge Graph ermöglicht diese Klasse eine klare Gruppierung der globalen Symbolik und erleichtert Abfragen, die sich auf globale Signale beziehen, etwa auf Safety Signale, Betriebsartenflags oder I O Variablen. Aus PLCopen XML wird eine solche Liste typischerweise aus GVL Bereichen abgeleitet, wobei jede enthaltene Variable separat als class_Variable modelliert wird. Die Klasse unterstützt außerdem die Nachvollziehbarkeit, weil sichtbar wird, welche Variablen tatsächlich global sind und welche nur lokal innerhalb eines Bausteins existieren. Für die Dokumentation ist class_GlobalVariableList hilfreich, um globale Schnittstellen der Anlage zu beschreiben und zentrale Signalgruppen systematisch zu erläutern. Außerdem lassen sich hieraus automatisch Listen für Hardwaremapping oder Schnittstellendokumente erzeugen."@de .
+
+dp:hasPOUAttribute a owl:DatatypeProperty ;
+    rdfs:domain ag:class_POU .
 
 ag:Port_CompressorControl_DI01 a ag:class_Port ;
     dp:hasPortDirection "Input" ;
@@ -21574,9 +21653,11 @@ ag:Port_CompressorControl_TON_Time_Valve a ag:class_Port ;
     dp:hasPortType "TIME" .
 
 ag:class_StandardFBType a owl:Class ;
+    rdfs:comment "Diese Klasse beschreibt Standard Function Block Typen, die typischerweise aus der SPS Bibliothek oder dem IEC 61131 3 Standard stammen, zum Beispiel RS Speicher, Triggerbausteine oder Zeitfunktionen. Sie wird eingesetzt, um wiederkehrende Basiskomponenten gesondert zu behandeln und nicht mit den projekt spezifischen Skill Bausteinen zu vermischen. StandardFBTypes dienen häufig als Infrastruktur für Zustandsbildung, Flankenerkennung, Zeitverhalten und Zählfunktionen und sind daher in vielen CustomFBTypes als interne Aufrufe enthalten. Im Knowledge Graph ermöglicht diese Klasse eine robuste Erkennung typischer Muster, etwa dass ein Skill durch einen R_TRIG gestartet wird, durch einen RS gehalten wird und durch Timerbedingungen gestoppt wird. Für die Analyse des Signalflusses sind Standardbausteine besonders relevant, weil sie häufig die eigentlichen Zustandswechsel erzwingen, auch wenn sie fachlich nicht als eigener Skill gelten. Aus PLCopen XML werden sie als POUCalls sichtbar, die innerhalb eines Bausteins auf solche Standardtypen verweisen. Die explizite Modellierung als StandardFBType verbessert außerdem das Filtering in Abfragen, sodass sich beispielsweise reine Skill Graphen ohne Bibliothekslogik erzeugen lassen."@de ;
     rdfs:subClassOf ag:class_FBType .
 
-ag:FBType_AxisControl_Encoder a ag:class_FBType ;
+ag:FBType_AxisControl_Encoder a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: AxisControl_Encoder | Inputs: DI01 (BOOL), DI02_EncoderStart01 (UDINT), DI03_EncoderTarget01 (UDINT), DI04_EncoderStart02 (UDINT), DI05_EncoderTarget02 (UDINT), Direction (BOOL), EmergencyStopSignal (BOOL), InitStateDrive_Input (BOOL), MethodCall (BOOL), OperatingMode (BOOL), TOF_Time_MotorControl (TIME), TOF_Time_TouchSensorRelief (TIME), TouchSensorRelief (BOOL) | Outputs: DigitalOutputControl_01 (BOOL), DigitalOutputControl_02 (BOOL), ResetMethodCall (BOOL) | Ruft auf: RS, R_TRIG, TOF | UNGENUTZTE Variablen (3): R_TRIG_EncoderPos01_Input, R_TRIG_EncoderPos01_Output, R_TRIG_EncoderPos02_Input" ;
     dp:hasPOUCode """// POU AxisControl_Encoder body
 R_TRIG_MethodCall(CLK := MethodCall);
@@ -21593,6 +21674,7 @@ TOF_TouchSensorRelief(IN := RS_TouchSensorRelief.Q1, PT := TOF_Time_TouchSensorR
 DigitalOutputControl_02 := TOF_TouchSensorRelief.Q;""" ;
     dp:hasPOULanguage "ST" ;
     dp:hasPOUName "AxisControl_Encoder" ;
+    dp:isGEMMAOutputLayer true ;
     op:containsPOUCall ag:POUCall_AxisControl_Encoder_RS_AxisControl_1,
         ag:POUCall_AxisControl_Encoder_RS_TouchSensorRelief_1,
         ag:POUCall_AxisControl_Encoder_R_TRIG_EncoderPos02_Output_1,
@@ -21666,7 +21748,8 @@ DigitalOutputControl_02 := TOF_TouchSensorRelief.Q;""" ;
         ag:Var_AxisControl_Encoder_TOF_TouchSensorRelief,
         ag:Var_AxisControl_Encoder_TouchSensorRelief .
 
-ag:FBType_MBS_DmPD_AS_RotationMove a ag:class_FBType ;
+ag:FBType_MBS_DmPD_AS_RotationMove a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: MBS_DmPD_AS_RotationMove | Inputs: AutomaticMode (BOOL), ESS (BOOL), TouchSensor_01 (BOOL), TouchSensor_02 (BOOL) | Outputs: DO_MovingRotationPmPD_01 (BOOL), DO_MovingRotationPmPD_02 (BOOL) | Ruft auf: AxisControl_MultipleInputSensors | UNGENUTZTE Variablen (2): AlwaysTrue, DO_MovingRotationPmPD_02 | UNGENUTZTE Ports (1): DO_MovingRotationPmPD_02" ;
     dp:hasPOUCode """// POU MBS_DmPD_AS_RotationMove body
 MBS_DmPD_RotationMove(
@@ -21773,9 +21856,8 @@ ag:StandardFBType_TOF a ag:class_FBType,
         ag:Port_TOF_PT,
         ag:Port_TOF_Q .
 
-ag:class_POU a owl:Class .
-
-ag:FBType_CompressorControl a ag:class_FBType ;
+ag:FBType_CompressorControl a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: CompressorControl | Inputs: DI01 (BOOL), DI02 (BOOL), DI03_EncoderStart01 (UDINT), DI04_EncoderStart02 (UDINT), DI05_EncoderStart03 (UDINT), DI06_EncoderStart04 (UDINT), DI07_EncoderStart05 (UDINT), DI08_EncoderStart06 (UDINT), DI09_EncoderTarget01 (UDINT), DI10_EncoderTarget02 (UDINT), DI11_EncoderTarget03 (UDINT), DI12_EncoderTarget04 (UDINT), DI13_EncoderTarget05 (UDINT), DI14_EncoderTarget06 (UDINT), Destination (string), EmergencyStopSignal (BOOL), InitStateDrive_Input (BOOL), MethodCall (BOOL), OperatingMode (BOOL), PowerOFF_SelfSet (BOOL), TON_Time_Compressor (TIME), TON_Time_PowerOFFSelfSet (TIME), TON_Time_Valve (TIME) | Outputs: DigitalOutputControl_01 (BOOL), DigitalOutputControl_02 (BOOL), ResetMethodCall (BOOL) | Ruft auf: RS, R_TRIG, TON" ;
     dp:hasPOUCode """// POU CompressorControl body
 R_TRIG_MethodCall(CLK := MethodCall);
@@ -21821,6 +21903,7 @@ TON_Valve_Control(IN := RS_Valve.Q1, PT := TON_Time_Valve);
 DigitalOutputControl_02 := TON_Valve_Control.Q;""" ;
     dp:hasPOULanguage "ST" ;
     dp:hasPOUName "CompressorControl" ;
+    dp:isGEMMAOutputLayer true ;
     op:containsPOUCall ag:POUCall_CompressorControl_RS_Compressor_1,
         ag:POUCall_CompressorControl_RS_Valve_1,
         ag:POUCall_CompressorControl_R_TRIG_EncoderPos01_CompressorInput_1,
@@ -21997,6 +22080,9 @@ ag:PortInstance_FBInst_MBS_SkillSet_MBS_OperatingModes_F1 a ag:class_PortInstanc
     op:instantiatesPort ag:Port_MBS_OperatingModes_F1 ;
     op:isPortOfInstance ag:FBInst_MBS_SkillSet_MBS_OperatingModes .
 
+ag:class_POU a owl:Class ;
+    rdfs:comment "Diese Klasse bildet das allgemeine Konzept einer Program Organisation Unit ab und dient als Oberbegriff für Programme und Function Blocks im Sinne der IEC 61131 3 Struktur. Sie wird im Knowledge Graph verwendet, um eine gemeinsame Abstraktion für alle ausführbaren oder wiederverwendbaren Bausteine bereitzustellen, unabhängig davon, ob sie zyklisch laufen oder innerhalb anderer Bausteine aufgerufen werden. Dadurch lassen sich Analyseoperationen vereinheitlichen, zum Beispiel die Suche nach Aufrufbeziehungen, der Vergleich von Schnittstellen oder das Auffinden von internen Abhängigkeiten. In einem PLCopen XML Export entsprechen POUs typischerweise den Elementen, die eine Bausteindefinition samt Interface und Code oder Netzwerkstruktur enthalten. In diesem Modell ist class_POU vor allem eine semantische Klammer, die eine saubere Spezialisierung zu class_Program und class_FBType ermöglicht. In praktischen Abfragen wird diese Klasse häufig indirekt genutzt, um alle ausführbaren Einheiten zusammenzufassen und anschließend nach Typ oder Sprache zu filtern."@de .
+
 ag:Port_AxisControl_MultipleInputSensors_DI01 a ag:class_Port ;
     dp:hasPortDirection "Input" ;
     dp:hasPortName "DI01" ;
@@ -22047,7 +22133,8 @@ ag:Port_AxisControl_MultipleInputSensors_MethodCall a ag:class_Port ;
     dp:hasPortName "MethodCall" ;
     dp:hasPortType "BOOL" .
 
-ag:FBType_AxisControl_MultipleInputSensors a ag:class_FBType ;
+ag:FBType_AxisControl_MultipleInputSensors a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: AxisControl_MultipleInputSensors | Inputs: DI01 (BOOL), DI02 (BOOL), Direction (BOOL), EmergencyStopSignal (BOOL), InitStateDrive_Input (BOOL), MethodCall (BOOL), OperatingMode (BOOL), TOF_Time_MotorControl (TIME), TOF_Time_TouchSensorRelief (TIME), TouchSensorRelief (BOOL) | Outputs: Count1 (INT), Count2 (INT), DigitalOutputControl_01 (BOOL), DigitalOutputControl_02 (BOOL), InitStateDriveFinished (BOOL), ResetMethodCall (BOOL) | Ruft auf: F_TRIG, RS, R_TRIG, TOF | UNGENUTZTE Variablen (2): Count1, Count2 | UNGENUTZTE Ports (2): Count1, Count2" ;
     dp:hasPOUCode """// POU AxisControl_MultipleInputSensors body
 R_TRIG_MethodCall(CLK := MethodCall);
@@ -22067,6 +22154,7 @@ F_TRIG_0(CLK := DigitalOutputControl_01);
 F_TRIG_1(CLK := DigitalOutputControl_02);""" ;
     dp:hasPOULanguage "ST" ;
     dp:hasPOUName "AxisControl_MultipleInputSensors" ;
+    dp:isGEMMAOutputLayer true ;
     op:containsPOUCall ag:POUCall_AxisControl_MultipleInputSensors_F_TRIG_0_1,
         ag:POUCall_AxisControl_MultipleInputSensors_F_TRIG_1_1,
         ag:POUCall_AxisControl_MultipleInputSensors_RS_AxisControl_1,
@@ -22140,10 +22228,16 @@ F_TRIG_1(CLK := DigitalOutputControl_02);""" ;
         ag:Var_AxisControl_MultipleInputSensors_TOF_TouchSensorRelief,
         ag:Var_AxisControl_MultipleInputSensors_TouchSensorRelief .
 
+ag:class_CustomFBType a owl:Class ;
+    rdfs:comment "Diese Klasse kennzeichnet Function Block Typen, die projekt spezifisch implementiert wurden und nicht aus einer Standardbibliothek stammen. Sie dient dazu, benutzerdefinierte Logikbausteine semantisch von generischen Standardfunktionen zu trennen, damit Analysen gezielter durchgeführt werden können. CustomFBTypes bilden häufig die eigentlichen Skills oder spezifische Steuerungslogik ab, zum Beispiel Bewegungen einer Achse, Prozessschritte oder die Abbildung einer Stationsfunktion. Im Knowledge Graph ist die Klasse hilfreich, um Abhängigkeiten zwischen Skills zu identifizieren, Schnittstellen zu vergleichen und zentrale Bausteine zu priorisieren. Aus PLCopen XML lassen sich solche Typen meist daran erkennen, dass sie als eigene POU Definitionen im Projekt auftauchen und keinen eindeutigen Standardnamen wie TON, TOF oder RS besitzen. In späteren Auswertungen kann diese Unterscheidung genutzt werden, um automatisiert eine Liste relevanter Skills zu extrahieren und Standardkomponenten wie Timer oder Trigger auszublenden. Insgesamt unterstützt class_CustomFBType somit die fachliche Strukturierung der Projektlogik und erleichtert die Dokumentation, weil projektbezogene Funktionen klar markiert werden."@de ;
+    rdfs:subClassOf ag:class_FBType .
+
 ag:class_PortInstance a owl:Class ;
+    rdfs:comment "Diese Klasse bildet die konkrete Ausprägung eines Ports innerhalb einer spezifischen Function Block Instanz ab und entspricht damit einem realen Pin in einem FBD Netzwerk. Während class_Port nur den abstrakten Parameter eines Typs beschreibt, ist die PortInstance der tatsächliche Anschluss, der im Netzwerk verdrahtet wird und Signale empfängt oder ausgibt. Im Knowledge Graph wird diese Klasse benötigt, weil Signalverbindungen immer an eine konkrete Instanz gebunden sind und nicht nur an den Typ. Eine PortInstance verweist einerseits auf die zugehörige FBInstance und andererseits auf den Port des zugrunde liegenden FBTypes, wodurch eine eindeutige Zuordnung möglich ist. Aus PLCopen XML ergibt sich dieses Konzept aus Block Pins und deren Verbindungen im FBD, die erst im Kontext der Instanz vollständig spezifiziert sind. PortInstanzen sind besonders wichtig für die Rekonstruktion von Signalflüssen, da Parameterzuweisungen genau diese Knoten als Ziel besitzen. Damit ermöglicht class_PortInstance eine vollständige Analyse, welche Variable oder welches Zwischensignal tatsächlich an welchen Bausteinpin angeschlossen ist."@de ;
     rdfs:subClassOf ag:class_SignalSource .
 
-ag:class_SignalSource a owl:Class .
+ag:class_SignalSource a owl:Class ;
+    rdfs:comment "Diese Klasse stellt eine abstrakte Signalquelle dar und dient als gemeinsamer Oberbegriff für unterschiedliche Ursprünge von Werten im FBD Netzwerk. Eine Signalquelle kann beispielsweise eine Variable sein, eine PortInstance eines Bausteins oder ein konstant definierter Literalwert. Im Knowledge Graph ist diese Abstraktion wichtig, weil Parameterzuweisungen immer nach dem gleichen Muster funktionieren, unabhängig davon, ob der Wert aus einer Variable oder aus einer Bausteinausgabe stammt. Dadurch können Signalflüsse einheitlich modelliert und abgefragt werden, ohne für jede Quelle unterschiedliche Datenstrukturen zu benötigen. Aus PLCopen XML entstehen Signalquellen aus Verdrahtungen, die entweder direkt auf Variablen verweisen oder die Ausgänge anderer Bausteine als Quelle verwenden. Die Klasse unterstützt komplexe Analysen wie Abhängigkeitsgraphen, Datenflussverfolgung oder die Ermittlung von Skill Vorbedingungen, da sich jede Eingangsbelegung auf eine SignalSource zurückführen lässt. Insgesamt sorgt class_SignalSource dafür, dass der Knowledge Graph die semantische Struktur des FBD Netzwerks vollständig und flexibel repräsentieren kann."@de .
 
 ag:GVL__dot__diNotAus_Kanal_A__leerz__AND__leerz__GVL__dot__diNotAus_Kanal_B a ag:class_Variable ;
     dp:hasVariableName "GVL.diNotAus_Kanal_A AND GVL.diNotAus_Kanal_B" ;
@@ -22160,6 +22254,7 @@ ag:StandardFBType_RS a ag:class_FBType,
         ag:Port_RS_S .
 
 ag:class_FBType a owl:Class ;
+    rdfs:comment "Diese Klasse beschreibt einen Function Block Typ als wiederverwendbaren Baustein mit fest definierter Schnittstelle und interner Logik. Ein FBType enthält typischerweise Eingänge, Ausgänge und interne Variablen sowie entweder ST Code oder eine aus dem FBD Netzwerk rekonstruierte Darstellung. Im Knowledge Graph wird der Baustein als Typ modelliert, damit einzelne Instanzen desselben Bausteins konsistent beschrieben und analysiert werden können. Die Ports eines FBType werden über class_Port repräsentiert und definieren Richtung und Datentyp der jeweiligen Parameter, wodurch eine saubere Typanalyse der Verdrahtung möglich ist. Darüber hinaus kann ein FBType selbst weitere POUs aufrufen, etwa Standardbausteine wie Trigger oder Timer, was über POUCalls nachvollzogen wird. Die Klasse ist zentral, um das Projekt modular zu verstehen, da sie die fachliche Logik kapselt, zum Beispiel Bewegungssteuerungen, Sensor Auswertungen oder Betriebsartenautomaten. Bei der Analyse von Skills ist class_FBType besonders wertvoll, weil sie die wiederkehrenden Muster einer Skill Implementierung sichtbar macht, etwa Start Trigger, Zustandsautomaten, Reset Mechanismen und Sicherheitsabfragen."@de ;
     rdfs:subClassOf ag:class_POU .
 
 ag:Port_R_TRIG_CLK a ag:class_Port,
@@ -22168,10 +22263,12 @@ ag:Port_R_TRIG_CLK a ag:class_Port,
     dp:hasPortName "CLK" ;
     dp:hasPortType "BOOL" .
 
-ag:FBType_ULINT a ag:class_FBType ;
+ag:FBType_ULINT a ag:class_CustomFBType,
+        ag:class_FBType ;
     dp:hasConsistencyReport "Baustein: FBType_ULINT" .
 
-ag:class_IOChannel a owl:Class .
+ag:class_IOChannel a owl:Class ;
+    rdfs:comment "Diese Klasse repräsentiert einen Hardwarekanal, also einen physikalischen Ein oder Ausgang, der in der Steuerung adressiert und mit Variablen verbunden werden kann. Ein IOChannel bildet damit die Brücke zwischen der semantischen Logik im Knowledge Graph und der realen Peripherie, etwa Sensoren, Ventile, Motoren oder Signallampen. Im Knowledge Graph wird ein IOChannel häufig genutzt, um Variablen mit Hardwareadressen zu verknüpfen und dadurch nachvollziehbar zu machen, welcher Code welche reale Komponente beeinflusst. Aus PLCopen XML kann ein IOChannel entweder direkt aus Hardwarezuordnungen oder indirekt aus Rohinformationen des Exports rekonstruiert werden, abhängig davon, wie vollständig das Mapping exportiert wurde. Die Klasse ist besonders wertvoll für Analysen, die Skill Ausführung mit physikalischen Effekten verbinden, da so sichtbar wird, welche Ausgänge ein Skill setzt und welche Eingänge er überwacht. Außerdem unterstützt sie Plausibilitätsprüfungen, beispielsweise ob ein Ausgang nur von einem Skill kontrolliert wird oder ob Konflikte zwischen mehreren Bausteinen existieren. Insgesamt macht class_IOChannel den Knowledge Graph hardware nah und damit für reale Automatisierungsszenarien aussagekräftig."@de .
 
 ag:StandardFBType_R_TRIG a ag:class_FBType,
         ag:class_StandardFBType,
@@ -22182,14 +22279,19 @@ ag:StandardFBType_R_TRIG a ag:class_FBType,
     op:hasPort ag:Port_R_TRIG_CLK,
         ag:Port_R_TRIG_Q .
 
-ag:class_POUCall a owl:Class .
+ag:class_POUCall a owl:Class ;
+    rdfs:comment "Diese Klasse beschreibt einen konkreten Aufruf einer Program Organisation Unit innerhalb eines Programms oder eines Function Blocks. Ein POUCall macht sichtbar, dass ein bestimmter Baustein nicht nur als Typ existiert, sondern an einer konkreten Stelle tatsächlich verwendet wird. Im Knowledge Graph ist dies essenziell, um Abhängigkeitsstrukturen zu rekonstruieren, also welche Bausteine intern voneinander abhängen und wie tief verschachtelte Logik aufgebaut ist. Ein POUCall kann mit einer FBInstance und deren PortInstanzen verknüpft werden, sodass klar wird, welche konkrete Instanz eines Bausteintyps gemeint ist. Aus PLCopen XML ergibt sich ein POUCall aus einem Bausteinblock im FBD oder aus einem Funktionsaufruf in ST Code, je nach Darstellung. Für die Skill Analyse kann damit nachvollzogen werden, welche Standardbausteine ein Skill verwendet, beispielsweise Trigger, Speicher oder Timer, und welche Unterbausteine die eigentliche Prozesslogik realisieren. Insgesamt macht class_POUCall die Ausführungsstruktur explizit, wodurch sich Skill Ketten, Signalpfade und interne Architektur systematisch untersuchen lassen."@de .
 
-ag:class_FBInstance a owl:Class .
+ag:class_FBInstance a owl:Class ;
+    rdfs:comment "Diese Klasse beschreibt eine konkrete Instanz eines Function Block Typs innerhalb eines Programms oder eines anderen Bausteins. Während class_FBType den Bauplan liefert, stellt class_FBInstance das tatsächliche Objekt dar, das in einem Netzwerk verwendet wird und dessen interne Zustände während der Laufzeit existieren. Im Knowledge Graph ist diese Klasse entscheidend, um die echte Struktur des FBD Netzwerks abzubilden, weil ein Baustein mehrfach instanziiert werden kann, jeweils mit eigenen Parametern, eigenen Variablenzuordnungen und eigenem Zustand. Eine FBInstance ist über Beziehungen einem FBType zugeordnet und besitzt PortInstanzen, die die konkreten Pins dieser Instanz darstellen. Damit lassen sich Verdrahtungen und Signalwege nicht nur abstrakt, sondern real und vollständig nachvollziehen. In PLCopen XML entspricht dies dem Auftreten eines Baustein Blocks im Netzwerk, also einer konkreten Verwendung innerhalb des FBD. Für Skill Analysen ist class_FBInstance besonders wichtig, weil hier ersichtlich wird, welche spezifischen Sensoren, Aktoren oder Parameter an einen Skill angeschlossen sind und wie die Logik in einer konkreten Station konfiguriert wurde."@de .
 
-ag:class_Port a owl:Class .
+ag:class_Port a owl:Class ;
+    rdfs:comment "Diese Klasse repräsentiert einen Port als Bestandteil eines Function Block Typs und definiert damit die formale Schnittstelle eines Bausteins. Ein Port beschreibt, ob ein Parameter ein Eingang oder Ausgang ist und welchen Datentyp er besitzt, etwa BOOL, INT, TIME oder andere PLC Typen. Im Knowledge Graph ist diese Struktur notwendig, um Verdrahtungen formal korrekt abzubilden und später automatisiert zu prüfen, ob Signale kompatibel verbunden wurden. Ports existieren zunächst nur auf der Typ Ebene und werden erst durch PortInstanzen innerhalb einer konkreten FBInstance tatsächlich genutzt. Aus PLCopen XML lässt sich ein Port aus den Variablendeklarationen eines POUs ableiten oder aus der Pinbeschreibung eines Bausteinblocks rekonstruieren. Die Klasse unterstützt außerdem semantische Abfragen, zum Beispiel die Suche nach allen Skills, die einen bestimmten Eingang besitzen oder die Ausgabe eines bestimmten Statussignals bereitstellen. Insgesamt dient class_Port als zentraler Baustein, um das Schnittstellen Design der Steuerung explizit zu modellieren und als Grundlage für Skill Kopplung und Parametervalidierung zu verwenden."@de .
 
-ag:class_ParameterAssignment a owl:Class .
+ag:class_ParameterAssignment a owl:Class ;
+    rdfs:comment "Diese Klasse repräsentiert eine konkrete Parameterzuweisung im Netzwerk und beschreibt damit die Verdrahtung eines Signals von einer Quelle zu einem Zielport. ParameterAssignments sind die zentrale Struktur, um den Datenfluss in einem FBD Modell vollständig abzubilden, da sie definieren, welcher Wert an welchem Eingang anliegt oder welche Variable mit einem Ausgang verbunden ist. Im Knowledge Graph verweist eine ParameterAssignment typischerweise auf eine SignalSource als Ursprung und auf eine PortInstance als Ziel, wodurch die Verbindung eindeutig und instanzbezogen beschrieben wird. Aus PLCopen XML entstehen Parameterzuweisungen aus den Verbindungsinformationen zwischen Block Pins und Variablen oder zwischen mehreren Bausteinen. Diese Klasse ist für Analysen besonders wichtig, weil darüber echte Signalpfade rekonstruiert werden können, beispielsweise vom Startsignal eines Skills über Triggerlogik bis zur Ansteuerung eines Aktors. Außerdem lassen sich darüber automatische Validierungen durchführen, etwa ob alle Pflichtparameter eines Bausteins beschaltet sind oder ob Datentypen konsistent verbunden wurden. Insgesamt ist class_ParameterAssignment die semantische Entsprechung einer Leitung im Schaltplan des FBD und damit eine Schlüsselklasse für jede Graphanalyse."@de .
 
 ag:class_Variable a owl:Class ;
+    rdfs:comment "Diese Klasse repräsentiert Variablen im SPS Projekt, unabhängig davon, ob es sich um globale Variablen, lokale Variablen, Ein und Ausgänge oder Instanzvariablen handelt. Variablen sind zentrale Träger von Zuständen und Signalen, da über sie Sensorwerte gelesen, Aktoren angesteuert und interne Zwischenergebnisse gespeichert werden. Im Knowledge Graph kann eine Variable zusätzlich Hardwareinformationen enthalten, beispielsweise eine physikalische Adresse oder eine Zuordnung zu einem IO Channel, wodurch die Verbindung zwischen Logik und Feldhardware sichtbar wird. Variablen können außerdem genutzt werden, um Function Block Instanzen abzubilden, da viele PLC Systeme Instanzen über benannte Variablen in der Symbolik repräsentieren. Aus PLCopen XML stammen Variablen aus den Deklarationsbereichen eines POUs, aus globalen Variablenlisten oder aus I O Mappings. Für Skill Analysen ist class_Variable besonders wertvoll, weil darüber erkennbar wird, welche realen Sensoren und Aktoren ein Skill verwendet und welche Parameter in die Skill Aufrufe einfließen. Zusätzlich erlaubt diese Klasse Konsistenzprüfungen, etwa ob eine Variable als BOOL modelliert ist und dennoch mit einem numerischen Port verbunden wurde."@de ;
     rdfs:subClassOf ag:class_SignalSource .
 

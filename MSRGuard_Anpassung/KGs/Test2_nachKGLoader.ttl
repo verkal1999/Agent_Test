@@ -220,7 +220,10 @@ ag:StandardFBType_TP a ag:class_FBType,
         ag:Port_TP_Q .
 
 ag:class_CustomFBType a owl:Class ;
+    rdfs:comment "Diese Klasse kennzeichnet Function Block Typen, die projekt spezifisch implementiert wurden und nicht aus einer Standardbibliothek stammen. Sie dient dazu, benutzerdefinierte Logikbausteine semantisch von generischen Standardfunktionen zu trennen, damit Analysen gezielter durchgeführt werden können. CustomFBTypes bilden häufig die eigentlichen Skills oder spezifische Steuerungslogik ab, zum Beispiel Bewegungen einer Achse, Prozessschritte oder die Abbildung einer Stationsfunktion. Im Knowledge Graph ist die Klasse hilfreich, um Abhängigkeiten zwischen Skills zu identifizieren, Schnittstellen zu vergleichen und zentrale Bausteine zu priorisieren. Aus PLCopen XML lassen sich solche Typen meist daran erkennen, dass sie als eigene POU Definitionen im Projekt auftauchen und keinen eindeutigen Standardnamen wie TON, TOF oder RS besitzen. In späteren Auswertungen kann diese Unterscheidung genutzt werden, um automatisiert eine Liste relevanter Skills zu extrahieren und Standardkomponenten wie Timer oder Trigger auszublenden. Insgesamt unterstützt class_CustomFBType somit die fachliche Strukturierung der Projektlogik und erleichtert die Dokumentation, weil projektbezogene Funktionen klar markiert werden."@de ;
     rdfs:subClassOf ag:class_FBType .
+
+ag:class_Skill a owl:Class .
 
 dp:hasConsistencyReport a owl:DatatypeProperty ;
     rdfs:domain ag:class_POU ;
@@ -311,6 +314,16 @@ dp:ioRawXml a owl:DatatypeProperty ;
     rdfs:domain ag:class_Variable ;
     rdfs:range xsd:string .
 
+dp:isGEMMAOutputLayer a owl:DatatypeProperty ;
+    rdfs:domain ag:class_POU ;
+    rdfs:range xsd:boolean ;
+    rdfs:subPropertyOf dp:isSpecificLayer .
+
+dp:isGEMMAStateMachine a owl:DatatypeProperty ;
+    rdfs:domain ag:class_POU ;
+    rdfs:range xsd:boolean ;
+    rdfs:subPropertyOf dp:isSpecificLayer .
+
 dp:isUnusedPort a owl:DatatypeProperty ;
     rdfs:domain ag:class_Port ;
     rdfs:range xsd:boolean ;
@@ -353,6 +366,10 @@ ag:op_hasCallerVariable a owl:ObjectProperty ;
 
 ag:op_hasInfluenceOnVariable a owl:ObjectProperty ;
     rdfs:domain ag:class_Variable ;
+    rdfs:range ag:class_Variable .
+
+ag:op_hasInternalVariable a owl:ObjectProperty ;
+    rdfs:domain ag:class_POU ;
     rdfs:range ag:class_Variable .
 
 ag:op_hasPort a owl:ObjectProperty ;
@@ -1881,39 +1898,35 @@ ag:GVL_SST__dot__SST_LS_weiss a ag:class_Variable ;
     ag:op_isBoundToChannel ag:IOChannel_TIID__dach__Device__leerz__1__leerz__\(EtherCAT\)__dach__Term__leerz__1__leerz__\(EK1200\)__dach__Term__leerz__8__leerz__\(EL1409\)__dach__DIP__leerz__Inputs__dach__Input__leerz__Channel__leerz__8 .
 
 ag:GVL_SST__dot__SST_MOT_Foerderband a ag:class_Variable ;
-    dp:hasHardwareAddress "%Q*",
-        "Q 114.6" ;
+    dp:hasHardwareAddress "%Q*" ;
     dp:hasVariableName "GVL_SST.SST_MOT_Foerderband",
         "SST_MOT_Foerderband" ;
     dp:hasVariableType "BOOL" ;
-    dp:ioRawXml "<?xml version=\"1.0\"?><TreeItem><ItemName>Output</ItemName><PathName>TIID^Device 1 (EtherCAT)^Term 1 (EK1200)^Term 10 (EL2409)^Channel 15^Output</PathName><ItemType>7</ItemType><ItemId>-131</ItemId><ChildCount>0</ChildCount><Disabled>false</Disabled><TreeImageId>18</TreeImageId><VarDef><VarType GUID=\"{18071995-0000-0000-0000-000000000010}\">BIT</VarType><VarBitSize>1</VarBitSize><VarBitAddr>918</VarBitAddr><VarInOut>1</VarInOut><VarFlags>#x0</VarFlags><AdsInfo><AmsAddress><AmsPort>11</AmsPort></AmsAddress><IndexGroup Hex=\"#x03040010\">50593808</IndexGroup><IndexOffset Hex=\"#xc1000396\">-1056963690</IndexOffset><Length Hex=\"#x00000001\">1</Length></AdsInfo><LinkedWith>TIPC^SPS_Demonstrator^SPS_Demonstrator Instance^PlcTask Outputs^GVL_SST.SST_MOT_Foerderband</LinkedWith></VarDef></TreeItem>"^^xsd:string ;
+    dp:ioRawXml "ERROR: LookupTreeItem.ProduceXml"^^xsd:string ;
     ag:op_isBoundToChannel ag:IOChannel_TIID__dach__Device__leerz__1__leerz__\(EtherCAT\)__dach__Term__leerz__1__leerz__\(EK1200\)__dach__Term__leerz__10__leerz__\(EL2409\)__dach__Channel__leerz__15__dach__Output .
 
 ag:GVL_SST__dot__SST_MV_blau a ag:class_Variable ;
-    dp:hasHardwareAddress "%Q*",
-        "Q 115.2" ;
+    dp:hasHardwareAddress "%Q*" ;
     dp:hasVariableName "GVL_SST.SST_MV_blau",
         "SST_MV_blau" ;
     dp:hasVariableType "BOOL" ;
-    dp:ioRawXml "<?xml version=\"1.0\"?><TreeItem><ItemName>Output</ItemName><PathName>TIID^Device 1 (EtherCAT)^Term 1 (EK1200)^Term 11 (EL2008)^Channel 3^Output</PathName><ItemType>7</ItemType><ItemId>-136</ItemId><ChildCount>0</ChildCount><Disabled>false</Disabled><TreeImageId>18</TreeImageId><VarDef><VarType GUID=\"{18071995-0000-0000-0000-000000000010}\">BIT</VarType><VarBitSize>1</VarBitSize><VarBitAddr>922</VarBitAddr><VarInOut>1</VarInOut><VarFlags>#x0</VarFlags><AdsInfo><AmsAddress><AmsPort>11</AmsPort></AmsAddress><IndexGroup Hex=\"#x03040010\">50593808</IndexGroup><IndexOffset Hex=\"#xc100039a\">-1056963686</IndexOffset><Length Hex=\"#x00000001\">1</Length></AdsInfo><LinkedWith>TIPC^SPS_Demonstrator^SPS_Demonstrator Instance^PlcTask Outputs^GVL_SST.SST_MV_blau</LinkedWith></VarDef></TreeItem>"^^xsd:string ;
+    dp:ioRawXml "ERROR: (-2147418111, 'Aufruf wurde durch Aufgerufenen abgelehnt.', None, None)"^^xsd:string ;
     ag:op_isBoundToChannel ag:IOChannel_TIID__dach__Device__leerz__1__leerz__\(EtherCAT\)__dach__Term__leerz__1__leerz__\(EK1200\)__dach__Term__leerz__11__leerz__\(EL2008\)__dach__Channel__leerz__3__dach__Output .
 
 ag:GVL_SST__dot__SST_MV_rot a ag:class_Variable ;
-    dp:hasHardwareAddress "%Q*",
-        "Q 115.1" ;
+    dp:hasHardwareAddress "%Q*" ;
     dp:hasVariableName "GVL_SST.SST_MV_rot",
         "SST_MV_rot" ;
     dp:hasVariableType "BOOL" ;
-    dp:ioRawXml "<?xml version=\"1.0\"?><TreeItem><ItemName>Output</ItemName><PathName>TIID^Device 1 (EtherCAT)^Term 1 (EK1200)^Term 11 (EL2008)^Channel 2^Output</PathName><ItemType>7</ItemType><ItemId>-135</ItemId><ChildCount>0</ChildCount><Disabled>false</Disabled><TreeImageId>18</TreeImageId><VarDef><VarType GUID=\"{18071995-0000-0000-0000-000000000010}\">BIT</VarType><VarBitSize>1</VarBitSize><VarBitAddr>921</VarBitAddr><VarInOut>1</VarInOut><VarFlags>#x0</VarFlags><AdsInfo><AmsAddress><AmsPort>11</AmsPort></AmsAddress><IndexGroup Hex=\"#x03040010\">50593808</IndexGroup><IndexOffset Hex=\"#xc1000399\">-1056963687</IndexOffset><Length Hex=\"#x00000001\">1</Length></AdsInfo><LinkedWith>TIPC^SPS_Demonstrator^SPS_Demonstrator Instance^PlcTask Outputs^GVL_SST.SST_MV_rot</LinkedWith></VarDef></TreeItem>"^^xsd:string ;
+    dp:ioRawXml "ERROR: (-2147418111, 'Aufruf wurde durch Aufgerufenen abgelehnt.', None, None)"^^xsd:string ;
     ag:op_isBoundToChannel ag:IOChannel_TIID__dach__Device__leerz__1__leerz__\(EtherCAT\)__dach__Term__leerz__1__leerz__\(EK1200\)__dach__Term__leerz__11__leerz__\(EL2008\)__dach__Channel__leerz__2__dach__Output .
 
 ag:GVL_SST__dot__SST_MV_weiss a ag:class_Variable ;
-    dp:hasHardwareAddress "%Q*",
-        "Q 115.0" ;
+    dp:hasHardwareAddress "%Q*" ;
     dp:hasVariableName "GVL_SST.SST_MV_weiss",
         "SST_MV_weiss" ;
     dp:hasVariableType "BOOL" ;
-    dp:ioRawXml "<?xml version=\"1.0\"?><TreeItem><ItemName>Output</ItemName><PathName>TIID^Device 1 (EtherCAT)^Term 1 (EK1200)^Term 11 (EL2008)^Channel 1^Output</PathName><ItemType>7</ItemType><ItemId>-134</ItemId><ChildCount>0</ChildCount><Disabled>false</Disabled><TreeImageId>18</TreeImageId><VarDef><VarType GUID=\"{18071995-0000-0000-0000-000000000010}\">BIT</VarType><VarBitSize>1</VarBitSize><VarBitAddr>920</VarBitAddr><VarInOut>1</VarInOut><VarFlags>#x0</VarFlags><AdsInfo><AmsAddress><AmsPort>11</AmsPort></AmsAddress><IndexGroup Hex=\"#x03040010\">50593808</IndexGroup><IndexOffset Hex=\"#xc1000398\">-1056963688</IndexOffset><Length Hex=\"#x00000001\">1</Length></AdsInfo><LinkedWith>TIPC^SPS_Demonstrator^SPS_Demonstrator Instance^PlcTask Outputs^GVL_SST.SST_MV_weiss</LinkedWith></VarDef></TreeItem>"^^xsd:string ;
+    dp:ioRawXml "ERROR: (-2147418111, 'Aufruf wurde durch Aufgerufenen abgelehnt.', None, None)"^^xsd:string ;
     ag:op_isBoundToChannel ag:IOChannel_TIID__dach__Device__leerz__1__leerz__\(EtherCAT\)__dach__Term__leerz__1__leerz__\(EK1200\)__dach__Term__leerz__11__leerz__\(EL2008\)__dach__Channel__leerz__1__dach__Output .
 
 ag:GVL_VSG__dot__VSG_Enc_drehen_I1 a ag:class_Variable ;
@@ -1998,75 +2011,67 @@ ag:GVL_VSG__dot__VSG_K1_5_Zaehler_Zuruecksetzen a ag:class_Variable ;
     ag:op_isBoundToChannel ag:IOChannel_TIID__dach__Device__leerz__1__leerz__\(EtherCAT\)__dach__Term__leerz__1__leerz__\(EK1200\)__dach__Term__leerz__6__leerz__\(EL1512\)__dach__CNT__leerz__Outputs__leerz__Channel__leerz__1__dach__Control__dach__Set__leerz__counter .
 
 ag:GVL_VSG__dot__VSG_Kompressor a ag:class_Variable ;
-    dp:hasHardwareAddress "%Q*",
-        "Q 114.4" ;
+    dp:hasHardwareAddress "%Q*" ;
     dp:hasVariableName "GVL_VSG.VSG_Kompressor",
         "VSG_Kompressor" ;
     dp:hasVariableType "BOOL" ;
-    dp:ioRawXml "<?xml version=\"1.0\"?><TreeItem><ItemName>Output</ItemName><PathName>TIID^Device 1 (EtherCAT)^Term 1 (EK1200)^Term 10 (EL2409)^Channel 13^Output</PathName><ItemType>7</ItemType><ItemId>-129</ItemId><ChildCount>0</ChildCount><Disabled>false</Disabled><TreeImageId>18</TreeImageId><VarDef><VarType GUID=\"{18071995-0000-0000-0000-000000000010}\">BIT</VarType><VarBitSize>1</VarBitSize><VarBitAddr>916</VarBitAddr><VarInOut>1</VarInOut><VarFlags>#x0</VarFlags><AdsInfo><AmsAddress><AmsPort>11</AmsPort></AmsAddress><IndexGroup Hex=\"#x03040010\">50593808</IndexGroup><IndexOffset Hex=\"#xc1000394\">-1056963692</IndexOffset><Length Hex=\"#x00000001\">1</Length></AdsInfo><LinkedWith>TIPC^SPS_Demonstrator^SPS_Demonstrator Instance^PlcTask Outputs^GVL_VSG.VSG_Kompressor</LinkedWith></VarDef></TreeItem>"^^xsd:string ;
+    dp:ioRawXml "ERROR: (-2147418111, 'Aufruf wurde durch Aufgerufenen abgelehnt.', None, None)"^^xsd:string ;
     ag:op_isBoundToChannel ag:IOChannel_TIID__dach__Device__leerz__1__leerz__\(EtherCAT\)__dach__Term__leerz__1__leerz__\(EK1200\)__dach__Term__leerz__10__leerz__\(EL2409\)__dach__Channel__leerz__13__dach__Output .
 
 ag:GVL_VSG__dot__VSG_MOT_drehen_CCW a ag:class_Variable ;
-    dp:hasHardwareAddress "%Q*",
-        "Q 114.3" ;
+    dp:hasHardwareAddress "%Q*" ;
     dp:hasVariableName "GVL_VSG.VSG_MOT_drehen_CCW",
         "VSG_MOT_drehen_CCW" ;
     dp:hasVariableType "BOOL" ;
-    dp:ioRawXml "<?xml version=\"1.0\"?><TreeItem><ItemName>Output</ItemName><PathName>TIID^Device 1 (EtherCAT)^Term 1 (EK1200)^Term 10 (EL2409)^Channel 12^Output</PathName><ItemType>7</ItemType><ItemId>-128</ItemId><ChildCount>0</ChildCount><Disabled>false</Disabled><TreeImageId>18</TreeImageId><VarDef><VarType GUID=\"{18071995-0000-0000-0000-000000000010}\">BIT</VarType><VarBitSize>1</VarBitSize><VarBitAddr>915</VarBitAddr><VarInOut>1</VarInOut><VarFlags>#x0</VarFlags><AdsInfo><AmsAddress><AmsPort>11</AmsPort></AmsAddress><IndexGroup Hex=\"#x03040010\">50593808</IndexGroup><IndexOffset Hex=\"#xc1000393\">-1056963693</IndexOffset><Length Hex=\"#x00000001\">1</Length></AdsInfo><LinkedWith>TIPC^SPS_Demonstrator^SPS_Demonstrator Instance^PlcTask Outputs^GVL_VSG.VSG_MOT_drehen_CCW</LinkedWith></VarDef></TreeItem>"^^xsd:string ;
+    dp:ioRawXml "ERROR: (-2147418111, 'Aufruf wurde durch Aufgerufenen abgelehnt.', None, None)"^^xsd:string ;
     ag:op_isBoundToChannel ag:IOChannel_TIID__dach__Device__leerz__1__leerz__\(EtherCAT\)__dach__Term__leerz__1__leerz__\(EK1200\)__dach__Term__leerz__10__leerz__\(EL2409\)__dach__Channel__leerz__12__dach__Output .
 
 ag:GVL_VSG__dot__VSG_MOT_drehen_CW a ag:class_Variable ;
-    dp:hasHardwareAddress "%Q*",
-        "Q 114.2" ;
+    dp:hasHardwareAddress "%Q*" ;
     dp:hasVariableName "GVL_VSG.VSG_MOT_drehen_CW",
         "VSG_MOT_drehen_CW" ;
     dp:hasVariableType "BOOL" ;
-    dp:ioRawXml "<?xml version=\"1.0\"?><TreeItem><ItemName>Output</ItemName><PathName>TIID^Device 1 (EtherCAT)^Term 1 (EK1200)^Term 10 (EL2409)^Channel 11^Output</PathName><ItemType>7</ItemType><ItemId>-127</ItemId><ChildCount>0</ChildCount><Disabled>false</Disabled><TreeImageId>18</TreeImageId><VarDef><VarType GUID=\"{18071995-0000-0000-0000-000000000010}\">BIT</VarType><VarBitSize>1</VarBitSize><VarBitAddr>914</VarBitAddr><VarInOut>1</VarInOut><VarFlags>#x0</VarFlags><AdsInfo><AmsAddress><AmsPort>11</AmsPort></AmsAddress><IndexGroup Hex=\"#x03040010\">50593808</IndexGroup><IndexOffset Hex=\"#xc1000392\">-1056963694</IndexOffset><Length Hex=\"#x00000001\">1</Length></AdsInfo><LinkedWith>TIPC^SPS_Demonstrator^SPS_Demonstrator Instance^PlcTask Outputs^GVL_VSG.VSG_MOT_drehen_CW</LinkedWith></VarDef></TreeItem>"^^xsd:string ;
+    dp:ioRawXml "ERROR: (-2147418111, 'Aufruf wurde durch Aufgerufenen abgelehnt.', None, None)"^^xsd:string ;
     ag:op_isBoundToChannel ag:IOChannel_TIID__dach__Device__leerz__1__leerz__\(EtherCAT\)__dach__Term__leerz__1__leerz__\(EK1200\)__dach__Term__leerz__10__leerz__\(EL2409\)__dach__Channel__leerz__11__dach__Output .
 
 ag:GVL_VSG__dot__VSG_MOT_horizontal_rueckwaerts a ag:class_Variable ;
-    dp:hasHardwareAddress "%Q*",
-        "Q 114.0" ;
+    dp:hasHardwareAddress "%Q*" ;
     dp:hasVariableName "GVL_VSG.VSG_MOT_horizontal_rueckwaerts",
         "VSG_MOT_horizontal_rueckwaerts" ;
     dp:hasVariableType "BOOL" ;
-    dp:ioRawXml "<?xml version=\"1.0\"?><TreeItem><ItemName>Output</ItemName><PathName>TIID^Device 1 (EtherCAT)^Term 1 (EK1200)^Term 10 (EL2409)^Channel 9^Output</PathName><ItemType>7</ItemType><ItemId>-125</ItemId><ChildCount>0</ChildCount><Disabled>false</Disabled><TreeImageId>18</TreeImageId><VarDef><VarType GUID=\"{18071995-0000-0000-0000-000000000010}\">BIT</VarType><VarBitSize>1</VarBitSize><VarBitAddr>912</VarBitAddr><VarInOut>1</VarInOut><VarFlags>#x0</VarFlags><AdsInfo><AmsAddress><AmsPort>11</AmsPort></AmsAddress><IndexGroup Hex=\"#x03040010\">50593808</IndexGroup><IndexOffset Hex=\"#xc1000390\">-1056963696</IndexOffset><Length Hex=\"#x00000001\">1</Length></AdsInfo><LinkedWith>TIPC^SPS_Demonstrator^SPS_Demonstrator Instance^PlcTask Outputs^GVL_VSG.VSG_MOT_horizontal_rueckwaerts</LinkedWith></VarDef></TreeItem>"^^xsd:string ;
+    dp:ioRawXml "ERROR: (-2147418111, 'Aufruf wurde durch Aufgerufenen abgelehnt.', None, None)"^^xsd:string ;
     ag:op_isBoundToChannel ag:IOChannel_TIID__dach__Device__leerz__1__leerz__\(EtherCAT\)__dach__Term__leerz__1__leerz__\(EK1200\)__dach__Term__leerz__10__leerz__\(EL2409\)__dach__Channel__leerz__9__dach__Output .
 
 ag:GVL_VSG__dot__VSG_MOT_horizontal_vorwaerts a ag:class_Variable ;
-    dp:hasHardwareAddress "%Q*",
-        "Q 114.1" ;
+    dp:hasHardwareAddress "%Q*" ;
     dp:hasVariableName "GVL_VSG.VSG_MOT_horizontal_vorwaerts",
         "VSG_MOT_horizontal_vorwaerts" ;
     dp:hasVariableType "BOOL" ;
-    dp:ioRawXml "<?xml version=\"1.0\"?><TreeItem><ItemName>Output</ItemName><PathName>TIID^Device 1 (EtherCAT)^Term 1 (EK1200)^Term 10 (EL2409)^Channel 10^Output</PathName><ItemType>7</ItemType><ItemId>-126</ItemId><ChildCount>0</ChildCount><Disabled>false</Disabled><TreeImageId>18</TreeImageId><VarDef><VarType GUID=\"{18071995-0000-0000-0000-000000000010}\">BIT</VarType><VarBitSize>1</VarBitSize><VarBitAddr>913</VarBitAddr><VarInOut>1</VarInOut><VarFlags>#x0</VarFlags><AdsInfo><AmsAddress><AmsPort>11</AmsPort></AmsAddress><IndexGroup Hex=\"#x03040010\">50593808</IndexGroup><IndexOffset Hex=\"#xc1000391\">-1056963695</IndexOffset><Length Hex=\"#x00000001\">1</Length></AdsInfo><LinkedWith>TIPC^SPS_Demonstrator^SPS_Demonstrator Instance^PlcTask Outputs^GVL_VSG.VSG_MOT_horizontal_vorwaerts</LinkedWith></VarDef></TreeItem>"^^xsd:string ;
+    dp:ioRawXml "ERROR: (-2147418111, 'Aufruf wurde durch Aufgerufenen abgelehnt.', None, None)"^^xsd:string ;
     ag:op_isBoundToChannel ag:IOChannel_TIID__dach__Device__leerz__1__leerz__\(EtherCAT\)__dach__Term__leerz__1__leerz__\(EK1200\)__dach__Term__leerz__10__leerz__\(EL2409\)__dach__Channel__leerz__10__dach__Output .
 
 ag:GVL_VSG__dot__VSG_MOT_vertikal_hoch a ag:class_Variable ;
-    dp:hasHardwareAddress "%Q*",
-        "Q 113.6" ;
+    dp:hasHardwareAddress "%Q*" ;
     dp:hasVariableName "GVL_VSG.VSG_MOT_vertikal_hoch",
         "VSG_MOT_vertikal_hoch" ;
     dp:hasVariableType "BOOL" ;
-    dp:ioRawXml "<?xml version=\"1.0\"?><TreeItem><ItemName>Output</ItemName><PathName>TIID^Device 1 (EtherCAT)^Term 1 (EK1200)^Term 10 (EL2409)^Channel 7^Output</PathName><ItemType>7</ItemType><ItemId>-123</ItemId><ChildCount>0</ChildCount><Disabled>false</Disabled><TreeImageId>18</TreeImageId><VarDef><VarType GUID=\"{18071995-0000-0000-0000-000000000010}\">BIT</VarType><VarBitSize>1</VarBitSize><VarBitAddr>910</VarBitAddr><VarInOut>1</VarInOut><VarFlags>#x0</VarFlags><AdsInfo><AmsAddress><AmsPort>11</AmsPort></AmsAddress><IndexGroup Hex=\"#x03040010\">50593808</IndexGroup><IndexOffset Hex=\"#xc100038e\">-1056963698</IndexOffset><Length Hex=\"#x00000001\">1</Length></AdsInfo><LinkedWith>TIPC^SPS_Demonstrator^SPS_Demonstrator Instance^PlcTask Outputs^GVL_VSG.VSG_MOT_vertikal_hoch</LinkedWith></VarDef></TreeItem>"^^xsd:string ;
+    dp:ioRawXml "ERROR: (-2147418111, 'Aufruf wurde durch Aufgerufenen abgelehnt.', None, None)"^^xsd:string ;
     ag:op_isBoundToChannel ag:IOChannel_TIID__dach__Device__leerz__1__leerz__\(EtherCAT\)__dach__Term__leerz__1__leerz__\(EK1200\)__dach__Term__leerz__10__leerz__\(EL2409\)__dach__Channel__leerz__7__dach__Output .
 
 ag:GVL_VSG__dot__VSG_MOT_vertikal_runter a ag:class_Variable ;
-    dp:hasHardwareAddress "%Q*",
-        "Q 113.7" ;
+    dp:hasHardwareAddress "%Q*" ;
     dp:hasVariableName "GVL_VSG.VSG_MOT_vertikal_runter",
         "VSG_MOT_vertikal_runter" ;
     dp:hasVariableType "BOOL" ;
-    dp:ioRawXml "<?xml version=\"1.0\"?><TreeItem><ItemName>Output</ItemName><PathName>TIID^Device 1 (EtherCAT)^Term 1 (EK1200)^Term 10 (EL2409)^Channel 8^Output</PathName><ItemType>7</ItemType><ItemId>-124</ItemId><ChildCount>0</ChildCount><Disabled>false</Disabled><TreeImageId>18</TreeImageId><VarDef><VarType GUID=\"{18071995-0000-0000-0000-000000000010}\">BIT</VarType><VarBitSize>1</VarBitSize><VarBitAddr>911</VarBitAddr><VarInOut>1</VarInOut><VarFlags>#x0</VarFlags><AdsInfo><AmsAddress><AmsPort>11</AmsPort></AmsAddress><IndexGroup Hex=\"#x03040010\">50593808</IndexGroup><IndexOffset Hex=\"#xc100038f\">-1056963697</IndexOffset><Length Hex=\"#x00000001\">1</Length></AdsInfo><LinkedWith>TIPC^SPS_Demonstrator^SPS_Demonstrator Instance^PlcTask Outputs^GVL_VSG.VSG_MOT_vertikal_runter</LinkedWith></VarDef></TreeItem>"^^xsd:string ;
+    dp:ioRawXml "ERROR: (-2147418111, 'Aufruf wurde durch Aufgerufenen abgelehnt.', None, None)"^^xsd:string ;
     ag:op_isBoundToChannel ag:IOChannel_TIID__dach__Device__leerz__1__leerz__\(EtherCAT\)__dach__Term__leerz__1__leerz__\(EK1200\)__dach__Term__leerz__10__leerz__\(EL2409\)__dach__Channel__leerz__8__dach__Output .
 
 ag:GVL_VSG__dot__VSG_MV_Vakuum a ag:class_Variable ;
-    dp:hasHardwareAddress "%Q*",
-        "Q 114.5" ;
+    dp:hasHardwareAddress "%Q*" ;
     dp:hasVariableName "GVL_VSG.VSG_MV_Vakuum",
         "VSG_MV_Vakuum" ;
     dp:hasVariableType "BOOL" ;
-    dp:ioRawXml "<?xml version=\"1.0\"?><TreeItem><ItemName>Output</ItemName><PathName>TIID^Device 1 (EtherCAT)^Term 1 (EK1200)^Term 10 (EL2409)^Channel 14^Output</PathName><ItemType>7</ItemType><ItemId>-130</ItemId><ChildCount>0</ChildCount><Disabled>false</Disabled><TreeImageId>18</TreeImageId><VarDef><VarType GUID=\"{18071995-0000-0000-0000-000000000010}\">BIT</VarType><VarBitSize>1</VarBitSize><VarBitAddr>917</VarBitAddr><VarInOut>1</VarInOut><VarFlags>#x0</VarFlags><AdsInfo><AmsAddress><AmsPort>11</AmsPort></AmsAddress><IndexGroup Hex=\"#x03040010\">50593808</IndexGroup><IndexOffset Hex=\"#xc1000395\">-1056963691</IndexOffset><Length Hex=\"#x00000001\">1</Length></AdsInfo><LinkedWith>TIPC^SPS_Demonstrator^SPS_Demonstrator Instance^PlcTask Outputs^GVL_VSG.VSG_MV_Vakuum</LinkedWith></VarDef></TreeItem>"^^xsd:string ;
+    dp:ioRawXml "ERROR: (-2147418111, 'Aufruf wurde durch Aufgerufenen abgelehnt.', None, None)"^^xsd:string ;
     ag:op_isBoundToChannel ag:IOChannel_TIID__dach__Device__leerz__1__leerz__\(EtherCAT\)__dach__Term__leerz__1__leerz__\(EK1200\)__dach__Term__leerz__10__leerz__\(EL2409\)__dach__Channel__leerz__14__dach__Output .
 
 ag:GVL_VSG__dot__VSG_Ref_Schalter_drehen a ag:class_Variable ;
@@ -2593,6 +2598,14 @@ HRL_ControlOfOutputs(
     Init_RGB_HorizontalBackwards := Init_RGB_HorizontalBackwards
 );
 GVL_HRL.HRL_MOT_Foerderband_vorwaerts := HRL_ControlOfOutputs.ConveyorBeltForward;
+GVL_HRL.HRL_MOT_Foerderband_rueckwaerts := HRL_ControlOfOutputs.ConveyorBeltBackward;
+GVL_HRL.HRL_MOT_Ausleger_vorwaerts := HRL_ControlOfOutputs.RGB_Forwards;
+GVL_HRL.HRL_MOT_Ausleger_rueckwaerts := HRL_ControlOfOutputs.RGB_Backwards;
+GVL_HRL.HRL_MOT_vertikal_runter := HRL_ControlOfOutputs.RGB_VerticalDown;
+GVL_HRL.HRL_MOT_vertikal_hoch := HRL_ControlOfOutputs.RGB_VerticalUp;
+GVL_HRL.HRL_MOT_horizontal_zum_Regal := HRL_ControlOfOutputs.RGB_HorizontalForward;
+GVL_HRL.HRL_MOT_horizontal_zum_Foerderband := HRL_ControlOfOutputs.RGB_HorizontalBackward;
+
 HRL_RGB_InitialStateDrive(
     MethodCall_InitDrive := HRL_OperatingModes.MethodCall_InitStateDrive,
     ESS := ((GVL.diNotAus_Kanal_A) AND (GVL.diNotAus_Kanal_B)),
@@ -3491,6 +3504,7 @@ ag:StandardFBType_SR a ag:class_FBType,
         ag:Port_SR_S1 .
 
 ag:class_SourceLiteral a owl:Class ;
+    rdfs:comment "Diese Klasse repräsentiert konstante Literalwerte, die in einem SPS Netzwerk direkt als Eingangswerte verwendet werden, zum Beispiel TRUE, FALSE, 0 oder Zeitkonstanten. Sie wird im Knowledge Graph als spezielle Form einer Signalquelle modelliert, damit Parameterzuweisungen auch dann sauber abgebildet werden können, wenn kein Variablenname existiert. Literale sind in vielen Steuerungslogiken wichtig, etwa um Defaultwerte zu setzen, Zustandsautomaten zu initialisieren oder Zeitparameter für Timer vorzugeben. Aus PLCopen XML lassen sich solche Literale häufig aus Parameterbelegungen erkennen, wenn ein Eingang nicht verdrahtet ist oder explizit mit einem konstanten Wert verbunden wird. Die Klasse ermöglicht es, den Datenfluss vollständig zu rekonstruieren, da sonst ein Teil der Eingänge als undefiniert erscheinen würde. In Skill Analysen helfen SourceLiterals dabei, feste Konfigurationen sichtbar zu machen, zum Beispiel konstante Verfahrzeiten oder feste Betriebsartenparameter. Damit trägt class_SourceLiteral zur Vollständigkeit und Nachvollziehbarkeit der Modellierung bei."@de ;
     rdfs:subClassOf ag:class_SignalSource .
 
 ag:FBType_AutomaticColorDetection_nichtfertig a ag:class_FBType ;
@@ -14365,6 +14379,12 @@ ag:Var_VSG_SkillSet_VSG_Valve a ag:class_Variable ;
     dp:hasVariableName "VSG_Valve" ;
     dp:hasVariableType "BOOL" .
 
+dp:isSpecificLayer a owl:DatatypeProperty ;
+    rdfs:comment "Hier wird gespeichert, ob etwas ein spezifisches Layer ist oder nicht. Damit wird insbesondere vom KGManager anhand des Programmcodes festgestellt, ob es sich bei diesem POU um ein GEMMA-Layer oder ein Output-Layer handelt, denn es wird von einer GEMMA-Steuerungsarchitektur ausgegangen, bei der es ein GEMMA-Layer als Steuerungsarchitektur gibt und ein Output-Layer,bei dem die Outputs in Abhängigkeit von den GEMMA-Zuständen ausgegeben werden." ;
+    rdfs:domain ag:class_POU ;
+    rdfs:range xsd:boolean ;
+    rdfs:subPropertyOf dp:hasPOUAttribute .
+
 dp:isUnused a owl:DatatypeProperty .
 
 ag:FBType_CuttingProcess a ag:class_FBType ;
@@ -15436,11 +15456,14 @@ Start := 0;""" ;
         ag:Var_VSG_AS_VerticalMoveEncoder_jobRunning,
         ag:Var_VSG_AS_VerticalMoveEncoder_state .
 
-ag:class_PLCProject a owl:Class .
+ag:class_PLCProject a owl:Class ;
+    rdfs:comment "Diese Klasse beschreibt das gesamte SPS Projekt als oberste Container Entität im Knowledge Graph. Eine Instanz dieser Klasse fasst alle Inhalte zusammen, die aus einem PLCopen XML Export abgeleitet wurden, also Programme, Function Block Typen, globale Variablenlisten und die zugehörigen Verknüpfungen. Das Objekt dient als Einstiegspunkt, um das Modell strukturiert abzufragen und alle Substrukturen eindeutig einem Projekt zuzuordnen. Typischerweise besitzt ein PLCProject Beziehungen zu Programmen und zu globalen Variablenlisten, wodurch nachvollziehbar wird, welche Logik zyklisch ausgeführt wird und welche Variablen projektweit verfügbar sind. In der praktischen Nutzung ist das PLCProject besonders hilfreich, um mehrere Exporte oder Versionen getrennt zu verwalten und Vergleiche zwischen unterschiedlichen Projektständen durchführen zu können. Zusätzlich unterstützt diese Klasse die Nachvollziehbarkeit der Provenienz, da alle abgeleiteten Entitäten eindeutig als Teil eines konkreten Exports interpretiert werden."@de .
 
-ag:class_ParameterAssignment a owl:Class .
+ag:class_ParameterAssignment a owl:Class ;
+    rdfs:comment "Diese Klasse repräsentiert eine konkrete Parameterzuweisung im Netzwerk und beschreibt damit die Verdrahtung eines Signals von einer Quelle zu einem Zielport. ParameterAssignments sind die zentrale Struktur, um den Datenfluss in einem FBD Modell vollständig abzubilden, da sie definieren, welcher Wert an welchem Eingang anliegt oder welche Variable mit einem Ausgang verbunden ist. Im Knowledge Graph verweist eine ParameterAssignment typischerweise auf eine SignalSource als Ursprung und auf eine PortInstance als Ziel, wodurch die Verbindung eindeutig und instanzbezogen beschrieben wird. Aus PLCopen XML entstehen Parameterzuweisungen aus den Verbindungsinformationen zwischen Block Pins und Variablen oder zwischen mehreren Bausteinen. Diese Klasse ist für Analysen besonders wichtig, weil darüber echte Signalpfade rekonstruiert werden können, beispielsweise vom Startsignal eines Skills über Triggerlogik bis zur Ansteuerung eines Aktors. Außerdem lassen sich darüber automatische Validierungen durchführen, etwa ob alle Pflichtparameter eines Bausteins beschaltet sind oder ob Datentypen konsistent verbunden wurden. Insgesamt ist class_ParameterAssignment die semantische Entsprechung einer Leitung im Schaltplan des FBD und damit eine Schlüsselklasse für jede Graphanalyse."@de .
 
 ag:class_PortInstance a owl:Class ;
+    rdfs:comment "Diese Klasse bildet die konkrete Ausprägung eines Ports innerhalb einer spezifischen Function Block Instanz ab und entspricht damit einem realen Pin in einem FBD Netzwerk. Während class_Port nur den abstrakten Parameter eines Typs beschreibt, ist die PortInstance der tatsächliche Anschluss, der im Netzwerk verdrahtet wird und Signale empfängt oder ausgibt. Im Knowledge Graph wird diese Klasse benötigt, weil Signalverbindungen immer an eine konkrete Instanz gebunden sind und nicht nur an den Typ. Eine PortInstance verweist einerseits auf die zugehörige FBInstance und andererseits auf den Port des zugrunde liegenden FBTypes, wodurch eine eindeutige Zuordnung möglich ist. Aus PLCopen XML ergibt sich dieses Konzept aus Block Pins und deren Verbindungen im FBD, die erst im Kontext der Instanz vollständig spezifiziert sind. PortInstanzen sind besonders wichtig für die Rekonstruktion von Signalflüssen, da Parameterzuweisungen genau diese Knoten als Ziel besitzen. Damit ermöglicht class_PortInstance eine vollständige Analyse, welche Variable oder welches Zwischensignal tatsächlich an welchen Bausteinpin angeschlossen ist."@de ;
     rdfs:subClassOf ag:class_SignalSource .
 
 dp:hasPortAttribute a owl:DatatypeProperty .
@@ -15549,9 +15572,11 @@ Start := 0;""" ;
         ag:Var_SST_PD_AS_HorizontalMove_jobRunning,
         ag:Var_SST_PD_AS_HorizontalMove_state .
 
-ag:class_POUCall a owl:Class .
+ag:class_POUCall a owl:Class ;
+    rdfs:comment "Diese Klasse beschreibt einen konkreten Aufruf einer Program Organisation Unit innerhalb eines Programms oder eines Function Blocks. Ein POUCall macht sichtbar, dass ein bestimmter Baustein nicht nur als Typ existiert, sondern an einer konkreten Stelle tatsächlich verwendet wird. Im Knowledge Graph ist dies essenziell, um Abhängigkeitsstrukturen zu rekonstruieren, also welche Bausteine intern voneinander abhängen und wie tief verschachtelte Logik aufgebaut ist. Ein POUCall kann mit einer FBInstance und deren PortInstanzen verknüpft werden, sodass klar wird, welche konkrete Instanz eines Bausteintyps gemeint ist. Aus PLCopen XML ergibt sich ein POUCall aus einem Bausteinblock im FBD oder aus einem Funktionsaufruf in ST Code, je nach Darstellung. Für die Skill Analyse kann damit nachvollzogen werden, welche Standardbausteine ein Skill verwendet, beispielsweise Trigger, Speicher oder Timer, und welche Unterbausteine die eigentliche Prozesslogik realisieren. Insgesamt macht class_POUCall die Ausführungsstruktur explizit, wodurch sich Skill Ketten, Signalpfade und interne Architektur systematisch untersuchen lassen."@de .
 
-ag:class_SignalSource a owl:Class .
+ag:class_SignalSource a owl:Class ;
+    rdfs:comment "Diese Klasse stellt eine abstrakte Signalquelle dar und dient als gemeinsamer Oberbegriff für unterschiedliche Ursprünge von Werten im FBD Netzwerk. Eine Signalquelle kann beispielsweise eine Variable sein, eine PortInstance eines Bausteins oder ein konstant definierter Literalwert. Im Knowledge Graph ist diese Abstraktion wichtig, weil Parameterzuweisungen immer nach dem gleichen Muster funktionieren, unabhängig davon, ob der Wert aus einer Variable oder aus einer Bausteinausgabe stammt. Dadurch können Signalflüsse einheitlich modelliert und abgefragt werden, ohne für jede Quelle unterschiedliche Datenstrukturen zu benötigen. Aus PLCopen XML entstehen Signalquellen aus Verdrahtungen, die entweder direkt auf Variablen verweisen oder die Ausgänge anderer Bausteine als Quelle verwenden. Die Klasse unterstützt komplexe Analysen wie Abhängigkeitsgraphen, Datenflussverfolgung oder die Ermittlung von Skill Vorbedingungen, da sich jede Eingangsbelegung auf eine SignalSource zurückführen lässt. Insgesamt sorgt class_SignalSource dafür, dass der Knowledge Graph die semantische Struktur des FBD Netzwerks vollständig und flexibel repräsentieren kann."@de .
 
 ag:FBType_SST_CB_AS_HorizontalMove a ag:class_FBType ;
     dp:hasPOUCode """// POU SST_CB_AS_HorizontalMove body
@@ -15731,10 +15756,8 @@ ag:StandardFBType_TON a ag:class_FBType,
         ag:Port_TON_Q .
 
 ag:class_Program a owl:Class ;
+    rdfs:comment "Diese Klasse repräsentiert ein SPS Programm, das im Normalfall zyklisch von der Runtime ausgeführt wird und daher die oberste Ebene der Steuerungslogik bildet. Programme sind die Haupt Einstiegspunkte für die Ausführung, da sie typische Betriebsartenlogiken, Sequenzen oder Skill Orchestrierungen enthalten. Im Knowledge Graph dient diese Klasse dazu, die Gesamtabläufe sichtbar zu machen und die enthaltenen Aufrufe von Function Blocks als POUCalls explizit zu modellieren. Ein Programm besitzt in der Regel Beziehungen zu den aufgerufenen Bausteinen und deren Parameterzuweisungen, wodurch die Signalflüsse und Startbedingungen nachvollziehbar werden. Aus einem PLCopen XML Export entsteht diese Struktur aus den Program POUs, die häufig als zentrale Knoten für Skill Sets oder Stationslogik fungieren. Für Analysen ist class_Program besonders wichtig, weil hier häufig entschieden wird, welche Subsysteme wann aktiviert werden und welche Ausgänge überhaupt freigegeben werden dürfen. Damit ist die Klasse ideal, um Skill Trigger, Betriebsmodi und globale Abhängigkeiten im Gesamtprojekt zu verstehen."@de ;
     rdfs:subClassOf ag:class_POU .
-
-dp:hasPOUAttribute a owl:DatatypeProperty ;
-    rdfs:domain ag:class_POU .
 
 ag:FBType_MBS_DmPD_AS_RotationMove a ag:class_FBType ;
     dp:hasPOUCode """// POU MBS_DmPD_AS_RotationMove body
@@ -15829,6 +15852,9 @@ ag:StandardFBType_TOF a ag:class_FBType,
         ag:Port_TOF_IN,
         ag:Port_TOF_PT,
         ag:Port_TOF_Q .
+
+dp:hasPOUAttribute a owl:DatatypeProperty ;
+    rdfs:domain ag:class_POU .
 
 ag:FBType_CompressorControl a ag:class_FBType ;
     dp:hasPOUCode """// POU CompressorControl body
@@ -16014,12 +16040,15 @@ DigitalOutputControl_02 := TON_Valve_Control.Q;""" ;
         ag:Var_CompressorControl_TON_Time_Valve,
         ag:Var_CompressorControl_TON_Valve_Control .
 
-ag:class_GlobalVariableList a owl:Class .
+ag:class_GlobalVariableList a owl:Class ;
+    rdfs:comment "Diese Klasse beschreibt eine globale Variablenliste als Container, der projektweit zugängliche Variablen zusammenfasst. GlobalVariableLists werden in SPS Projekten verwendet, um gemeinsame Signale, Zustände oder Hardwarezuordnungen zentral zu verwalten und in mehreren Programmen oder Function Blocks nutzbar zu machen. Im Knowledge Graph ermöglicht diese Klasse eine klare Gruppierung der globalen Symbolik und erleichtert Abfragen, die sich auf globale Signale beziehen, etwa auf Safety Signale, Betriebsartenflags oder I O Variablen. Aus PLCopen XML wird eine solche Liste typischerweise aus GVL Bereichen abgeleitet, wobei jede enthaltene Variable separat als class_Variable modelliert wird. Die Klasse unterstützt außerdem die Nachvollziehbarkeit, weil sichtbar wird, welche Variablen tatsächlich global sind und welche nur lokal innerhalb eines Bausteins existieren. Für die Dokumentation ist class_GlobalVariableList hilfreich, um globale Schnittstellen der Anlage zu beschreiben und zentrale Signalgruppen systematisch zu erläutern. Außerdem lassen sich hieraus automatisch Listen für Hardwaremapping oder Schnittstellendokumente erzeugen."@de .
 
 ag:class_StandardFBType a owl:Class ;
+    rdfs:comment "Diese Klasse beschreibt Standard Function Block Typen, die typischerweise aus der SPS Bibliothek oder dem IEC 61131 3 Standard stammen, zum Beispiel RS Speicher, Triggerbausteine oder Zeitfunktionen. Sie wird eingesetzt, um wiederkehrende Basiskomponenten gesondert zu behandeln und nicht mit den projekt spezifischen Skill Bausteinen zu vermischen. StandardFBTypes dienen häufig als Infrastruktur für Zustandsbildung, Flankenerkennung, Zeitverhalten und Zählfunktionen und sind daher in vielen CustomFBTypes als interne Aufrufe enthalten. Im Knowledge Graph ermöglicht diese Klasse eine robuste Erkennung typischer Muster, etwa dass ein Skill durch einen R_TRIG gestartet wird, durch einen RS gehalten wird und durch Timerbedingungen gestoppt wird. Für die Analyse des Signalflusses sind Standardbausteine besonders relevant, weil sie häufig die eigentlichen Zustandswechsel erzwingen, auch wenn sie fachlich nicht als eigener Skill gelten. Aus PLCopen XML werden sie als POUCalls sichtbar, die innerhalb eines Bausteins auf solche Standardtypen verweisen. Die explizite Modellierung als StandardFBType verbessert außerdem das Filtering in Abfragen, sodass sich beispielsweise reine Skill Graphen ohne Bibliothekslogik erzeugen lassen."@de ;
     rdfs:subClassOf ag:class_FBType .
 
-ag:class_POU a owl:Class .
+ag:class_POU a owl:Class ;
+    rdfs:comment "Diese Klasse bildet das allgemeine Konzept einer Program Organisation Unit ab und dient als Oberbegriff für Programme und Function Blocks im Sinne der IEC 61131 3 Struktur. Sie wird im Knowledge Graph verwendet, um eine gemeinsame Abstraktion für alle ausführbaren oder wiederverwendbaren Bausteine bereitzustellen, unabhängig davon, ob sie zyklisch laufen oder innerhalb anderer Bausteine aufgerufen werden. Dadurch lassen sich Analyseoperationen vereinheitlichen, zum Beispiel die Suche nach Aufrufbeziehungen, der Vergleich von Schnittstellen oder das Auffinden von internen Abhängigkeiten. In einem PLCopen XML Export entsprechen POUs typischerweise den Elementen, die eine Bausteindefinition samt Interface und Code oder Netzwerkstruktur enthalten. In diesem Modell ist class_POU vor allem eine semantische Klammer, die eine saubere Spezialisierung zu class_Program und class_FBType ermöglicht. In praktischen Abfragen wird diese Klasse häufig indirekt genutzt, um alle ausführbaren Einheiten zusammenzufassen und anschließend nach Typ oder Sprache zu filtern."@de .
 
 ag:FBType_AxisControl_MultipleInputSensors a ag:class_FBType ;
     dp:hasPOUCode """// POU AxisControl_MultipleInputSensors body
@@ -16125,16 +16154,21 @@ ag:StandardFBType_R_TRIG a ag:class_FBType,
         ag:Port_R_TRIG_Q .
 
 ag:class_FBType a owl:Class ;
+    rdfs:comment "Diese Klasse beschreibt einen Function Block Typ als wiederverwendbaren Baustein mit fest definierter Schnittstelle und interner Logik. Ein FBType enthält typischerweise Eingänge, Ausgänge und interne Variablen sowie entweder ST Code oder eine aus dem FBD Netzwerk rekonstruierte Darstellung. Im Knowledge Graph wird der Baustein als Typ modelliert, damit einzelne Instanzen desselben Bausteins konsistent beschrieben und analysiert werden können. Die Ports eines FBType werden über class_Port repräsentiert und definieren Richtung und Datentyp der jeweiligen Parameter, wodurch eine saubere Typanalyse der Verdrahtung möglich ist. Darüber hinaus kann ein FBType selbst weitere POUs aufrufen, etwa Standardbausteine wie Trigger oder Timer, was über POUCalls nachvollzogen wird. Die Klasse ist zentral, um das Projekt modular zu verstehen, da sie die fachliche Logik kapselt, zum Beispiel Bewegungssteuerungen, Sensor Auswertungen oder Betriebsartenautomaten. Bei der Analyse von Skills ist class_FBType besonders wertvoll, weil sie die wiederkehrenden Muster einer Skill Implementierung sichtbar macht, etwa Start Trigger, Zustandsautomaten, Reset Mechanismen und Sicherheitsabfragen."@de ;
     rdfs:subClassOf ag:class_POU .
 
 ag:FBType_ULINT a ag:class_FBType .
 
-ag:class_IOChannel a owl:Class .
+ag:class_IOChannel a owl:Class ;
+    rdfs:comment "Diese Klasse repräsentiert einen Hardwarekanal, also einen physikalischen Ein oder Ausgang, der in der Steuerung adressiert und mit Variablen verbunden werden kann. Ein IOChannel bildet damit die Brücke zwischen der semantischen Logik im Knowledge Graph und der realen Peripherie, etwa Sensoren, Ventile, Motoren oder Signallampen. Im Knowledge Graph wird ein IOChannel häufig genutzt, um Variablen mit Hardwareadressen zu verknüpfen und dadurch nachvollziehbar zu machen, welcher Code welche reale Komponente beeinflusst. Aus PLCopen XML kann ein IOChannel entweder direkt aus Hardwarezuordnungen oder indirekt aus Rohinformationen des Exports rekonstruiert werden, abhängig davon, wie vollständig das Mapping exportiert wurde. Die Klasse ist besonders wertvoll für Analysen, die Skill Ausführung mit physikalischen Effekten verbinden, da so sichtbar wird, welche Ausgänge ein Skill setzt und welche Eingänge er überwacht. Außerdem unterstützt sie Plausibilitätsprüfungen, beispielsweise ob ein Ausgang nur von einem Skill kontrolliert wird oder ob Konflikte zwischen mehreren Bausteinen existieren. Insgesamt macht class_IOChannel den Knowledge Graph hardware nah und damit für reale Automatisierungsszenarien aussagekräftig."@de .
 
-ag:class_FBInstance a owl:Class .
+ag:class_FBInstance a owl:Class ;
+    rdfs:comment "Diese Klasse beschreibt eine konkrete Instanz eines Function Block Typs innerhalb eines Programms oder eines anderen Bausteins. Während class_FBType den Bauplan liefert, stellt class_FBInstance das tatsächliche Objekt dar, das in einem Netzwerk verwendet wird und dessen interne Zustände während der Laufzeit existieren. Im Knowledge Graph ist diese Klasse entscheidend, um die echte Struktur des FBD Netzwerks abzubilden, weil ein Baustein mehrfach instanziiert werden kann, jeweils mit eigenen Parametern, eigenen Variablenzuordnungen und eigenem Zustand. Eine FBInstance ist über Beziehungen einem FBType zugeordnet und besitzt PortInstanzen, die die konkreten Pins dieser Instanz darstellen. Damit lassen sich Verdrahtungen und Signalwege nicht nur abstrakt, sondern real und vollständig nachvollziehen. In PLCopen XML entspricht dies dem Auftreten eines Baustein Blocks im Netzwerk, also einer konkreten Verwendung innerhalb des FBD. Für Skill Analysen ist class_FBInstance besonders wichtig, weil hier ersichtlich wird, welche spezifischen Sensoren, Aktoren oder Parameter an einen Skill angeschlossen sind und wie die Logik in einer konkreten Station konfiguriert wurde."@de .
 
-ag:class_Port a owl:Class .
+ag:class_Port a owl:Class ;
+    rdfs:comment "Diese Klasse repräsentiert einen Port als Bestandteil eines Function Block Typs und definiert damit die formale Schnittstelle eines Bausteins. Ein Port beschreibt, ob ein Parameter ein Eingang oder Ausgang ist und welchen Datentyp er besitzt, etwa BOOL, INT, TIME oder andere PLC Typen. Im Knowledge Graph ist diese Struktur notwendig, um Verdrahtungen formal korrekt abzubilden und später automatisiert zu prüfen, ob Signale kompatibel verbunden wurden. Ports existieren zunächst nur auf der Typ Ebene und werden erst durch PortInstanzen innerhalb einer konkreten FBInstance tatsächlich genutzt. Aus PLCopen XML lässt sich ein Port aus den Variablendeklarationen eines POUs ableiten oder aus der Pinbeschreibung eines Bausteinblocks rekonstruieren. Die Klasse unterstützt außerdem semantische Abfragen, zum Beispiel die Suche nach allen Skills, die einen bestimmten Eingang besitzen oder die Ausgabe eines bestimmten Statussignals bereitstellen. Insgesamt dient class_Port als zentraler Baustein, um das Schnittstellen Design der Steuerung explizit zu modellieren und als Grundlage für Skill Kopplung und Parametervalidierung zu verwenden."@de .
 
 ag:class_Variable a owl:Class ;
+    rdfs:comment "Diese Klasse repräsentiert Variablen im SPS Projekt, unabhängig davon, ob es sich um globale Variablen, lokale Variablen, Ein und Ausgänge oder Instanzvariablen handelt. Variablen sind zentrale Träger von Zuständen und Signalen, da über sie Sensorwerte gelesen, Aktoren angesteuert und interne Zwischenergebnisse gespeichert werden. Im Knowledge Graph kann eine Variable zusätzlich Hardwareinformationen enthalten, beispielsweise eine physikalische Adresse oder eine Zuordnung zu einem IO Channel, wodurch die Verbindung zwischen Logik und Feldhardware sichtbar wird. Variablen können außerdem genutzt werden, um Function Block Instanzen abzubilden, da viele PLC Systeme Instanzen über benannte Variablen in der Symbolik repräsentieren. Aus PLCopen XML stammen Variablen aus den Deklarationsbereichen eines POUs, aus globalen Variablenlisten oder aus I O Mappings. Für Skill Analysen ist class_Variable besonders wertvoll, weil darüber erkennbar wird, welche realen Sensoren und Aktoren ein Skill verwendet und welche Parameter in die Skill Aufrufe einfließen. Zusätzlich erlaubt diese Klasse Konsistenzprüfungen, etwa ob eine Variable als BOOL modelliert ist und dennoch mit einem numerischen Port verbunden wurde."@de ;
     rdfs:subClassOf ag:class_SignalSource .
 

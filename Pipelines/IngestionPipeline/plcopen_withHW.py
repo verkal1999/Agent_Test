@@ -355,7 +355,29 @@ class PLCOpenXMLParser:
     # ----------------------------
     # COM-Export aus Cell 4: export.xml erzeugen
     # ----------------------------
+    def _com_retry(self, fn, retries: int = 60, delay: float = 0.5):
+        import time
+        import pythoncom
+        from pywintypes import com_error
 
+        last = None
+        for _ in range(retries):
+            try:
+                return fn()
+            except (pythoncom.com_error, com_error) as e:
+                # hresult je nach Exception-Typ
+                hr = getattr(e, "hresult", None)
+                if hr is None and getattr(e, "args", None):
+                    hr = e.args[0]
+
+                # RPC_E_CALL_REJECTED
+                if hr == -2147418111:
+                    last = e
+                    time.sleep(delay)
+                    pythoncom.PumpWaitingMessages()
+                    continue
+                raise
+        raise RuntimeError(f"COM bleibt busy (RPC_E_CALL_REJECTED). Letzter Fehler: {last}")
     def export_plcopen_xml(self) -> None:
         """
         Exportiert alle gefundenen POUs als PLCopen XML (TwinCAT-Export).
@@ -408,8 +430,8 @@ class PLCOpenXMLParser:
 
         if tc_project is None:
             raise RuntimeError("Kein TwinCAT-Systemprojekt (.tsproj) in der Solution gefunden")
-        sys_mgr = tc_project.Object
-        root_plc = sys_mgr.LookupTreeItem("TIPC")
+        sys_mgr = self._com_retry(lambda: tc_project.Object)
+        root_plc = self._com_retry(lambda: sys_mgr.LookupTreeItem("TIPC"))
 
         children = []
         try:

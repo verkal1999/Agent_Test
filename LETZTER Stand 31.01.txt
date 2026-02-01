@@ -1,0 +1,3 @@
+- Skill-Connection zwischen FMEA und PLC-Ontologie aufbauen
+- Dem Agenten hierarchie über GEMMA-Diagramm mitgeben mit Output Layer
+- 

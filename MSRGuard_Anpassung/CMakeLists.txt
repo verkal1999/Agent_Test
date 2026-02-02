@@ -48,6 +48,8 @@ add_executable(opcua_client
   src/TimeBlogger.cpp
   src/WriteCsvForce.cpp
   src/PythonAgentBridge.cpp
+  src/ExcHUiObserver.cpp
+  src/AgentStartCoordinator.cpp
 )
 
 target_sources(opcua_client PRIVATE
@@ -73,6 +75,8 @@ target_sources(opcua_client PRIVATE
   include/InventorySnapshot.h
   include/InventorySnapshotUtils.h
   include/TimeBlogger.h
+  include/ExcHUiObserver.h
+  include/AgentStartCoordinator.h
 )
 
 # Includes (eigene + open62541 generated)
@@ -93,7 +97,15 @@ target_link_libraries(opcua_client PRIVATE
 # Python3 Embed (wie zuvor)
 find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
 target_link_libraries(opcua_client PRIVATE Python3::Python)
+file(TO_CMAKE_PATH "${CMAKE_SOURCE_DIR}/python" PY_SRC_DIR_CMAKE)
 
+# Annahme: MSRGuardAnpassung und MA_Python_Agent haben denselben Parent
+file(TO_CMAKE_PATH "${CMAKE_SOURCE_DIR}/../MA_Python_Agent/.venv311/Scripts/python.exe" VENV_PY_EXE_CMAKE)
+
+target_compile_definitions(opcua_client PRIVATE
+  PY_SRC_DIR="${PY_SRC_DIR_CMAKE}"
+  VENV_PY_EXE="${VENV_PY_EXE_CMAKE}"
+)
 # Client-Zertifikate neben die EXE spiegeln (wie zuvor)
 add_custom_command(TARGET opcua_client POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:opcua_client>/certificates"

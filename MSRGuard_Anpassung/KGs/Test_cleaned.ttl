@@ -14,6 +14,10 @@
 #    Object Properties
 #################################################################
 
+###  http://www.semanticweb.org/AgentProgramParams/op_HypothesisConnections
+ag:op_HypothesisConnections rdf:type owl:ObjectProperty .
+
+
 ###  http://www.semanticweb.org/AgentProgramParams/op_assignsFrom
 ag:op_assignsFrom rdf:type owl:ObjectProperty ;
                   rdfs:domain ag:class_ParameterAssignment ;
@@ -58,6 +62,20 @@ ag:op_hasCallerVariable rdf:type owl:ObjectProperty ;
                         rdfs:range ag:class_Variable .
 
 
+###  http://www.semanticweb.org/AgentProgramParams/op_hasHypothesisAboutPOU
+ag:op_hasHypothesisAboutPOU rdf:type owl:ObjectProperty ;
+                            rdfs:subPropertyOf ag:op_HypothesisConnections ;
+                            rdfs:domain ag:class_SkillImplementationHypothesis ;
+                            rdfs:range ag:class_POU .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_hasHypothesisAboutSkill
+ag:op_hasHypothesisAboutSkill rdf:type owl:ObjectProperty ;
+                              rdfs:subPropertyOf ag:op_HypothesisConnections ;
+                              rdfs:domain ag:class_SkillImplementationHypothesis ;
+                              rdfs:range ag:class_Skill .
+
+
 ###  http://www.semanticweb.org/AgentProgramParams/op_hasInfluenceOnVariable
 ag:op_hasInfluenceOnVariable rdf:type owl:ObjectProperty ;
                              rdfs:domain ag:class_Variable ;
@@ -83,6 +101,12 @@ ag:op_implementsPort rdf:type owl:ObjectProperty ;
                      rdfs:comment "Verbindet eine interne Variable eines FBs mit dem Port, den sie repräsentiert" .
 
 
+###  http://www.semanticweb.org/AgentProgramParams/op_implementsSkill
+ag:op_implementsSkill rdf:type owl:ObjectProperty ;
+                      rdfs:domain ag:class_POU ;
+                      rdfs:range ag:class_Skill .
+
+
 ###  http://www.semanticweb.org/AgentProgramParams/op_instantiatesPort
 ag:op_instantiatesPort rdf:type owl:ObjectProperty ;
                        rdfs:domain ag:class_PortInstance ;
@@ -99,6 +123,12 @@ ag:op_isBoundToChannel rdf:type owl:ObjectProperty ;
 ag:op_isBoundToPort rdf:type owl:ObjectProperty ;
                     rdfs:domain ag:class_Variable ;
                     rdfs:range ag:class_Port .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_isExpressionCreatedBy
+ag:op_isExpressionCreatedBy rdf:type owl:ObjectProperty ;
+                            rdfs:domain ag:class_Expression ;
+                            rdfs:range ag:class_SignalSource .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/op_isInstanceOfFBType
@@ -171,6 +201,11 @@ ag:op_usesVariable rdf:type owl:ObjectProperty ;
 #    Data properties
 #################################################################
 
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasConfidence
+ag:dp_hasConfidence rdf:type owl:DatatypeProperty ;
+                    rdfs:subPropertyOf ag:dp_hasHypothesisParams .
+
+
 ###  http://www.semanticweb.org/AgentProgramParams/dp_hasConsistencyReport
 ag:dp_hasConsistencyReport rdf:type owl:DatatypeProperty ;
                            rdfs:subPropertyOf ag:dp_hasPOUAttribute ;
@@ -184,6 +219,18 @@ ag:dp_hasDescription rdf:type owl:DatatypeProperty ;
                      rdfs:range xsd:string .
 
 
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasEvidenceSnippet
+ag:dp_hasEvidenceSnippet rdf:type owl:DatatypeProperty ;
+                         rdfs:subPropertyOf ag:dp_hasHypothesisParams .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasExpressionText
+ag:dp_hasExpressionText rdf:type owl:DatatypeProperty ;
+                        rdfs:subPropertyOf ag:dp_hasSignalSourceAttribute ;
+                        rdfs:domain ag:class_Expression ;
+                        rdfs:range xsd:string .
+
+
 ###  http://www.semanticweb.org/AgentProgramParams/dp_hasGlobalVariableListName
 ag:dp_hasGlobalVariableListName rdf:type owl:DatatypeProperty ;
                                 rdfs:domain ag:class_GlobalVariableList ;
@@ -195,6 +242,12 @@ ag:dp_hasHardwareAddress rdf:type owl:DatatypeProperty ;
                          rdfs:subPropertyOf owl:topDataProperty ;
                          rdfs:domain ag:class_Variable ;
                          rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasHypothesisParams
+ag:dp_hasHypothesisParams rdf:type owl:DatatypeProperty ;
+                          rdfs:domain ag:class_SkillImplementationHypothesis ;
+                          rdfs:range xsd:string .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/dp_hasPLCProjectName
@@ -268,8 +321,24 @@ ag:dp_hasPortType rdf:type owl:DatatypeProperty ;
                   rdfs:range xsd:string .
 
 
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasRationale
+ag:dp_hasRationale rdf:type owl:DatatypeProperty ;
+                   rdfs:subPropertyOf ag:dp_hasHypothesisParams .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasSignalSourceAttribute
+ag:dp_hasSignalSourceAttribute rdf:type owl:DatatypeProperty .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasSkillDescription
+ag:dp_hasSkillDescription rdf:type owl:DatatypeProperty ;
+                          rdfs:domain ag:class_Skill ;
+                          rdfs:range xsd:string .
+
+
 ###  http://www.semanticweb.org/AgentProgramParams/dp_hasVariableAttribute
-ag:dp_hasVariableAttribute rdf:type owl:DatatypeProperty .
+ag:dp_hasVariableAttribute rdf:type owl:DatatypeProperty ;
+                           rdfs:subPropertyOf ag:dp_hasSignalSourceAttribute .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/dp_hasVariableName
@@ -304,6 +373,16 @@ ag:dp_hasVariableType rdf:type owl:DatatypeProperty ;
                       rdfs:subPropertyOf ag:dp_hasVariableAttribute ;
                       rdfs:domain ag:class_Variable ;
                       rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_inferredAt
+ag:dp_inferredAt rdf:type owl:DatatypeProperty ;
+                 rdfs:subPropertyOf ag:dp_hasHypothesisParams .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_inferredByModel
+ag:dp_inferredByModel rdf:type owl:DatatypeProperty ;
+                      rdfs:subPropertyOf ag:dp_hasHypothesisParams .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/dp_ioRawXml
@@ -360,6 +439,12 @@ ag:dp_isUnusedVar rdf:type owl:DatatypeProperty ;
 ag:class_CustomFBType rdf:type owl:Class ;
                       rdfs:subClassOf ag:class_FBType ;
                       rdfs:comment "Diese Klasse kennzeichnet Function Block Typen, die projekt spezifisch implementiert wurden und nicht aus einer Standardbibliothek stammen. Sie dient dazu, benutzerdefinierte Logikbausteine semantisch von generischen Standardfunktionen zu trennen, damit Analysen gezielter durchgeführt werden können. CustomFBTypes bilden häufig die eigentlichen Skills oder spezifische Steuerungslogik ab, zum Beispiel Bewegungen einer Achse, Prozessschritte oder die Abbildung einer Stationsfunktion. Im Knowledge Graph ist die Klasse hilfreich, um Abhängigkeiten zwischen Skills zu identifizieren, Schnittstellen zu vergleichen und zentrale Bausteine zu priorisieren. Aus PLCopen XML lassen sich solche Typen meist daran erkennen, dass sie als eigene POU Definitionen im Projekt auftauchen und keinen eindeutigen Standardnamen wie TON, TOF oder RS besitzen. In späteren Auswertungen kann diese Unterscheidung genutzt werden, um automatisiert eine Liste relevanter Skills zu extrahieren und Standardkomponenten wie Timer oder Trigger auszublenden. Insgesamt unterstützt class_CustomFBType somit die fachliche Strukturierung der Projektlogik und erleichtert die Dokumentation, weil projektbezogene Funktionen klar markiert werden."@de .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/class_Expression
+ag:class_Expression rdf:type owl:Class ;
+                    rdfs:subClassOf ag:class_SignalSource ;
+                    rdfs:comment "Bbehandelt Ausrücke, wie z.B. AND, OR etc. aus mehreren Variablen oder Werten. Hat zudem immer ExpressionText und einen Verweis auf die erzeugenden Elemente." .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/class_FBInstance
@@ -427,6 +512,10 @@ ag:class_SignalSource rdf:type owl:Class ;
 
 ###  http://www.semanticweb.org/AgentProgramParams/class_Skill
 ag:class_Skill rdf:type owl:Class .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/class_SkillImplementationHypothesis
+ag:class_SkillImplementationHypothesis rdf:type owl:Class .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/class_SourceLiteral

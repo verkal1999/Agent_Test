@@ -136,9 +136,8 @@ void ReactionManager::onEvent(const Event& ev) {
                 srows = PythonWorker::instance().call([&](){
                     py::module_ sys = py::module_::import("sys");
                     py::list path = sys.attr("path").cast<py::list>();
-                    path.append(R"(C:\Users\Alexander Verkhov\OneDrive\Dokumente\MPA\Implementierung_MPA\Test\src)");
-                    py::module_ kg  = py::module_::import("KG_Interface");
-                    py::object kgi  = kg.attr("KGInterface")();
+                    py::module_ kg = py::module_::import("msrguard.KG_Interface");
+                    py::object kgi = kg.attr("KGInterface")();
                     if (interruptedSkill.empty()) {
                         // Fallback: ggf. neutraler Skillname
                         return std::string(R"({"rows":[]})");
@@ -264,9 +263,8 @@ std::string ReactionManager::fetchMonitoringActionForFM(const std::string& fmIri
         return PythonWorker::instance().call([&]() -> std::string {
             py::module_ sys = py::module_::import("sys");
             py::list path   = sys.attr("path").cast<py::list>();
-            path.append(R"(C:\Users\Alexander Verkhov\OneDrive\Dokumente\MPA\Implementierung_MPA\Test\src)");
-            py::module_ kg  = py::module_::import("KG_Interface");
-            py::object kgi  = kg.attr("KGInterface")();
+            py::module_ kg = py::module_::import("msrguard.KG_Interface");
+            py::object kgi = kg.attr("KGInterface")();
             py::object res  = kgi.attr("getMonitoringActionForFailureMode")(fmIri.c_str());
             return std::string(py::str(res));
         });
@@ -277,9 +275,8 @@ std::string ReactionManager::fetchSystemReactionForFM(const std::string& fmIri) 
         return PythonWorker::instance().call([&]() -> std::string {
             py::module_ sys = py::module_::import("sys");
             py::list path   = sys.attr("path").cast<py::list>();
-            path.append(R"(C:\Users\Alexander Verkhov\OneDrive\Dokumente\MPA\Implementierung_MPA\Test\src)");
-            py::module_ kg  = py::module_::import("KG_Interface");
-            py::object kgi  = kg.attr("KGInterface")();
+            py::module_ kg = py::module_::import("msrguard.KG_Interface");
+            py::object kgi = kg.attr("KGInterface")();
             py::object res  = kgi.attr("getSystemreactionForFailureMode")(fmIri.c_str());
             //std::cout << std::string(py::str(res)) << "/n";
             return std::string(py::str(res));

@@ -39,7 +39,7 @@
       "TS_Endschalter_02",
       "TS_EndschalterEntlastung"
     ],
-    "reason_short": "Die POU JobMethode_Schablone enthält Ausgabesignale für Motor_Ansteuerung01 und Eingabesignale für LightSensor_01, LightSensor_02, TS_Endschalter_01, TS_Endschalter_02 und TS_EndschalterEntlastung.",
+    "reason_short": "Die POU JobMethode_Schablone enthält Ausgabesignale für Motor_Ansteuerung01 und Eingabesignale für LightSensor_01, LightSensor_02, TS_Endschallter_01, TS_Endschalter_02 und TS_EndschalterEntlastung.",
     "evidence": [
       "Motor_Ansteuerung01 := JobMethode_Name.Motor_Direction01;",
       "IF DirectionPointA := TRUE THEN DirectionPointB := FALSE; END_IF",

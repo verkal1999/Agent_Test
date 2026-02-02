@@ -130,7 +130,7 @@ int KgIngestionForce::execute(const Plan& p) {
             // Modul/Instanz 1x holen; Funktion 1x auflösen
             static py::object func;      // Cache über Aufrufe hinweg
             if (!func) {
-                py::module_ kg = py::module_::import("KG_Interface");
+                py::module_ kg = py::module_::import("msrguard.KG_Interface");
                 py::object kgi = kg.attr("KGInterface")();
                 func = kgi.attr("ingestOccuredFailure");
             }

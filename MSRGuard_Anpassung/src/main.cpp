@@ -1,72 +1,117 @@
 // main.cpp
 // Einstiegspunkt der Anwendung: initialisiert Python, den EventBus, den PLCMonitor
-// und verbindet die Komponenten gemäß deinem MPA-Draft (Trigger D1/D2/D3, KG-Abfragen usw.).
+// und verbindet die Komponenten. Zusätzlich: startet ExcHUiObserver bei evUnknownFM.
+
 #include "PLCMonitor.h"
 #include "EventBus.h"
 #include "ReactionManager.h"
 #include "AckLogger.h"
 #include "PythonRuntime.h"
 #include "PythonWorker.h"
-#include <atomic>
-#include <chrono>
-#include <iostream>
-#include <thread>
-#include <pybind11/embed.h>
+#include "ExcHUiObserver.h"
+
 #include "InventorySnapshot.h"
 #include "InventorySnapshotUtils.h"
 #include "FailureRecorder.h"
 #include "TimeBlogger.h"
-#include "ExcHAgentObserver.h"
 
+#include <pybind11/embed.h>
+
+#include <atomic>
+#include <chrono>
+#include <cstdlib>
+#include <filesystem>
+#include <iostream>
+#include <memory>
+#include <stdexcept>
+#include <thread>
 
 namespace py = pybind11;
 
-int main() {
-    // Interpreter starten
-    py::scoped_interpreter guard{};
+static void prepend_to_path_env(const std::filesystem::path& dir) {
+    if (dir.empty()) return;
 
-    // *** WICHTIG: GIL für den Main-Thread freigeben, damit andere Threads (PythonWorker)
-    //     Python ausführen können. Der GIL bleibt bis zum Ende von main() freigegeben.
+#ifdef _WIN32
+    const char* oldPathC = std::getenv("PATH");
+    std::string newPath = dir.string();
+    if (oldPathC && *oldPathC) newPath += ";" + std::string(oldPathC);
+    _putenv_s("PATH", newPath.c_str());
+#else
+    const char* oldPathC = std::getenv("PATH");
+    std::string newPath = dir.string();
+    if (oldPathC && *oldPathC) newPath += ":" + std::string(oldPathC);
+    setenv("PATH", newPath.c_str(), 1);
+#endif
+}
+
+int main() {
+    // 1) Interpreter starten (einmalig, global gehalten)
+    PythonRuntime::ensure_started();
+
+    // 2) GIL im Main-Thread freigeben, damit andere Threads (PythonWorker) Python ausführen können.
     static std::unique_ptr<py::gil_scoped_release> main_gil_release;
     main_gil_release = std::make_unique<py::gil_scoped_release>();
-    //py::gil_scoped_release main_gil_release;
 
-    // PythonWorker starten
+    // 3) Pfade zentral definieren (kommt aus CMake target_compile_definitions)
+    const std::string src_dir = KG_SRC_DIR;
+
+    // 4) Windows: venv-Python für std::system("python ...") bevorzugen
+    //    Annahme gemäß deiner Beschreibung:
+    //    - MSRGuardAnpassung und MA_Python_Agent liegen im selben Parent-Ordner
+    //    - venv liegt unter: MA_Python_Agent/.venv311
+#ifdef _WIN32
+    try {
+        const std::filesystem::path srcPath = std::filesystem::path(src_dir);
+        const std::filesystem::path msrGuardRoot = srcPath.parent_path();            // .../MSRGuardAnpassung
+        const std::filesystem::path workspaceRoot = msrGuardRoot.parent_path();      // .../(Parent von MSRGuardAnpassung)
+        const std::filesystem::path venvScripts =
+            workspaceRoot / "MA_Python_Agent" / ".venv311" / "Scripts";
+
+        const std::filesystem::path venvPython = venvScripts / "python.exe";
+        if (std::filesystem::exists(venvPython)) {
+            prepend_to_path_env(venvScripts);
+            std::cout << "[Env] PATH prepended with venv Scripts: " << venvScripts.string() << "\n";
+        } else {
+            std::cerr << "[Env] WARNING: venv python not found at: " << venvPython.string()
+                      << "\n[Env] std::system(\"python ...\") may use system Python.\n";
+        }
+    } catch (const std::exception& ex) {
+        std::cerr << "[Env] WARNING: could not adjust PATH for venv: " << ex.what() << "\n";
+    }
+#endif
+
+    // 5) PythonWorker starten (führt Python-Jobs in eigenem Thread aus)
     PythonWorker::instance().start();
 
-    PythonWorker::instance().call([]{
+    // 6) sys.path setzen + KG_Interface warm-up import (läuft im PythonWorker-Thread)
+    PythonWorker::instance().call([src_dir] {
         namespace py = pybind11;
 
-        // 1) Pfad setzen – KEIN py::str(char*), sondern sicher casten
         py::module_ sys  = py::module_::import("sys");
-        py::list    path = sys.attr("path").cast<py::list>();
+        py::list path = sys.attr("path").cast<py::list>();
 
-        // Hier den Ordner eintragen, der *KG_Interface.py* oder *KG_Interface/__init__.py* enthält:
-        // Tipp: UTF-8 Literal + std::string vermeidet char*-Spezialfälle.
-        const std::string src_dir = R"(C:\Users\Alexander Verkhov\OneDrive\Dokumente\MPA\Implementierung_MPA\MSRGuard\src)";
+        // Der Ordner, der KG_Interface.py enthält
         path.insert(0, py::cast(src_dir));
 
-        // 2) Optional: venv-Site-Packages hinzufügen (falls benutzt)
-        // py::module_::import("site").attr("addsitedir")(py::str(u8R"(C:\pfad\zu\venv\Lib\site-packages)"));
-
-        // 3) Diagnose: zeig uns die ersten Pfade
         py::print("[Py] exe=", sys.attr("executable"), " prefix=", sys.attr("prefix"));
-        py::print("[Py] sys.path[0..2] = ", sys.attr("path").attr("__getitem__")(0),
-                                    ", ", sys.attr("path").attr("__getitem__")(1),
-                                    ", ", sys.attr("path").attr("__getitem__")(2));
+        py::print("[Py] sys.path[0..2] = ",
+                  sys.attr("path").attr("__getitem__")(0), ", ",
+                  sys.attr("path").attr("__getitem__")(1), ", ",
+                  sys.attr("path").attr("__getitem__")(2));
 
-        // 4) Vorab prüfen, ob das Modul gefunden wird
-        py::object spec = py::module_::import("importlib.util").attr("find_spec")("KG_Interface");
+        py::object spec =
+            py::module_::import("importlib.util").attr("find_spec")("KG_Interface");
+
         if (spec.is_none()) {
             py::print("[KG] find_spec('KG_Interface') -> None ; sys.path=", sys.attr("path"));
             throw std::runtime_error("KG_Interface not found on sys.path");
         }
 
-        // 5) Warm-Up: tatsächlicher Import
         py::module_::import("KG_Interface");
         std::cout << "[KG] warm-up import done\n";
     });
 
+    // 7) PLCMonitor konfigurieren + connect
     PLCMonitor::Options opt;
     opt.endpoint       = "opc.tcp://DESKTOP-LNJR8E0:4840";
     opt.username       = "VDAdmin";
@@ -83,38 +128,47 @@ int main() {
     }
     std::cout << "[Client] connected\n";
 
-    // 6) EventBus + ReactionManager + Logger + Abos
+    // 8) EventBus + ReactionManager + Logger + Abos
     EventBus bus;
-    auto rm        = std::make_shared<ReactionManager>(mon, bus);
+
+    auto rm = std::make_shared<ReactionManager>(mon, bus);
     rm->setLogLevel(ReactionManager::LogLevel::Info);
-    auto subD2     = bus.subscribe_scoped(EventType::evD2, rm, 4);
-    //auto subD1 = bus.subscribe_scoped(EventType::evD1, rm, 4);
-    //auto subD3 = bus.subscribe_scoped(EventType::evD3, rm, 4);
+
+    auto subD2 = bus.subscribe_scoped(EventType::evD2, rm, 4);
+    // auto subD1 = bus.subscribe_scoped(EventType::evD1, rm, 4);
+    // auto subD3 = bus.subscribe_scoped(EventType::evD3, rm, 4);
+
     auto ackLogger = std::make_shared<AckLogger>();
     auto subPlan   = bus.subscribe_scoped(EventType::evSRPlanned, ackLogger, 1);
     auto subDone   = bus.subscribe_scoped(EventType::evSRDone,    ackLogger, 1);
-    auto subPlan2   = bus.subscribe_scoped(EventType::evMonActPlanned, ackLogger, 1);
-    auto subDone2   = bus.subscribe_scoped(EventType::evMonActDone,    ackLogger, 1);
-    auto subProcessFail   = bus.subscribe_scoped(EventType::evProcessFail,    ackLogger, 1);
-    auto subKGRes  = bus.subscribe_scoped(EventType::evKGResult,        rm, 4);
-    auto subKGTo   = bus.subscribe_scoped(EventType::evKGTimeout,       rm, 4);
+    auto subPlan2  = bus.subscribe_scoped(EventType::evMonActPlanned, ackLogger, 1);
+    auto subDone2  = bus.subscribe_scoped(EventType::evMonActDone,    ackLogger, 1);
+    auto subProcessFail = bus.subscribe_scoped(EventType::evProcessFail, ackLogger, 1);
+
+    auto subKGRes  = bus.subscribe_scoped(EventType::evKGResult,  rm, 4);
+    auto subKGTo   = bus.subscribe_scoped(EventType::evKGTimeout, rm, 4);
+
     auto rec = std::make_shared<FailureRecorder>(bus);
-    rec->subscribeAll();   // registriert Observer für alle EventTypes
+    rec->subscribeAll();
+
     auto subIngPlan = bus.subscribe_scoped(EventType::evIngestionPlanned, ackLogger, 1);
     auto subIngDone = bus.subscribe_scoped(EventType::evIngestionDone,    ackLogger, 1);
-    auto subUnknown = bus.subscribe_scoped(EventType::evUnknownFM, ackLogger, 1);
-    auto exhObserver = std::make_shared<ExcHAgentObserver>(bus);
-    
-    // 7) Trigger-Subscription → Event
+    auto subUnknown = bus.subscribe_scoped(EventType::evUnknownFM,        ackLogger, 1);
+
+    // 9) Neuer Observer: startet Python-UI bei evUnknownFM
+    //    scriptFile liegt unter src_dir (KG_SRC_DIR)
+    auto excHUiObserver = ExcHUiObserver::attach(bus, PY_SRC_DIR, "excH_agent_ui.py", 3);
+
+    // 10) Trigger-Subscriptions → Events (D1/D2/D3 + zusätzlich UnknownFM als Demo-Branch)
     mon.subscribeBool("OPCUA.TriggerD3", opt.nsIndex, 0.0, 10,
         [&](bool b, const UA_DataValue& dv) {
             static std::atomic<bool> initialized{false};
             static std::atomic<bool> prev{false};
 
             std::cout << "[TrigD3] b=" << (b ? "true" : "false")
-                    << " sourceTs=" << static_cast<UA_UInt64>(dv.sourceTimestamp)
-                    << " serverTs=" << static_cast<UA_UInt64>(dv.serverTimestamp)
-                    << "\n";
+                      << " sourceTs=" << static_cast<UA_UInt64>(dv.sourceTimestamp)
+                      << " serverTs=" << static_cast<UA_UInt64>(dv.serverTimestamp)
+                      << "\n";
 
             if (!initialized.exchange(true)) { prev = b; return; }
             if (!b) { prev = false; return; }
@@ -123,7 +177,7 @@ int main() {
             mon.post([&]{
                 InventorySnapshot inv;
                 const bool ok = buildInventorySnapshotNow(mon, "PLC", inv);
-                std::cout << "[Debug] Snapshot D3 = " << (ok ? "OK":"FAIL") << "\n";
+                std::cout << "[Debug] Snapshot D3 = " << (ok ? "OK" : "FAIL") << "\n";
                 dumpInventorySnapshot(inv);
 
                 const auto now = std::chrono::steady_clock::now();
@@ -131,18 +185,19 @@ int main() {
 
                 bus.post({ EventType::evD3, now, std::any{ D2Snapshot{ corr, std::move(inv) } } });
                 bus.post({ EventType::evUnknownFM, now,
-                        std::any{ UnknownFMAck{ corr, "UnknownFM", "Triggered by D3" } } });
+                           std::any{ UnknownFMAck{ corr, "UnknownFM", "Triggered by D3" } } });
             });
         });
+
     mon.subscribeBool("OPCUA.TriggerD1", opt.nsIndex, 0.0, 10,
         [&](bool b, const UA_DataValue& dv) {
             static std::atomic<bool> initialized{false};
             static std::atomic<bool> prev{false};
 
             std::cout << "[TrigD1] b=" << (b ? "true" : "false")
-                    << " sourceTs=" << static_cast<UA_UInt64>(dv.sourceTimestamp)
-                    << " serverTs=" << static_cast<UA_UInt64>(dv.serverTimestamp)
-                    << "\n";
+                      << " sourceTs=" << static_cast<UA_UInt64>(dv.sourceTimestamp)
+                      << " serverTs=" << static_cast<UA_UInt64>(dv.serverTimestamp)
+                      << "\n";
 
             if (!initialized.exchange(true)) { prev = b; return; }
             if (!b) { prev = false; return; }
@@ -151,7 +206,7 @@ int main() {
             mon.post([&]{
                 InventorySnapshot inv;
                 const bool ok = buildInventorySnapshotNow(mon, "PLC", inv);
-                std::cout << "[Debug] Snapshot D1 = " << (ok ? "OK":"FAIL") << "\n";
+                std::cout << "[Debug] Snapshot D1 = " << (ok ? "OK" : "FAIL") << "\n";
                 dumpInventorySnapshot(inv);
 
                 const auto now = std::chrono::steady_clock::now();
@@ -159,18 +214,19 @@ int main() {
 
                 bus.post({ EventType::evD1, now, std::any{ D2Snapshot{ corr, std::move(inv) } } });
                 bus.post({ EventType::evUnknownFM, now,
-                        std::any{ UnknownFMAck{ corr, "UnknownFM", "Triggered by D1" } } });
+                           std::any{ UnknownFMAck{ corr, "UnknownFM", "Triggered by D1" } } });
             });
         });
+
     mon.subscribeBool("OPCUA.TriggerD2", opt.nsIndex, 0.0, 10,
         [&](bool b, const UA_DataValue& dv) {
             static std::atomic<bool> initialized{false};
             static std::atomic<bool> prev{false};
 
             std::cout << "[TrigD2] b=" << (b ? "true" : "false")
-                    << " sourceTs=" << static_cast<UA_UInt64>(dv.sourceTimestamp)
-                    << " serverTs=" << static_cast<UA_UInt64>(dv.serverTimestamp)
-                    << "\n";
+                      << " sourceTs=" << static_cast<UA_UInt64>(dv.sourceTimestamp)
+                      << " serverTs=" << static_cast<UA_UInt64>(dv.serverTimestamp)
+                      << "\n";
 
             if (!initialized.exchange(true)) { prev = b; return; }
             if (!b) { prev = false; return; }
@@ -179,7 +235,7 @@ int main() {
             mon.post([&]{
                 InventorySnapshot inv;
                 const bool ok = buildInventorySnapshotNow(mon, "PLC", inv);
-                std::cout << "[Debug] Snapshot D2 = " << (ok ? "OK":"FAIL") << "\n";
+                std::cout << "[Debug] Snapshot D2 = " << (ok ? "OK" : "FAIL") << "\n";
                 dumpInventorySnapshot(inv);
 
                 const auto now = std::chrono::steady_clock::now();
@@ -187,40 +243,22 @@ int main() {
 
                 bus.post({ EventType::evD2, now, std::any{ D2Snapshot{ corr, std::move(inv) } } });
                 bus.post({ EventType::evUnknownFM, now,
-                        std::any{ UnknownFMAck{ corr, "UnknownFM", "Triggered by D2" } } });
+                           std::any{ UnknownFMAck{ corr, "UnknownFM", "Triggered by D2" } } });
             });
         });
-    /*
-    std::atomic<bool> d2Prev{false};
-    mon.subscribeBool("OPCUA.TriggerD2", opt.nsIndex, 0.0, 10, [&](bool b, const UA_DataValue&) {
-        static std::atomic<bool> d2Prev{false};
-        if (!b) { d2Prev = false; return; }
-        if (d2Prev.exchange(true)) return;
 
-        mon.post([&]{
-            InventorySnapshot inv;
-            const bool ok = buildInventorySnapshotNow(mon, "PLC", inv);
-            std::cout << "[Debug] buildInventorySnapshotNow = " << (ok ? "OK":"FAIL") << "\n";
-            dumpInventorySnapshot(inv);  // <— kompletter Dump hier
+    std::cout << "[Client] subscribed triggers\n";
 
-            const std::string corr = "evD2-" + std::to_string(
-                std::chrono::steady_clock::now().time_since_epoch().count());
-            bus.post({ EventType::evD2, std::chrono::steady_clock::now(),
-                    std::any{ D2Snapshot{ corr, std::move(inv) } } });
-        });
-    }); */
-    std::cout << "[Client] subscribed: ns=4;s=TriggerD2\n";
-        
     auto tb = std::make_shared<TimeBlogger>(bus);
     tb->subscribeAll();
 
-    // 8) Main-Loop
+    // 11) Main-Loop
     for (;;) {
-        mon.runIterate(50);   
+        mon.runIterate(50);
         mon.processPosted(16);
         bus.process(16);
-        // std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
     // (Nie erreicht) PythonWorker::instance().stop();
+    return 0;
 }

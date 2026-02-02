@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 from typing import Optional, Dict, List, Tuple, Set
-
+import hashlib
 from rdflib import Graph, Literal, Namespace, URIRef
 from rdflib.namespace import RDF, OWL, XSD, RDFS
 
@@ -114,6 +114,7 @@ class KGManager:
         self.graph.remove((None, DP.hasConsistencyReport, None))
         self.graph.remove((None, DP.isUnusedVar, None))
         self.graph.remove((None, DP.isUnusedPort, None))
+        self.graph.remove((None, DP.isGEMMAOutputLayer, None))
         
         print(f"Bereinigung abgeschlossen. {count} Knoten entfernt.")
 
@@ -447,58 +448,257 @@ class KGManager:
                     self.graph.add((assign_uri, OP.assignsToPort, formal_port_uri))
                     self.graph.add((assign_uri, OP.assignsFrom, source_uri))
         
-        # 2. NEU: Unused Detection laufen lassen
+        # Calls sind jetzt im KG -> jetzt ST Assignments parsen und an Calls hängen
+        self.analyze_st_assignments()
+
+        #OutputLayer hardwarebasiert markieren (benötigt Calls + STAssigns)
+        self.mark_gemma_output_layer_by_hardware()
+
+        # Unused Detection laufen lassen
         self.analyze_unused_elements()
         
-        # 3. Reports erstellen
+        # Reports erstellen
         self.generate_reports()
         
         print("Analyse vollständig abgeschlossen.")
+
+    def analyze_st_assignments(self) -> None:
+        """
+        Parst ST-Zuweisungen wie:
+          GVL_X.Y := Instanz.Port;
+        und erzeugt daraus ParameterAssignment-Knoten mit:
+          op:assignsFrom        -> SignalSource (typisch PortInstance)
+          op:assignsToVariable  -> Variable (LHS)
+        Optional: hängt das Assignment auch an den passenden POUCall derselben Instanz.
+        """
+        if not self.graph:
+            return
+
+        # Property ergänzen, weil es bisher nur assignsToPort gibt
+        self._ensure_obj_property(
+            OP.assignsToVariable,
+            AG.class_ParameterAssignment,
+            AG.class_Variable,
+            comment="Wohin geht das Signal bei ST-Zuweisung? (LHS Variable)"
+        )
+
+        # Regex für ST Assignments (eine Zeile)
+        # LHS darf Punkte enthalten, RHS wird später geprüft
+        assign_re = re.compile(
+            r"^\s*(?P<lhs>[A-Za-z_][A-Za-z0-9_\.]*)\s*:=\s*(?P<rhs>[^;]+?)\s*;",
+            flags=re.M
+        )
+
+        # RHS Pattern Instanz.Port (keine globalen Präfixe)
+        rhs_inst_port_re = re.compile(r"^(?P<inst>[A-Za-z_][A-Za-z0-9_]*)\s*\.\s*(?P<port>[A-Za-z_][A-Za-z0-9_]*)$")
+
+        for caller_pou_uri in self.graph.subjects(RDF.type, AG.class_Program):
+            code_lit = next(self.graph.objects(caller_pou_uri, DP.hasPOUCode), None)
+            if not code_lit:
+                continue
+
+            caller_name = self._get_name(caller_pou_uri, [DP.hasProgramName, DP.hasPOUName])
+            code = str(code_lit)
+
+            idx = 0
+            for m in assign_re.finditer(code):
+                lhs = m.group("lhs").strip()
+                rhs = m.group("rhs").strip()
+
+                # Nur Fälle Instanz.Port; (genau dein Use Case)
+                rhs_m = rhs_inst_port_re.match(rhs)
+                if not rhs_m:
+                    continue
+
+                inst_name = rhs_m.group("inst").strip()
+                port_name = rhs_m.group("port").strip()
+
+                # LHS Variable URI auflösen (global oder existierend)
+                lhs_norm = self._normalize_name(lhs)
+                lhs_var_uri = self._var_lookup.get(lhs_norm)
+                if not lhs_var_uri:
+                    # falls es wie GVL/OPCUA aussieht, als global anlegen
+                    if lhs_norm.startswith("gvl") or lhs_norm.startswith("opcua"):
+                        lhs_var_uri = self._ensure_global_variable(lhs)
+                    else:
+                        # sonst als Variable (lokal) erzeugen
+                        lhs_var_uri = self._make_uri(f"Var_{caller_name}_{lhs}")
+
+                # RHS PortInstance als SignalSource auflösen
+                # Das nutzt exakt deine vorhandene Logik inkl. instantiatesPort Verknüpfung
+                source_uri = self._resolve_signal_source(f"{inst_name}.{port_name}", caller_name)
+
+                # Assignment Knoten erzeugen
+                idx += 1
+                assign_uri = self._make_uri(f"STAssign_{caller_name}_{inst_name}_{port_name}_{idx}")
+
+                self.graph.add((assign_uri, RDF.type, AG.class_ParameterAssignment))
+                self.graph.add((assign_uri, OP.assignsFrom, source_uri))
+                self.graph.add((assign_uri, OP.assignsToVariable, lhs_var_uri))
+
+                # Optional: an den passenden POUCall hängen (für deine gewünschte Konsistenz)
+                # Wir suchen einen Call in diesem Programm, der dieselbe Caller-Variable nutzt
+                inst_var_uri = self._var_lookup.get(self._normalize_name(f"Var_{caller_name}_{inst_name}"))
+                if inst_var_uri:
+                    candidate_calls = []
+                    for call_uri in self.graph.objects(caller_pou_uri, OP.containsPOUCall):
+                        cv = next(self.graph.objects(call_uri, OP.hasCallerVariable), None)
+                        if cv and URIRef(cv) == inst_var_uri:
+                            candidate_calls.append(URIRef(call_uri))
+
+                    # Wenn es mehrere Calls gibt, nimm den ersten (stabil sortiert)
+                    if candidate_calls:
+                        candidate_calls.sort(key=lambda u: self._get_local_name(str(u)))
+                        self.graph.add((candidate_calls[0], OP.hasAssignment, assign_uri))
+
+
+        # Property ergänzen, weil es bisher nur assignsToPort gibt
+    def _ensure_obj_property(self, prop_uri: URIRef, domain: URIRef, range_: URIRef, comment: str | None = None) -> None:
+        """Stellt sicher, dass eine op-Property als ObjectProperty existiert."""
+        self.graph.add((prop_uri, RDF.type, OWL.ObjectProperty))
+        self.graph.add((prop_uri, RDFS.domain, domain))
+        self.graph.add((prop_uri, RDFS.range, range_))
+        if comment:
+            self.graph.add((prop_uri, RDFS.comment, Literal(comment)))
+
 
     # ----------------------------------------------------------------------- #
     # Resolution Logic
     # ----------------------------------------------------------------------- #
     def _resolve_signal_source(self, expression: str, caller_pou_name: str) -> URIRef:
-        expr_clean = expression.replace("NOT ", "").replace("-", "").replace("(", "").replace(")", "").strip()
-        norm_expr = self._normalize_name(expr_clean)
+        expr_raw = (expression or "").strip()
 
-        # 1. Literal Check
-        if (re.match(r"^[-+]?\d", expr_clean) or 
-            expr_clean.startswith("T#") or expr_clean.startswith("TIME#") or 
-            expr_clean.startswith("'") or 
-            expr_clean.upper() in ["TRUE", "FALSE"]):
+        # minimal cleaning (wie bei dir)
+        expr_clean = (
+            expr_raw
+            .replace("NOT ", "")
+            .replace("(", "")
+            .replace(")", "")
+            .strip()
+        )
+
+        expr_upper = expr_clean.upper()
+
+        # --- Helper (Fix C): lokale Variable sauber anlegen + lookup pflegen ---
+        def ensure_local_var(var_name: str) -> URIRef:
+            uri = self._make_uri(f"Var_{caller_pou_name}_{var_name}")
+            if (uri, RDF.type, AG.class_Variable) not in self.graph:
+                self.graph.add((uri, RDF.type, AG.class_Variable))
+                # optional, aber oft hilfreich: als SignalSource typisieren
+                self.graph.add((uri, RDF.type, AG.class_SignalSource))
+                self.graph.add((uri, DP.hasVariableName, Literal(var_name)))
+                self.graph.add((uri, DP.hasVariableScope, Literal("local")))
+            # Key-Format muss zu deinem Code passen (du suchst nach Var_{caller}_{name})
+            self._var_lookup[self._normalize_name(f"Var_{caller_pou_name}_{var_name}")] = uri
+            return uri
+
+        # --- Helper: Expression (optional, passend zu deinem Fix B) ---
+        def ensure_expression(expr_text: str) -> URIRef:
+            import hashlib
+            digest = hashlib.md5(f"{caller_pou_name}|{expr_text}".encode("utf-8")).hexdigest()[:10]
+            expr_uri = self._make_uri(f"Expression_{caller_pou_name}_{digest}")
+            if (expr_uri, RDF.type, AG.class_Expression) not in self.graph:
+                self.graph.add((expr_uri, RDF.type, AG.class_Expression))
+                self.graph.add((expr_uri, RDF.type, AG.class_SignalSource))
+                # Falls dein Property anders heißt: hier anpassen
+                self.graph.add((expr_uri, DP.hasExpressionText, Literal(expr_text)))
+
+                # Optional: erkannte Subquellen verlinken (konservativ)
+                token_re = re.compile(r"[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*")
+                tokens = set(token_re.findall(expr_text))
+                for t in sorted(tokens):
+                    tu = t.upper()
+                    if tu in {"TRUE", "FALSE", "AND", "OR", "XOR", "NOT", "MOD", "DIV"}:
+                        continue
+
+                    nt = self._normalize_name(t)
+                    if nt.startswith("gvl") or nt.startswith("opcua") or nt.startswith("gv"):
+                        src = self._ensure_global_variable(t)
+                        # Falls dein Property anders heißt: hier anpassen
+                        self.graph.add((expr_uri, OP.isExpressionCreatedBy, src))
+                    else:
+                        lk = self._normalize_name(f"Var_{caller_pou_name}_{t}")
+                        if lk in self._var_lookup:
+                            self.graph.add((expr_uri, OP.isExpressionCreatedBy, self._var_lookup[lk]))
+
+                for lit in set(re.findall(r"\b(?:TIME#|T#)[0-9A-Za-z_.]+\b", expr_text, flags=re.I)):
+                    self.graph.add((expr_uri, OP.isExpressionCreatedBy, self._ensure_literal_source(lit)))
+
+            return expr_uri
+
+        # 0) Direkt im Lookup? (dein Verhalten beibehalten)
+        norm_full = self._normalize_name(expr_clean)
+        if norm_full in self._var_lookup:
+            return self._var_lookup[norm_full]
+
+        # 1) Literal Check (dein Verhalten beibehalten)
+        if (
+            re.match(r"^[-+]?\d", expr_clean) or
+            expr_upper.startswith(("T#", "TIME#")) or
+            (expr_clean.startswith("'") and expr_clean.endswith("'")) or
+            expr_upper in ["TRUE", "FALSE"]
+        ):
             return self._ensure_literal_source(expr_clean)
 
-        # 2. Dot-Access (Externe Instanz: fb.Out)
+        # 2) Global Check (wie bei dir, aber mit kleinem Guard: nur "var-path", keine Operatoren)
+        # Das verhindert, dass "GVL.X AND Y" als Global-Variable missinterpretiert wird.
         if "." in expr_clean:
-            parts = expr_clean.split(".")
-            prefix = parts[0]
-            suffix = parts[1]
-            norm_prefix = self._normalize_name(prefix)
+            first = expr_clean.split(".", 1)[0].strip()
+            norm_first = self._normalize_name(first)
+            norm_full = self._normalize_name(expr_clean)
 
-            # Global Check
-            if norm_expr in self._var_lookup: return self._var_lookup[norm_expr]
-            if norm_prefix.startswith("gvl") or norm_prefix.startswith("opcua"):
+            if norm_full in self._var_lookup:
+                return self._var_lookup[norm_full]
+
+            looks_like_path = re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)+", expr_clean) is not None
+            if looks_like_path and (norm_first.startswith("gvl") or norm_first.startswith("opcua") or norm_first.startswith("gv")):
                 return self._ensure_global_variable(expr_clean)
 
-            # Lokale Instanz
+        # 3) Dot-Access NUR wenn exakt "Instanz.Port" (dein Ansatz) + Fix A Guard
+        inst_port_m = re.fullmatch(
+            r"(?P<prefix>[A-Za-z_][A-Za-z0-9_]*)\s*\.\s*(?P<suffix>[A-Za-z_][A-Za-z0-9_]*)",
+            expr_clean
+        )
+        if inst_port_m:
+            prefix = inst_port_m.group("prefix")
+            suffix = inst_port_m.group("suffix")
+
             local_key = self._normalize_name(f"Var_{caller_pou_name}_{prefix}")
             inst_var_uri = self._var_lookup.get(local_key)
+
+            # Fix C: wenn unbekannt, sauber als lokale Variable anlegen
             if not inst_var_uri:
-                inst_var_uri = self._make_uri(f"Var_{caller_pou_name}_{prefix}")
+                inst_var_uri = ensure_local_var(prefix)
 
-            fb_inst_uri = self._ensure_fb_instance(inst_var_uri)
-            fb_type_uri = next(self.graph.objects(fb_inst_uri, OP.isInstanceOfFBType), None)
-            
-            return self._ensure_port_instance(fb_inst_uri, fb_type_uri, suffix)
+            # Fix A: nur als FBInst behandeln, wenn wirklich FB-Instanz
+            is_fb_instance = (
+                (inst_var_uri, OP.representsFBInstance, None) in self.graph or
+                (inst_var_uri, DP.hasVariableType, None) in self.graph
+            )
 
-        # 3. Simple Name (Lokal oder Input/Output)
+            if is_fb_instance:
+                fb_inst_uri = self._ensure_fb_instance(inst_var_uri)
+                fb_type_uri = next(self.graph.objects(fb_inst_uri, OP.isInstanceOfFBType), None)
+                return self._ensure_port_instance(fb_inst_uri, fb_type_uri, suffix)
+
+            # sonst: struct.member o.ä. -> als lokale Variable behandeln
+            return ensure_local_var(expr_clean)
+
+        # 4) Expression Detection (optional, aber verhindert deine "Var_*__leerz__=__leerz__" Artefakte)
+        if (
+            re.search(r"[+\-*/=<>\s]", expr_raw) or
+            re.search(r"\b(AND|OR|XOR|MOD|DIV|NOT)\b", expr_raw, flags=re.I) or
+            "(" in expr_raw or ")" in expr_raw
+        ):
+            return ensure_expression(expr_raw.strip())
+
+        # 5) Simple Name (lokal)
         local_key = self._normalize_name(f"Var_{caller_pou_name}_{expr_clean}")
         if local_key in self._var_lookup:
             return self._var_lookup[local_key]
-            
-        # Fallback (Erstelle Variable)
-        return self._make_uri(f"Var_{caller_pou_name}_{expr_clean}")
+
+        # 6) Fallback (Fix C): als lokale Variable konsistent anlegen
+        return ensure_local_var(expr_clean)
 
     # ----------------------------------------------------------------------- #
     # Helper Creation Methods
@@ -546,6 +746,73 @@ class KGManager:
             self._var_lookup[self._normalize_name(var_name)] = uri
         return uri
 
+    def _ensure_local_variable(self, var_name: str, caller_pou_name: str) -> URIRef:
+        """
+        Erzeugt eine lokale Variable im Stil des KG_Loaders:
+        URI: Var_{callerPOU}_{varName}
+        Triples: rdf:type Variable + hasVariableName
+        """
+        uri = self._make_uri(f"Var_{caller_pou_name}_{var_name}")
+
+        if (uri, RDF.type, AG.class_Variable) not in self.graph:
+            self.graph.add((uri, RDF.type, AG.class_Variable))
+            # Optional aber sinnvoll: Variable auch als SignalSource typisieren
+            self.graph.add((uri, RDF.type, AG.class_SignalSource))
+            self.graph.add((uri, DP.hasVariableName, Literal(var_name)))
+
+        # Lookup-Key exakt wie in _resolve_signal_source genutzt wird
+        local_key = self._normalize_name(f"Var_{caller_pou_name}_{var_name}")
+        self._var_lookup[local_key] = uri
+        return uri
+
+
+    def _ensure_expression_source(self, expression_text: str, caller_pou_name: str) -> URIRef:
+        """
+        Erzeugt eine Expression-Instanz (deine neue Klasse) als SignalSource.
+        dp:hasExpressionText = expression_text
+        op:isExpressionCreatedBy -> optionale Links auf erkannte Sub-Sources
+        """
+        # stabile kurze ID
+        digest = hashlib.md5(f"{caller_pou_name}|{expression_text}".encode("utf-8")).hexdigest()[:10]
+        expr_uri = self._make_uri(f"Expression_{caller_pou_name}_{digest}")
+
+        if (expr_uri, RDF.type, AG.class_Expression) not in self.graph:
+            self.graph.add((expr_uri, RDF.type, AG.class_Expression))
+            self.graph.add((expr_uri, RDF.type, AG.class_SignalSource))
+            self.graph.add((expr_uri, DP.hasExpressionText, Literal(expression_text)))
+
+            # OPTIONAL: ExpressionCreatedBy für bereits bekannte Variablen/Literale
+            # (konservativ: wir erzeugen hier keine neuen Variablen)
+            # Variablen-Tokens (inkl. dotted paths)
+            token_re = re.compile(r"[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*")
+            tokens = set(token_re.findall(expression_text))
+
+            # TIME-Literale + Zahlen-Literale
+            time_lits = set(re.findall(r"\b(?:TIME#|T#)[0-9A-Za-z_.]+\b", expression_text))
+            num_lits = set(re.findall(r"(?<![A-Za-z_])[-+]?\d+(?:\.\d+)?(?![A-Za-z_])", expression_text))
+
+            for t in sorted(tokens):
+                tu = t.upper()
+                if tu in {"TRUE","FALSE","AND","OR","XOR","NOT","MOD","DIV"}:
+                    continue
+                # global var (GVL*/OPCUA*)
+                if self._normalize_name(t).startswith("gvl") or self._normalize_name(t).startswith("opcua"):
+                    src = self._ensure_global_variable(t)
+                    self.graph.add((expr_uri, OP.isExpressionCreatedBy, src))
+                    continue
+
+                # local var nur wenn bekannt
+                lk = self._normalize_name(f"Var_{caller_pou_name}_{t}")
+                if lk in self._var_lookup:
+                    self.graph.add((expr_uri, OP.isExpressionCreatedBy, self._var_lookup[lk]))
+
+            for lit in sorted(time_lits):
+                self.graph.add((expr_uri, OP.isExpressionCreatedBy, self._ensure_literal_source(lit)))
+            for lit in sorted(num_lits):
+                self.graph.add((expr_uri, OP.isExpressionCreatedBy, self._ensure_literal_source(lit)))
+
+        return expr_uri
+
     def _ensure_literal_source(self, literal_val: str) -> URIRef:
         clean = literal_val.replace("#", "_").replace("'", "").strip()
         lit_uri = self._make_uri(f"Literal_{clean}")
@@ -587,3 +854,116 @@ class KGManager:
     def _make_uri(self, name: str) -> URIRef:
         safe = name.replace("^", "__dach__").replace(".", "__dot__").replace(" ", "__leerz__").replace("'", "").replace("<", "").replace(">", "")
         return URIRef(AG + safe)
+    
+# --------------------------------------------------------------------------- #
+# Finden des GEMMA Output-Layer
+# --------------------------------------------------------------------------- #
+    def mark_gemma_output_layer_by_hardware(self) -> None:
+        """
+        dp:isGEMMAOutputLayer := TRUE wenn:
+        A) POU wird von einem Program (ag:class_Program) via POUCall aufgerufen
+            und in diesem Call gibt es ein Assignment zu einer HW-Variable (dp:hasHardwareAddress)
+        ODER
+        B) POU schreibt in ihrem eigenen ST Code auf HW-Variablen (dp:hasHardwareAddress).
+        """
+        if not self.graph:
+            return
+
+        # Property sicherstellen + alte Markierungen entfernen (wichtig, sonst bleiben Stale Flags)
+        self._ensure_bool_flag_property(DP.isGEMMAOutputLayer)
+        self.graph.remove((None, DP.isGEMMAOutputLayer, None))
+
+        hw_vars: set[URIRef] = set(self.graph.subjects(DP.hasHardwareAddress, None))
+        if not hw_vars:
+            # Falls du HW nur über ioRawXml erkennst, kannst du optional erweitern:
+            # hw_vars = set(self.graph.subjects(DP.ioRawXml, None))
+            if self.debug:
+                print("[WARN] Keine Variablen mit dp:hasHardwareAddress gefunden. OutputLayer-Markierung übersprungen.")
+            return
+
+        # ------------------------------------------------------------------
+        # A) POUs, die von PROGRAMMEN aufgerufen werden und deren Call HW treibt
+        # ------------------------------------------------------------------
+        called_by_program: set[URIRef] = set()
+
+        for call_uri in self.graph.subjects(RDF.type, AG.class_POUCall):
+            caller_pou = next(self.graph.subjects(OP.containsPOUCall, call_uri), None)
+            if not caller_pou:
+                continue
+            if (caller_pou, RDF.type, AG.class_Program) not in self.graph:
+                continue  # "aus einem beliebigen Programm"
+
+            called_pou = next(self.graph.objects(call_uri, OP.callsPOU), None)
+            if not called_pou:
+                continue
+
+            called_by_program.add(URIRef(called_pou))
+
+            # Entscheidend: Call hat Assignment zu HW-Variable?
+            for a_uri in self.graph.objects(call_uri, OP.hasAssignment):
+                lhs_var = next(self.graph.objects(a_uri, OP.assignsToVariable), None)
+                if lhs_var and URIRef(lhs_var) in hw_vars:
+                    self.graph.add((URIRef(called_pou), DP.isGEMMAOutputLayer, Literal(True, datatype=XSD.boolean)))
+                    break
+
+        # Fallback (robuster): Falls Assignments nicht am Call hängen sollten,
+        # markiere FBTypes, wenn ein HW-Assignment von einer PortInstance stammt,
+        # deren FBType überhaupt von einem Program aufgerufen wird.
+        for a_uri in self.graph.subjects(RDF.type, AG.class_ParameterAssignment):
+            lhs_var = next(self.graph.objects(a_uri, OP.assignsToVariable), None)
+            if not lhs_var or URIRef(lhs_var) not in hw_vars:
+                continue
+
+            src = next(self.graph.objects(a_uri, OP.assignsFrom), None)
+            if not src:
+                continue
+
+            # Nur PortInstance -> damit ist klar, dass HW von Instanz.Port kommt
+            if (URIRef(src), RDF.type, AG.class_PortInstance) not in self.graph:
+                continue
+
+            parent_inst = next(self.graph.objects(URIRef(src), OP.isPortOfInstance), None)
+            if not parent_inst:
+                continue
+
+            fb_type = next(self.graph.objects(URIRef(parent_inst), OP.isInstanceOfFBType), None)
+            if fb_type and URIRef(fb_type) in called_by_program:
+                self.graph.add((URIRef(fb_type), DP.isGEMMAOutputLayer, Literal(True, datatype=XSD.boolean)))
+
+        # ------------------------------------------------------------------
+        # B) POUs, die in ihrem eigenen Code direkt HW-Variablen beschreiben
+        # ------------------------------------------------------------------
+        """
+        assign_re = re.compile(
+            r"^\s*(?P<lhs>[A-Za-z_][A-Za-z0-9_\.]*)\s*:=\s*[^;]+?\s*;",
+            flags=re.M
+        )
+
+        for pou_uri in self.graph.subjects(RDF.type, None):
+            # Nur Programme und FBTypes (keine Standard FBTypes)
+            if not any((pou_uri, RDF.type, t) in self.graph for t in [AG.class_Program, AG.class_FBType]):
+                continue
+            if (pou_uri, RDF.type, AG.class_StandardFBType) in self.graph:
+                continue
+
+            code_lit = next(self.graph.objects(pou_uri, DP.hasPOUCode), None)
+            if not code_lit:
+                continue
+
+            code = str(code_lit)
+            for m in assign_re.finditer(code):
+                lhs = m.group("lhs").strip()
+                lhs_norm = self._normalize_name(lhs)
+
+                lhs_var_uri = self._var_lookup.get(lhs_norm)
+                if not lhs_var_uri:
+                    # Falls LHS eine globale Variable ist, aber noch nicht im KG existiert
+                    if lhs_norm.startswith("gvl") or lhs_norm.startswith("opcua"):
+                        lhs_var_uri = self._ensure_global_variable(lhs)
+
+                if lhs_var_uri and URIRef(lhs_var_uri) in hw_vars:
+                    self.graph.add((URIRef(pou_uri), DP.isGEMMAOutputLayer, Literal(True, datatype=XSD.boolean)))
+                    break
+        """
+    
+    

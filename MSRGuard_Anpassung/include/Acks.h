@@ -93,3 +93,22 @@ struct DStateAck {
     std::string stateName;            // "D1" / "D2" / "D3"
     std::string summary;              // optionaler Kurztext
 };
+
+struct AgentStartAck {
+    std::string correlationId;
+
+    // Kontext, warum Agent startet:
+    std::string triggerEvent;   // z.B. "evUnknownFM"
+    std::string processName;    // aus UnknownFMAck
+    std::string summary;        // aus UnknownFMAck
+
+    // Ergebnis der Ingestion:
+    int rc = 0;                 // aus IngestionDoneAck.rc
+    std::string message;        // aus IngestionDoneAck.message
+};
+
+struct AgentDoneAck {
+    std::string correlationId;
+    int rc = 1;
+    std::string resultJson;     // optional (später Agent-Result zurück ans C++)
+};

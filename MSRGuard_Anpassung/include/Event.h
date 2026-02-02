@@ -20,7 +20,8 @@ enum class EventType {
     evKGResult, evKGTimeout,
     evIngestionPlanned, evIngestionDone,
     evMonActFinished, evSysReactFinished,
-    evUnknownFM, evGotFM
+    evUnknownFM, evGotFM,
+    evAgentStart, evAgentDone, evIngestionDoneFromUFM
 };
 // Minimale Event-Hülle: Typ, Zeitstempel, generische Payload.
 // Die Payload wird per std::any auf eine konkrete Struktur aus Acks.h gecastet.

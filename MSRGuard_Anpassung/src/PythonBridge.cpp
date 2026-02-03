@@ -8,7 +8,7 @@ void PythonBridge::ingestUnknownFailure(const std::string &id,
                                         const std::string &summary) {
     PythonRuntime::ensure_started();
     py::gil_scoped_acquire gil;
-    py::module_ kg = py::module_::import("KG_Interface");
+    py::module_ kg = py::module_::import("KGInterface");
     py::object kgi = kg.attr("KGInterface")();
     // Übergabe: id, None für failureModeIRI, leere Listen, etc.
     kgi.attr("ingestOccuredFailure")(id.c_str(), py::none(), py::none(), py::none(),

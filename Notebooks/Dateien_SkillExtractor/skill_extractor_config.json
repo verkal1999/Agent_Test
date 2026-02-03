@@ -1,0 +1,125 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-02-02T06:30:58.447550+00:00",
+  "abbreviations": {
+    "HRL": "Hochregallager (storage & retrieval / high-bay warehouse)",
+    "RBG": "Regalbediengerät (warehouse gantry/robot)",
+    "MBS": "Multi-Bearbeitungsstation (multi processing station)",
+    "VSG": "Vakuum-Sauggreifer (vacuum suction gripper / pick-and-place)",
+    "SST": "Sortierstrecke / Sortierstation (sorting station/line)",
+    "CS": "Conveyor & Stanzmaschine (conveyor + punching station)",
+    "CB": "Conveyor Belt (Förderband)",
+    "PD": "Pushing Device (Schiebeeinheit/Transfer)",
+    "MR01": "Bearbeitungsmodul 01 (im MBS-Kontext)",
+    "MR02": "Bearbeitungsmodul 02 (im MBS-Kontext)",
+    "AS": "Atomic Skill Marker in POU-Namen (…_AS_…)"
+  },
+  "skill_verbs": {
+    "HorizontalMove": "horizontale Bewegung/Transport",
+    "VerticalMove": "vertikale Bewegung",
+    "RotationMove": "Rotation/Drehbewegung",
+    "SuctionProcess": "Vakuum greifen/halten/lösen",
+    "HardeningProcess": "Härten/Ofenprozess",
+    "CuttingProcess": "Schneiden",
+    "CompressorControl": "Kompressor/Vakuum-Erzeugung steuern",
+    "ColorDetection": "Farberkennung/Farbsensorik",
+    "BufferStatus": "Pufferstatus/Belegstatus lesen"
+  },
+  "module_to_skill_stations": {
+    "MBS": [
+      "MBS"
+    ],
+    "HRL": [
+      "HRL"
+    ],
+    "VSG": [
+      "VSG",
+      "SG1",
+      "SG2",
+      "SG3"
+    ],
+    "SST": [
+      "SST",
+      "SORT",
+      "CS1",
+      "CS2"
+    ],
+    "CS": [
+      "CS1",
+      "CS2",
+      "CS"
+    ]
+  },
+  "action_hints": {
+    "HardeningProcess": [
+      "härten",
+      "haerten",
+      "ofen",
+      "heat",
+      "hardening"
+    ],
+    "CuttingProcess": [
+      "schneiden",
+      "cut",
+      "cutting",
+      "cutter"
+    ],
+    "ColorDetection": [
+      "farbe",
+      "farberkennung",
+      "color",
+      "rgb"
+    ],
+    "CompressorControl": [
+      "kompressor",
+      "compressor",
+      "vakuum",
+      "vacuum"
+    ],
+    "SuctionProcess": [
+      "vakuum",
+      "ansaugen",
+      "suction",
+      "pick",
+      "place",
+      "grip"
+    ],
+    "HorizontalMove": [
+      "horizontal",
+      "verfahren",
+      "move"
+    ],
+    "VerticalMove": [
+      "vertikal",
+      "heben",
+      "senken",
+      "vertical",
+      "move"
+    ],
+    "RotationMove": [
+      "rotieren",
+      "drehen",
+      "rotation",
+      "move"
+    ]
+  },
+  "pou_filters": {
+    "include_contains": [
+      "_AS_"
+    ],
+    "exclude_prefixes": [
+      "FB_"
+    ],
+    "exclude_contains": [
+      "Schablone",
+      "JobMethode"
+    ]
+  },
+  "llm": {
+    "model": "llama-3.1-8b-instant",
+    "candidate_top_n": 12,
+    "max_pous": 50,
+    "confidence_threshold": 0.35,
+    "sleep_s": 0.2
+  }
+}

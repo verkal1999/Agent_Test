@@ -5,14 +5,18 @@ from pathlib import Path
 import tkinter as tk
 from tkinter import messagebox, scrolledtext
 
-# wichtig: Core import
-from msrguard.excH_agent_core import handle_event
+
+def ensure_python_root_on_sys_path():
+    # .../python/msrguard/excH_agent_ui.py -> parents[1] = python root
+    this_file = Path(__file__).resolve()
+    python_root = this_file.parents[1]
+    if str(python_root) not in sys.path:
+        sys.path.insert(0, str(python_root))
 
 
 def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument("--event_json", default=None, help="Full event JSON as string")
-    # fallback, falls du doch noch separat übergibst
     p.add_argument("--corr", default=None)
     p.add_argument("--process", default=None)
     p.add_argument("--summary", default=None)
@@ -26,7 +30,6 @@ def build_event_from_args(args) -> dict:
         except Exception:
             return {"type": "invalid_json", "payload": {"raw": args.event_json}}
 
-    # fallback (kompatibel zu deinem alten Aufruf)
     return {
         "type": "evUnknownFM",
         "ts_ticks": 0,
@@ -39,24 +42,26 @@ def build_event_from_args(args) -> dict:
 
 
 class ExcHAgentUI:
-    def __init__(self, event: dict):
+    def __init__(self, event: dict, handle_event_func):
         self.event = event
+        self.handle_event = handle_event_func
         self.agent_result = None
 
         self.root = tk.Tk()
         self.root.title("ExcH Agent UI (MVP)")
 
-        # --- Event Anzeige ---
-        tk.Label(self.root, text="Event (inkl. Payload):", font=("Arial", 12, "bold")).pack(anchor="w", padx=10, pady=(10, 0))
+        tk.Label(self.root, text="Event (inkl. Payload):", font=("Arial", 12, "bold")).pack(
+            anchor="w", padx=10, pady=(10, 0)
+        )
         self.event_text = scrolledtext.ScrolledText(self.root, width=120, height=18)
         self.event_text.pack(padx=10, pady=5, fill="both", expand=True)
 
-        # --- Agent Output ---
-        tk.Label(self.root, text="Agent Output:", font=("Arial", 12, "bold")).pack(anchor="w", padx=10, pady=(10, 0))
+        tk.Label(self.root, text="Agent Output:", font=("Arial", 12, "bold")).pack(
+            anchor="w", padx=10, pady=(10, 0)
+        )
         self.out_text = scrolledtext.ScrolledText(self.root, width=120, height=14)
         self.out_text.pack(padx=10, pady=5, fill="both", expand=True)
 
-        # Buttons
         btn_frame = tk.Frame(self.root)
         btn_frame.pack(pady=10)
 
@@ -74,7 +79,7 @@ class ExcHAgentUI:
 
     def run_agent(self):
         try:
-            self.agent_result = handle_event(self.event)
+            self.agent_result = self.handle_event(self.event)
             self.out_text.delete("1.0", tk.END)
             self.out_text.insert(tk.END, json.dumps(self.agent_result, indent=2, ensure_ascii=False))
             messagebox.showinfo("Agent", "Agent ist durchgelaufen (MVP).")
@@ -82,7 +87,6 @@ class ExcHAgentUI:
             messagebox.showerror("Error", f"Agent failed: {e}")
 
     def on_continue(self):
-        # MVP: einfach schließen -> C++ läuft danach weiter
         self.root.destroy()
 
     def run(self):
@@ -90,16 +94,14 @@ class ExcHAgentUI:
 
 
 def main():
-    # damit package-import sicher ist, wenn als Datei gestartet wird:
-    # .../python/msrguard/excH_agent_ui.py -> parents[1] = python root
-    this_file = Path(__file__).resolve()
-    python_root = this_file.parents[1]
-    if str(python_root) not in sys.path:
-        sys.path.insert(0, str(python_root))
+    ensure_python_root_on_sys_path()
+
+    # import erst NACH sys.path fix
+    from msrguard.excH_agent_core import handle_event
 
     args = parse_args()
     event = build_event_from_args(args)
-    ui = ExcHAgentUI(event)
+    ui = ExcHAgentUI(event, handle_event)
     ui.run()
 
 

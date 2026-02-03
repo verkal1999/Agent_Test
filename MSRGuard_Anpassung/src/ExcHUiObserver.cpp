@@ -119,15 +119,45 @@ void ExcHUiObserver::onEvent(const Event& ev) {
 }
 
 
-void ExcHUiObserver::launchPythonUI(const std::string& eventJson, const AgentStartAck& ack) {
-    std::filesystem::path script = std::filesystem::path(pythonSrcDir_) / "msrguard" / scriptFile_;
+#ifdef _WIN32
+  #include <process.h>   // _spawnv
+#endif
+#include <vector>
+#include <string>
+#include <filesystem>
+#include <iostream>
 
+void ExcHUiObserver::launchPythonUI(const std::string& eventJson, const AgentStartAck& ack)
+{
+    std::filesystem::path script =
+        std::filesystem::path(pythonSrcDir_) / "msrguard" / scriptFile_;
+    script = script.make_preferred();
+
+#ifdef _WIN32
+    // args: argv[0] = exe, argv[1] = script, ...
+    std::string exe = std::string(VENV_PY_EXE);
+
+    std::vector<std::string> args = {
+        exe,
+        script.string(),
+        "--event_json",
+        eventJson
+    };
+
+    std::vector<const char*> argv;
+    argv.reserve(args.size() + 1);
+    for (auto& a : args) argv.push_back(a.c_str());
+    argv.push_back(nullptr);
+
+    int rc = _spawnv(_P_WAIT, exe.c_str(), argv.data());
+    std::cerr << "[ExcHUiObserver] Python UI exited with rc=" << rc
+              << " corr=" << ack.correlationId << "\n";
+#else
+    // Fallback (Linux/Mac): system, hier reicht normales quoting
     std::string cmd =
-        quote_arg(std::string(VENV_PY_EXE)) + " " +
-        quote_arg(script.string()) +
-        " --event_json " + quote_arg(eventJson);
-
+        std::string(VENV_PY_EXE) + " \"" + script.string() + "\" --event_json \"" + eventJson + "\"";
     int rc = std::system(cmd.c_str());
     std::cerr << "[ExcHUiObserver] Python UI exited with rc=" << rc
               << " corr=" << ack.correlationId << "\n";
+#endif
 }

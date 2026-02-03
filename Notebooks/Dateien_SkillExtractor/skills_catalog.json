@@ -1,0 +1,343 @@
+{
+    "schema_version": "1.0",
+    "generated_at": "2026-02-02T07:11:33.821429+00:00",
+    "notes": "Skills-Katalog für SkillExtractor; Nutzer-Skillliste (fischertechnik Lernfabrik 4.0 Kontext).",
+    "skills": [
+        {
+            "id": "Skill_HRL_RBG_MoveX",
+            "label": "HRL: RBG X verfahren",
+            "description": "Verfährt den Regalbediengerät Schlitten entlang der X Achse zur horizontalen Positionierung im Hochregallager.",
+            "station_prefix": "HRL",
+            "aliases": []
+        },
+        {
+            "id": "Skill_HRL_RBG_MoveY",
+            "label": "HRL: RBG Y verfahren",
+            "description": "Verfährt die Hubachse entlang der Y Achse zur vertikalen Positionierung im Hochregallager.",
+            "station_prefix": "HRL",
+            "aliases": []
+        },
+        {
+            "id": "Skill_HRL_RBG_MoveOutrigger",
+            "label": "HRL: Ausleger verfahren",
+            "description": "Fährt den Ausleger des Regalbediengeräts ein oder aus, um Werkstücke aufzunehmen oder abzulegen.",
+            "station_prefix": "HRL",
+            "aliases": []
+        },
+        {
+            "id": "Skill_HRL_CB_DriveConveyor",
+            "label": "HRL: Förderband antreiben",
+            "description": "Startet oder stoppt das Förderband der Ein und Auslagerungsstation zum Materialtransport zwischen Stationen.",
+            "station_prefix": "HRL",
+            "aliases": []
+        },
+        {
+            "id": "Skill_HRL_InternalSafety_Check",
+            "label": "HRL: Sicherheitsprüfung",
+            "description": "Prüft sicherheitsrelevante Sensorik oder Zustände im Hochregallager Kontext, z. B. Endlagen oder Freigaben.",
+            "station_prefix": "HRL",
+            "aliases": []
+        },
+        {
+            "id": "Skill_SG1_MoveHorizontal",
+            "label": "SG1: Horizontal verfahren",
+            "description": "Verfährt den Vakuum Greifer Roboter entlang der horizontalen Achse zur Positionierung über einem Zielpunkt.",
+            "station_prefix": "SG1",
+            "aliases": []
+        },
+        {
+            "id": "Skill_SG1_MoveVertical",
+            "label": "SG1: Vertikal verfahren",
+            "description": "Verfährt den Vakuum Greifer Roboter entlang der vertikalen Achse zum Absenken oder Anheben des Greifers.",
+            "station_prefix": "SG1",
+            "aliases": []
+        },
+        {
+            "id": "Skill_SG1_Rotate",
+            "label": "SG1: Rotieren",
+            "description": "Rotiert den Greifer oder die Werkzeugaufnahme zur Ausrichtung des Werkstücks.",
+            "station_prefix": "SG1",
+            "aliases": []
+        },
+        {
+            "id": "Skill_SG1_VacuumPickPlace",
+            "label": "SG1: Ansaugen und Ablagen",
+            "description": "Aktiviert Vakuum zum Greifen eines Werkstücks und deaktiviert Vakuum zum Ablagevorgang.",
+            "station_prefix": "SG1",
+            "aliases": []
+        },
+        {
+            "id": "Skill_SG2_MoveHorizontal",
+            "label": "SG2: Horizontal verfahren",
+            "description": "Verfährt den zweiten Vakuum Greifer entlang der horizontalen Achse zur Positionierung.",
+            "station_prefix": "SG2",
+            "aliases": []
+        },
+        {
+            "id": "Skill_SG2_MoveVertical",
+            "label": "SG2: Vertikal verfahren",
+            "description": "Verfährt den zweiten Vakuum Greifer entlang der vertikalen Achse zum Greifen oder Lösen.",
+            "station_prefix": "SG2",
+            "aliases": []
+        },
+        {
+            "id": "Skill_SG2_Rotate",
+            "label": "SG2: Rotieren",
+            "description": "Rotiert die Greiferaufnahme zur Ausrichtung des Werkstücks im Handhabungsprozess.",
+            "station_prefix": "SG2",
+            "aliases": []
+        },
+        {
+            "id": "Skill_SG2_VacuumPickPlace",
+            "label": "SG2: Ansaugen und Ablagen",
+            "description": "Greifen und Ablegen über Vakuumfunktion am zweiten Greifer.",
+            "station_prefix": "SG2",
+            "aliases": []
+        },
+        {
+            "id": "Skill_SG3_MoveHorizontal",
+            "label": "SG3: Horizontal verfahren",
+            "description": "Verfährt den dritten Vakuum Greifer entlang der horizontalen Achse zur Positionierung.",
+            "station_prefix": "SG3",
+            "aliases": []
+        },
+        {
+            "id": "Skill_SG3_MoveVertical",
+            "label": "SG3: Vertikal verfahren",
+            "description": "Verfährt den dritten Vakuum Greifer entlang der vertikalen Achse zum Absenken oder Anheben.",
+            "station_prefix": "SG3",
+            "aliases": []
+        },
+        {
+            "id": "Skill_SG3_Rotate",
+            "label": "SG3: Rotieren",
+            "description": "Rotiert die Greiferaufnahme zur Ausrichtung des Werkstücks am dritten Greifer.",
+            "station_prefix": "SG3",
+            "aliases": []
+        },
+        {
+            "id": "Skill_SG3_VacuumPickPlace",
+            "label": "SG3: Ansaugen und Ablagen",
+            "description": "Greifen und Ablegen über Vakuumfunktion am dritten Greifer.",
+            "station_prefix": "SG3",
+            "aliases": []
+        },
+        {
+            "id": "Skill_SORT_CB_DriveConveyor",
+            "label": "SORT: Förderband antreiben",
+            "description": "Startet oder stoppt das Förderband der Sortierstrecke für den Transport durch die Farberkennung.",
+            "station_prefix": "SORT",
+            "aliases": []
+        },
+        {
+            "id": "Skill_SORT_Color_Detect",
+            "label": "SORT: Farbe erkennen",
+            "description": "Ermittelt die Werkstückfarbe über Farbsensorik der Sortierstrecke (z. B. für anschließende Sortierlogik).",
+            "station_prefix": "SORT",
+            "aliases": []
+        },
+        {
+            "id": "Skill_SORT_Pusher_Move",
+            "label": "SORT: Schieber bewegen",
+            "description": "Bewegt den Ausschleuser oder Schieber zur Übergabe des Werkstücks in eine definierte Bahn oder Rutsche.",
+            "station_prefix": "SORT",
+            "aliases": []
+        },
+        {
+            "id": "Skill_SORT_Chute_BufferStatus",
+            "label": "SORT: Pufferstatus Rutsche lesen",
+            "description": "Liest den Belegstatus einer Rutsche oder eines Puffers (z. B. frei oder belegt) über Sensorik.",
+            "station_prefix": "SORT",
+            "aliases": []
+        },
+        {
+            "id": "Skill_SORT_LightBarrier_Check",
+            "label": "SORT: Lichtschranke prüfen",
+            "description": "Prüft Lichtschranken oder Durchlauf Sensorik zur Werkstückdetektion im Sortierbereich.",
+            "station_prefix": "SORT",
+            "aliases": []
+        },
+        {
+            "id": "Skill_MBS_SuctionGripper_MoveHorizontal",
+            "label": "MBS: Greifer horizontal verfahren",
+            "description": "Verfährt den Handhabungs Greifer der Multi Processing Station horizontal zur Positionierung an Stationen.",
+            "station_prefix": "MBS",
+            "aliases": []
+        },
+        {
+            "id": "Skill_MBS_SuctionGripper_MoveVertical",
+            "label": "MBS: Greifer vertikal verfahren",
+            "description": "Verfährt den Handhabungs Greifer der Multi Processing Station vertikal zum Greifen oder Ablegen.",
+            "station_prefix": "MBS",
+            "aliases": []
+        },
+        {
+            "id": "Skill_MBS_Turntable_Rotate",
+            "label": "MBS: Drehteller rotieren",
+            "description": "Rotiert den Drehteller zur Übergabe zwischen Bearbeitungsschritten oder zur Positionierung eines Werkstücks.",
+            "station_prefix": "MBS",
+            "aliases": []
+        },
+        {
+            "id": "Skill_MBS_PushingDevice_Move",
+            "label": "MBS: Schiebevorrichtung bewegen",
+            "description": "Bewegt die Schiebevorrichtung zur Werkstückübergabe oder zum Einschub in die Ofenstation.",
+            "station_prefix": "MBS",
+            "aliases": []
+        },
+        {
+            "id": "Skill_MBS_Cutter_Cut",
+            "label": "MBS: Schneiden",
+            "description": "Startet den Schneidprozess an der Schneidemaschine innerhalb der Multi Processing Station.",
+            "station_prefix": "MBS",
+            "aliases": []
+        },
+        {
+            "id": "Skill_MBS_Oven_ClampUnclamp",
+            "label": "MBS: Werkstück spannen oder lösen",
+            "description": "Spann oder Lösevorgang am Werkstück in der Ofenstation zur sicheren Positionierung während der Bearbeitung.",
+            "station_prefix": "MBS",
+            "aliases": []
+        },
+        {
+            "id": "Skill_MBS_Oven_MoveInOut",
+            "label": "MBS: Werkstück in Ofen ein oder ausfahren",
+            "description": "Führt den Einschub oder Ausschub des Werkstücks in die Ofenstation über eine Schiebeeinheit aus.",
+            "station_prefix": "MBS",
+            "aliases": []
+        },
+        {
+            "id": "Skill_MBS_Oven_Harden",
+            "label": "MBS: Härten",
+            "description": "Startet den Härtprozess in der Ofenstation als Bearbeitungsschritt der Multi Processing Station.",
+            "station_prefix": "MBS",
+            "aliases": []
+        },
+        {
+            "id": "Skill_MBS_CB_DriveConveyor",
+            "label": "MBS: Förderband antreiben",
+            "description": "Startet oder stoppt Förderbandbewegungen im Bereich der Multi Processing Station.",
+            "station_prefix": "MBS",
+            "aliases": []
+        },
+        {
+            "id": "Skill_CS1_Conveyor_FeedToPunch",
+            "label": "CS1: Zufördern zur Stanze",
+            "description": "Fördert ein Werkstück zur Stanzstation 1 und positioniert es für den Stanzvorgang.",
+            "station_prefix": "CS1",
+            "aliases": []
+        },
+        {
+            "id": "Skill_CS1_Conveyor_FeedFromPunch",
+            "label": "CS1: Abfördern von der Stanze",
+            "description": "Fördert ein bearbeitetes Werkstück von der Stanzstation 1 ab und übergibt es an den nächsten Transportabschnitt.",
+            "station_prefix": "CS1",
+            "aliases": []
+        },
+        {
+            "id": "Skill_CS1_Punch_Punch",
+            "label": "CS1: Stanzen",
+            "description": "Startet den Stanzvorgang an der Stanzstation 1.",
+            "station_prefix": "CS1",
+            "aliases": []
+        },
+        {
+            "id": "Skill_CS2_Conveyor_FeedToPunch",
+            "label": "CS2: Zufördern zur Stanze",
+            "description": "Fördert ein Werkstück zur Stanzstation 2 und positioniert es für den Stanzvorgang.",
+            "station_prefix": "CS2",
+            "aliases": []
+        },
+        {
+            "id": "Skill_CS2_Conveyor_FeedFromPunch",
+            "label": "CS2: Abfördern von der Stanze",
+            "description": "Fördert ein bearbeitetes Werkstück von der Stanzstation 2 ab und übergibt es an den nächsten Transportabschnitt.",
+            "station_prefix": "CS2",
+            "aliases": []
+        },
+        {
+            "id": "Skill_CS2_Punch_Punch",
+            "label": "CS2: Stanzen",
+            "description": "Startet den Stanzvorgang an der Stanzstation 2.",
+            "station_prefix": "CS2",
+            "aliases": []
+        },
+        {
+            "id": "Skill_USTR_CB1_DriveConveyor",
+            "label": "USTR: Förderband 1 antreiben",
+            "description": "Startet oder stoppt Förderband 1 zur Zuführung oder Übergabe in der U Straße.",
+            "station_prefix": "USTR",
+            "aliases": []
+        },
+        {
+            "id": "Skill_USTR_CB2_FeedIn",
+            "label": "USTR: Förderband 2 zutransport",
+            "description": "Transportiert Werkstücke auf Förderband 2 in Richtung Bearbeitung.",
+            "station_prefix": "USTR",
+            "aliases": []
+        },
+        {
+            "id": "Skill_USTR_CB2_FeedOut",
+            "label": "USTR: Förderband 2 abtransport",
+            "description": "Transportiert Werkstücke auf Förderband 2 aus dem Bearbeitungsbereich heraus.",
+            "station_prefix": "USTR",
+            "aliases": []
+        },
+        {
+            "id": "Skill_USTR_CB3_FeedIn",
+            "label": "USTR: Förderband 3 zutransport",
+            "description": "Transportiert Werkstücke auf Förderband 3 in Richtung Bearbeitung.",
+            "station_prefix": "USTR",
+            "aliases": []
+        },
+        {
+            "id": "Skill_USTR_CB3_FeedOut",
+            "label": "USTR: Förderband 3 abtransport",
+            "description": "Transportiert Werkstücke auf Förderband 3 aus dem Bearbeitungsbereich heraus.",
+            "station_prefix": "USTR",
+            "aliases": []
+        },
+        {
+            "id": "Skill_USTR_CB4_DriveConveyor",
+            "label": "USTR: Förderband 4 antreiben",
+            "description": "Startet oder stoppt Förderband 4 zur Pufferung oder Übergabe in der U Straße.",
+            "station_prefix": "USTR",
+            "aliases": []
+        },
+        {
+            "id": "Skill_USTR_PD1_CornerTransfer",
+            "label": "USTR: Ecktransport 1",
+            "description": "Ecktransport mittels Schiebeeinheit 1 zur Richtungsänderung oder Übergabe zwischen Förderstrecken.",
+            "station_prefix": "USTR",
+            "aliases": []
+        },
+        {
+            "id": "Skill_USTR_PD2_CornerTransfer",
+            "label": "USTR: Ecktransport 2",
+            "description": "Ecktransport mittels Schiebeeinheit 2 zur Richtungsänderung oder Übergabe zwischen Förderstrecken.",
+            "station_prefix": "USTR",
+            "aliases": []
+        },
+        {
+            "id": "Skill_USTR_Drill_Drill",
+            "label": "USTR: Bohren",
+            "description": "Startet den Bohrprozess als Bearbeitungsschritt in der U Straße Bearbeitungsstation.",
+            "station_prefix": "USTR",
+            "aliases": []
+        },
+        {
+            "id": "Skill_USTR_Mill_Mill",
+            "label": "USTR: Fräsen",
+            "description": "Startet den Fräsprozess als Bearbeitungsschritt in der U Straße Bearbeitungsstation.",
+            "station_prefix": "USTR",
+            "aliases": []
+        },
+        {
+            "id": "Skill_USTR_CB4_BufferStatus",
+            "label": "USTR: Pufferstatus lesen",
+            "description": "Liest den Belegstatus eines Pufferplatzes im Bereich Förderband 4, z. B. frei oder belegt.",
+            "station_prefix": "USTR",
+            "aliases": []
+        }
+    ]
+}

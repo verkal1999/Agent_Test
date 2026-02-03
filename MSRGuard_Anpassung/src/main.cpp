@@ -9,12 +9,12 @@
 #include "PythonRuntime.h"
 #include "PythonWorker.h"
 #include "ExcHUiObserver.h"
-
+#include "AgentStartCoordinator.h"
 #include "InventorySnapshot.h"
 #include "InventorySnapshotUtils.h"
 #include "FailureRecorder.h"
 #include "TimeBlogger.h"
-
+#include "AgentStartCoordinator.h"
 #include <pybind11/embed.h>
 
 #include <atomic>
@@ -53,7 +53,7 @@ int main() {
     main_gil_release = std::make_unique<py::gil_scoped_release>();
 
     // 3) Pfade zentral definieren (kommt aus CMake target_compile_definitions)
-    const std::string src_dir = KG_SRC_DIR;
+    const std::string src_dir = PY_SRC_DIR;
 
     // 4) Windows: venv-Python für std::system("python ...") bevorzugen
     //    Annahme gemäß deiner Beschreibung:
@@ -100,21 +100,21 @@ int main() {
                   sys.attr("path").attr("__getitem__")(2));
 
         py::object spec =
-            py::module_::import("importlib.util").attr("find_spec")("KG_Interface");
+            py::module_::import("importlib.util").attr("find_spec")("msrguard.KG_Interface");
 
         if (spec.is_none()) {
-            py::print("[KG] find_spec('KG_Interface') -> None ; sys.path=", sys.attr("path"));
-            throw std::runtime_error("KG_Interface not found on sys.path");
+            py::print("[KG] find_spec('msrguard.KG_Interface') -> None ; sys.path=", sys.attr("path"));
+            throw std::runtime_error("msrguard.KG_Interface not found on sys.path");
         }
 
-        py::module_::import("KG_Interface");
+        py::module_::import("msrguard.KG_Interface");
         std::cout << "[KG] warm-up import done\n";
     });
 
     // 7) PLCMonitor konfigurieren + connect
     PLCMonitor::Options opt;
     opt.endpoint       = "opc.tcp://DESKTOP-LNJR8E0:4840";
-    opt.username       = "VDAdmin";
+    opt.username       = "AdminVD";
     opt.password       = "123456";
     opt.certDerPath    = R"(..\..\certificates\client_cert.der)";
     opt.keyDerPath     = R"(..\..\certificates\client_key.der)";
@@ -150,6 +150,10 @@ int main() {
 
     auto rec = std::make_shared<FailureRecorder>(bus);
     rec->subscribeAll();
+
+    // NEU: Coordinator sitzt zwischen evUnknownFM + evIngestionDone -> evAgentStart
+    auto agentCoord = AgentStartCoordinator::attach(bus, 3);
+
 
     auto subIngPlan = bus.subscribe_scoped(EventType::evIngestionPlanned, ackLogger, 1);
     auto subIngDone = bus.subscribe_scoped(EventType::evIngestionDone,    ackLogger, 1);

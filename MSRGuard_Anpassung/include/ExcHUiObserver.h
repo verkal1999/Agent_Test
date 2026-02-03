@@ -14,6 +14,7 @@ class ExcHUiObserver : public ReactiveObserver,
                        public std::enable_shared_from_this<ExcHUiObserver>
 {
 public:
+    // attach() erstellt den Observer und subscribed sicher nach der Konstruktion
     static std::shared_ptr<ExcHUiObserver> attach(EventBus& bus,
                                                   std::string pythonSrcDir,
                                                   std::string scriptFile = "excH_agent_ui.py",
@@ -37,6 +38,7 @@ private:
 
     bool enabled_ = true;
 
+    // Schutz gegen mehrfaches Starten für dieselbe correlationId
     std::mutex mx_;
     std::unordered_set<std::string> startedCorr_;
 };

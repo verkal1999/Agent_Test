@@ -15,100 +15,95 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <chrono>
+#include <any>
 
-// Wird z. B. durch ReactionManager vor Ausführung einer Systemreaktion/MonAction
-// gefüllt und als evSRPlanned / evMonActPlanned über den EventBus verschickt.
 struct ReactionPlannedAck {
-    std::string correlationId;     // für Tracing (gleich bleibt über alle Acks)
-    std::string resourceId;        // betroffene Ressource (optional)
-    std::string summary;           // kurze Beschreibung des Plans
-    // optional: Liste der Operationen etc.
+    std::string correlationId;
+    std::string resourceId;
+    std::string summary;
 };
-// Allgemeines „Plan fertig ausgeführt“-Ack, siehe evSRDone / evMonActDone.
+
 struct ReactionDoneAck {
     std::string correlationId;
-    int rc = 0;                    // 1=OK, 0=Fehler
-    std::string summary;           // was wurde getan / Ergebnis
+    int rc = 0; 
+    std::string summary;
 };
-// Spezielles Ack, falls ein Prozess/Skill abgebrochen oder fehlgeschlagen ist.
+
 struct ProcessFailAck {
     std::string correlationId;
-    std::string processName;                  // 1=OK, 0=Fehler
-    std::string summary;           // was wurde getan / Ergebnis
+    std::string processName;
+    std::string summary;
 };
-// Wird vor der eigentlichen Ingestion erzeugt (FailureRecorder → KgIngestionForce).
+
 struct IngestionPlannedAck {
     std::string correlationId;
-    std::string individualName;   // corr_ts
-    std::string process;          // lastExecutedProcess (aus Param)
-    std::string summary;          // kurze Beschreibung
+    std::string individualName;
+    std::string process;
+    std::string summary;
 };
-// Ergebnis der KG-Ingestion (z. B. Erfolg der Speicherung im KG_Interface).
+
 struct IngestionDoneAck {
     std::string correlationId;
-    int rc = 0;                   // 1=OK, 0=FAIL
-    std::string message;          // z.B. "printed params"
+    int rc = 0;
+    std::string message;
 };
-// Typalias: die gleichen Acks werden für MonitoringActions und SystemReactions verwendet.
-using MonActPlannedAck = ReactionPlannedAck;  // evMonActPlanned
-using MonActDoneAck    = ReactionDoneAck;     // evMonActDone
-using SRPlannedAck     = ReactionPlannedAck;  // evSRPlanned
-using SRDoneAck        = ReactionDoneAck;     // evSRDone
-// Summary aller tatsächlich ausgeführten Monitoring-Actions (IRIs).
+
+using MonActPlannedAck = ReactionPlannedAck;
+using MonActDoneAck    = ReactionDoneAck;
+using SRPlannedAck     = ReactionPlannedAck;
+using SRDoneAck        = ReactionDoneAck;
+
 struct MonActFinishedAck {
     std::string correlationId;
-    std::vector<std::string> skills;       // IRIs der ausgeführten Monitoring-Actions
+    std::vector<std::string> skills;
 };
-// Summary aller tatsächlich ausgeführten System-Reactions (IRIs).
+
 struct SysReactFinishedAck {
     std::string correlationId;
-    std::vector<std::string> skills;       // IRIs der ausgeführten System-Reactions
+    std::vector<std::string> skills;
 };
-// Wird gesetzt, wenn der KG keine passenden Failure Modes liefert bzw. keine eindeutige
-// Zuordnung möglich ist (vgl. MPA_Draft: UnknownFM-Branch).
+
 struct UnknownFMAck {
     std::string correlationId;
-    std::string processName;   // z.B. "UnknownFM" oder letzter Prozess
-    std::string summary;       // kurze Erklärung ("KG: no failure modes for <skill>")
+    std::string processName;
+    std::string summary;
+    std::string triggerEvent; // HINZUGEFÜGT
 };
-// Wird gesetzt, wenn ein konkreter Failure Mode (IRI) aus dem KG ausgewählt wurde.
+
 struct GotFMAck {
     std::string correlationId;
-    std::string failureModeName;   // z.B. "UnknownFM" oder letzter Prozess      // kurze Erklärung ("KG: no failure modes for <skill>")
+    std::string failureModeName;
 };
-// Ergebnis einer KG-Abfrage, wenn die Antwort als „rowsJson“ in einen weiteren
-// Schritt (z. B. PlanJsonUtils) überführt werden soll.
+
 struct KGResultAck {
     std::string correlationId;
-    std::string rowsJson;             // KG-Ergebnis als JSON-String
-    bool        ok = true;            // Gesamtergebnis
+    std::string rowsJson;
+    bool ok = true;
 };
-// Wird verwendet, wenn eine KG-Anfrage in einen Timeout läuft (z. B. Pythonseite).
+
 struct KGTimeoutAck {
-    std::string correlationId;        // nur zum Tracing
+    std::string correlationId;
 };
-// Zustand der D-Stufen (D1/D2/D3) aus Sicht der RTEH-Logik (optional).
+
 struct DStateAck {
     std::string correlationId;
-    std::string stateName;            // "D1" / "D2" / "D3"
-    std::string summary;              // optionaler Kurztext
+    std::string stateName;
+    std::string summary;
 };
 
 struct AgentStartAck {
     std::string correlationId;
-
-    // Kontext, warum Agent startet:
-    std::string triggerEvent;   // z.B. "evUnknownFM"
-    std::string processName;    // aus UnknownFMAck
-    std::string summary;        // aus UnknownFMAck
-
-    // Ergebnis der Ingestion:
-    int rc = 0;                 // aus IngestionDoneAck.rc
-    std::string message;        // aus IngestionDoneAck.message
+    std::string triggerEvent;
+    std::string processName;
+    std::string summary;
+    int rc = 0;
+    std::string message;
+    IngestionDoneAck ingestion; // HINZUGEFÜGT
 };
 
 struct AgentDoneAck {
     std::string correlationId;
     int rc = 1;
-    std::string resultJson;     // optional (später Agent-Result zurück ans C++)
+    std::string resultJson;
 };

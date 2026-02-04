@@ -15,6 +15,7 @@
 #include "FailureRecorder.h"
 #include "TimeBlogger.h"
 #include "AgentStartCoordinator.h"
+#include "AgentGate.h"
 #include <pybind11/embed.h>
 
 #include <atomic>

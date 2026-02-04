@@ -1,0 +1,9 @@
+{
+  "correlationId": "evD2-774645253851700",
+  "ingestionMsg": "ingested via single-call",
+  "ingestionRc": 1,
+  "outJson": "D:/MA_Python_Agent/MSRGuard_Anpassung/python\\agent_results\\evD2-774645253851700_result.json",
+  "processName": "ExTechnProcess1",
+  "summary": "KG: no failure modes for skill 'TestSkill3'",
+  "triggerEvent": "evUnknownFM"
+}

@@ -95,6 +95,14 @@ target_link_libraries(opcua_client PRIVATE
 
 # Python3 Embed (wie zuvor)
 find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Embed)
+cmake_path(GET Python3_EXECUTABLE PARENT_PATH _py_scripts_dir)
+cmake_path(GET _py_scripts_dir PARENT_PATH VENV_DIR) # ..../.venv311
+
+target_compile_definitions(opcua_client PRIVATE
+  VENV_PYTHON_EXE="${Python3_EXECUTABLE}"
+  PY_SRC_DIR="${CMAKE_SOURCE_DIR}/python"
+  VENV_DIR="${VENV_DIR}"
+)
 
 file(TO_CMAKE_PATH "${Python3_EXECUTABLE}" VENV_PY_EXE_CMAKE)
 
@@ -115,7 +123,7 @@ add_custom_command(TARGET opcua_client POST_BUILD
 
 # Absoluten Quellpfad als Define einbacken (mit Forward Slashes)
 file(TO_CMAKE_PATH "${CMAKE_SOURCE_DIR}/src" KG_SRC_DIR_CMAKE)
-file(TO_CMAKE_PATH "${CMAKE_SOURCE_DIR}/src/FMEA_KG.ttl" KG_TTL_CMAKE)
+file(TO_CMAKE_PATH "${CMAKE_SOURCE_DIR}/KGs/FMEA_KG_demo.ttl" KG_TTL_CMAKE)
 
 # Python-Root (enthält dein Package python/msrguard/...)
 file(TO_CMAKE_PATH "${CMAKE_SOURCE_DIR}/python" PY_SRC_DIR_CMAKE)
@@ -123,5 +131,5 @@ file(TO_CMAKE_PATH "${CMAKE_SOURCE_DIR}/python" PY_SRC_DIR_CMAKE)
 target_compile_definitions(opcua_client PRIVATE
   KG_SRC_DIR="${KG_SRC_DIR_CMAKE}"
   KG_TTL_PATH="${KG_TTL_CMAKE}"
-  PY_SRC_DIR="${PY_SRC_DIR_CMAKE}"
+  PY_SRC_DIR=\"${CMAKE_SOURCE_DIR}/python\"
 )

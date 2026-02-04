@@ -90,6 +90,7 @@ ReactionManager::~ReactionManager() {
 
 // ---------- Event-Entry -------------------------------------------------------
 void ReactionManager::onEvent(const Event& ev) {
+    
     const char* evName = nullptr;
     switch (ev.type) {
         case EventType::evD1: evName = "evD1"; break;

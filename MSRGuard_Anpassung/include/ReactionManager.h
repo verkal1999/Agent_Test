@@ -18,6 +18,7 @@
 #include "Event.h"
 #include "PLCMonitor.h"
 #include "Plan.h"
+#include "AgentGate.h"
 #include "InventorySnapshot.h"   // NodeKey, InventorySnapshot, D2Snapshot
 
 class EventBus;
@@ -61,6 +62,8 @@ public:
         std::string              potFM;    // IRI/ID der potenziellen FailureMode
         std::vector<KgExpect>    expects;  // zu prüfende Istwerte (nur gegen Cache!)
     };
+
+    struct AgentGate;
 
 private:
     // --- Umgebung

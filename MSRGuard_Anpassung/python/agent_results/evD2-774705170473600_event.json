@@ -1,0 +1,9 @@
+{
+  "correlationId": "evD2-774705170473600",
+  "ingestionMsg": "ingested via single-call",
+  "ingestionRc": 1,
+  "outJson": "D:/MA_Python_Agent/MSRGuard_Anpassung/python\\agent_results\\evD2-774705170473600_result.json",
+  "processName": "UnknownFM",
+  "summary": "Triggered by D2",
+  "triggerEvent": "evUnknownFM"
+}

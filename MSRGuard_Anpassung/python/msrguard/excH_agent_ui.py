@@ -96,7 +96,6 @@ class ExcHAgentUI:
 def main():
     ensure_python_root_on_sys_path()
 
-    # import erst NACH sys.path fix
     from msrguard.excH_agent_core import handle_event
 
     args = parse_args()

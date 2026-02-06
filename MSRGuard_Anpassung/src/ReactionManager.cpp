@@ -121,6 +121,37 @@ ReactionManager::~ReactionManager() {
 // ---------- Event-Entry -------------------------------------------------------
 void ReactionManager::onEvent(const Event& ev) {
         // --- NEU: UI/Agent fertig -> pending Fallback ausführen ---
+    if (ev.type == EventType::evAgentAbort) {
+        auto d = std::any_cast<AgentAbortAck>(&ev.payload);
+        if (!d) return;
+
+        {
+            std::lock_guard<std::mutex> lk(pending_mx_);
+            pendingFallbackPlans_.erase(d->correlationId);
+            pendingProcessNames_.erase(d->correlationId);
+        }
+
+        log(LogLevel::Warn) << "[RM] AgentAbort corr=" << d->correlationId
+                            << " -> no pulse executed\n";
+        return;
+    }
+
+    if (ev.type == EventType::evAgentFail) {
+        auto d = std::any_cast<AgentFailAck>(&ev.payload);
+        if (!d) return;
+
+        {
+            std::lock_guard<std::mutex> lk(pending_mx_);
+            pendingFallbackPlans_.erase(d->correlationId);
+            pendingProcessNames_.erase(d->correlationId);
+        }
+
+        log(LogLevel::Warn) << "[RM] AgentFail corr=" << d->correlationId
+                            << " exitCode=" << d->exitCode
+                            << " -> no pulse executed\n";
+        return;
+    }
+
     if (ev.type == EventType::evAgentDone) {
         auto d = std::any_cast<AgentDoneAck>(&ev.payload);
         if (!d) return;

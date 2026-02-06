@@ -36,6 +36,8 @@ private:
     void handleUnknownFM(const UnknownFMAck& u);
     void handleIngestionDone(const IngestionDoneAck& d);
     void handleAgentDone(const AgentDoneAck& d);
+    void handleAgentAbort(const AgentAbortAck& d);
+    void handleAgentFail(const AgentFailAck& d);
 
     void tryEmitAgentStartLocked(const std::string& corr);
 

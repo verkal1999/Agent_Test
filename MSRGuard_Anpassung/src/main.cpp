@@ -149,6 +149,8 @@ int main() {
     auto subKGRes  = bus.subscribe_scoped(EventType::evKGResult,  rm, 4);
     auto subKGTo   = bus.subscribe_scoped(EventType::evKGTimeout, rm, 4);
     auto subAgentDone = bus.subscribe_scoped(EventType::evAgentDone, rm, 4);
+    auto subAgentAbort = bus.subscribe_scoped(EventType::evAgentAbort, rm, 4);
+    auto subAgentFail  = bus.subscribe_scoped(EventType::evAgentFail, rm, 4);
 
     auto rec = std::make_shared<FailureRecorder>(bus);
     rec->subscribeAll();
@@ -160,6 +162,8 @@ int main() {
     auto subIngPlan = bus.subscribe_scoped(EventType::evIngestionPlanned, ackLogger, 1);
     auto subIngDone = bus.subscribe_scoped(EventType::evIngestionDone,    ackLogger, 1);
     auto subUnknown = bus.subscribe_scoped(EventType::evUnknownFM,        ackLogger, 1);
+    auto subAgentAbort2 = bus.subscribe_scoped(EventType::evAgentAbort,   ackLogger, 1);
+    auto subAgentFail2  = bus.subscribe_scoped(EventType::evAgentFail,    ackLogger, 1);
 
     // 9) Neuer Observer: startet Python-UI bei evUnknownFM
     //    scriptFile liegt unter src_dir (KG_SRC_DIR)

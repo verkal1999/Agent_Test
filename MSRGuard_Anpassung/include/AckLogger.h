@@ -65,6 +65,21 @@ public:
             }
             break;
         }
+        case EventType::evAgentAbort: {
+            if (auto a = std::any_cast<AgentAbortAck>(&ev.payload)) {
+                std::cout << "[AckLogger] AGENT ABORT      corr=" << a->correlationId
+                          << " summary=" << a->summary << "\n";
+            }
+            break;
+        }
+        case EventType::evAgentFail: {
+            if (auto a = std::any_cast<AgentFailAck>(&ev.payload)) {
+                std::cout << "[AckLogger] AGENT FAIL       corr=" << a->correlationId
+                          << " exitCode=" << a->exitCode
+                          << " summary=" << a->summary << "\n";
+            }
+            break;
+        }
         default: break;
         }
     }

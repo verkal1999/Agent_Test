@@ -30,6 +30,8 @@ void AgentStartCoordinator::subscribe(int priority)
     bus_.subscribe(EventType::evUnknownFM,     self, priority);
     bus_.subscribe(EventType::evIngestionDone, self, priority);
     bus_.subscribe(EventType::evAgentDone,     self, priority);
+    bus_.subscribe(EventType::evAgentAbort,    self, priority);
+    bus_.subscribe(EventType::evAgentFail,     self, priority);
 }
 
 void AgentStartCoordinator::onEvent(const Event& ev)
@@ -51,6 +53,20 @@ void AgentStartCoordinator::onEvent(const Event& ev)
     if (ev.type == EventType::evAgentDone) {
         if (auto d = std::any_cast<AgentDoneAck>(&ev.payload)) {
             handleAgentDone(*d);
+        }
+        return;
+    }
+
+    if (ev.type == EventType::evAgentAbort) {
+        if (auto d = std::any_cast<AgentAbortAck>(&ev.payload)) {
+            handleAgentAbort(*d);
+        }
+        return;
+    }
+
+    if (ev.type == EventType::evAgentFail) {
+        if (auto d = std::any_cast<AgentFailAck>(&ev.payload)) {
+            handleAgentFail(*d);
         }
         return;
     }
@@ -115,6 +131,34 @@ void AgentStartCoordinator::handleAgentDone(const AgentDoneAck& d)
 
     std::cout << "[AgentStartCoordinator] AgentDone corr=" << d.correlationId
               << " rc=" << d.rc << " -> gate inactive\n";
+
+    if (gate_) gate_->set(false);
+
+    unknownByCorr_.erase(d.correlationId);
+    ingestionByCorr_.erase(d.correlationId);
+    agentStartEmitted_.erase(d.correlationId);
+}
+
+void AgentStartCoordinator::handleAgentAbort(const AgentAbortAck& d)
+{
+    std::lock_guard<std::mutex> lk(mx_);
+
+    std::cout << "[AgentStartCoordinator] AgentAbort corr=" << d.correlationId
+              << " -> gate inactive\n";
+
+    if (gate_) gate_->set(false);
+
+    unknownByCorr_.erase(d.correlationId);
+    ingestionByCorr_.erase(d.correlationId);
+    agentStartEmitted_.erase(d.correlationId);
+}
+
+void AgentStartCoordinator::handleAgentFail(const AgentFailAck& d)
+{
+    std::lock_guard<std::mutex> lk(mx_);
+
+    std::cout << "[AgentStartCoordinator] AgentFail corr=" << d.correlationId
+              << " exitCode=" << d.exitCode << " -> gate inactive\n";
 
     if (gate_) gate_->set(false);
 

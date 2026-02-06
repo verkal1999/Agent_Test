@@ -248,46 +248,63 @@ void ExcHUiObserver::launchPythonUI_async(const AgentStartAck& ack)
                 resultJson = buf.str();
             }
 
-            AgentDoneAck done;
-            done.correlationId = ack.correlationId;
-            done.resultJson = std::move(resultJson);
-
-            // gate/fallback: evAgentDone soll nur "erfolgreich" sein, wenn user_continue geklickt wurde.
-            bool proceed = false;
-            if (!done.resultJson.empty()) {
+            // Terminal events:
+            // - evAgentDone  : user clicked "Weiter" (continue=true)
+            // - evAgentAbort : user aborted/closed UI (continue=false, reason=user_abort)
+            // - evAgentFail  : launch failed or UI didn't produce a valid result JSON
+            if (procRc == -1) {
+                bus_.post(Event{
+                    EventType::evAgentFail,
+                    std::chrono::steady_clock::now(),
+                    std::any{ AgentFailAck{ ack.correlationId, "Failed to launch Python UI", -1 } }
+                });
+            } else if (resultJson.empty()) {
+                bus_.post(Event{
+                    EventType::evAgentFail,
+                    std::chrono::steady_clock::now(),
+                    std::any{ AgentFailAck{ ack.correlationId, "Python UI exited without writing out_json", procRc } }
+                });
+            } else {
                 try {
-                    auto jr = nlohmann::json::parse(done.resultJson);
-                    proceed = jr.value("continue", false);
-                } catch (...) {
-                    proceed = false;
+                    auto jr = nlohmann::json::parse(resultJson);
+                    const bool proceed = jr.value("continue", false);
+                    const std::string reason = jr.value("reason", "");
+
+                    if (proceed) {
+                        bus_.post(Event{
+                            EventType::evAgentDone,
+                            std::chrono::steady_clock::now(),
+                            std::any{ AgentDoneAck{ ack.correlationId, 1, resultJson } }
+                        });
+                    } else {
+                        bus_.post(Event{
+                            EventType::evAgentAbort,
+                            std::chrono::steady_clock::now(),
+                            std::any{ AgentAbortAck{ ack.correlationId,
+                                                     reason.empty() ? "User aborted in UI" : ("UI: " + reason),
+                                                     resultJson } }
+                        });
+                    }
+                } catch (const std::exception& ex) {
+                    bus_.post(Event{
+                        EventType::evAgentFail,
+                        std::chrono::steady_clock::now(),
+                        std::any{ AgentFailAck{ ack.correlationId,
+                                                std::string("Invalid out_json: ") + ex.what(),
+                                                procRc } }
+                    });
                 }
             }
-
-            // Falls die UI gar nicht gestartet ist oder kein Result geschrieben wurde -> nicht fortfahren.
-            if (procRc == -1 || done.resultJson.empty()) {
-                proceed = false;
-            }
-
-            done.rc = proceed ? 1 : 0;
-
-            bus_.post(Event{
-                EventType::evAgentDone,
-                std::chrono::steady_clock::now(),
-                std::any{done}
-            });
 
         } catch (const std::exception& ex) {
             std::cerr << "[ExcHUiObserver] ERROR in python launch thread: " << ex.what() << "\n";
 
-            AgentDoneAck done;
-            done.correlationId = ack.correlationId;
-            done.rc = 0;
-            done.resultJson = "{}";
-
             bus_.post(Event{
-                EventType::evAgentDone,
+                EventType::evAgentFail,
                 std::chrono::steady_clock::now(),
-                std::any{done}
+                std::any{ AgentFailAck{ ack.correlationId,
+                                        std::string("Exception in UI thread: ") + ex.what(),
+                                        -1 } }
             });
         }
 

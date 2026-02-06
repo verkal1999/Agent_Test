@@ -32,6 +32,9 @@ void TimeBlogger::subscribeAll() {
     bus_.subscribe(EventType::evIngestionDone,    self, 3);
     bus_.subscribe(EventType::evUnknownFM,        self, 3);
     bus_.subscribe(EventType::evGotFM,            self, 3);
+    bus_.subscribe(EventType::evAgentDone,        self, 3);
+    bus_.subscribe(EventType::evAgentAbort,       self, 3);
+    bus_.subscribe(EventType::evAgentFail,        self, 3);
 }
 
 const char* TimeBlogger::toName_(EventType t) {
@@ -52,6 +55,9 @@ const char* TimeBlogger::toName_(EventType t) {
         case EventType::evSysReactFinished: return "evSysReactFinished";
         case EventType::evUnknownFM: return "evUnknownFM";
         case EventType::evGotFM: return "evGotFM";
+        case EventType::evAgentDone: return "evAgentDone";
+        case EventType::evAgentAbort: return "evAgentAbort";
+        case EventType::evAgentFail: return "evAgentFail";
     }
     return "ev";
 }
@@ -67,6 +73,9 @@ std::string TimeBlogger::extractCorrId_(const Event& ev) {
     if (auto p = std::any_cast<SysReactFinishedAck>(&ev.payload))   return p->correlationId;
     if (auto p = std::any_cast<UnknownFMAck>(&ev.payload))          return p->correlationId;
     if (auto p = std::any_cast<GotFMAck>(&ev.payload))              return p->correlationId;
+    if (auto p = std::any_cast<AgentDoneAck>(&ev.payload))          return p->correlationId;
+    if (auto p = std::any_cast<AgentAbortAck>(&ev.payload))         return p->correlationId;
+    if (auto p = std::any_cast<AgentFailAck>(&ev.payload))          return p->correlationId;
 
 
     if (auto p = std::any_cast<PLCSnapshotPayload>(&ev.payload))    return p->correlationId; // Event.h 

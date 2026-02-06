@@ -109,3 +109,15 @@ struct AgentDoneAck {
     int rc = 1;
     std::string resultJson;
 };
+
+struct AgentAbortAck {
+    std::string correlationId;
+    std::string summary;
+    std::string resultJson;
+};
+
+struct AgentFailAck {
+    std::string correlationId;
+    std::string summary;
+    int exitCode = -1;
+};

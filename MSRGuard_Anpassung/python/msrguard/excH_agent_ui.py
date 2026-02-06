@@ -16,22 +16,46 @@ def ensure_python_root_on_sys_path():
 
 def parse_args():
     p = argparse.ArgumentParser()
-    p.add_argument("--event_json", default=None, help="Full event JSON as string")
+    # kompatibel: entweder JSON-String ODER Pfad
+    p.add_argument("--event_json", default=None, help="Event JSON as string OR path to a json file")
+    p.add_argument("--event_json_path", default=None, help="Path to event json file")
+    p.add_argument("--out_json", default=None, help="Path to write result json")
     p.add_argument("--corr", default=None)
     p.add_argument("--process", default=None)
     p.add_argument("--summary", default=None)
-    return p.parse_args()
+    args, unknown = p.parse_known_args()
+    if unknown:
+        print(f"[UI] Warning: ignoring unknown args: {unknown}", file=sys.stderr)
+    return args
+
+
+def _load_json_file(path_str: str) -> dict:
+    p = Path(path_str).expanduser().resolve()
+    return json.loads(p.read_text(encoding="utf-8"))
 
 
 def build_event_from_args(args) -> dict:
+    # 1) expliziter Pfad
+    if args.event_json_path:
+        try:
+            return _load_json_file(args.event_json_path)
+        except Exception as e:
+            return {"type": "invalid_json_path", "payload": {"error": str(e), "path": args.event_json_path}}
+
+    # 2) event_json: JSON-String ODER Pfad
     if args.event_json:
         try:
+            # wenn es wie ein existierender Pfad aussieht -> Datei laden
+            p = Path(args.event_json)
+            if p.exists() and p.is_file():
+                return _load_json_file(str(p))
             return json.loads(args.event_json)
         except Exception:
             return {"type": "invalid_json", "payload": {"raw": args.event_json}}
 
+    # 3) fallback minimal
     return {
-        "type": "evUnknownFM",
+        "type": "evAgentStart",
         "ts_ticks": 0,
         "payload": {
             "correlationId": args.corr or "",
@@ -42,13 +66,17 @@ def build_event_from_args(args) -> dict:
 
 
 class ExcHAgentUI:
-    def __init__(self, event: dict, handle_event_func):
+    def __init__(self, event: dict, handle_event_func, out_json_path: str | None):
         self.event = event
         self.handle_event = handle_event_func
+        self.out_json_path = out_json_path
         self.agent_result = None
+        self.user_continue = False
 
         self.root = tk.Tk()
         self.root.title("ExcH Agent UI (MVP)")
+        self.root.protocol("WM_DELETE_WINDOW", self.on_abort)
+        self.root.after(0, self._bring_to_front)
 
         tk.Label(self.root, text="Event (inkl. Payload):", font=("Arial", 12, "bold")).pack(
             anchor="w", padx=10, pady=(10, 0)
@@ -71,7 +99,20 @@ class ExcHAgentUI:
         self.continue_btn = tk.Button(btn_frame, text="Weiter", command=self.on_continue, width=20)
         self.continue_btn.pack(side="left", padx=10)
 
+        self.abort_btn = tk.Button(btn_frame, text="Abbrechen", command=self.on_abort, width=20)
+        self.abort_btn.pack(side="left", padx=10)
+
         self.populate_event()
+
+    def _bring_to_front(self):
+        try:
+            self.root.deiconify()
+            self.root.lift()
+            self.root.focus_force()
+            self.root.attributes("-topmost", True)
+            self.root.after(250, lambda: self.root.attributes("-topmost", False))
+        except Exception:
+            pass
 
     def populate_event(self):
         self.event_text.delete("1.0", tk.END)
@@ -86,8 +127,28 @@ class ExcHAgentUI:
         except Exception as e:
             messagebox.showerror("Error", f"Agent failed: {e}")
 
-    def on_continue(self):
+    def _write_result_and_close(self, continue_flag: bool, reason: str):
+        self.user_continue = continue_flag
+
+        if self.out_json_path:
+            outp = Path(self.out_json_path).expanduser().resolve()
+            outp.parent.mkdir(parents=True, exist_ok=True)
+
+            result = {
+                "continue": continue_flag,
+                "reason": reason,
+                "agent_result": self.agent_result,
+                "event": self.event,  # enthält plcSnapshot bereits
+            }
+            outp.write_text(json.dumps(result, indent=2, ensure_ascii=False), encoding="utf-8")
+
         self.root.destroy()
+
+    def on_continue(self):
+        self._write_result_and_close(True, "user_continue")
+
+    def on_abort(self):
+        self._write_result_and_close(False, "user_abort")
 
     def run(self):
         self.root.mainloop()
@@ -100,7 +161,7 @@ def main():
 
     args = parse_args()
     event = build_event_from_args(args)
-    ui = ExcHAgentUI(event, handle_event)
+    ui = ExcHAgentUI(event, handle_event, args.out_json)
     ui.run()
 
 

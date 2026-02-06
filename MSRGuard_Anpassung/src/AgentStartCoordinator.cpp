@@ -90,11 +90,13 @@ void AgentStartCoordinator::tryEmitAgentStartLocked(const std::string& corr)
 
     AgentStartAck a;
     a.correlationId = corr;
-    a.triggerEvent  = "evUnknownFM";
+    a.triggerEvent  = itU->second.triggerEvent.empty() ? "evUnknownFM" : itU->second.triggerEvent;
     a.processName   = itU->second.processName;
     a.summary       = itU->second.summary;
     a.rc            = itD->second.rc;
     a.message       = itD->second.message;
+    a.PLCSnapshotJson = itU->second.plcSnapShotJson;
+    a.ingestion     = itD->second;
 
     agentStartEmitted_.insert(corr);
 

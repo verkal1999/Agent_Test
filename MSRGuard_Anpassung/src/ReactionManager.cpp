@@ -58,6 +58,36 @@ std::ostream& ReactionManager::log(LogLevel lvl) const {
 std::string ReactionManager::makeCorrelationId(const char* evName) {
     return std::string(evName) + "-" + std::to_string(Clock::now().time_since_epoch().count());
 }
+static std::mutex pending_mx_;
+std::unordered_map<std::string, Plan> pendingFallbackPlans_;
+std::unordered_map<std::string, std::string> pendingProcessNames_;
+
+namespace {
+json snapshotToJson_flat(const InventorySnapshot& inv)
+{
+    auto add = [](json& arr, const std::string& id, const char* t, const json& v) {
+        arr.push_back(json{{"id", id}, {"t", t}, {"v", v}});
+    };
+
+    json out;
+    out["rows"] = json::array();
+    for (const auto& r : inv.rows) {
+        out["rows"].push_back({{"id", r.nodeId}, {"t", r.dtypeOrSig}, {"nodeClass", r.nodeClass}});
+    }
+
+    out["vars"] = json::array();
+    for (const auto& [k, v] : inv.bools)   add(out["vars"], k.id, "bool", v);
+    for (const auto& [k, v] : inv.strings) add(out["vars"], k.id, "string", v);
+    for (const auto& [k, v] : inv.int16s)  add(out["vars"], k.id, "int16", v);
+    for (const auto& [k, v] : inv.floats)  add(out["vars"], k.id, "float", v);
+    return out;
+}
+
+std::string wrapSnapshot(const std::string& js)
+{
+    return "==InventorySnapshot==" + js + "==InventorySnapshot==";
+}
+}
 
 // ---------- Konstruktor: Worker-Thread ---------------------------------------
 ReactionManager::ReactionManager(PLCMonitor& mon, EventBus& bus)
@@ -90,7 +120,63 @@ ReactionManager::~ReactionManager() {
 
 // ---------- Event-Entry -------------------------------------------------------
 void ReactionManager::onEvent(const Event& ev) {
-    
+        // --- NEU: UI/Agent fertig -> pending Fallback ausführen ---
+    if (ev.type == EventType::evAgentDone) {
+        auto d = std::any_cast<AgentDoneAck>(&ev.payload);
+        if (!d) return;
+
+        // Plan (DiagnoseFinished-Puls) optional aus Pending-Map holen und immer bereinigen
+        Plan plan;
+        {
+            std::lock_guard<std::mutex> lk(pending_mx_);
+            auto it = pendingFallbackPlans_.find(d->correlationId);
+            if (it != pendingFallbackPlans_.end()) {
+                plan = it->second;
+                pendingFallbackPlans_.erase(it);
+                pendingProcessNames_.erase(d->correlationId);
+            }
+        }
+
+        // Optional: “continue” aus resultJson auswerten (wenn du das so baust)
+        bool proceed = (d->rc != 0);
+        try {
+            if (!d->resultJson.empty()) {
+                auto jr = nlohmann::json::parse(d->resultJson);
+                proceed = jr.value("continue", proceed);
+            }
+        } catch (...) {
+            // wenn parsing kaputt ist: nicht blockieren
+        }
+
+        if (!proceed) {
+            log(LogLevel::Warn) << "[RM] AgentDone corr=" << d->correlationId
+                                << " proceed=false -> no pulse executed (check your PLC behavior!)\n";
+            // Ich empfehle hier trotzdem “auto proceed” zu machen, sonst hängt die SPS ggf.
+            // proceed = true;
+            return;
+        }
+
+        if (plan.ops.empty()) {
+            plan = buildPlanFromComparison(d->correlationId, ComparisonReport{false, {}});
+        }
+
+        // Wichtig: nicht im Event-Thread blockieren -> in Worker-Queue schieben
+        {
+            std::lock_guard<std::mutex> lk(job_mx_);
+            jobs_.push([this, plan](std::stop_token st) mutable {
+                if (st.stop_requested()) return;
+
+                // evAgentDone soll (bei "Weiter") das DiagnoseFinished-Pulsing auslösen.
+                // Hier bewusst ohne SRDone/ProcessFail-Acks, um keine erneute KG-Ingestion zu triggern.
+                PLCCommandForce cf(mon_, /*oq*/nullptr);
+                (void)cf.execute(plan);
+            });
+        }
+        job_cv_.notify_one();
+
+        return;
+    }
+
     const char* evName = nullptr;
     switch (ev.type) {
         case EventType::evD1: evName = "evD1"; break;
@@ -119,11 +205,12 @@ void ReactionManager::onEvent(const Event& ev) {
     log(LogLevel::Info) << "onEvent ENTER " << evName << " corr=" << corr << "\n";
     logInventoryVariables(inv);
     const std::string processName = getStringFromCache(inv, /*ns*/4, "OPCUA.lastExecutedProcess");
+    const std::string triggerEvent = evName ? evName : "";
 
     // --- Worker-Job -----------------------------------------------------------
     {
         std::lock_guard<std::mutex> lk(job_mx_);
-        jobs_.push([this, corr, inv, processName](std::stop_token st) mutable {
+        jobs_.push([this, corr, inv, processName, triggerEvent](std::stop_token st) mutable {
             log(LogLevel::Info) << "[worker] corr=" << corr << " START\n";
             const auto lap = [this, t0=Clock::now()](const char* tag) {
                 auto dt = std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now()-t0).count();
@@ -196,28 +283,44 @@ void ReactionManager::onEvent(const Event& ev) {
                 return;
             // 5) Fallback bei 0 oder >1 Gewinnern -> DiagnoseFinished-Puls
             } else {
+                std::string summary;
                 if (potCands.empty()) {
-                    // -> KG lieferte 0 Kandidaten: UnknownFM posten und danach Puls auslösen
-                    bus_.post(Event{
-                        EventType::evUnknownFM, Clock::now(),
-                        std::any{ UnknownFMAck{
-                            corr,
-                            processName,  // oder "UnknownFM"
-                            std::string("KG: no failure modes for skill '") + interruptedSkill + "'"
-                        } }
-                    });
-                    log(LogLevel::Info) << "[potFM] KG lieferte 0 Kandidaten -> UnknownFM + Fallback (Pulse DiagnoseFinished)\n";
+                    log(LogLevel::Info) << "[potFM] KG lieferte 0 Kandidaten -> UnknownFM + Fallback Agent";
+                    summary = std::string("KG: no failure modes for skill '") + interruptedSkill + "'";
                 } else if (winners.empty()) {
-                    log(LogLevel::Info) << "[potFM] keine Kandidaten übrig nach MonAct -> Fallback (Pulse DiagnoseFinished)\n";
+                    log(LogLevel::Info) << "[potFM] keine Kandidaten übrig nach MonAct -> Fallback Agent";
+                    summary = "No candidates after MonitoringAction filter";
                 } else {
-                    log(LogLevel::Warn) << "[potFM] mehrdeutige Kandidaten (" << winners.size() << ") -> Fallback (Pulse DiagnoseFinished)\n";
+                    log(LogLevel::Warn) << "[potFM] mehrdeutige Kandidaten (" << winners.size() << ") -> Fallback Agent";
+                    summary = "Ambiguous candidates after KG/filters";
                 }
 
-                // Fallback-Plan: nur Puls auf OPCUA.DiagnoseFinished; keine CallMethod → checksOk = false
-                auto plan = buildPlanFromComparison(corr, ComparisonReport{false, {}});
-                createCommandForceForPlanAndAck(plan, /*checksOk=*/false, processName);
+                const std::string snapshotWrapped = wrapSnapshot(snapshotToJson_flat(inv).dump());
+                const std::string uiProcessName = processName.empty() ? "UnknownFM" : processName;
 
-                log(LogLevel::Info) << "[worker] corr=" << corr << " END (fallback)\n";
+                // -> UI/Agent triggern + Ingestion triggern
+                bus_.post(Event{
+                    EventType::evUnknownFM, Clock::now(),
+                    std::any{ UnknownFMAck{
+                        corr,
+                        uiProcessName,
+                        summary,
+                        triggerEvent,
+                        snapshotWrapped
+                    } }
+                });
+
+                // Fallback-Plan (DiagnoseFinished-Puls) nur speichern, NICHT ausführen
+                auto plan = buildPlanFromComparison(corr, ComparisonReport{false, {}});
+
+                {
+                    std::lock_guard<std::mutex> lk(pending_mx_);
+                    pendingFallbackPlans_[corr] = plan;
+                    pendingProcessNames_[corr]  = uiProcessName;
+                }
+
+                log(LogLevel::Info) << "[worker] corr=" << corr
+                                    << " fallback stored -> waiting for evAgentDone\n";
                 return;
             }
         }
@@ -508,8 +611,8 @@ Plan ReactionManager::buildPlanFromComparison(const std::string& corr,
     op.type      = OpType::PulseBool;
     op.ns        = 4;
     op.nodeId    = "OPCUA.DiagnoseFinished";
-    op.arg       = "true";
-    op.timeoutMs = 5000;
+    op.arg       = "preclear";
+    op.timeoutMs = 100;
 
     p.ops.push_back(op);
     return p;

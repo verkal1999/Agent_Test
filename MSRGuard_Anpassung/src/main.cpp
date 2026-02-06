@@ -66,7 +66,7 @@ int main() {
         const std::filesystem::path msrGuardRoot = srcPath.parent_path();            // .../MSRGuardAnpassung
         const std::filesystem::path workspaceRoot = msrGuardRoot.parent_path();      // .../(Parent von MSRGuardAnpassung)
         const std::filesystem::path venvScripts =
-            workspaceRoot / "MA_Python_Agent" / ".venv311" / "Scripts";
+            workspaceRoot / ".venv311" / "Scripts";
 
         const std::filesystem::path venvPython = venvScripts / "python.exe";
         if (std::filesystem::exists(venvPython)) {
@@ -148,6 +148,7 @@ int main() {
 
     auto subKGRes  = bus.subscribe_scoped(EventType::evKGResult,  rm, 4);
     auto subKGTo   = bus.subscribe_scoped(EventType::evKGTimeout, rm, 4);
+    auto subAgentDone = bus.subscribe_scoped(EventType::evAgentDone, rm, 4);
 
     auto rec = std::make_shared<FailureRecorder>(bus);
     rec->subscribeAll();
@@ -164,7 +165,7 @@ int main() {
     //    scriptFile liegt unter src_dir (KG_SRC_DIR)
     auto excHUiObserver = ExcHUiObserver::attach(bus, PY_SRC_DIR, "excH_agent_ui.py", 3);
 
-    // 10) Trigger-Subscriptions → Events (D1/D2/D3 + zusätzlich UnknownFM als Demo-Branch)
+    // 10) Trigger-Subscriptions → Events (D1/D2/D3)
     mon.subscribeBool("OPCUA.TriggerD3", opt.nsIndex, 0.0, 10,
         [&](bool b, const UA_DataValue& dv) {
             static std::atomic<bool> initialized{false};
@@ -189,8 +190,6 @@ int main() {
                 const std::string corr = "evD3-" + std::to_string(now.time_since_epoch().count());
 
                 bus.post({ EventType::evD3, now, std::any{ D2Snapshot{ corr, std::move(inv) } } });
-                bus.post({ EventType::evUnknownFM, now,
-                           std::any{ UnknownFMAck{ corr, "UnknownFM", "Triggered by D3" } } });
             });
         });
 
@@ -218,8 +217,6 @@ int main() {
                 const std::string corr = "evD1-" + std::to_string(now.time_since_epoch().count());
 
                 bus.post({ EventType::evD1, now, std::any{ D2Snapshot{ corr, std::move(inv) } } });
-                bus.post({ EventType::evUnknownFM, now,
-                           std::any{ UnknownFMAck{ corr, "UnknownFM", "Triggered by D1" } } });
             });
         });
 
@@ -247,8 +244,6 @@ int main() {
                 const std::string corr = "evD2-" + std::to_string(now.time_since_epoch().count());
 
                 bus.post({ EventType::evD2, now, std::any{ D2Snapshot{ corr, std::move(inv) } } });
-                bus.post({ EventType::evUnknownFM, now,
-                           std::any{ UnknownFMAck{ corr, "UnknownFM", "Triggered by D2" } } });
             });
         });
 

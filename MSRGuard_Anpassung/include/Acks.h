@@ -69,6 +69,7 @@ struct UnknownFMAck {
     std::string processName;
     std::string summary;
     std::string triggerEvent; // HINZUGEFÜGT
+    std::string plcSnapShotJson;
 };
 
 struct GotFMAck {
@@ -99,6 +100,7 @@ struct AgentStartAck {
     std::string summary;
     int rc = 0;
     std::string message;
+    std::string PLCSnapshotJson;
     IngestionDoneAck ingestion; // HINZUGEFÜGT
 };
 

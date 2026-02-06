@@ -4,13 +4,17 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <vector>
 #include <sstream>
+#include <system_error>
 #include <thread>
 
 #include <nlohmann/json.hpp>
 
 #ifdef _WIN32
 #include <Windows.h>
+#include <process.h> // _wspawnvp
+#include <cerrno>
 #endif
 
 // Optional: aus CMake als target_compile_definitions setzen:
@@ -32,6 +36,30 @@ static std::string quote_arg(const std::string& s)
     out.push_back('"');
     return out;
 }
+
+#ifdef _WIN32
+static std::wstring toWide(const std::string& s)
+{
+    if (s.empty()) return {};
+
+    auto convert = [&](UINT codePage, DWORD flags) -> std::wstring {
+        const int len = MultiByteToWideChar(codePage, flags,
+                                            s.data(), static_cast<int>(s.size()),
+                                            nullptr, 0);
+        if (len <= 0) return {};
+        std::wstring out(static_cast<size_t>(len), L'\0');
+        MultiByteToWideChar(codePage, flags,
+                            s.data(), static_cast<int>(s.size()),
+                            out.data(), len);
+        return out;
+    };
+
+    // Prefer UTF-8, but fall back to the active codepage if the input isn't valid UTF-8.
+    std::wstring w = convert(CP_UTF8, MB_ERR_INVALID_CHARS);
+    if (!w.empty()) return w;
+    return convert(CP_ACP, 0);
+}
+#endif
 
 std::shared_ptr<ExcHUiObserver> ExcHUiObserver::attach(EventBus& bus,
                                                        std::string pythonSrcDir,
@@ -93,6 +121,29 @@ void ExcHUiObserver::onEvent(const Event& ev)
     launchPythonUI_async(*ack);
 }
 
+static nlohmann::json snapshot_to_json_or_string(const std::string& s)
+{
+    if (s.empty()) return nullptr;
+
+    std::string t = s;
+
+    // Falls du Marker nutzt: ==InventorySnapshot=={...}==InventorySnapshot==
+    const std::string mark = "==InventorySnapshot==";
+    auto p1 = t.find(mark);
+    auto p2 = t.rfind(mark);
+    if (p1 != std::string::npos && p2 != std::string::npos && p2 > p1) {
+        auto start = p1 + mark.size();
+        t = t.substr(start, p2 - start);
+    }
+
+    try {
+        return nlohmann::json::parse(t);
+    } catch (...) {
+        return t; // fallback: als String
+    }
+}
+
+
 void ExcHUiObserver::launchPythonUI_async(const AgentStartAck& ack)
 {
     // Thread damit EventBus loop nicht blockiert
@@ -111,51 +162,82 @@ void ExcHUiObserver::launchPythonUI_async(const AgentStartAck& ack)
             const fs::path outJson  = outDir / (ack.correlationId + "_result.json");
 
             // Event JSON schreiben
-            nlohmann::json j;
-            j["correlationId"] = ack.correlationId;
-            j["triggerEvent"]  = ack.triggerEvent;
-            j["processName"]   = ack.processName;
-            j["summary"]       = ack.summary;
-            j["ingestionRc"]   = ack.rc;
-            j["ingestionMsg"]  = ack.message;
-            j["outJson"]       = outJson.string();
+            nlohmann::json event;
+            event["type"] = "evAgentStart";
+            event["ts_ticks"] = static_cast<long long>(std::chrono::steady_clock::now().time_since_epoch().count());
+
+            nlohmann::json payload;
+            payload["correlationId"] = ack.correlationId;
+            payload["triggerEvent"]  = ack.triggerEvent;
+            payload["processName"]   = ack.processName;
+            payload["summary"]       = ack.summary;
+
+            // Ingestion als Objekt
+            payload["ingestion"] = {
+                {"correlationId", ack.ingestion.correlationId},
+                {"rc",            ack.ingestion.rc},
+                {"message",       ack.ingestion.message}
+            };
+
+            // Snapshot rows+vars
+            payload["plcSnapshot"] = snapshot_to_json_or_string(ack.PLCSnapshotJson);
+
+            event["payload"] = payload;
+
+            // optional für Debug
+            event["outJson"] = outJson.string();
 
             {
                 std::ofstream f(inJson.string(), std::ios::binary);
-                f << j.dump(2);
+                f << event.dump(2);
             }
 
             // Python starten
-            // Wichtig: ich kenne deine echten CLI Args des Scripts nicht, weil excH_agent_ui.py hier nicht hochgeladen ist.
-            // Daher übergeben wir beides:
-            // 1) --event_json und --out_json
-            // 2) zusätzlich --corr/--process/--summary als Fallback
-            std::ostringstream cmd;
-
+            // Wichtig: unter Windows NICHT std::system() verwenden, da cmd.exe-Quoting schnell zu
+            // "Dateiname/Verzeichnisname/Datenträgerbezeichnung ist falsch." führt.
+            int procRc = -1;
 #ifdef _WIN32
-            // start /wait öffnet ein eigenes Fenster und wartet, ohne den C++ Main Loop zu blockieren (wir sind im Thread)
-            cmd << "cmd /c start \"\" /wait "
-                << quote_arg(VENV_PYTHON_EXE) << " "
-                << quote_arg(script.string()) << " "
-                << "--event_json " << quote_arg(inJson.string()) << " "
-                << "--out_json "   << quote_arg(outJson.string()) << " "
-                << "--corr "       << quote_arg(ack.correlationId) << " "
-                << "--process "    << quote_arg(ack.processName) << " "
-                << "--summary "    << quote_arg(ack.summary);
+            std::vector<std::wstring> args;
+            args.reserve(16);
+            args.push_back(toWide(VENV_PYTHON_EXE));
+            args.push_back(script.wstring());
+            args.push_back(L"--event_json_path");
+            args.push_back(inJson.wstring());
+            args.push_back(L"--out_json");
+            args.push_back(outJson.wstring());
+
+            std::vector<const wchar_t*> argv;
+            argv.reserve(args.size() + 1);
+            for (auto& a : args) argv.push_back(a.c_str());
+            argv.push_back(nullptr);
+
+            std::cout << "[ExcHUiObserver] Launch: " << VENV_PYTHON_EXE
+                      << " " << script.string()
+                      << " --event_json_path " << inJson.string()
+                      << " --out_json " << outJson.string()
+                      << "\n";
+
+            errno = 0;
+            procRc = _wspawnvp(_P_WAIT, args[0].c_str(), argv.data());
+            if (procRc == -1) {
+                const int e = errno;
+                std::error_code ec{e, std::generic_category()};
+                std::cerr << "[ExcHUiObserver] ERROR: failed to launch Python (errno=" << e
+                          << "): " << ec.message() << "\n";
+            }
 #else
+            std::ostringstream cmd;
             cmd << quote_arg(VENV_PYTHON_EXE) << " "
                 << quote_arg(script.string()) << " "
-                << "--event_json " << quote_arg(inJson.string()) << " "
+                << "--event_json_path " << quote_arg(inJson.string()) << " "
                 << "--out_json "   << quote_arg(outJson.string()) << " "
-                << "--corr "       << quote_arg(ack.correlationId) << " "
-                << "--process "    << quote_arg(ack.processName) << " "
-                << "--summary "    << quote_arg(ack.summary);
-#endif
+                ;
 
             const std::string cmdStr = cmd.str();
             std::cout << "[ExcHUiObserver] Launch: " << cmdStr << "\n";
 
-            const int sysRc = std::system(cmdStr.c_str());
+            procRc = std::system(cmdStr.c_str());
+#endif
 
             // Ergebnis lesen falls vorhanden
             std::string resultJson;
@@ -168,8 +250,25 @@ void ExcHUiObserver::launchPythonUI_async(const AgentStartAck& ack)
 
             AgentDoneAck done;
             done.correlationId = ack.correlationId;
-            done.rc = (sysRc == 0) ? 1 : 0;
             done.resultJson = std::move(resultJson);
+
+            // gate/fallback: evAgentDone soll nur "erfolgreich" sein, wenn user_continue geklickt wurde.
+            bool proceed = false;
+            if (!done.resultJson.empty()) {
+                try {
+                    auto jr = nlohmann::json::parse(done.resultJson);
+                    proceed = jr.value("continue", false);
+                } catch (...) {
+                    proceed = false;
+                }
+            }
+
+            // Falls die UI gar nicht gestartet ist oder kein Result geschrieben wurde -> nicht fortfahren.
+            if (procRc == -1 || done.resultJson.empty()) {
+                proceed = false;
+            }
+
+            done.rc = proceed ? 1 : 0;
 
             bus_.post(Event{
                 EventType::evAgentDone,

@@ -1,0 +1,604 @@
+[
+  {
+    "pou_name": "CTD",
+    "reachable_pous": [
+      "CTD"
+    ],
+    "called_pou_names": [],
+    "used_variable_names": [],
+    "hardware_addresses": [],
+    "port_names": [
+      "CD",
+      "CV",
+      "LD",
+      "PV",
+      "Q"
+    ]
+  },
+  {
+    "pou_name": "CTU",
+    "reachable_pous": [
+      "CTU"
+    ],
+    "called_pou_names": [],
+    "used_variable_names": [],
+    "hardware_addresses": [],
+    "port_names": [
+      "CU",
+      "CV",
+      "PV",
+      "Q",
+      "R"
+    ]
+  },
+  {
+    "pou_name": "CTUD",
+    "reachable_pous": [
+      "CTUD"
+    ],
+    "called_pou_names": [],
+    "used_variable_names": [],
+    "hardware_addresses": [],
+    "port_names": [
+      "CD",
+      "CU",
+      "CV",
+      "LD",
+      "PV",
+      "QD",
+      "QU",
+      "R"
+    ]
+  },
+  {
+    "pou_name": "FB_Automatikbetrieb_F1",
+    "reachable_pous": [
+      "FB_Automatikbetrieb_F1",
+      "R_TRIG",
+      "TON",
+      "TP"
+    ],
+    "called_pou_names": [
+      "R_TRIG",
+      "TON",
+      "TP"
+    ],
+    "used_variable_names": [
+      "AutoRestartEnable",
+      "Automatikbetrieb_Fertig",
+      "Automatikbetrieb_Starten",
+      "FaultPulse",
+      "PeriodicFaultEnable",
+      "PeriodicFaultPeriod",
+      "RestartPulseLength",
+      "Schritt1",
+      "Schritt2",
+      "Stoerung_erkannt",
+      "Zwischen",
+      "dbg_Stoerung_Manuell",
+      "lastSkillIsOne",
+      "pPer",
+      "perEn",
+      "rPer",
+      "rStart",
+      "rStep1",
+      "rtStoer",
+      "tPer",
+      "tSchritt1",
+      "tSchritt2",
+      "tpRestart"
+    ],
+    "hardware_addresses": [],
+    "port_names": [
+      "AutoRestartEnable",
+      "Automatikbetrieb_Fertig",
+      "Automatikbetrieb_Starten",
+      "CLK",
+      "ET",
+      "FaultPulse",
+      "IN",
+      "PT",
+      "PeriodicFaultEnable",
+      "PeriodicFaultPeriod",
+      "Q",
+      "Stoerung_erkannt"
+    ]
+  },
+  {
+    "pou_name": "FB_Betriebsarten",
+    "reachable_pous": [
+      "FB_Betriebsarten"
+    ],
+    "called_pou_names": [],
+    "used_variable_names": [
+      "A1",
+      "A2",
+      "A2_Requested",
+      "A5",
+      "A6",
+      "Alt_abort",
+      "Alt_found",
+      "Auto_Fertig",
+      "Auto_Stoerung",
+      "Cycle_ended",
+      "D1",
+      "D2",
+      "D3",
+      "D3_Requested",
+      "F1",
+      "F4",
+      "Fehler",
+      "Init_reached",
+      "NotStop",
+      "RS_A1",
+      "RS_A2",
+      "RS_A5",
+      "RS_A6",
+      "RS_AutomaticOperationMode",
+      "RS_CycleEnded",
+      "RS_D1",
+      "RS_D2",
+      "RS_D3",
+      "RS_F1",
+      "RS_InitialDrive",
+      "RS_InitialState",
+      "RS_ManualOperationMode",
+      "R_TRIG_Automatic",
+      "R_TRIG_CycleEnded",
+      "R_TRIG_Init",
+      "R_TRIG_InitialDrive",
+      "R_TRIG_Manual",
+      "Start",
+      "Start_Init",
+      "Weiter",
+      "bFirstScan"
+    ],
+    "hardware_addresses": [],
+    "port_names": [
+      "A1",
+      "A2",
+      "A2_Requested",
+      "A5",
+      "A6",
+      "Alt_abort",
+      "Alt_found",
+      "Auto_Fertig",
+      "Auto_Stoerung",
+      "Cycle_ended",
+      "D1",
+      "D2",
+      "D3",
+      "D3_Requested",
+      "F1",
+      "F4",
+      "Fehler",
+      "Init_reached",
+      "NotStop",
+      "Start",
+      "Start_Init",
+      "Weiter"
+    ]
+  },
+  {
+    "pou_name": "FB_Diagnose_D2",
+    "reachable_pous": [
+      "FB_Diagnose_D2",
+      "R_TRIG"
+    ],
+    "called_pou_names": [
+      "R_TRIG"
+    ],
+    "used_variable_names": [
+      "Alt_gefunden",
+      "Busy",
+      "Diagnose_beendet",
+      "Diagnose_gefordert",
+      "rtAck",
+      "rtD3",
+      "rtFinished",
+      "rtReq",
+      "tpPulse"
+    ],
+    "hardware_addresses": [],
+    "port_names": [
+      "Alt_gefunden",
+      "CLK",
+      "Diagnose_beendet",
+      "Diagnose_gefordert",
+      "Q"
+    ]
+  },
+  {
+    "pou_name": "FB_InitFahrt_A6_A2",
+    "reachable_pous": [
+      "FB_InitFahrt_A6_A2",
+      "TON"
+    ],
+    "called_pou_names": [
+      "TON"
+    ],
+    "used_variable_names": [
+      "A2",
+      "A6",
+      "Init_erreicht",
+      "tInit"
+    ],
+    "hardware_addresses": [],
+    "port_names": [
+      "A2",
+      "A6",
+      "ET",
+      "IN",
+      "Init_erreicht",
+      "PT",
+      "Q"
+    ]
+  },
+  {
+    "pou_name": "FB_Methode1Job",
+    "reachable_pous": [
+      "FB_Methode1Job",
+      "TON"
+    ],
+    "called_pou_names": [
+      "TON"
+    ],
+    "used_variable_names": [
+      "counter",
+      "reached",
+      "running",
+      "t20s",
+      "y"
+    ],
+    "hardware_addresses": [],
+    "port_names": [
+      "ET",
+      "IN",
+      "PT",
+      "Q"
+    ]
+  },
+  {
+    "pou_name": "FB_Notaus_D1",
+    "reachable_pous": [
+      "FB_Notaus_D1",
+      "TON"
+    ],
+    "called_pou_names": [
+      "TON"
+    ],
+    "used_variable_names": [
+      "D1",
+      "Diagnose_gefordert",
+      "Notaus_Entriegelt",
+      "ton5s"
+    ],
+    "hardware_addresses": [],
+    "port_names": [
+      "D1",
+      "Diagnose_gefordert",
+      "ET",
+      "IN",
+      "Notaus_Entriegelt",
+      "PT",
+      "Q"
+    ]
+  },
+  {
+    "pou_name": "FB_ProduktionMitStoerung_D3",
+    "reachable_pous": [
+      "FB_ProduktionMitStoerung_D3",
+      "R_TRIG",
+      "TON"
+    ],
+    "called_pou_names": [
+      "R_TRIG",
+      "TON"
+    ],
+    "used_variable_names": [
+      "Fertig",
+      "ProduktionMitStoerung_Starten",
+      "RestartPulseLength",
+      "Schritt3",
+      "Schritt4",
+      "Stoerung_erkannt",
+      "Zwischen",
+      "dbg_Stoerung_Manuell",
+      "lastSkillIsOne",
+      "pPer",
+      "perEn",
+      "rPer",
+      "rStart",
+      "rStep1",
+      "rtStoer",
+      "tPer",
+      "tSchritt3",
+      "tSchritt4",
+      "tpRestart",
+      "z"
+    ],
+    "hardware_addresses": [],
+    "port_names": [
+      "CLK",
+      "ET",
+      "Fertig",
+      "IN",
+      "PT",
+      "ProduktionMitStoerung_Starten",
+      "Q",
+      "Stoerung_erkannt"
+    ]
+  },
+  {
+    "pou_name": "F_TRIG",
+    "reachable_pous": [
+      "F_TRIG"
+    ],
+    "called_pou_names": [],
+    "used_variable_names": [],
+    "hardware_addresses": [],
+    "port_names": [
+      "CLK",
+      "Q"
+    ]
+  },
+  {
+    "pou_name": "MAIN",
+    "reachable_pous": [
+      "FB_Automatikbetrieb_F1",
+      "FB_Betriebsarten",
+      "FB_Diagnose_D2",
+      "FB_InitFahrt_A6_A2",
+      "FB_Notaus_D1",
+      "FB_ProduktionMitStoerung_D3",
+      "MAIN",
+      "R_TRIG",
+      "TON",
+      "TP"
+    ],
+    "called_pou_names": [
+      "FB_Automatikbetrieb_F1",
+      "FB_Betriebsarten",
+      "FB_Diagnose_D2",
+      "FB_InitFahrt_A6_A2",
+      "FB_Notaus_D1",
+      "FB_ProduktionMitStoerung_D3",
+      "R_TRIG",
+      "TON",
+      "TP"
+    ],
+    "used_variable_names": [
+      "A1",
+      "A2",
+      "A2_Requested",
+      "A2_angefordert",
+      "A5",
+      "A6",
+      "Alt_abort",
+      "Alt_found",
+      "Alt_gefunden",
+      "AutoRestartEnable",
+      "Auto_Fertig",
+      "Auto_Stoerung",
+      "Automatikbetrieb_Fertig",
+      "Automatikbetrieb_Starten",
+      "Busy",
+      "Cycle_ended",
+      "D1",
+      "D2",
+      "D3",
+      "D3_Requested",
+      "D3_angefordert",
+      "Diagnose_beendet",
+      "Diagnose_gefordert",
+      "F1",
+      "F4",
+      "FaultPulse",
+      "Fehler",
+      "Fertig",
+      "Init_erreicht",
+      "Init_reached",
+      "Init_start",
+      "NotStop",
+      "Notaus_Entriegelt",
+      "PeriodicFaultEnable",
+      "PeriodicFaultPeriod",
+      "ProduktionMitStoerung_Starten",
+      "RS_A1",
+      "RS_A2",
+      "RS_A5",
+      "RS_A6",
+      "RS_AutomaticOperationMode",
+      "RS_CycleEnded",
+      "RS_D1",
+      "RS_D2",
+      "RS_D3",
+      "RS_F1",
+      "RS_InitialDrive",
+      "RS_InitialState",
+      "RS_ManualOperationMode",
+      "R_TRIG_Automatic",
+      "R_TRIG_CycleEnded",
+      "R_TRIG_Init",
+      "R_TRIG_InitialDrive",
+      "R_TRIG_Manual",
+      "RestartPulseLength",
+      "Schritt1",
+      "Schritt2",
+      "Schritt3",
+      "Schritt4",
+      "Start",
+      "Start_Init",
+      "Start_eff",
+      "Stoerung_erkannt",
+      "Weiter",
+      "Weiter_eff",
+      "Zwischen",
+      "Zyklus_beendet",
+      "alt_abort",
+      "alt_found",
+      "bFirstScan",
+      "dbg_Stoerung_Manuell",
+      "edgeDone",
+      "edgeF1",
+      "fbAuto",
+      "fbBA",
+      "fbDiag",
+      "fbInit",
+      "fbJob",
+      "fbNot",
+      "fbProStoer",
+      "lastSkillIsOne",
+      "pPer",
+      "perEn",
+      "rPer",
+      "rStart",
+      "rStep1",
+      "rtAck",
+      "rtD3",
+      "rtFinished",
+      "rtReq",
+      "rtStoer",
+      "tInit",
+      "tPer",
+      "tSchritt1",
+      "tSchritt2",
+      "tSchritt3",
+      "tSchritt4",
+      "ton5s",
+      "tpPulse",
+      "tpRestart",
+      "z"
+    ],
+    "hardware_addresses": [],
+    "port_names": [
+      "A1",
+      "A2",
+      "A2_Requested",
+      "A5",
+      "A6",
+      "Alt_abort",
+      "Alt_found",
+      "Alt_gefunden",
+      "AutoRestartEnable",
+      "Auto_Fertig",
+      "Auto_Stoerung",
+      "Automatikbetrieb_Fertig",
+      "Automatikbetrieb_Starten",
+      "CLK",
+      "Cycle_ended",
+      "D1",
+      "D2",
+      "D3",
+      "D3_Requested",
+      "Diagnose_beendet",
+      "Diagnose_gefordert",
+      "ET",
+      "F1",
+      "F4",
+      "FaultPulse",
+      "Fehler",
+      "Fertig",
+      "IN",
+      "Init_erreicht",
+      "Init_reached",
+      "NotStop",
+      "Notaus_Entriegelt",
+      "PT",
+      "PeriodicFaultEnable",
+      "PeriodicFaultPeriod",
+      "ProduktionMitStoerung_Starten",
+      "Q",
+      "Start",
+      "Start_Init",
+      "Stoerung_erkannt",
+      "Weiter"
+    ]
+  },
+  {
+    "pou_name": "RS",
+    "reachable_pous": [
+      "RS"
+    ],
+    "called_pou_names": [],
+    "used_variable_names": [],
+    "hardware_addresses": [],
+    "port_names": [
+      "Q1",
+      "R1",
+      "S"
+    ]
+  },
+  {
+    "pou_name": "R_TRIG",
+    "reachable_pous": [
+      "R_TRIG"
+    ],
+    "called_pou_names": [],
+    "used_variable_names": [],
+    "hardware_addresses": [],
+    "port_names": [
+      "CLK",
+      "Q"
+    ]
+  },
+  {
+    "pou_name": "SR",
+    "reachable_pous": [
+      "SR"
+    ],
+    "called_pou_names": [],
+    "used_variable_names": [],
+    "hardware_addresses": [],
+    "port_names": [
+      "Q1",
+      "R",
+      "S1"
+    ]
+  },
+  {
+    "pou_name": "TOF",
+    "reachable_pous": [
+      "TOF"
+    ],
+    "called_pou_names": [],
+    "used_variable_names": [],
+    "hardware_addresses": [],
+    "port_names": [
+      "ET",
+      "IN",
+      "PT",
+      "Q"
+    ]
+  },
+  {
+    "pou_name": "TON",
+    "reachable_pous": [
+      "TON"
+    ],
+    "called_pou_names": [],
+    "used_variable_names": [],
+    "hardware_addresses": [],
+    "port_names": [
+      "ET",
+      "IN",
+      "PT",
+      "Q"
+    ]
+  },
+  {
+    "pou_name": "TP",
+    "reachable_pous": [
+      "TP"
+    ],
+    "called_pou_names": [],
+    "used_variable_names": [],
+    "hardware_addresses": [],
+    "port_names": [
+      "ET",
+      "IN",
+      "PT",
+      "Q"
+    ]
+  }
+]

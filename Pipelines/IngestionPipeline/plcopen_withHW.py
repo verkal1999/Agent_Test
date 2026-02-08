@@ -6,6 +6,7 @@ from typing import List, Optional, Dict, Any, Tuple
 import re
 import json
 import sys
+import os
 import xml.etree.ElementTree as ET
 
 # Für COM-Export (TwinCAT)
@@ -60,6 +61,14 @@ class PLCOpenXMLParser:
         self._program_models: Optional[List[ProgramMapping]] = None
         self._gvl_models: Optional[List[GVL]] = None
         self.io_hw_mappings: list[IoHardwareAddress] = []
+
+        # -----------------------------
+        # COM Cache (TwinCAT XAE Shell)
+        # -----------------------------
+        self._dte = None
+        self._solution = None
+        self._tc_project = None
+        self._sys_mgr = None
     # ----------------------------
     # Hilfsfunktionen aus Agent_Test2_extracted.py (Cell 2)
     # ----------------------------
@@ -378,11 +387,129 @@ class PLCOpenXMLParser:
                     continue
                 raise
         raise RuntimeError(f"COM bleibt busy (RPC_E_CALL_REJECTED). Letzter Fehler: {last}")
+    def _get_dte_cached(self):
+        """
+        Liefert eine gecachte DTE-Instanz (TwinCAT XAE Shell) oder erstellt/attach't sie.
+        """
+        # COM init (thread-local)
+        try:
+            pythoncom.CoInitialize()
+        except Exception:
+            pass
+
+        if self._dte is not None:
+            try:
+                _ = self._dte.Solution
+                return self._dte
+            except Exception:
+                self._dte = None
+
+        # Erst versuchen: laufende Instanz verwenden, sonst neue starten
+        try:
+            dte = com.GetActiveObject("TcXaeShell.DTE.17.0")
+        except Exception:
+            dte = com.Dispatch("TcXaeShell.DTE.17.0")
+
+        # Verhalten wie bisher
+        dte.SuppressUI = False
+        dte.MainWindow.Visible = True
+
+        self._dte = dte
+        return dte
+
+
+    def _get_solution_cached(self):
+        """
+        Öffnet die Solution genau einmal pro Pipeline-Run und cached sie.
+        Wenn bereits eine andere Solution offen ist, wird sie durch die gewünschte ersetzt.
+        """
+        dte = self._get_dte_cached()
+        sol = dte.Solution
+
+        desired = str(self.sln_path).lower()
+
+        def _safe_fullname() -> str:
+            try:
+                return str(sol.FullName or "")
+            except Exception:
+                return ""
+
+        current = self._com_retry(_safe_fullname, retries=10, delay=0.2)
+        current_norm = current.lower() if current else ""
+
+        if (not current_norm) or (current_norm != desired):
+            # Öffnen (mit COM-Retry gegen RPC_E_CALL_REJECTED)
+            self._com_retry(lambda: sol.Open(str(self.sln_path)))
+            self._wait_for_projects_ready(sol)
+
+            # Projekt-/SysMgr-Cache invalidieren
+            self._tc_project = None
+            self._sys_mgr = None
+
+        self._solution = sol
+        return sol
+
+
+    def _get_tc_project_cached(self):
+        """
+        Findet das TwinCAT-Systemprojekt (.tsproj) genau einmal und cached es.
+        """
+        if self._tc_project is not None:
+            try:
+                _ = self._tc_project.FullName
+                return self._tc_project
+            except Exception:
+                self._tc_project = None
+
+        sol = self._get_solution_cached()
+
+        def _find_tsproj():
+            for i in range(1, sol.Projects.Count + 1):
+                p = sol.Projects.Item(i)
+                try:
+                    full_name = p.FullName
+                except com_error as e:
+                    # RPC_E_CALL_REJECTED (busy)
+                    if e.hresult == -2147418111:
+                        time.sleep(0.5)
+                        pythoncom.PumpWaitingMessages()
+                        full_name = p.FullName
+                    else:
+                        raise
+
+                if str(full_name).lower().endswith(".tsproj"):
+                    return p
+            return None
+
+        tc_project = self._com_retry(_find_tsproj, retries=20, delay=0.3)
+        if tc_project is None:
+            raise RuntimeError("Kein TwinCAT-Systemprojekt (.tsproj) in der Solution gefunden")
+
+        self._tc_project = tc_project
+        return tc_project
+
+
+    def _get_system_manager_cached(self):
+        """
+        Liefert den System Manager (tc_project.Object) gecacht zurück.
+        Das ist das Objekt, das du für LookupTreeItem / PlcOpenExport / ProduceMappingInfo brauchst.
+        """
+        if self._sys_mgr is not None:
+            return self._sys_mgr
+
+        tc_project = self._get_tc_project_cached()
+        sys_mgr = self._com_retry(lambda: tc_project.Object)
+
+        self._sys_mgr = sys_mgr
+        return sys_mgr
+    
     def export_plcopen_xml(self) -> None:
         """
-        Exportiert alle gefundenen POUs als PLCopen XML (TwinCAT-Export).
-        Verwendet bevorzugt den in-memory Cache, fällt nur im Notfall auf JSON zurück.
+        Exportiert PLCopen XML (export.xml) über TwinCAT COM.
+        Robust: versucht NestedProject, sonst LookupTreeItem-Kandidaten.
+        Nutzt COM-Cache (_get_system_manager_cached), öffnet Solution nicht mehrfach.
         """
+        # --- Objektliste (wie bisher) ---
         if self._objects_cache is not None:
             objects = self._objects_cache
         elif self.objects_json_path.exists():
@@ -390,9 +517,9 @@ class PLCOpenXMLParser:
                 objects = json.load(f)
             self._objects_cache = objects
         else:
-            # Falls weder Cache noch JSON existiert, neu scannen (ohne JSON zu schreiben)
             print("Keine Objektliste im Speicher/JSON gefunden -> Projekt wird neu gescannt.")
             objects = self.scan_project_and_write_objects_json(write_json=False)
+
         plc_names = set()
         for obj in objects:
             fpath = Path(obj["file"].split(" (inline)")[0])
@@ -404,33 +531,8 @@ class PLCOpenXMLParser:
                     continue
                 break
 
-        dte = com.Dispatch("TcXaeShell.DTE.17.0")
-        dte.SuppressUI = False
-        dte.MainWindow.Visible = True
-        solution = dte.Solution
-        solution.Open(str(self.sln_path))
-        self._wait_for_projects_ready(solution)
-
-        tc_project = None
-        for i in range(1, solution.Projects.Count + 1):
-            p = solution.Projects.Item(i)
-            try:
-                full_name = p.FullName
-            except com_error as e:
-                if e.hresult == -2147418111:
-                    # einmal kurz warten und nochmal versuchen
-                    time.sleep(0.5)
-                    pythoncom.PumpWaitingMessages()
-                    full_name = p.FullName
-                else:
-                    raise
-            if full_name.lower().endswith(".tsproj"):
-                tc_project = p
-                break
-
-        if tc_project is None:
-            raise RuntimeError("Kein TwinCAT-Systemprojekt (.tsproj) in der Solution gefunden")
-        sys_mgr = self._com_retry(lambda: tc_project.Object)
+        # --- COM: System Manager aus Cache (Solution wird nur 1x geöffnet) ---
+        sys_mgr = self._get_system_manager_cached()
         root_plc = self._com_retry(lambda: sys_mgr.LookupTreeItem("TIPC"))
 
         children = []
@@ -442,7 +544,13 @@ class PLCOpenXMLParser:
             for i in range(1, cnt + 1):
                 children.append(root_plc.Child(i))
 
-        def try_export_from_node(node, out_path: Path, selection: str = ""):
+        def try_export_from_node(node, out_path: Path, selection: str = "") -> bool:
+            # PlcOpenExport existiert nicht auf jedem TreeItem -> AttributeError vermeiden
+            try:
+                export_fn = node.PlcOpenExport
+            except AttributeError:
+                return False
+
             target = out_path
             if target.exists():
                 try:
@@ -452,34 +560,52 @@ class PLCOpenXMLParser:
                     ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
                     target = target.with_name(f"{target.stem}_{ts}{target.suffix}")
                     print("Konnte bestehende Datei nicht löschen -> nutze:", target)
-            node.PlcOpenExport(str(target), selection)
+
+            # COM-call über retry (busy handling)
+            self._com_retry(lambda: export_fn(str(target), selection))
             print("XML-Export erstellt:", target)
-            return target
+            return True
 
         exported = False
         last_err = None
 
+        # 1) Primär: NestedProject (robusteste Variante, wie in deinem Original) :contentReference[oaicite:2]{index=2}
         for child in children:
             try:
-                nested = child.NestedProject
-                try_export_from_node(nested, self.export_xml_path, selection="")
-                exported = True
-                break
-            except pythoncom.com_error as e:
+                nested = None
+                # Manche Versionen haben NestedProject; manche heißen anders -> defensiv
+                if hasattr(child, "NestedProject"):
+                    nested = child.NestedProject
+                elif hasattr(child, "NestedItems"):
+                    nested = child.NestedItems
+
+                if nested is not None and try_export_from_node(nested, self.export_xml_path, selection=""):
+                    exported = True
+                    break
+            except Exception as e:
                 last_err = e
 
+        # 2) Fallback: Kandidaten-Pfade bauen und LookupTreeItem nutzen :contentReference[oaicite:3]{index=3}
         if not exported:
             candidates = []
             for child in children:
-                base = child.PathName
-                name = child.Name
-                candidates += [
-                    f"{base}^{name} Project",
-                    f"{base}^{name} Projekt",
-                    f"{base}^{name}",
-                ]
+                try:
+                    base = child.PathName
+                    name = child.Name
+                    candidates += [
+                        f"{base}^{name} Project",
+                        f"{base}^{name} Projekt",
+                        f"{base}^{name}",
+                    ]
+                except Exception:
+                    pass
+
             for nm in sorted(plc_names):
-                candidates += [f"TIPC^{nm}^{nm} Project", f"TIPC^{nm}^{nm} Projekt", f"TIPC^{nm}"]
+                candidates += [
+                    f"TIPC^{nm}^{nm} Project",
+                    f"TIPC^{nm}^{nm} Projekt",
+                    f"TIPC^{nm}",
+                ]
 
             seen = set()
             uniq = []
@@ -490,15 +616,17 @@ class PLCOpenXMLParser:
 
             for c in uniq:
                 try:
-                    node = sys_mgr.LookupTreeItem(c)
-                    try_export_from_node(node, self.export_xml_path, selection="")
-                    exported = True
-                    break
-                except pythoncom.com_error as e:
+                    node = self._com_retry(lambda: sys_mgr.LookupTreeItem(c))
+                    if try_export_from_node(node, self.export_xml_path, selection=""):
+                        exported = True
+                        break
+                except Exception as e:
                     last_err = e
 
         if not exported:
             raise RuntimeError(f"Kein exportierbarer PLC-Knoten gefunden. Letzter Fehler: {last_err}")
+
+
 
     # ----------------------------
     # analyze_plcopen aus Cell 5
@@ -1132,24 +1260,9 @@ class PLCOpenXMLParserWithHW(PLCOpenXMLParser):
     def produce_mapping_xml(self, out_path: Optional[Path] = None) -> str:
         target = Path(out_path) if out_path else self.io_mapping_xml_path
 
-        dte = com.Dispatch("TcXaeShell.DTE.17.0")
-        dte.SuppressUI = False
-        dte.MainWindow.Visible = True
+        # COM: gecachten System Manager verwenden (öffnet Solution nur 1× pro Run)
+        sys_mgr = self._get_system_manager_cached()
 
-        solution = dte.Solution
-        solution.Open(str(self.sln_path))
-
-        tc_project = None
-        for i in range(1, solution.Projects.Count + 1):
-            p = solution.Projects.Item(i)
-            if p.FullName.lower().endswith(".tsproj"):
-                tc_project = p
-                break
-
-        if tc_project is None:
-            raise RuntimeError("Kein TwinCAT-Systemprojekt (.tsproj) in der Solution gefunden")
-
-        sys_mgr = tc_project.Object
         xml_text = sys_mgr.ProduceMappingInfo()
         target.write_text(xml_text or "", encoding="utf-8")
         print(f"Mapping-XML gespeichert: {target}")
@@ -1194,22 +1307,8 @@ class PLCOpenXMLParserWithHW(PLCOpenXMLParser):
         return links
 
     def _open_system_manager(self) -> Any:
-        dte = com.Dispatch("TcXaeShell.DTE.17.0")
-        dte.SuppressUI = False
-        dte.MainWindow.Visible = True
-
-        solution = dte.Solution
-        solution.Open(str(self.sln_path))
-
-        tc_project = None
-        for i in range(1, solution.Projects.Count + 1):
-            p = solution.Projects.Item(i)
-            if p.FullName.lower().endswith(".tsproj"):
-                tc_project = p
-                break
-        if tc_project is None:
-            raise RuntimeError("Kein TwinCAT-Systemprojekt (.tsproj) in der Solution gefunden")
-        return tc_project.Object
+        # COM: gecachten System Manager verwenden
+        return self._get_system_manager_cached()
 
     def build_io_mappings(self, xml_text: Optional[str] = None, save_json: bool = True) -> List[IoHardwareAddress]:
         xml_content = xml_text or ""

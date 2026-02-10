@@ -49,6 +49,7 @@ ag:PLCProject__Proj1 a ag:class_PLCProject ;
         ag:Program_MAIN .
 
 ag:StandardFBType_CTD a ag:class_FBType,
+        ag:class_POU,
         ag:class_StandardFBType,
         owl:NamedIndividual ;
     dp:hasPOULanguage "ST" ;
@@ -61,6 +62,7 @@ ag:StandardFBType_CTD a ag:class_FBType,
         ag:Port_CTD_Q .
 
 ag:StandardFBType_CTU a ag:class_FBType,
+        ag:class_POU,
         ag:class_StandardFBType,
         owl:NamedIndividual ;
     dp:hasPOULanguage "ST" ;
@@ -73,6 +75,7 @@ ag:StandardFBType_CTU a ag:class_FBType,
         ag:Port_CTU_R .
 
 ag:StandardFBType_CTUD a ag:class_FBType,
+        ag:class_POU,
         ag:class_StandardFBType,
         owl:NamedIndividual ;
     dp:hasPOULanguage "ST" ;
@@ -88,6 +91,7 @@ ag:StandardFBType_CTUD a ag:class_FBType,
         ag:Port_CTUD_R .
 
 ag:StandardFBType_F_TRIG a ag:class_FBType,
+        ag:class_POU,
         ag:class_StandardFBType,
         owl:NamedIndividual ;
     dp:hasPOULanguage "ST" ;
@@ -97,6 +101,7 @@ ag:StandardFBType_F_TRIG a ag:class_FBType,
         ag:Port_F_TRIG_Q .
 
 ag:StandardFBType_SR a ag:class_FBType,
+        ag:class_POU,
         ag:class_StandardFBType,
         owl:NamedIndividual ;
     dp:hasPOULanguage "ST" ;
@@ -107,6 +112,7 @@ ag:StandardFBType_SR a ag:class_FBType,
         ag:Port_SR_S1 .
 
 ag:StandardFBType_TOF a ag:class_FBType,
+        ag:class_POU,
         ag:class_StandardFBType,
         owl:NamedIndividual ;
     dp:hasPOULanguage "ST" ;
@@ -712,20 +718,23 @@ ag:FBInst_MAIN_edgeDone a ag:class_FBInstance ;
 ag:FBInst_MAIN_fbJob a ag:class_FBInstance ;
     op:isInstanceOfFBType ag:FBType_FB_Methode1Job .
 
-ag:GVL__dot__Start a ag:class_Variable ;
+ag:GVL__dot__Start a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "GVL.Start",
         "Start" ;
     dp:hasVariableScope "global" ;
     dp:hasVariableType "BOOL" ;
     op:isBoundToPort ag:Port_FB_Betriebsarten_Start .
 
-ag:GVL__dot__Stopp a ag:class_Variable ;
+ag:GVL__dot__Stopp a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasInitialValue "FALSE" ;
     dp:hasVariableName "GVL.Stopp",
         "Stopp" ;
     dp:hasVariableType "BOOL" .
 
-ag:GVL__dot__Weiter a ag:class_Variable ;
+ag:GVL__dot__Weiter a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "GVL.Weiter",
         "Weiter" ;
     dp:hasVariableScope "global" ;
@@ -738,91 +747,106 @@ ag:Literal_TRUE a ag:class_SignalSource,
 ag:Literal_T_3S a ag:class_SignalSource,
         ag:class_SourceLiteral .
 
-ag:OPCUA__dot__Alt_abort a ag:class_Variable ;
+ag:OPCUA__dot__Alt_abort a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasInitialValue "FALSE" ;
     dp:hasVariableName "Alt_abort",
         "OPCUA.Alt_abort" ;
     dp:hasVariableType "BOOL" .
 
-ag:OPCUA__dot__M1 a ag:class_Variable ;
+ag:OPCUA__dot__M1 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasInitialValue "0" ;
     dp:hasVariableName "M1",
         "OPCUA.M1" ;
     dp:hasVariableType "INT" .
 
-ag:OPCUA__dot__M2 a ag:class_Variable ;
+ag:OPCUA__dot__M2 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasInitialValue "0" ;
     dp:hasVariableName "M2",
         "OPCUA.M2" ;
     dp:hasVariableType "INT" .
 
-ag:OPCUA__dot__M3 a ag:class_Variable ;
+ag:OPCUA__dot__M3 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasInitialValue "0" ;
     dp:hasVariableName "M3",
         "OPCUA.M3" ;
     dp:hasVariableType "INT" .
 
-ag:OPCUA__dot__TriggerD1 a ag:class_Variable ;
+ag:OPCUA__dot__TriggerD1 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasInitialValue "FALSE" ;
     dp:hasVariableName "OPCUA.TriggerD1",
         "TriggerD1" ;
     dp:hasVariableType "BOOL" .
 
-ag:OPCUA__dot__TriggerD2 a ag:class_Variable ;
+ag:OPCUA__dot__TriggerD2 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasInitialValue "FALSE" ;
     dp:hasVariableName "OPCUA.TriggerD2",
         "TriggerD2" ;
     dp:hasVariableType "BOOL" .
 
-ag:OPCUA__dot__TriggerD3 a ag:class_Variable ;
+ag:OPCUA__dot__TriggerD3 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasInitialValue "FALSE" ;
     dp:hasVariableName "OPCUA.TriggerD3",
         "TriggerD3" ;
     dp:hasVariableType "BOOL" .
 
-ag:OPCUA__dot__Z1 a ag:class_Variable ;
+ag:OPCUA__dot__Z1 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasInitialValue "0" ;
     dp:hasVariableName "OPCUA.Z1",
         "Z1" ;
     dp:hasVariableType "INT" .
 
-ag:OPCUA__dot__Z2 a ag:class_Variable ;
+ag:OPCUA__dot__Z2 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasInitialValue "0" ;
     dp:hasVariableName "OPCUA.Z2",
         "Z2" ;
     dp:hasVariableType "INT" .
 
-ag:OPCUA__dot__Z3 a ag:class_Variable ;
+ag:OPCUA__dot__Z3 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasInitialValue "0" ;
     dp:hasVariableName "OPCUA.Z3",
         "Z3" ;
     dp:hasVariableType "INT" .
 
-ag:OPCUA__dot__bool1 a ag:class_Variable ;
+ag:OPCUA__dot__bool1 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasInitialValue "FALSE" ;
     dp:hasVariableName "OPCUA.bool1",
         "bool1" ;
     dp:hasVariableType "BOOL" .
 
-ag:OPCUA__dot__bool2 a ag:class_Variable ;
+ag:OPCUA__dot__bool2 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasInitialValue "FALSE" ;
     dp:hasVariableName "OPCUA.bool2",
         "bool2" ;
     dp:hasVariableType "BOOL" .
 
-ag:OPCUA__dot__bool3 a ag:class_Variable ;
+ag:OPCUA__dot__bool3 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasInitialValue "FALSE" ;
     dp:hasVariableName "OPCUA.bool3",
         "bool3" ;
     dp:hasVariableType "BOOL" .
 
-ag:OPCUA__dot__lastExecutedProcess a ag:class_Variable ;
+ag:OPCUA__dot__lastExecutedProcess a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasInitialValue "''" ;
     dp:hasVariableName "OPCUA.lastExecutedProcess",
         "lastExecutedProcess" ;
     dp:hasVariableType "STRING" .
 
-ag:OPCUA__dot__lastExecutedSkill a ag:class_Variable ;
+ag:OPCUA__dot__lastExecutedSkill a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasInitialValue "''" ;
     dp:hasVariableName "OPCUA.lastExecutedSkill",
         "lastExecutedSkill" ;
@@ -1265,7 +1289,8 @@ ag:Port_TP_Q a ag:class_Port,
     dp:hasPortName "Q" ;
     dp:hasPortType "BOOL" .
 
-ag:Program_MAIN a ag:class_Program ;
+ag:Program_MAIN a ag:class_POU,
+        ag:class_Program ;
     dp:hasConsistencyReport "Baustein: MAIN | Ruft auf: FB_Automatikbetrieb_F1, FB_Betriebsarten, FB_Diagnose_D2, FB_InitFahrt_A6_A2, FB_Notaus_D1, FB_ProduktionMitStoerung_D3, R_TRIG | UNGENUTZTE Variablen (1): fbJob" ;
     dp:hasPOUCode """// POU MAIN body
 edgeDone(CLK := fbDiag.Diagnose_beendet);
@@ -1394,7 +1419,8 @@ ag:FBInst_MAIN_fbProStoer a ag:class_FBInstance ;
     op:isInstanceOfFBType ag:FBType_FB_ProduktionMitStoerung_D3 .
 
 ag:FBType_FB_Methode1Job a ag:class_CustomFBType,
-        ag:class_FBType ;
+        ag:class_FBType,
+        ag:class_POU ;
     dp:hasConsistencyReport "Baustein: FB_Methode1Job | Ruft auf: TON" ;
     dp:hasPOUCode """// METHOD Abort of FB_Methode1Job
 running := FALSE;
@@ -1444,19 +1470,22 @@ Start := 0;""" ;
         ag:Var_FB_Methode1Job_t20s,
         ag:Var_FB_Methode1Job_y .
 
-ag:GVL__dot__DiagnoseRequested a ag:class_Variable ;
+ag:GVL__dot__DiagnoseRequested a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "DiagnoseRequested",
         "GVL.DiagnoseRequested" ;
     dp:hasVariableType "BOOL" .
 
-ag:GVL__dot__Fehler a ag:class_Variable ;
+ag:GVL__dot__Fehler a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "Fehler",
         "GVL.Fehler" ;
     dp:hasVariableScope "global" ;
     dp:hasVariableType "BOOL" ;
     op:isBoundToPort ag:Port_FB_Betriebsarten_Fehler .
 
-ag:GVL__dot__NotStopp a ag:class_Variable ;
+ag:GVL__dot__NotStopp a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasInitialValue "TRUE" ;
     dp:hasVariableName "GVL.NotStopp",
         "NotStopp" ;
@@ -1474,13 +1503,15 @@ ag:Literal_T_55S a ag:class_SignalSource,
 ag:Literal_T_9S a ag:class_SignalSource,
         ag:class_SourceLiteral .
 
-ag:OPCUA__dot__Alt_found a ag:class_Variable ;
+ag:OPCUA__dot__Alt_found a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasInitialValue "FALSE" ;
     dp:hasVariableName "Alt_found",
         "OPCUA.Alt_found" ;
     dp:hasVariableType "BOOL" .
 
-ag:OPCUA__dot__DiagnoseFinished a ag:class_Variable ;
+ag:OPCUA__dot__DiagnoseFinished a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasInitialValue "FALSE" ;
     dp:hasVariableName "DiagnoseFinished",
         "OPCUA.DiagnoseFinished" ;
@@ -1557,425 +1588,504 @@ ag:Port_TP_PT a ag:class_Port,
     dp:hasPortName "PT" ;
     dp:hasPortType "TIME" .
 
-ag:Var_FB_Automatikbetrieb_F1_AutoRestartEnable a ag:class_Variable ;
+ag:Var_FB_Automatikbetrieb_F1_AutoRestartEnable a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "AutoRestartEnable" ;
     dp:hasVariableType "BOOL" ;
     op:implementsPort ag:Port_FB_Automatikbetrieb_F1_AutoRestartEnable .
 
-ag:Var_FB_Automatikbetrieb_F1_Automatikbetrieb_Fertig a ag:class_Variable ;
+ag:Var_FB_Automatikbetrieb_F1_Automatikbetrieb_Fertig a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "Automatikbetrieb_Fertig" ;
     dp:hasVariableType "BOOL" ;
     op:implementsPort ag:Port_FB_Automatikbetrieb_F1_Automatikbetrieb_Fertig .
 
-ag:Var_FB_Automatikbetrieb_F1_PeriodicFaultEnable a ag:class_Variable ;
+ag:Var_FB_Automatikbetrieb_F1_PeriodicFaultEnable a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "PeriodicFaultEnable" ;
     dp:hasVariableType "BOOL" ;
     dp:isUnusedVar true ;
     op:implementsPort ag:Port_FB_Automatikbetrieb_F1_PeriodicFaultEnable .
 
-ag:Var_FB_Automatikbetrieb_F1_RestartPulseLength a ag:class_Variable ;
+ag:Var_FB_Automatikbetrieb_F1_RestartPulseLength a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "RestartPulseLength" ;
     dp:hasVariableType "INT" ;
     dp:isUnusedVar true .
 
-ag:Var_FB_Automatikbetrieb_F1_Stoerung_erkannt a ag:class_Variable ;
+ag:Var_FB_Automatikbetrieb_F1_Stoerung_erkannt a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "Stoerung_erkannt" ;
     dp:hasVariableType "BOOL" ;
     op:implementsPort ag:Port_FB_Automatikbetrieb_F1_Stoerung_erkannt .
 
-ag:Var_FB_Automatikbetrieb_F1_Zwischen a ag:class_Variable ;
+ag:Var_FB_Automatikbetrieb_F1_Zwischen a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "Zwischen" ;
     dp:hasVariableType "string" ;
     dp:isUnusedVar true .
 
-ag:Var_FB_Automatikbetrieb_F1_dbg_Stoerung_Manuell a ag:class_Variable ;
+ag:Var_FB_Automatikbetrieb_F1_dbg_Stoerung_Manuell a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "dbg_Stoerung_Manuell" ;
     dp:hasVariableType "BOOL" ;
     dp:isUnusedVar true .
 
-ag:Var_FB_Automatikbetrieb_F1_lastSkillIsOne a ag:class_Variable ;
+ag:Var_FB_Automatikbetrieb_F1_lastSkillIsOne a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "lastSkillIsOne" ;
     dp:hasVariableType "BOOL" .
 
-ag:Var_FB_Automatikbetrieb_F1_perEn a ag:class_Variable ;
+ag:Var_FB_Automatikbetrieb_F1_perEn a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "perEn" ;
     dp:hasVariableType "BOOL" ;
     dp:isUnusedVar true .
 
-ag:Var_FB_Automatikbetrieb_F1_rtStoer a ag:class_Variable ;
+ag:Var_FB_Automatikbetrieb_F1_rtStoer a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "rtStoer" ;
     dp:hasVariableType "R_TRIG" ;
     dp:isUnusedVar true ;
     op:representsFBInstance ag:FBInst_FB_Automatikbetrieb_F1_rtStoer .
 
-ag:Var_FB_Automatikbetrieb_F1_tpRestart a ag:class_Variable ;
+ag:Var_FB_Automatikbetrieb_F1_tpRestart a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "tpRestart" ;
     dp:hasVariableType "INT" ;
     dp:isUnusedVar true .
 
-ag:Var_FB_Betriebsarten_A1 a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_A1 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "A1" ;
     dp:hasVariableType "BOOL" ;
     op:implementsPort ag:Port_FB_Betriebsarten_A1 .
 
-ag:Var_FB_Betriebsarten_A2 a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_A2 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "A2" ;
     dp:hasVariableType "BOOL" ;
     op:implementsPort ag:Port_FB_Betriebsarten_A2 .
 
-ag:Var_FB_Betriebsarten_A2_Requested a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_A2_Requested a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "A2_Requested" ;
     dp:hasVariableType "BOOL" ;
     op:implementsPort ag:Port_FB_Betriebsarten_A2_Requested .
 
-ag:Var_FB_Betriebsarten_A5 a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_A5 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "A5" ;
     dp:hasVariableType "BOOL" ;
     op:implementsPort ag:Port_FB_Betriebsarten_A5 .
 
-ag:Var_FB_Betriebsarten_A6 a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_A6 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "A6" ;
     dp:hasVariableType "BOOL" ;
     op:implementsPort ag:Port_FB_Betriebsarten_A6 .
 
-ag:Var_FB_Betriebsarten_Alt_abort a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_Alt_abort a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "Alt_abort" ;
     dp:hasVariableType "BOOL" ;
     op:implementsPort ag:Port_FB_Betriebsarten_Alt_abort .
 
-ag:Var_FB_Betriebsarten_Alt_found a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_Alt_found a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "Alt_found" ;
     dp:hasVariableType "BOOL" ;
     op:implementsPort ag:Port_FB_Betriebsarten_Alt_found .
 
-ag:Var_FB_Betriebsarten_Auto_Fertig a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_Auto_Fertig a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "Auto_Fertig" ;
     dp:hasVariableType "BOOL" ;
     dp:isUnusedVar true ;
     op:implementsPort ag:Port_FB_Betriebsarten_Auto_Fertig .
 
-ag:Var_FB_Betriebsarten_Auto_Stoerung a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_Auto_Stoerung a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "Auto_Stoerung" ;
     dp:hasVariableType "BOOL" ;
     op:implementsPort ag:Port_FB_Betriebsarten_Auto_Stoerung .
 
-ag:Var_FB_Betriebsarten_Cycle_ended a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_Cycle_ended a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "Cycle_ended" ;
     dp:hasVariableType "BOOL" ;
     op:implementsPort ag:Port_FB_Betriebsarten_Cycle_ended .
 
-ag:Var_FB_Betriebsarten_D1 a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_D1 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "D1" ;
     dp:hasVariableType "BOOL" ;
     op:implementsPort ag:Port_FB_Betriebsarten_D1 .
 
-ag:Var_FB_Betriebsarten_D2 a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_D2 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "D2" ;
     dp:hasVariableType "BOOL" ;
     op:implementsPort ag:Port_FB_Betriebsarten_D2 .
 
-ag:Var_FB_Betriebsarten_D3 a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_D3 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "D3" ;
     dp:hasVariableType "BOOL" ;
     op:implementsPort ag:Port_FB_Betriebsarten_D3 .
 
-ag:Var_FB_Betriebsarten_D3_Requested a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_D3_Requested a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "D3_Requested" ;
     dp:hasVariableType "BOOL" ;
     op:implementsPort ag:Port_FB_Betriebsarten_D3_Requested .
 
-ag:Var_FB_Betriebsarten_F1 a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_F1 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "F1" ;
     dp:hasVariableType "BOOL" ;
     op:implementsPort ag:Port_FB_Betriebsarten_F1 .
 
-ag:Var_FB_Betriebsarten_F4 a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_F4 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "F4" ;
     dp:hasVariableType "BOOL" ;
     dp:isUnusedVar true ;
     op:implementsPort ag:Port_FB_Betriebsarten_F4 .
 
-ag:Var_FB_Betriebsarten_Fehler a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_Fehler a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "Fehler" ;
     dp:hasVariableType "BOOL" ;
     dp:isUnusedVar true ;
     op:implementsPort ag:Port_FB_Betriebsarten_Fehler .
 
-ag:Var_FB_Betriebsarten_Init_reached a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_Init_reached a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "Init_reached" ;
     dp:hasVariableType "BOOL" ;
     op:implementsPort ag:Port_FB_Betriebsarten_Init_reached .
 
-ag:Var_FB_Betriebsarten_NotStop a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_NotStop a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "NotStop" ;
     dp:hasVariableType "BOOL" ;
     dp:isUnusedVar true ;
     op:implementsPort ag:Port_FB_Betriebsarten_NotStop .
 
-ag:Var_FB_Betriebsarten_RS_A1 a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_RS_A1 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "RS_A1" ;
     dp:hasVariableType "RS" ;
     dp:isUnusedVar true ;
     op:representsFBInstance ag:FBInst_FB_Betriebsarten_RS_A1 .
 
-ag:Var_FB_Betriebsarten_RS_A2 a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_RS_A2 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "RS_A2" ;
     dp:hasVariableType "RS" ;
     dp:isUnusedVar true ;
     op:representsFBInstance ag:FBInst_FB_Betriebsarten_RS_A2 .
 
-ag:Var_FB_Betriebsarten_RS_A5 a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_RS_A5 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "RS_A5" ;
     dp:hasVariableType "RS" ;
     dp:isUnusedVar true ;
     op:representsFBInstance ag:FBInst_FB_Betriebsarten_RS_A5 .
 
-ag:Var_FB_Betriebsarten_RS_A6 a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_RS_A6 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "RS_A6" ;
     dp:hasVariableType "RS" ;
     dp:isUnusedVar true ;
     op:representsFBInstance ag:FBInst_FB_Betriebsarten_RS_A6 .
 
-ag:Var_FB_Betriebsarten_RS_AutomaticOperationMode a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_RS_AutomaticOperationMode a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "RS_AutomaticOperationMode" ;
     dp:hasVariableType "RS" ;
     dp:isUnusedVar true ;
     op:representsFBInstance ag:FBInst_FB_Betriebsarten_RS_AutomaticOperationMode .
 
-ag:Var_FB_Betriebsarten_RS_CycleEnded a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_RS_CycleEnded a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "RS_CycleEnded" ;
     dp:hasVariableType "RS" ;
     dp:isUnusedVar true ;
     op:representsFBInstance ag:FBInst_FB_Betriebsarten_RS_CycleEnded .
 
-ag:Var_FB_Betriebsarten_RS_D1 a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_RS_D1 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "RS_D1" ;
     dp:hasVariableType "RS" ;
     dp:isUnusedVar true ;
     op:representsFBInstance ag:FBInst_FB_Betriebsarten_RS_D1 .
 
-ag:Var_FB_Betriebsarten_RS_D2 a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_RS_D2 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "RS_D2" ;
     dp:hasVariableType "RS" ;
     dp:isUnusedVar true ;
     op:representsFBInstance ag:FBInst_FB_Betriebsarten_RS_D2 .
 
-ag:Var_FB_Betriebsarten_RS_D3 a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_RS_D3 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "RS_D3" ;
     dp:hasVariableType "RS" ;
     dp:isUnusedVar true ;
     op:representsFBInstance ag:FBInst_FB_Betriebsarten_RS_D3 .
 
-ag:Var_FB_Betriebsarten_RS_F1 a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_RS_F1 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "RS_F1" ;
     dp:hasVariableType "RS" ;
     dp:isUnusedVar true ;
     op:representsFBInstance ag:FBInst_FB_Betriebsarten_RS_F1 .
 
-ag:Var_FB_Betriebsarten_RS_InitialDrive a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_RS_InitialDrive a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "RS_InitialDrive" ;
     dp:hasVariableType "RS" ;
     dp:isUnusedVar true ;
     op:representsFBInstance ag:FBInst_FB_Betriebsarten_RS_InitialDrive .
 
-ag:Var_FB_Betriebsarten_RS_InitialState a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_RS_InitialState a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "RS_InitialState" ;
     dp:hasVariableType "RS" ;
     dp:isUnusedVar true ;
     op:representsFBInstance ag:FBInst_FB_Betriebsarten_RS_InitialState .
 
-ag:Var_FB_Betriebsarten_RS_ManualOperationMode a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_RS_ManualOperationMode a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "RS_ManualOperationMode" ;
     dp:hasVariableType "RS" ;
     dp:isUnusedVar true ;
     op:representsFBInstance ag:FBInst_FB_Betriebsarten_RS_ManualOperationMode .
 
-ag:Var_FB_Betriebsarten_R_TRIG_Automatic a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_R_TRIG_Automatic a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "R_TRIG_Automatic" ;
     dp:hasVariableType "R_TRIG" ;
     dp:isUnusedVar true ;
     op:representsFBInstance ag:FBInst_FB_Betriebsarten_R_TRIG_Automatic .
 
-ag:Var_FB_Betriebsarten_R_TRIG_CycleEnded a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_R_TRIG_CycleEnded a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "R_TRIG_CycleEnded" ;
     dp:hasVariableType "R_TRIG" ;
     dp:isUnusedVar true ;
     op:representsFBInstance ag:FBInst_FB_Betriebsarten_R_TRIG_CycleEnded .
 
-ag:Var_FB_Betriebsarten_R_TRIG_Init a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_R_TRIG_Init a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "R_TRIG_Init" ;
     dp:hasVariableType "R_TRIG" ;
     dp:isUnusedVar true ;
     op:representsFBInstance ag:FBInst_FB_Betriebsarten_R_TRIG_Init .
 
-ag:Var_FB_Betriebsarten_R_TRIG_InitialDrive a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_R_TRIG_InitialDrive a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "R_TRIG_InitialDrive" ;
     dp:hasVariableType "R_TRIG" ;
     dp:isUnusedVar true ;
     op:representsFBInstance ag:FBInst_FB_Betriebsarten_R_TRIG_InitialDrive .
 
-ag:Var_FB_Betriebsarten_R_TRIG_Manual a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_R_TRIG_Manual a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "R_TRIG_Manual" ;
     dp:hasVariableType "R_TRIG" ;
     dp:isUnusedVar true ;
     op:representsFBInstance ag:FBInst_FB_Betriebsarten_R_TRIG_Manual .
 
-ag:Var_FB_Betriebsarten_Start a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_Start a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "Start" ;
     dp:hasVariableType "BOOL" ;
     dp:isUnusedVar true ;
     op:implementsPort ag:Port_FB_Betriebsarten_Start .
 
-ag:Var_FB_Betriebsarten_Start_Init a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_Start_Init a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "Start_Init" ;
     dp:hasVariableType "BOOL" ;
     op:implementsPort ag:Port_FB_Betriebsarten_Start_Init .
 
-ag:Var_FB_Betriebsarten_Weiter a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_Weiter a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "Weiter" ;
     dp:hasVariableType "BOOL" ;
     dp:isUnusedVar true ;
     op:implementsPort ag:Port_FB_Betriebsarten_Weiter .
 
-ag:Var_FB_Betriebsarten_bFirstScan a ag:class_Variable ;
+ag:Var_FB_Betriebsarten_bFirstScan a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "bFirstScan" ;
     dp:hasVariableType "BOOL" ;
     dp:isUnusedVar true .
 
-ag:Var_FB_Diagnose_D2_Alt_gefunden a ag:class_Variable ;
+ag:Var_FB_Diagnose_D2_Alt_gefunden a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "Alt_gefunden" ;
     dp:hasVariableType "BOOL" ;
     op:implementsPort ag:Port_FB_Diagnose_D2_Alt_gefunden .
 
-ag:Var_FB_Diagnose_D2_Busy a ag:class_Variable ;
+ag:Var_FB_Diagnose_D2_Busy a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "Busy" ;
     dp:hasVariableType "BOOL" .
 
-ag:Var_FB_Diagnose_D2_Diagnose_beendet a ag:class_Variable ;
+ag:Var_FB_Diagnose_D2_Diagnose_beendet a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "Diagnose_beendet" ;
     dp:hasVariableType "BOOL" ;
     op:implementsPort ag:Port_FB_Diagnose_D2_Diagnose_beendet .
 
-ag:Var_FB_Diagnose_D2_rtFinished a ag:class_Variable ;
+ag:Var_FB_Diagnose_D2_rtFinished a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "rtFinished" ;
     dp:hasVariableType "R_TRIG" ;
     dp:isUnusedVar true ;
     op:representsFBInstance ag:FBInst_FB_Diagnose_D2_rtFinished .
 
-ag:Var_FB_Diagnose_D2_tpPulse a ag:class_Variable ;
+ag:Var_FB_Diagnose_D2_tpPulse a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "tpPulse" ;
     dp:hasVariableType "TP" ;
     dp:isUnusedVar true ;
     op:representsFBInstance ag:FBInst_FB_Diagnose_D2_tpPulse .
 
-ag:Var_FB_InitFahrt_A6_A2_Init_erreicht a ag:class_Variable ;
+ag:Var_FB_InitFahrt_A6_A2_Init_erreicht a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "Init_erreicht" ;
     dp:hasVariableType "BOOL" ;
     op:implementsPort ag:Port_FB_InitFahrt_A6_A2_Init_erreicht .
 
-ag:Var_FB_Methode1Job_counter a ag:class_Variable ;
+ag:Var_FB_Methode1Job_counter a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "counter" ;
     dp:hasVariableType "DINT" .
 
-ag:Var_FB_Methode1Job_running a ag:class_Variable ;
+ag:Var_FB_Methode1Job_running a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "running" ;
     dp:hasVariableType "BOOL" .
 
-ag:Var_FB_Methode1Job_y a ag:class_Variable ;
+ag:Var_FB_Methode1Job_y a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "y" ;
     dp:hasVariableType "DINT" .
 
-ag:Var_FB_Notaus_D1_D1 a ag:class_Variable ;
+ag:Var_FB_Notaus_D1_D1 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "D1" ;
     dp:hasVariableType "BOOL" ;
     op:implementsPort ag:Port_FB_Notaus_D1_D1 .
 
-ag:Var_FB_Notaus_D1_Diagnose_gefordert a ag:class_Variable ;
+ag:Var_FB_Notaus_D1_Diagnose_gefordert a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "Diagnose_gefordert" ;
     dp:hasVariableType "BOOL" ;
     op:implementsPort ag:Port_FB_Notaus_D1_Diagnose_gefordert .
 
-ag:Var_FB_Notaus_D1_Notaus_Entriegelt a ag:class_Variable ;
+ag:Var_FB_Notaus_D1_Notaus_Entriegelt a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "Notaus_Entriegelt" ;
     dp:hasVariableType "BOOL" ;
     dp:isUnusedVar true ;
     op:implementsPort ag:Port_FB_Notaus_D1_Notaus_Entriegelt .
 
-ag:Var_FB_ProduktionMitStoerung_D3_Fertig a ag:class_Variable ;
+ag:Var_FB_ProduktionMitStoerung_D3_Fertig a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "Fertig" ;
     dp:hasVariableType "BOOL" ;
     op:implementsPort ag:Port_FB_ProduktionMitStoerung_D3_Fertig .
 
-ag:Var_FB_ProduktionMitStoerung_D3_RestartPulseLength a ag:class_Variable ;
+ag:Var_FB_ProduktionMitStoerung_D3_RestartPulseLength a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "RestartPulseLength" ;
     dp:hasVariableType "INT" ;
     dp:isUnusedVar true .
 
-ag:Var_FB_ProduktionMitStoerung_D3_Stoerung_erkannt a ag:class_Variable ;
+ag:Var_FB_ProduktionMitStoerung_D3_Stoerung_erkannt a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "Stoerung_erkannt" ;
     dp:hasVariableType "BOOL" ;
     op:implementsPort ag:Port_FB_ProduktionMitStoerung_D3_Stoerung_erkannt .
 
-ag:Var_FB_ProduktionMitStoerung_D3_Zwischen a ag:class_Variable ;
+ag:Var_FB_ProduktionMitStoerung_D3_Zwischen a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "Zwischen" ;
     dp:hasVariableType "string" ;
     dp:isUnusedVar true .
 
-ag:Var_FB_ProduktionMitStoerung_D3_dbg_Stoerung_Manuell a ag:class_Variable ;
+ag:Var_FB_ProduktionMitStoerung_D3_dbg_Stoerung_Manuell a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "dbg_Stoerung_Manuell" ;
     dp:hasVariableType "BOOL" ;
     dp:isUnusedVar true .
 
-ag:Var_FB_ProduktionMitStoerung_D3_lastSkillIsOne a ag:class_Variable ;
+ag:Var_FB_ProduktionMitStoerung_D3_lastSkillIsOne a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "lastSkillIsOne" ;
     dp:hasVariableType "BOOL" ;
     dp:isUnusedVar true .
 
-ag:Var_FB_ProduktionMitStoerung_D3_pPer a ag:class_Variable ;
+ag:Var_FB_ProduktionMitStoerung_D3_pPer a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "pPer" ;
     dp:hasVariableType "TP" ;
     dp:isUnusedVar true ;
     op:representsFBInstance ag:FBInst_FB_ProduktionMitStoerung_D3_pPer .
 
-ag:Var_FB_ProduktionMitStoerung_D3_perEn a ag:class_Variable ;
+ag:Var_FB_ProduktionMitStoerung_D3_perEn a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "perEn" ;
     dp:hasVariableType "BOOL" ;
     dp:isUnusedVar true .
 
-ag:Var_FB_ProduktionMitStoerung_D3_rPer a ag:class_Variable ;
+ag:Var_FB_ProduktionMitStoerung_D3_rPer a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "rPer" ;
     dp:hasVariableType "R_TRIG" ;
     dp:isUnusedVar true ;
     op:representsFBInstance ag:FBInst_FB_ProduktionMitStoerung_D3_rPer .
 
-ag:Var_FB_ProduktionMitStoerung_D3_rStep1 a ag:class_Variable ;
+ag:Var_FB_ProduktionMitStoerung_D3_rStep1 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "rStep1" ;
     dp:hasVariableType "R_TRIG" ;
     dp:isUnusedVar true ;
     op:representsFBInstance ag:FBInst_FB_ProduktionMitStoerung_D3_rStep1 .
 
-ag:Var_FB_ProduktionMitStoerung_D3_rtStoer a ag:class_Variable ;
+ag:Var_FB_ProduktionMitStoerung_D3_rtStoer a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "rtStoer" ;
     dp:hasVariableType "R_TRIG" ;
     dp:isUnusedVar true ;
     op:representsFBInstance ag:FBInst_FB_ProduktionMitStoerung_D3_rtStoer .
 
-ag:Var_FB_ProduktionMitStoerung_D3_tPer a ag:class_Variable ;
+ag:Var_FB_ProduktionMitStoerung_D3_tPer a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "tPer" ;
     dp:hasVariableType "TON" ;
     dp:isUnusedVar true ;
     op:representsFBInstance ag:FBInst_FB_ProduktionMitStoerung_D3_tPer .
 
-ag:Var_FB_ProduktionMitStoerung_D3_tpRestart a ag:class_Variable ;
+ag:Var_FB_ProduktionMitStoerung_D3_tpRestart a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "tpRestart" ;
     dp:hasVariableType "INT" ;
     dp:isUnusedVar true .
 
-ag:Var_FB_ProduktionMitStoerung_D3_z a ag:class_Variable ;
+ag:Var_FB_ProduktionMitStoerung_D3_z a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "z" ;
     dp:hasVariableType "INT" .
 
-ag:Var_MAIN_fbJob a ag:class_Variable ;
+ag:Var_MAIN_fbJob a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "fbJob" ;
     dp:hasVariableType "FB_Methode1Job" ;
     dp:isUnusedVar true ;
@@ -2004,7 +2114,8 @@ ag:FBInst_MAIN_fbDiag a ag:class_FBInstance ;
     op:isInstanceOfFBType ag:FBType_FB_Diagnose_D2 .
 
 ag:FBType_FB_Automatikbetrieb_F1 a ag:class_CustomFBType,
-        ag:class_FBType ;
+        ag:class_FBType,
+        ag:class_POU ;
     dp:hasConsistencyReport "Baustein: FB_Automatikbetrieb_F1 | Inputs: AutoRestartEnable (BOOL), Automatikbetrieb_Starten (BOOL), FaultPulse (TIME), PeriodicFaultEnable (BOOL), PeriodicFaultPeriod (TIME) | Outputs: Automatikbetrieb_Fertig (BOOL), Stoerung_erkannt (BOOL) | Ruft auf: R_TRIG, TON, TP | UNGENUTZTE Variablen (7): PeriodicFaultEnable, RestartPulseLength, Zwischen, dbg_Stoerung_Manuell, perEn, rtStoer, tpRestart | UNGENUTZTE Ports (1): PeriodicFaultEnable" ;
     dp:hasPOUCode """// POU FB_Automatikbetrieb_F1 body
 IF GVL.Start THEN
@@ -2146,7 +2257,8 @@ END_IF""" ;
         ag:Var_FB_Automatikbetrieb_F1_tpRestart .
 
 ag:FBType_FB_Betriebsarten a ag:class_CustomFBType,
-        ag:class_FBType ;
+        ag:class_FBType,
+        ag:class_POU ;
     dp:hasConsistencyReport "Baustein: FB_Betriebsarten | Inputs: A2_Requested (BOOL), Alt_abort (BOOL), Alt_found (BOOL), Auto_Fertig (BOOL), Auto_Stoerung (BOOL), Cycle_ended (BOOL), D3_Requested (BOOL), Fehler (BOOL), Init_reached (BOOL), NotStop (BOOL), Start (BOOL), Start_Init (BOOL), Weiter (BOOL) | Outputs: A1 (BOOL), A2 (BOOL), A5 (BOOL), A6 (BOOL), D1 (BOOL), D2 (BOOL), D3 (BOOL), F1 (BOOL), F4 (BOOL) | UNGENUTZTE Variablen (25): Auto_Fertig, F4, Fehler, NotStop, RS_A1, RS_A2, RS_A5, RS_A6, RS_AutomaticOperationMode, RS_CycleEnded, RS_D1, RS_D2, RS_D3, RS_F1, RS_InitialDrive, RS_InitialState, RS_ManualOperationMode, R_TRIG_Automatic, R_TRIG_CycleEnded, R_TRIG_Init, R_TRIG_InitialDrive, R_TRIG_Manual, Start, Weiter, bFirstScan | UNGENUTZTE Ports (6): Auto_Fertig, F4, Fehler, NotStop, Start, Weiter" ;
     dp:hasPOUCode """import time
 
@@ -2453,7 +2565,8 @@ def FB_Betriebsarten(V_10000000001: bool, D2: bool, A5: bool, GVL.Start: bool, A
         ag:Var_FB_Betriebsarten_bFirstScan .
 
 ag:FBType_FB_Diagnose_D2 a ag:class_CustomFBType,
-        ag:class_FBType ;
+        ag:class_FBType,
+        ag:class_POU ;
     dp:hasConsistencyReport "Baustein: FB_Diagnose_D2 | Inputs: Diagnose_gefordert (BOOL) | Outputs: Alt_gefunden (BOOL), Diagnose_beendet (BOOL) | Ruft auf: R_TRIG | UNGENUTZTE Variablen (2): rtFinished, tpPulse" ;
     dp:hasPOUCode """// POU FB_Diagnose_D2 body
 rtReq(CLK := Diagnose_gefordert);
@@ -2513,7 +2626,8 @@ END_IF""" ;
         ag:Var_FB_Diagnose_D2_tpPulse .
 
 ag:FBType_FB_InitFahrt_A6_A2 a ag:class_CustomFBType,
-        ag:class_FBType ;
+        ag:class_FBType,
+        ag:class_POU ;
     dp:hasConsistencyReport "Baustein: FB_InitFahrt_A6_A2 | Inputs: A2 (BOOL), A6 (BOOL) | Outputs: Init_erreicht (BOOL) | Ruft auf: TON" ;
     dp:hasPOUCode """// POU FB_InitFahrt_A6_A2 body
 IF A6 THEN
@@ -2544,7 +2658,8 @@ END_IF""" ;
         ag:Var_FB_InitFahrt_A6_A2_tInit .
 
 ag:FBType_FB_Notaus_D1 a ag:class_CustomFBType,
-        ag:class_FBType ;
+        ag:class_FBType,
+        ag:class_POU ;
     dp:hasConsistencyReport "Baustein: FB_Notaus_D1 | Inputs: D1 (BOOL) | Outputs: Diagnose_gefordert (BOOL), Notaus_Entriegelt (BOOL) | Ruft auf: TON | UNGENUTZTE Variablen (1): Notaus_Entriegelt | UNGENUTZTE Ports (1): Notaus_Entriegelt" ;
     dp:hasPOUCode """// POU FB_Notaus_D1 body
 IF D1 THEN
@@ -2578,7 +2693,8 @@ END_IF;""" ;
         ag:Var_FB_Notaus_D1_ton5s .
 
 ag:FBType_FB_ProduktionMitStoerung_D3 a ag:class_CustomFBType,
-        ag:class_FBType ;
+        ag:class_FBType,
+        ag:class_POU ;
     dp:hasConsistencyReport "Baustein: FB_ProduktionMitStoerung_D3 | Inputs: ProduktionMitStoerung_Starten (BOOL) | Outputs: Fertig (BOOL), Stoerung_erkannt (BOOL) | Ruft auf: R_TRIG, TON | UNGENUTZTE Variablen (11): RestartPulseLength, Zwischen, dbg_Stoerung_Manuell, lastSkillIsOne, pPer, perEn, rPer, rStep1, rtStoer, tPer, tpRestart" ;
     dp:hasPOUCode """// POU FB_ProduktionMitStoerung_D3 body
 rStart(CLK := ProduktionMitStoerung_Starten);
@@ -2820,182 +2936,220 @@ ag:Port_R_TRIG_Q a ag:class_Port,
     dp:hasPortName "Q" ;
     dp:hasPortType "BOOL" .
 
-ag:Var_FB_Automatikbetrieb_F1_Automatikbetrieb_Starten a ag:class_Variable ;
+ag:Var_FB_Automatikbetrieb_F1_Automatikbetrieb_Starten a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "Automatikbetrieb_Starten" ;
     dp:hasVariableType "BOOL" ;
     op:implementsPort ag:Port_FB_Automatikbetrieb_F1_Automatikbetrieb_Starten .
 
-ag:Var_FB_Automatikbetrieb_F1_FaultPulse a ag:class_Variable ;
+ag:Var_FB_Automatikbetrieb_F1_FaultPulse a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "FaultPulse" ;
     dp:hasVariableType "TIME" ;
     op:implementsPort ag:Port_FB_Automatikbetrieb_F1_FaultPulse .
 
-ag:Var_FB_Automatikbetrieb_F1_PeriodicFaultPeriod a ag:class_Variable ;
+ag:Var_FB_Automatikbetrieb_F1_PeriodicFaultPeriod a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "PeriodicFaultPeriod" ;
     dp:hasVariableType "TIME" ;
     op:implementsPort ag:Port_FB_Automatikbetrieb_F1_PeriodicFaultPeriod .
 
-ag:Var_FB_Automatikbetrieb_F1_Schritt2 a ag:class_Variable ;
+ag:Var_FB_Automatikbetrieb_F1_Schritt2 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "Schritt2" ;
     dp:hasVariableType "BOOL" .
 
-ag:Var_FB_Automatikbetrieb_F1_pPer a ag:class_Variable ;
+ag:Var_FB_Automatikbetrieb_F1_pPer a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "pPer" ;
     dp:hasVariableType "TP" ;
     op:representsFBInstance ag:FBInst_FB_Automatikbetrieb_F1_pPer .
 
-ag:Var_FB_Automatikbetrieb_F1_rPer a ag:class_Variable ;
+ag:Var_FB_Automatikbetrieb_F1_rPer a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "rPer" ;
     dp:hasVariableType "R_TRIG" ;
     op:representsFBInstance ag:FBInst_FB_Automatikbetrieb_F1_rPer .
 
-ag:Var_FB_Automatikbetrieb_F1_rStart a ag:class_Variable ;
+ag:Var_FB_Automatikbetrieb_F1_rStart a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "rStart" ;
     dp:hasVariableType "R_TRIG" ;
     op:representsFBInstance ag:FBInst_FB_Automatikbetrieb_F1_rStart .
 
-ag:Var_FB_Automatikbetrieb_F1_rStep1 a ag:class_Variable ;
+ag:Var_FB_Automatikbetrieb_F1_rStep1 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "rStep1" ;
     dp:hasVariableType "R_TRIG" ;
     op:representsFBInstance ag:FBInst_FB_Automatikbetrieb_F1_rStep1 .
 
-ag:Var_FB_Automatikbetrieb_F1_tPer a ag:class_Variable ;
+ag:Var_FB_Automatikbetrieb_F1_tPer a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "tPer" ;
     dp:hasVariableType "TON" ;
     op:representsFBInstance ag:FBInst_FB_Automatikbetrieb_F1_tPer .
 
-ag:Var_FB_Automatikbetrieb_F1_tSchritt1 a ag:class_Variable ;
+ag:Var_FB_Automatikbetrieb_F1_tSchritt1 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "tSchritt1" ;
     dp:hasVariableType "TON" ;
     op:representsFBInstance ag:FBInst_FB_Automatikbetrieb_F1_tSchritt1 .
 
-ag:Var_FB_Automatikbetrieb_F1_tSchritt2 a ag:class_Variable ;
+ag:Var_FB_Automatikbetrieb_F1_tSchritt2 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "tSchritt2" ;
     dp:hasVariableType "TON" ;
     op:representsFBInstance ag:FBInst_FB_Automatikbetrieb_F1_tSchritt2 .
 
-ag:Var_FB_Diagnose_D2_Diagnose_gefordert a ag:class_Variable ;
+ag:Var_FB_Diagnose_D2_Diagnose_gefordert a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "Diagnose_gefordert" ;
     dp:hasVariableType "BOOL" ;
     op:implementsPort ag:Port_FB_Diagnose_D2_Diagnose_gefordert .
 
-ag:Var_FB_Diagnose_D2_rtAck a ag:class_Variable ;
+ag:Var_FB_Diagnose_D2_rtAck a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "rtAck" ;
     dp:hasVariableType "R_TRIG" ;
     op:representsFBInstance ag:FBInst_FB_Diagnose_D2_rtAck .
 
-ag:Var_FB_Diagnose_D2_rtD3 a ag:class_Variable ;
+ag:Var_FB_Diagnose_D2_rtD3 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "rtD3" ;
     dp:hasVariableType "R_TRIG" ;
     op:representsFBInstance ag:FBInst_FB_Diagnose_D2_rtD3 .
 
-ag:Var_FB_Diagnose_D2_rtReq a ag:class_Variable ;
+ag:Var_FB_Diagnose_D2_rtReq a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "rtReq" ;
     dp:hasVariableType "R_TRIG" ;
     op:representsFBInstance ag:FBInst_FB_Diagnose_D2_rtReq .
 
-ag:Var_FB_InitFahrt_A6_A2_A2 a ag:class_Variable ;
+ag:Var_FB_InitFahrt_A6_A2_A2 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "A2" ;
     dp:hasVariableType "BOOL" ;
     op:implementsPort ag:Port_FB_InitFahrt_A6_A2_A2 .
 
-ag:Var_FB_InitFahrt_A6_A2_A6 a ag:class_Variable ;
+ag:Var_FB_InitFahrt_A6_A2_A6 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "A6" ;
     dp:hasVariableType "BOOL" ;
     op:implementsPort ag:Port_FB_InitFahrt_A6_A2_A6 .
 
-ag:Var_FB_Methode1Job_reached a ag:class_Variable ;
+ag:Var_FB_Methode1Job_reached a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "reached" ;
     dp:hasVariableType "BOOL" .
 
-ag:Var_FB_ProduktionMitStoerung_D3_ProduktionMitStoerung_Starten a ag:class_Variable ;
+ag:Var_FB_ProduktionMitStoerung_D3_ProduktionMitStoerung_Starten a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "ProduktionMitStoerung_Starten" ;
     dp:hasVariableType "BOOL" ;
     op:implementsPort ag:Port_FB_ProduktionMitStoerung_D3_ProduktionMitStoerung_Starten .
 
-ag:Var_FB_ProduktionMitStoerung_D3_Schritt3 a ag:class_Variable ;
+ag:Var_FB_ProduktionMitStoerung_D3_Schritt3 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "Schritt3" ;
     dp:hasVariableType "BOOL" .
 
-ag:Var_FB_ProduktionMitStoerung_D3_Schritt4 a ag:class_Variable ;
+ag:Var_FB_ProduktionMitStoerung_D3_Schritt4 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "Schritt4" ;
     dp:hasVariableType "BOOL" .
 
-ag:Var_FB_ProduktionMitStoerung_D3_rStart a ag:class_Variable ;
+ag:Var_FB_ProduktionMitStoerung_D3_rStart a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "rStart" ;
     dp:hasVariableType "R_TRIG" ;
     op:representsFBInstance ag:FBInst_FB_ProduktionMitStoerung_D3_rStart .
 
-ag:Var_FB_ProduktionMitStoerung_D3_tSchritt3 a ag:class_Variable ;
+ag:Var_FB_ProduktionMitStoerung_D3_tSchritt3 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "tSchritt3" ;
     dp:hasVariableType "TON" ;
     op:representsFBInstance ag:FBInst_FB_ProduktionMitStoerung_D3_tSchritt3 .
 
-ag:Var_FB_ProduktionMitStoerung_D3_tSchritt4 a ag:class_Variable ;
+ag:Var_FB_ProduktionMitStoerung_D3_tSchritt4 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "tSchritt4" ;
     dp:hasVariableType "TON" ;
     op:representsFBInstance ag:FBInst_FB_ProduktionMitStoerung_D3_tSchritt4 .
 
-ag:Var_MAIN_A2_angefordert a ag:class_Variable ;
+ag:Var_MAIN_A2_angefordert a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "A2_angefordert" ;
     dp:hasVariableType "BOOL" .
 
-ag:Var_MAIN_D3_angefordert a ag:class_Variable ;
+ag:Var_MAIN_D3_angefordert a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "D3_angefordert" ;
     dp:hasVariableType "BOOL" .
 
-ag:Var_MAIN_Init_start a ag:class_Variable ;
+ag:Var_MAIN_Init_start a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "Init_start" ;
     dp:hasVariableType "BOOL" .
 
-ag:Var_MAIN_Start_eff a ag:class_Variable ;
+ag:Var_MAIN_Start_eff a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "Start_eff" ;
     dp:hasVariableType "BOOL" .
 
-ag:Var_MAIN_Weiter_eff a ag:class_Variable ;
+ag:Var_MAIN_Weiter_eff a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "Weiter_eff" ;
     dp:hasVariableType "BOOL" .
 
-ag:Var_MAIN_Zyklus_beendet a ag:class_Variable ;
+ag:Var_MAIN_Zyklus_beendet a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "Zyklus_beendet" ;
     dp:hasVariableType "BOOL" .
 
-ag:Var_MAIN_edgeDone a ag:class_Variable ;
+ag:Var_MAIN_edgeDone a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "edgeDone" ;
     dp:hasVariableType "R_TRIG" ;
     op:representsFBInstance ag:FBInst_MAIN_edgeDone .
 
-ag:Var_MAIN_edgeF1 a ag:class_Variable ;
+ag:Var_MAIN_edgeF1 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "edgeF1" ;
     dp:hasVariableType "R_TRIG" ;
     op:representsFBInstance ag:FBInst_MAIN_edgeF1 .
 
-ag:Var_MAIN_fbAuto a ag:class_Variable ;
+ag:Var_MAIN_fbAuto a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "fbAuto" ;
     dp:hasVariableType "FB_Automatikbetrieb_F1" ;
     op:representsFBInstance ag:FBInst_MAIN_fbAuto .
 
-ag:Var_MAIN_fbBA a ag:class_Variable ;
+ag:Var_MAIN_fbBA a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "fbBA" ;
     dp:hasVariableType "FB_Betriebsarten" ;
     op:representsFBInstance ag:FBInst_MAIN_fbBA .
 
-ag:Var_MAIN_fbDiag a ag:class_Variable ;
+ag:Var_MAIN_fbDiag a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "fbDiag" ;
     dp:hasVariableType "FB_Diagnose_D2" ;
     op:representsFBInstance ag:FBInst_MAIN_fbDiag .
 
-ag:Var_MAIN_fbInit a ag:class_Variable ;
+ag:Var_MAIN_fbInit a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "fbInit" ;
     dp:hasVariableType "FB_InitFahrt_A6_A2" ;
     op:representsFBInstance ag:FBInst_MAIN_fbInit .
 
-ag:Var_MAIN_fbNot a ag:class_Variable ;
+ag:Var_MAIN_fbNot a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "fbNot" ;
     dp:hasVariableType "FB_Notaus_D1" ;
     op:representsFBInstance ag:FBInst_MAIN_fbNot .
 
-ag:Var_MAIN_fbProStoer a ag:class_Variable ;
+ag:Var_MAIN_fbProStoer a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "fbProStoer" ;
     dp:hasVariableType "FB_ProduktionMitStoerung_D3" ;
     op:representsFBInstance ag:FBInst_MAIN_fbProStoer .
@@ -3035,6 +3189,7 @@ ag:Port_FB_Betriebsarten_Weiter a ag:class_Port ;
     dp:isUnusedPort true .
 
 ag:StandardFBType_TP a ag:class_FBType,
+        ag:class_POU,
         ag:class_StandardFBType,
         owl:NamedIndividual ;
     dp:hasPOULanguage "ST" ;
@@ -3045,34 +3200,41 @@ ag:StandardFBType_TP a ag:class_FBType,
         ag:Port_TP_PT,
         ag:Port_TP_Q .
 
-ag:Var_FB_Automatikbetrieb_F1_Schritt1 a ag:class_Variable ;
+ag:Var_FB_Automatikbetrieb_F1_Schritt1 a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "Schritt1" ;
     dp:hasVariableType "BOOL" .
 
-ag:Var_FB_InitFahrt_A6_A2_tInit a ag:class_Variable ;
+ag:Var_FB_InitFahrt_A6_A2_tInit a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "tInit" ;
     dp:hasVariableType "TON" ;
     op:representsFBInstance ag:FBInst_FB_InitFahrt_A6_A2_tInit .
 
-ag:Var_FB_Methode1Job_t20s a ag:class_Variable ;
+ag:Var_FB_Methode1Job_t20s a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "t20s" ;
     dp:hasVariableType "TON" ;
     op:representsFBInstance ag:FBInst_FB_Methode1Job_t20s .
 
-ag:Var_FB_Notaus_D1_ton5s a ag:class_Variable ;
+ag:Var_FB_Notaus_D1_ton5s a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "ton5s" ;
     dp:hasVariableType "TON" ;
     op:representsFBInstance ag:FBInst_FB_Notaus_D1_ton5s .
 
-ag:Var_MAIN_Init_erreicht a ag:class_Variable ;
+ag:Var_MAIN_Init_erreicht a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "Init_erreicht" ;
     dp:hasVariableType "BOOL" .
 
-ag:Var_MAIN_alt_abort a ag:class_Variable ;
+ag:Var_MAIN_alt_abort a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "alt_abort" ;
     dp:hasVariableType "BOOL" .
 
-ag:Var_MAIN_alt_found a ag:class_Variable ;
+ag:Var_MAIN_alt_found a ag:class_SignalSource,
+        ag:class_Variable ;
     dp:hasVariableName "alt_found" ;
     dp:hasVariableType "BOOL" .
 
@@ -3120,6 +3282,7 @@ ag:Port_TON_PT a ag:class_Port,
     dp:hasPortType "TIME" .
 
 ag:StandardFBType_RS a ag:class_FBType,
+        ag:class_POU,
         ag:class_StandardFBType,
         owl:NamedIndividual ;
     dp:hasPOULanguage "ST" ;
@@ -3134,6 +3297,7 @@ ag:class_PortInstance a owl:Class ;
     rdfs:subClassOf ag:class_SignalSource .
 
 ag:StandardFBType_TON a ag:class_FBType,
+        ag:class_POU,
         ag:class_StandardFBType,
         owl:NamedIndividual ;
     dp:hasPOULanguage "ST" ;
@@ -3148,10 +3312,8 @@ ag:class_FBType a owl:Class ;
     rdfs:comment "Diese Klasse beschreibt einen Function Block Typ als wiederverwendbaren Baustein mit fest definierter Schnittstelle und interner Logik. Ein FBType enthält typischerweise Eingänge, Ausgänge und interne Variablen sowie entweder ST Code oder eine aus dem FBD Netzwerk rekonstruierte Darstellung. Im Knowledge Graph wird der Baustein als Typ modelliert, damit einzelne Instanzen desselben Bausteins konsistent beschrieben und analysiert werden können. Die Ports eines FBType werden über class_Port repräsentiert und definieren Richtung und Datentyp der jeweiligen Parameter, wodurch eine saubere Typanalyse der Verdrahtung möglich ist. Darüber hinaus kann ein FBType selbst weitere POUs aufrufen, etwa Standardbausteine wie Trigger oder Timer, was über POUCalls nachvollzogen wird. Die Klasse ist zentral, um das Projekt modular zu verstehen, da sie die fachliche Logik kapselt, zum Beispiel Bewegungssteuerungen, Sensor Auswertungen oder Betriebsartenautomaten. Bei der Analyse von Skills ist class_FBType besonders wertvoll, weil sie die wiederkehrenden Muster einer Skill Implementierung sichtbar macht, etwa Start Trigger, Zustandsautomaten, Reset Mechanismen und Sicherheitsabfragen."@de ;
     rdfs:subClassOf ag:class_POU .
 
-ag:class_POU a owl:Class ;
-    rdfs:comment "Diese Klasse bildet das allgemeine Konzept einer Program Organisation Unit ab und dient als Oberbegriff für Programme und Function Blocks im Sinne der IEC 61131 3 Struktur. Sie wird im Knowledge Graph verwendet, um eine gemeinsame Abstraktion für alle ausführbaren oder wiederverwendbaren Bausteine bereitzustellen, unabhängig davon, ob sie zyklisch laufen oder innerhalb anderer Bausteine aufgerufen werden. Dadurch lassen sich Analyseoperationen vereinheitlichen, zum Beispiel die Suche nach Aufrufbeziehungen, der Vergleich von Schnittstellen oder das Auffinden von internen Abhängigkeiten. In einem PLCopen XML Export entsprechen POUs typischerweise den Elementen, die eine Bausteindefinition samt Interface und Code oder Netzwerkstruktur enthalten. In diesem Modell ist class_POU vor allem eine semantische Klammer, die eine saubere Spezialisierung zu class_Program und class_FBType ermöglicht. In praktischen Abfragen wird diese Klasse häufig indirekt genutzt, um alle ausführbaren Einheiten zusammenzufassen und anschließend nach Typ oder Sprache zu filtern."@de .
-
 ag:StandardFBType_R_TRIG a ag:class_FBType,
+        ag:class_POU,
         ag:class_StandardFBType,
         owl:NamedIndividual ;
     dp:hasPOULanguage "ST" ;
@@ -3160,11 +3322,11 @@ ag:StandardFBType_R_TRIG a ag:class_FBType,
     op:hasPort ag:Port_R_TRIG_CLK,
         ag:Port_R_TRIG_Q .
 
-ag:class_SignalSource a owl:Class ;
-    rdfs:comment "Diese Klasse stellt eine abstrakte Signalquelle dar und dient als gemeinsamer Oberbegriff für unterschiedliche Ursprünge von Werten im FBD Netzwerk. Eine Signalquelle kann beispielsweise eine Variable sein, eine PortInstance eines Bausteins oder ein konstant definierter Literalwert. Im Knowledge Graph ist diese Abstraktion wichtig, weil Parameterzuweisungen immer nach dem gleichen Muster funktionieren, unabhängig davon, ob der Wert aus einer Variable oder aus einer Bausteinausgabe stammt. Dadurch können Signalflüsse einheitlich modelliert und abgefragt werden, ohne für jede Quelle unterschiedliche Datenstrukturen zu benötigen. Aus PLCopen XML entstehen Signalquellen aus Verdrahtungen, die entweder direkt auf Variablen verweisen oder die Ausgänge anderer Bausteine als Quelle verwenden. Die Klasse unterstützt komplexe Analysen wie Abhängigkeitsgraphen, Datenflussverfolgung oder die Ermittlung von Skill Vorbedingungen, da sich jede Eingangsbelegung auf eine SignalSource zurückführen lässt. Insgesamt sorgt class_SignalSource dafür, dass der Knowledge Graph die semantische Struktur des FBD Netzwerks vollständig und flexibel repräsentieren kann."@de .
-
 ag:class_POUCall a owl:Class ;
     rdfs:comment "Diese Klasse beschreibt einen konkreten Aufruf einer Program Organisation Unit innerhalb eines Programms oder eines Function Blocks. Ein POUCall macht sichtbar, dass ein bestimmter Baustein nicht nur als Typ existiert, sondern an einer konkreten Stelle tatsächlich verwendet wird. Im Knowledge Graph ist dies essenziell, um Abhängigkeitsstrukturen zu rekonstruieren, also welche Bausteine intern voneinander abhängen und wie tief verschachtelte Logik aufgebaut ist. Ein POUCall kann mit einer FBInstance und deren PortInstanzen verknüpft werden, sodass klar wird, welche konkrete Instanz eines Bausteintyps gemeint ist. Aus PLCopen XML ergibt sich ein POUCall aus einem Bausteinblock im FBD oder aus einem Funktionsaufruf in ST Code, je nach Darstellung. Für die Skill Analyse kann damit nachvollzogen werden, welche Standardbausteine ein Skill verwendet, beispielsweise Trigger, Speicher oder Timer, und welche Unterbausteine die eigentliche Prozesslogik realisieren. Insgesamt macht class_POUCall die Ausführungsstruktur explizit, wodurch sich Skill Ketten, Signalpfade und interne Architektur systematisch untersuchen lassen."@de .
+
+ag:class_POU a owl:Class ;
+    rdfs:comment "Diese Klasse bildet das allgemeine Konzept einer Program Organisation Unit ab und dient als Oberbegriff für Programme und Function Blocks im Sinne der IEC 61131 3 Struktur. Sie wird im Knowledge Graph verwendet, um eine gemeinsame Abstraktion für alle ausführbaren oder wiederverwendbaren Bausteine bereitzustellen, unabhängig davon, ob sie zyklisch laufen oder innerhalb anderer Bausteine aufgerufen werden. Dadurch lassen sich Analyseoperationen vereinheitlichen, zum Beispiel die Suche nach Aufrufbeziehungen, der Vergleich von Schnittstellen oder das Auffinden von internen Abhängigkeiten. In einem PLCopen XML Export entsprechen POUs typischerweise den Elementen, die eine Bausteindefinition samt Interface und Code oder Netzwerkstruktur enthalten. In diesem Modell ist class_POU vor allem eine semantische Klammer, die eine saubere Spezialisierung zu class_Program und class_FBType ermöglicht. In praktischen Abfragen wird diese Klasse häufig indirekt genutzt, um alle ausführbaren Einheiten zusammenzufassen und anschließend nach Typ oder Sprache zu filtern."@de .
 
 ag:class_FBInstance a owl:Class ;
     rdfs:comment "Diese Klasse beschreibt eine konkrete Instanz eines Function Block Typs innerhalb eines Programms oder eines anderen Bausteins. Während class_FBType den Bauplan liefert, stellt class_FBInstance das tatsächliche Objekt dar, das in einem Netzwerk verwendet wird und dessen interne Zustände während der Laufzeit existieren. Im Knowledge Graph ist diese Klasse entscheidend, um die echte Struktur des FBD Netzwerks abzubilden, weil ein Baustein mehrfach instanziiert werden kann, jeweils mit eigenen Parametern, eigenen Variablenzuordnungen und eigenem Zustand. Eine FBInstance ist über Beziehungen einem FBType zugeordnet und besitzt PortInstanzen, die die konkreten Pins dieser Instanz darstellen. Damit lassen sich Verdrahtungen und Signalwege nicht nur abstrakt, sondern real und vollständig nachvollziehen. In PLCopen XML entspricht dies dem Auftreten eines Baustein Blocks im Netzwerk, also einer konkreten Verwendung innerhalb des FBD. Für Skill Analysen ist class_FBInstance besonders wichtig, weil hier ersichtlich wird, welche spezifischen Sensoren, Aktoren oder Parameter an einen Skill angeschlossen sind und wie die Logik in einer konkreten Station konfiguriert wurde."@de .
@@ -3178,4 +3340,7 @@ ag:class_Port a owl:Class ;
 ag:class_Variable a owl:Class ;
     rdfs:comment "Diese Klasse repräsentiert Variablen im SPS Projekt, unabhängig davon, ob es sich um globale Variablen, lokale Variablen, Ein und Ausgänge oder Instanzvariablen handelt. Variablen sind zentrale Träger von Zuständen und Signalen, da über sie Sensorwerte gelesen, Aktoren angesteuert und interne Zwischenergebnisse gespeichert werden. Im Knowledge Graph kann eine Variable zusätzlich Hardwareinformationen enthalten, beispielsweise eine physikalische Adresse oder eine Zuordnung zu einem IO Channel, wodurch die Verbindung zwischen Logik und Feldhardware sichtbar wird. Variablen können außerdem genutzt werden, um Function Block Instanzen abzubilden, da viele PLC Systeme Instanzen über benannte Variablen in der Symbolik repräsentieren. Aus PLCopen XML stammen Variablen aus den Deklarationsbereichen eines POUs, aus globalen Variablenlisten oder aus I O Mappings. Für Skill Analysen ist class_Variable besonders wertvoll, weil darüber erkennbar wird, welche realen Sensoren und Aktoren ein Skill verwendet und welche Parameter in die Skill Aufrufe einfließen. Zusätzlich erlaubt diese Klasse Konsistenzprüfungen, etwa ob eine Variable als BOOL modelliert ist und dennoch mit einem numerischen Port verbunden wurde."@de ;
     rdfs:subClassOf ag:class_SignalSource .
+
+ag:class_SignalSource a owl:Class ;
+    rdfs:comment "Diese Klasse stellt eine abstrakte Signalquelle dar und dient als gemeinsamer Oberbegriff für unterschiedliche Ursprünge von Werten im FBD Netzwerk. Eine Signalquelle kann beispielsweise eine Variable sein, eine PortInstance eines Bausteins oder ein konstant definierter Literalwert. Im Knowledge Graph ist diese Abstraktion wichtig, weil Parameterzuweisungen immer nach dem gleichen Muster funktionieren, unabhängig davon, ob der Wert aus einer Variable oder aus einer Bausteinausgabe stammt. Dadurch können Signalflüsse einheitlich modelliert und abgefragt werden, ohne für jede Quelle unterschiedliche Datenstrukturen zu benötigen. Aus PLCopen XML entstehen Signalquellen aus Verdrahtungen, die entweder direkt auf Variablen verweisen oder die Ausgänge anderer Bausteine als Quelle verwenden. Die Klasse unterstützt komplexe Analysen wie Abhängigkeitsgraphen, Datenflussverfolgung oder die Ermittlung von Skill Vorbedingungen, da sich jede Eingangsbelegung auf eine SignalSource zurückführen lässt. Insgesamt sorgt class_SignalSource dafür, dass der Knowledge Graph die semantische Struktur des FBD Netzwerks vollständig und flexibel repräsentieren kann."@de .
 

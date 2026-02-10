@@ -1,0 +1,21 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ag: <http://www.semanticweb.org/AgentProgramParams/>
+SELECT *
+WHERE {
+?pou a ag:class_CustomFBType;
+ ag:dp_isGEMMAStateMachine "true"^^xsd:boolean;
+ ag:op_hasPort ?p.
+?p  ag:dp_hasPortDirection "Output"^^xsd:string;
+ ag:dp_hasPortName ?port_name.
+# Filter nach "D2"
+?port_instance ag:op_instantiatesPort ?p;
+ag:op_isPortOfInstance ?fb_inst.
+# Jetzt Variablen ermitteln, die die FB_Inst aufrufen.
+?var_inst ag:op_representsFBInstance ?fb_inst.
+# Jetzt die Programme ermitteln, aus denen die Aufrufvariablen aufgerufen werden.
+?caller_POU ag:op_usesVariable ?var_inst.
+}
+LIMIT 100

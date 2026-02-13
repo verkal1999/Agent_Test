@@ -387,6 +387,69 @@ class KGManager:
                 self.graph.add((fb_type_uri, DP.isGEMMAOutputLayer, Literal(True, datatype=XSD.boolean)))
 
     # ----------------------------------------------------------------------- #
+    # Reasoning / Type Inference
+    # ----------------------------------------------------------------------- #
+    def run_type_reasoning(self) -> None:
+        """
+        Führt ein einfaches RDFS-Reasoning durch (Transitive Hülle über rdfs:subClassOf).
+        Instanzen von Unterklassen erhalten automatisch den Typ der Oberklasse.
+        """
+        print("Starte Type-Reasoning (Inferenz)...")
+        
+        # 1. Hierarchie definieren (Schema anreichern, falls noch nicht geschehen)
+        # Hier definierst du, wer wessen Unterklasse ist.
+        schema_triples = [
+            (AG.class_StandardFBType, RDFS.subClassOf, AG.class_FBType),
+            (AG.class_CustomFBType,   RDFS.subClassOf, AG.class_FBType),
+            (AG.class_FBType,         RDFS.subClassOf, AG.class_POU),
+            (AG.class_Program,        RDFS.subClassOf, AG.class_POU),
+            # Optional: Weitere Hierarchien
+            # (AG.class_InputPort, RDFS.subClassOf, AG.class_Port), 
+        ]
+        
+        for sub, rel, obj in schema_triples:
+            self.graph.add((sub, rel, obj))
+
+        # 2. Transitive Map der Oberklassen aufbauen
+        # Map: Unterklasse -> Set aller (direkten und indirekten) Oberklassen
+        superclass_map: Dict[URIRef, Set[URIRef]] = {}
+        
+        # Initialisierung mit direkten Eltern
+        for sub, p_obj in self.graph.subject_objects(RDFS.subClassOf):
+            if sub not in superclass_map: superclass_map[sub] = set()
+            superclass_map[sub].add(URIRef(p_obj))
+
+        # Fixpunkt-Iteration für transitive Hülle (A sub B, B sub C -> A sub C)
+        changed = True
+        while changed:
+            changed = False
+            for sub in list(superclass_map.keys()):
+                parents = superclass_map[sub]
+                new_parents = set()
+                for p in parents:
+                    if p in superclass_map:
+                        new_parents.update(superclass_map[p])
+                
+                # Wenn wir neue Vorfahren gefunden haben, hinzufügen
+                if not new_parents.issubset(parents):
+                    parents.update(new_parents)
+                    changed = True
+
+        # 3. Materialisierung: Typen an Instanzen schreiben
+        new_triples_count = 0
+        # Wir iterieren über alle Klassen, die Unterklassen sind
+        for sub_cls, parents in superclass_map.items():
+            # Finde alle Instanzen dieser Unterklasse
+            for instance in self.graph.subjects(RDF.type, sub_cls):
+                for parent_cls in parents:
+                    # Wenn das Tripel (Instanz type Oberklasse) noch fehlt -> hinzufügen
+                    if (instance, RDF.type, parent_cls) not in self.graph:
+                        self.graph.add((instance, RDF.type, parent_cls))
+                        new_triples_count += 1
+
+        print(f"Reasoning abgeschlossen. {new_triples_count} 'rdf:type'-Tripel hinzugefügt.")
+
+    # ----------------------------------------------------------------------- #
     # Haupt-Logik: Call Analyse
     # ----------------------------------------------------------------------- #
     def analyze_calls(self) -> None:
@@ -456,6 +519,9 @@ class KGManager:
 
         # Unused Detection laufen lassen
         self.analyze_unused_elements()
+
+        # Resoning Subklassen-Instanzen zu Oberklassen-Instanzen
+        self.run_type_reasoning()
         
         # Reports erstellen
         self.generate_reports()
@@ -561,7 +627,244 @@ class KGManager:
         if comment:
             self.graph.add((prop_uri, RDFS.comment, Literal(comment)))
 
+    # ----------------------------------------------------------------------- #
+    # Default Values aus dp:hasPOUDeclarationHeader
+    # ----------------------------------------------------------------------- #
+    def _ensure_string_dt_property(
+        self,
+        prop_uri: URIRef,
+        domain: URIRef,
+        *,
+        comment: str | None = None,
+    ) -> None:
+        """Stellt sicher, dass eine dp-Property als DatatypeProperty (xsd:string) existiert."""
+        if not self.graph:
+            return
+        self.graph.add((prop_uri, RDF.type, OWL.DatatypeProperty))
+        self.graph.add((prop_uri, RDFS.domain, domain))
+        self.graph.add((prop_uri, RDFS.range, XSD.string))
+        if comment:
+            self.graph.add((prop_uri, RDFS.comment, Literal(comment)))
 
+    def _extract_default_initializers_from_decl_header(self, header: str) -> Dict[str, str]:
+        """
+        Extrahiert Default-Initialisierungen aus IEC 61131-3 Deklarations-Headern.
+
+        Erkennt Zeilen wie:
+            Name : BOOL := TRUE;
+            Period : TIME := T#60s;
+
+        Liefert Dict: { "Name": "TRUE", "Period": "T#60s", ... }
+        """
+        if not header:
+            return {}
+
+        # Block-Kommentare (* ... *) entfernen
+        text = re.sub(r"\(\*.*?\*\)", " ", header, flags=re.S)
+
+        in_var_block = False
+        buf = ""
+        defaults: Dict[str, str] = {}
+
+        for raw in text.splitlines():
+            s = raw.strip()
+            if not s:
+                continue
+
+            up = s.upper()
+
+            # VAR / VAR_INPUT / VAR RETAIN / VAR_TEMP ...
+            if up.startswith("VAR"):
+                in_var_block = True
+                buf = ""
+                continue
+
+            if up.startswith("END_VAR"):
+                in_var_block = False
+                buf = ""
+                continue
+
+            if not in_var_block:
+                continue
+
+            # Attribute-Zeilen ignorieren
+            if s.startswith("{attribute") or s.startswith("{ATTRIBUTE"):
+                continue
+
+            # Zeilenkommentar abschneiden
+            if "//" in raw:
+                raw = raw.split("//", 1)[0]
+
+            buf += " " + raw.strip()
+
+            # Statements bis Semikolon sammeln (robuster als line-only)
+            if ";" in buf:
+                parts = buf.split(";")
+                for stmt in parts[:-1]:
+                    stmt = stmt.strip()
+                    if not stmt:
+                        continue
+
+                    # name [AT ...] : type [:= init]
+                    m = re.match(
+                        r"^(?P<name>[A-Za-z_][A-Za-z0-9_]*)\s*"
+                        r"(?:AT\s+[^:]+)?\s*:\s*"
+                        r"(?P<type>[^:=]+?)\s*"
+                        r"(?:\s*:=\s*(?P<init>.+))?$",
+                        stmt,
+                    )
+                    if not m:
+                        continue
+
+                    init = m.group("init")
+                    if init is None:
+                        continue
+
+                    name = m.group("name").strip()
+                    init_clean = init.strip()
+                    if name and init_clean:
+                        defaults[name] = init_clean
+
+                buf = parts[-1]
+
+        return defaults
+
+    def _find_internal_variable_in_pou(self, pou_uri: URIRef, var_name: str) -> Optional[URIRef]:
+        """Sucht eine interne Variable (op:hasInternalVariable) anhand dp:hasVariableName im gegebenen POU."""
+        if not self.graph:
+            return None
+
+        norm_target = self._normalize_name(var_name)
+        for var_uri in self.graph.objects(pou_uri, OP.hasInternalVariable):
+            nm = next(self.graph.objects(var_uri, DP.hasVariableName), None)
+            if nm and self._normalize_name(str(nm)) == norm_target:
+                return URIRef(var_uri)
+        return None
+
+    def _ensure_local_variable_for_pou(self, pou_uri: URIRef, pou_name: str, var_name: str) -> URIRef:
+        """
+        Legt (falls nötig) eine lokale Variable im KG an, konsistent zu deinem URI-Schema:
+            ag:Var_<POU>_<VarName>
+        und verknüpft sie mit op:hasInternalVariable + op:usesVariable.
+        """
+        var_uri = self._make_uri(f"Var_{pou_name}_{var_name}")
+
+        if (var_uri, RDF.type, AG.class_Variable) not in self.graph:
+            self.graph.add((var_uri, RDF.type, AG.class_Variable))
+            self.graph.add((var_uri, DP.hasVariableName, Literal(var_name)))
+            self.graph.add((var_uri, DP.hasVariableScope, Literal("local")))
+
+        self.graph.add((pou_uri, OP.hasInternalVariable, var_uri))
+        self.graph.add((pou_uri, OP.usesVariable, var_uri))
+        return var_uri
+
+    def enrich_default_values_from_declaration_headers(
+        self,
+        *,
+        overwrite: bool = True,
+        create_missing_variables: bool = True,
+    ) -> Dict[str, int]:
+        """
+        Liest dp:hasPOUDeclarationHeader pro POU, extrahiert ':=' Defaults und schreibt:
+          - dp:hasDefaultPortValue an Ports
+          - dp:hasDefaultVariableValue an Variablen
+        Ports: Default wird zusätzlich auf die implementierende Variable (op:implementsPort) übertragen.
+
+        Return: einfache Statistik.
+        """
+        if not self.graph:
+            raise RuntimeError("Graph ist nicht geladen. Erst load() aufrufen.")
+
+        # Properties sicherstellen
+        self._ensure_string_dt_property(
+            DP.hasDefaultPortValue,
+            AG.class_Port,
+            comment="Default value for Port extracted from dp:hasPOUDeclarationHeader (':= ...').",
+        )
+        self._ensure_string_dt_property(
+            DP.hasDefaultVariableValue,
+            AG.class_Variable,
+            comment="Default value for Variable extracted from dp:hasPOUDeclarationHeader (':= ...').",
+        )
+
+        ports_set = 0
+        vars_set = 0
+        pous_seen = 0
+        missing_ports = 0
+        created_vars = 0
+
+        # Nur POUs, die überhaupt einen Header haben
+        for pou_uri in set(self.graph.subjects(DP.hasPOUDeclarationHeader, None)):
+            header_lit = next(self.graph.objects(pou_uri, DP.hasPOUDeclarationHeader), None)
+            if not header_lit:
+                continue
+
+            pou_name = self._get_name(pou_uri, [DP.hasPOUName, DP.hasProgramName])
+            defaults = self._extract_default_initializers_from_decl_header(str(header_lit))
+            if not defaults:
+                continue
+
+            pous_seen += 1
+            pou_norm = self._normalize_name(pou_name)
+
+            # Port-Map für diese POU (schnell)
+            port_by_name: Dict[str, URIRef] = {}
+            for port_uri in self.graph.objects(pou_uri, OP.hasPort):
+                pn = next(self.graph.objects(port_uri, DP.hasPortName), None)
+                if pn:
+                    port_by_name[self._normalize_name(str(pn))] = URIRef(port_uri)
+
+            for name, init in defaults.items():
+                init_lit = Literal(init, datatype=XSD.string)
+                name_norm = self._normalize_name(name)
+
+                # 1) Falls Port existiert: dp_hasDefaultPortValue setzen
+                port_uri = port_by_name.get(name_norm)
+                if port_uri:
+                    if overwrite:
+                        self.graph.remove((port_uri, DP.hasDefaultPortValue, None))
+                    self.graph.add((port_uri, DP.hasDefaultPortValue, init_lit))
+                    ports_set += 1
+
+                    # Default zusätzlich auf implementierende Variable(n) übertragen
+                    for var_uri in self.graph.subjects(OP.implementsPort, port_uri):
+                        if overwrite:
+                            self.graph.remove((var_uri, DP.hasDefaultVariableValue, None))
+                        self.graph.add((var_uri, DP.hasDefaultVariableValue, init_lit))
+                        vars_set += 1
+                    continue
+
+                # 2) Kein Port: interne Variable suchen/erzeugen
+                var_uri = self._find_internal_variable_in_pou(pou_uri, name)
+                if not var_uri and create_missing_variables:
+                    var_uri = self._ensure_local_variable_for_pou(pou_uri, pou_name, name)
+                    created_vars += 1
+
+                if var_uri:
+                    if overwrite:
+                        self.graph.remove((var_uri, DP.hasDefaultVariableValue, None))
+                    self.graph.add((var_uri, DP.hasDefaultVariableValue, init_lit))
+                    vars_set += 1
+                else:
+                    missing_ports += 1
+
+        # Indizes aktualisieren, falls neue Variablen angelegt wurden
+        if created_vars > 0:
+            self._build_indices()
+
+        if self.debug:
+            print(
+                f"[defaults] POUs: {pous_seen}, ports_set: {ports_set}, vars_set: {vars_set}, "
+                f"created_vars: {created_vars}, unresolved: {missing_ports}"
+            )
+
+        return {
+            "pous_seen": pous_seen,
+            "ports_set": ports_set,
+            "vars_set": vars_set,
+            "created_vars": created_vars,
+            "unresolved": missing_ports,
+        }
     # ----------------------------------------------------------------------- #
     # Resolution Logic
     # ----------------------------------------------------------------------- #

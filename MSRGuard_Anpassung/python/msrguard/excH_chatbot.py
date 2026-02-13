@@ -70,6 +70,8 @@ class IncidentContext:
     lastSkill: str = ""  # z.B. TestSkill3
     plcSnapshot: Any = None
 
+    lastGEMMAStateBeforeFailure: str = ""  # z.B. F1
+
     kg_ttl_path: str = ""
     project_root: str = ""
     agent_result: Any = None
@@ -111,6 +113,19 @@ class IncidentContext:
             elif s in {"false", "0"}:
                 trigger_d2_val = False
 
+        last_gemma = ""
+        vgemma = _snapshot_get_var(
+            plc_snapshot,
+            [
+                "LastGEMMAStateBeforeFailure",
+                "OPCUA.LastGEMMAStateBeforeFailure",
+                "LastGemmaStateBeforeFailure",
+                "OPCUA.LastGemmaStateBeforeFailure",
+            ],
+        )
+        if vgemma is not None:
+            last_gemma = str(vgemma).strip()
+
         return IncidentContext(
             correlationId=corr,
             processName=proc,
@@ -118,6 +133,7 @@ class IncidentContext:
             triggerEvent=trig_evt,
             lastSkill=last,
             plcSnapshot=plc_snapshot,
+            lastGEMMAStateBeforeFailure=last_gemma,
             kg_ttl_path=_pick(payload, ["kg_ttl_path", "kgTtlPath", "kg_path", "kgPath", "ttl_path", "ttlPath"]),
             project_root=_pick(payload, ["project_root", "projectRoot"]),
             agent_result=_as_dict(obj).get("agent_result"),
@@ -146,6 +162,10 @@ def build_initial_prompt(ctx: IncidentContext, diagnoseplan: Optional[Dict[str, 
         parts.append(f"triggerEvent: {ctx.triggerEvent}")
     if ctx.triggerD2 is not None:
         parts.append(f"snapshot.OPCUA.TriggerD2: {ctx.triggerD2}")
+    if ctx.lastGEMMAStateBeforeFailure:
+        parts.append(f"snapshot.OPCUA.LastGEMMAStateBeforeFailure: {ctx.lastGEMMAStateBeforeFailure}")
+        if (ctx.triggerEvent or "").strip().lower() == "evd2" or ctx.triggerD2 is True:
+            parts.append("GEMMA: letzter stabiler Zustand vor Fehler war oben; aktueller Fehlerzustand ist D2 (evD2).")
 
     if ctx.lastSkill:
         parts.append(f"lastSkill (lastExecutedSkill): {ctx.lastSkill}")
@@ -179,6 +199,10 @@ def build_initial_prompt(ctx: IncidentContext, diagnoseplan: Optional[Dict[str, 
         "3) Finde die GEMMA-State-Machine (dp:isGEMMAStateMachine true), identifiziere den Output-Port D2 und wie D2 in MAIN verdrahtet ist.\n"
         "4) Analysiere die D2-Logik im GEMMA-Layer (FBD) als RS-Flipflop: 1. Argument = Set, 2. Argument = Reset.\n"
         "5) Suche danach im Code, wo die Einflussgrößen der Set/Reset-Bedingung gesetzt werden und ob diese durch den lastSkill-Pfad beeinflusst werden.\n\n"
+        "GEMMA Hinweis:\n"
+        "- Im GEMMA ist typischerweise immer genau 1 Zustand gleichzeitig aktiv (one-hot). "
+        "Wenn snapshot.OPCUA.LastGEMMAStateBeforeFailure gesetzt ist (z.B. F1), nutze das als starken Hinweis, "
+        "welcher Zweig einer ODER-Set-Bedingung realistisch aktiv war.\n\n"
         "Liefer bitte: konkrete POU-Namen, relevante Code-Snippets und klare nächste Debug-Schritte.\n"
     )
     return prompt
@@ -204,7 +228,7 @@ class ExcHChatBotSession:
             self.bootstrap_evd2_plan = {"error": str(e)}
         return self.bootstrap_evd2_plan
 
-    def ask(self, user_msg: str, debug: bool = True, *, include_bootstrap: bool = True) -> Dict[str, Any]:
+    def ask(self, user_msg: str, debug: bool = True, *, include_bootstrap: bool = False) -> Dict[str, Any]:
         ctx_blob = asdict(self.ctx)
         wrapped = (
             "Incident Kontext (JSON):\n"
@@ -248,6 +272,7 @@ def build_evd2_diagnoseplan(session: ExcHChatBotSession) -> Dict[str, Any]:
         "evd2_diagnoseplan",
         {
             "last_skill": session.ctx.lastSkill or "",
+            "last_gemma_state": session.ctx.lastGEMMAStateBeforeFailure or "",
             "trigger_var": "OPCUA.TriggerD2",
             "event_name": "evD2",
             "port_name_contains": "D2",

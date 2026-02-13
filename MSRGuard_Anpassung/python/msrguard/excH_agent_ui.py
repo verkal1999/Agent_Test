@@ -8,6 +8,7 @@ import os
 import subprocess
 import sys
 import threading
+from datetime import datetime, timezone
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, Optional, List
@@ -173,6 +174,7 @@ class ExcHAgentUI(ctk.CTk):
         self.cfg = cfg
         self.event: Dict[str, Any] = event
         self.out_json_path = out_json_path or ""
+        self.chat_log_path: Optional[Path] = None
 
         self._pipeline_started = False
         self._pipeline_done_evt = threading.Event()
@@ -188,6 +190,7 @@ class ExcHAgentUI(ctk.CTk):
         self.chatbot_session = None
         self.chatbot_last_error: str = ""
         self.chat_transcript: List[Dict[str, Any]] = []
+        self.ui_events: List[Dict[str, Any]] = []
 
         self.title("MSRGuard ExcH Agent UI")
         self.geometry("1280x780")
@@ -226,8 +229,16 @@ class ExcHAgentUI(ctk.CTk):
         self.mid.grid_rowconfigure(1, weight=1)
         self.mid.grid_columnconfigure(0, weight=1)
 
-        self.lbl_chat = ctk.CTkLabel(self.mid, text="ChatBot", font=ctk.CTkFont(size=16, weight="bold"))
-        self.lbl_chat.grid(row=0, column=0, padx=12, pady=(12, 6), sticky="w")
+        self.chat_header = ctk.CTkFrame(self.mid, fg_color="transparent")
+        self.chat_header.grid(row=0, column=0, padx=12, pady=(12, 6), sticky="ew")
+        self.chat_header.grid_columnconfigure(0, weight=1)
+        self.chat_header.grid_columnconfigure(1, weight=0)
+
+        self.lbl_chat = ctk.CTkLabel(self.chat_header, text="ChatBot", font=ctk.CTkFont(size=16, weight="bold"))
+        self.lbl_chat.grid(row=0, column=0, sticky="w")
+
+        self.chat_status = ctk.CTkLabel(self.chat_header, text="Bereit.", anchor="e")
+        self.chat_status.grid(row=0, column=1, sticky="e")
 
         self.chat_scroll = ctk.CTkScrollableFrame(self.mid, corner_radius=10)
         self.chat_scroll.grid(row=1, column=0, padx=12, pady=6, sticky="nsew")
@@ -276,6 +287,7 @@ class ExcHAgentUI(ctk.CTk):
 
         self.populate_event_box()
         self._post_initial_system_messages()
+        self._init_chat_log()
 
         if self.cfg.pipeline.enabled:
             self._start_pipeline_async()
@@ -293,6 +305,80 @@ class ExcHAgentUI(ctk.CTk):
         state = "normal" if enabled else "disabled"
         self.entry.configure(state=state)
         self.btn_send.configure(state=state)
+
+    def set_chat_status(self, text: str) -> None:
+        self._log_ui_event("chat_status", {"text": text})
+        try:
+            self.chat_status.configure(text=text)
+        except Exception:
+            pass
+
+    def _utc_now_iso(self) -> str:
+        return datetime.now(timezone.utc).isoformat()
+
+    def _log_ui_event(self, kind: str, data: Optional[Dict[str, Any]] = None) -> None:
+        try:
+            self.ui_events.append(
+                {
+                    "ts_utc": self._utc_now_iso(),
+                    "kind": str(kind),
+                    "data": data or {},
+                }
+            )
+            self._flush_chat_log()
+        except Exception:
+            pass
+
+    def _sanitize_for_path(self, s: str) -> str:
+        s = (s or "").strip()
+        s = "".join(ch if ch.isalnum() or ch in ("-", "_") else "_" for ch in s)
+        return s[:80] if s else "noid"
+
+    def _init_chat_log(self) -> None:
+        """
+        Legt pro UI-Session einen neuen Ordner unter python/agent_results an und schreibt
+        dort eine chatBot_verlauf.json, die während der Session fortlaufend aktualisiert wird.
+        """
+        try:
+            here = Path(__file__).resolve()
+            python_root = here.parent.parent  # .../python
+            out_dir = python_root / "agent_results"
+            out_dir.mkdir(parents=True, exist_ok=True)
+
+            payload = self.event.get("payload") if isinstance(self.event.get("payload"), dict) else {}
+            corr = self._sanitize_for_path(str(payload.get("correlationId") or payload.get("corr") or ""))
+            ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+            session_dir = out_dir / f"chat_{ts}_{corr}"
+            session_dir.mkdir(parents=True, exist_ok=True)
+            self.chat_log_path = session_dir / "chatBot_verlauf.json"
+
+            self._flush_chat_log()
+        except Exception:
+            self.chat_log_path = None
+
+    def _flush_chat_log(self) -> None:
+        if not self.chat_log_path:
+            return
+        try:
+            payload = self.event.get("payload") if isinstance(self.event.get("payload"), dict) else {}
+            meta = {
+                "started_at_utc": getattr(self, "_chat_started_at_utc", None) or self._utc_now_iso(),
+                "event_type": self.event.get("type", ""),
+                "correlationId": payload.get("correlationId") or payload.get("corr") or "",
+                "processName": payload.get("processName") or payload.get("process") or payload.get("lastProcessName") or "",
+                "out_json_path": self.out_json_path,
+            }
+            if not getattr(self, "_chat_started_at_utc", None):
+                self._chat_started_at_utc = meta["started_at_utc"]
+
+            blob = {
+                "meta": meta,
+                "transcript": self.chat_transcript,
+                "events": self.ui_events,
+            }
+            self.chat_log_path.write_text(json.dumps(blob, indent=2, ensure_ascii=False), encoding="utf-8")
+        except Exception:
+            pass
 
     def _add_chat_bubble(self, role: str, text: str) -> None:
         role = role.strip() or "System"
@@ -321,7 +407,8 @@ class ExcHAgentUI(ctk.CTk):
         txt.insert("1.0", text or "")
         txt.configure(state="disabled")
 
-        self.chat_transcript.append({"role": role, "text": text})
+        self.chat_transcript.append({"ts_utc": self._utc_now_iso(), "role": role, "text": text})
+        self._flush_chat_log()
 
         try:
             self.chat_scroll._parent_canvas.yview_moveto(1.0)
@@ -330,6 +417,53 @@ class ExcHAgentUI(ctk.CTk):
 
     def _chat_threadsafe(self, role: str, text: str) -> None:
         self.after(0, lambda: self._add_chat_bubble(role, text))
+
+    @staticmethod
+    def _tool_results_look_empty(tool_results: Any) -> bool:
+        if not isinstance(tool_results, dict) or not tool_results:
+            return True
+        for val in tool_results.values():
+            if isinstance(val, dict) and "error" in val:
+                return False
+            if isinstance(val, list) and len(val) > 0:
+                return False
+            if val:
+                return False
+        return True
+
+    def _show_chatbot_debug_in_chat(self, res: Any) -> None:
+        """
+        Zeigt Debug-Infos (Plan) im Chat an und meldet sichtbar, wenn der Planner/Tools
+        keine verwertbaren Ergebnisse geliefert haben.
+        """
+        if not isinstance(res, dict):
+            return
+
+        plan = res.get("plan")
+        tool_results = res.get("tool_results")
+
+        if isinstance(plan, dict):
+            steps = plan.get("steps")
+            if isinstance(steps, list) and len(steps) == 0:
+                self._chat_threadsafe("System", "Hinweis: Planner hat keine Tool-Schritte geplant (steps=[]).")
+
+            self._chat_threadsafe(
+                "System",
+                "Plan (Tool-Aufrufe):\n" + json.dumps(plan, ensure_ascii=False, indent=2),
+            )
+
+        # Tool-Fehler sichtbar machen
+        if isinstance(tool_results, dict):
+            err_steps = [k for k, v in tool_results.items() if isinstance(v, dict) and "error" in v]
+            if err_steps:
+                self._chat_threadsafe("System", "Hinweis: Tool-Fehler in: " + ", ".join(err_steps))
+
+        if self._tool_results_look_empty(tool_results):
+            self._chat_threadsafe(
+                "System",
+                "Hinweis: Keine/zu wenige Tool-Ergebnisse für eine konkrete Antwort. "
+                "Der ChatBot konnte vermutlich nicht die richtigen Tools auswählen oder das KG enthält die Info nicht.",
+            )
 
     def _post_initial_system_messages(self) -> None:
         payload = self.event.get("payload") if isinstance(self.event.get("payload"), dict) else {}
@@ -469,8 +603,9 @@ class ExcHAgentUI(ctk.CTk):
         if self.analysis_started:
             return
         self.analysis_started = True
-        self.set_status("Analyse wird gestartet…")
-        self._chat_threadsafe("System", "Analyse wird gestartet…")
+        self.set_status("Analyse wird gestartet...")
+        self._chat_threadsafe("System", "Analyse wird gestartet...")
+        self.set_chat_status("Analyse läuft…")
 
         err = try_set_openai_key_from_file(self.cfg.openai_api_key_file)
         if err:
@@ -478,18 +613,19 @@ class ExcHAgentUI(ctk.CTk):
 
         def worker():
             if self.cfg.pipeline.enabled:
-                self._chat_threadsafe("System", "Warte auf Pipeline-Finish…")
+                self._chat_threadsafe("System", "Warte auf Pipeline-Finish...")
                 self._pipeline_done_evt.wait()
 
             try:
                 handle_event = self._import_handle_event()
                 self.agent_result = handle_event(self.event)
                 self.after(0, self._render_agent_output)
-                self._chat_threadsafe("System", "Agent-Analyse abgeschlossen.")
+                self._log_ui_event("agent_core_done", {"ok": True})
             except Exception as e:
                 self.agent_result = {"status": "error", "error": str(e)}
                 self.after(0, self._render_agent_output)
                 self._chat_threadsafe("System", f"Agent Fehler: {e}")
+                self._log_ui_event("agent_core_done", {"ok": False, "error": str(e)})
 
             try:
                 IncidentContext, ExcHChatBotSession, run_initial_analysis, build_bot = self._import_chatbot_pieces()
@@ -506,15 +642,26 @@ class ExcHAgentUI(ctk.CTk):
                 self.chatbot_session = ExcHChatBotSession(bot=bot, ctx=ctx)
 
                 res = run_initial_analysis(self.chatbot_session, debug=True)
+                if isinstance(res, dict):
+                    self._log_ui_event(
+                        "chatbot_initial_debug",
+                        {
+                            "plan": res.get("plan"),
+                            "tool_results": res.get("tool_results"),
+                        },
+                    )
                 answer = res.get("answer") if isinstance(res, dict) else None
                 self._chat_threadsafe("Assistant", answer or _json_or_str(res))
+                self._show_chatbot_debug_in_chat(res)
                 self.after(0, lambda: self.set_chat_enabled(True))
+                self.after(0, lambda: self.set_chat_status("Bereit."))
 
             except Exception as e:
                 self.chatbot_session = None
                 self.chatbot_last_error = str(e)
                 self._chat_threadsafe("System", f"ChatBot init Fehler: {e}")
                 self.after(0, lambda: self.set_chat_enabled(False))
+                self.after(0, lambda: self.set_chat_status("ChatBot Fehler."))
 
             self.analysis_done = True
             self.after(0, lambda: self.set_status("Analyse abgeschlossen. Du kannst noch Fragen stellen oder 'Weiter' drücken."))
@@ -537,18 +684,29 @@ class ExcHAgentUI(ctk.CTk):
             return
 
         self.set_chat_enabled(False)
-        self.set_status("ChatBot antwortet…")
+        self.set_status("ChatBot antwortet...")
+        self.set_chat_status("ChatBot denkt…")
 
         def worker():
             try:
                 res = self.chatbot_session.ask(msg, debug=True)
+                if isinstance(res, dict):
+                    self._log_ui_event(
+                        "chatbot_message_debug",
+                        {
+                            "plan": res.get("plan"),
+                            "tool_results": res.get("tool_results"),
+                        },
+                    )
                 answer = res.get("answer") if isinstance(res, dict) else None
                 self._chat_threadsafe("Assistant", answer or _json_or_str(res))
+                self._show_chatbot_debug_in_chat(res)
             except Exception as e:
                 self._chat_threadsafe("System", f"ChatBot Fehler: {e}")
             finally:
                 self.after(0, lambda: self.set_chat_enabled(True))
                 self.after(0, lambda: self.set_status("Bereit."))
+                self.after(0, lambda: self.set_chat_status("Bereit."))
 
         threading.Thread(target=worker, daemon=True).start()
 

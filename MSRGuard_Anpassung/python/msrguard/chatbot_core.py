@@ -4,6 +4,7 @@ import json
 import os
 import re
 import inspect
+from collections import deque
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
@@ -641,6 +642,436 @@ class GeneralSearchTool(BaseAgentTool):
         return sparql_select_raw(q)
 
 
+@dataclass(frozen=True)
+class InvestigationNode:
+    type: str
+    key: str
+    depth: int
+    priority: int
+    parent: str
+    reason: str
+
+    @property
+    def node_id(self) -> str:
+        return f"{self.type}:{self.key}"
+
+
+class GraphInvestigateTool(BaseAgentTool):
+    name = "graph_investigate"
+    description = (
+        "Generischer Suchalgorithmus: startet mit Seed-Knoten und expandiert iterativ "
+        "(Code-/KG-Suche, Call-Chain, Setter-Guards), bis keine neuen Knoten mehr entstehen."
+    )
+    usage_guide = (
+        "Nutzen, wenn du eine echte Root-Cause-Kette brauchst (Setter -> Bedingung -> Upstream-Signale). "
+        "Gib seed_terms (z.B. Trigger-Variable, lastSkill, wichtige Ports/Variablen) und optional target_terms."
+    )
+
+    _kw = {
+        "IF", "THEN", "ELSE", "ELSIF", "END_IF", "CASE", "OF", "END_CASE",
+        "FOR", "TO", "DO", "END_FOR", "WHILE", "END_WHILE", "REPEAT", "UNTIL", "END_REPEAT",
+        "AND", "OR", "NOT", "XOR",
+        "TRUE", "FALSE",
+        "VAR", "END_VAR", "VAR_INPUT", "VAR_OUTPUT", "VAR_IN_OUT", "VAR_TEMP", "VAR_GLOBAL", "VAR_CONFIG",
+        "R_TRIG", "F_TRIG", "RS", "SR",
+    }
+
+    @staticmethod
+    def _escape_sparql_string(s: str) -> str:
+        return (s or "").replace("\\", "\\\\").replace('"', '\\"')
+
+    @staticmethod
+    def _snippets(code: str, needle: str, radius: int = 10, max_snips: int = 6) -> List[Dict[str, Any]]:
+        if not code or not needle:
+            return []
+        lines = code.splitlines()
+        hits = [i for i, ln in enumerate(lines) if needle in ln]
+        out: List[Dict[str, Any]] = []
+        for idx in hits[:max_snips]:
+            lo = max(0, idx - radius)
+            hi = min(len(lines), idx + radius + 1)
+            out.append(
+                {
+                    "line": idx + 1,
+                    "needle": needle,
+                    "snippet": "\n".join(lines[lo:hi]),
+                }
+            )
+        return out
+
+    @classmethod
+    def _extract_symbols(cls, text: str) -> List[str]:
+        if not text:
+            return []
+        toks = re.findall(r"[A-Za-z_][A-Za-z0-9_.]*", text)
+        out: List[str] = []
+        seen: Set[str] = set()
+        for t in toks:
+            if t.upper() in cls._kw:
+                continue
+            if re.fullmatch(r"\d+", t):
+                continue
+            # kleine Heuristik: sehr kurze Tokens ignorieren (Q, I, etc.) außer bei dotted form
+            if len(t) <= 1 and "." not in t:
+                continue
+            if t not in seen:
+                seen.add(t)
+                out.append(t)
+        return out
+
+    @staticmethod
+    def _extract_if_conditions(snippet: str, max_conditions: int = 3) -> List[str]:
+        if not snippet:
+            return []
+        lines = [ln.strip() for ln in snippet.splitlines() if ln.strip()]
+        conds: List[str] = []
+        for ln in lines:
+            m = re.match(r"(?i)^IF\s+(.+?)\s+THEN\b", ln)
+            if m:
+                conds.append(m.group(1).strip())
+                if len(conds) >= max_conditions:
+                    break
+        return conds
+
+    @staticmethod
+    def _general_search(name_contains: str, limit: int = 20) -> List[Dict[str, Any]]:
+        needle = GraphInvestigateTool._escape_sparql_string(name_contains)
+        needle_dot = needle.replace(".", "__dot__")
+        q = f"""
+        SELECT DISTINCT ?name ?type ?category WHERE {{
+          {{
+            ?s rdf:type ag:class_POU ;
+               dp:hasPOUName ?name .
+            BIND("" AS ?type)
+            BIND("POU" AS ?category)
+          }}
+          UNION
+          {{
+            ?s rdf:type ag:class_Variable ;
+               dp:hasVariableName ?name ;
+               dp:hasVariableType ?type .
+            BIND("Variable" AS ?category)
+          }}
+          UNION
+          {{
+            ?s rdf:type ag:class_Port ;
+               dp:hasPortName ?name ;
+               dp:hasPortType ?type .
+            BIND("Port" AS ?category)
+          }}
+          FILTER(
+            CONTAINS(LCASE(STR(?name)), LCASE("{needle}")) ||
+            CONTAINS(LCASE(STR(?s)), LCASE("{needle_dot}"))
+          )
+        }} LIMIT {int(limit)}
+        """
+        return sparql_select_raw(q, max_rows=limit)
+
+    @staticmethod
+    def _pou_code(pou_name: str) -> str:
+        pn = GraphInvestigateTool._escape_sparql_string(pou_name)
+        q = f"""
+        SELECT ?code WHERE {{
+          ?pou rdf:type ag:class_POU ;
+               dp:hasPOUName "{pn}" ;
+               dp:hasPOUCode ?code .
+        }}
+        """
+        rows = sparql_select_raw(q, max_rows=3)
+        return rows[0].get("code", "") if rows else ""
+
+    @staticmethod
+    def _pou_callers(pou_name: str, limit: int = 50) -> List[str]:
+        pn = GraphInvestigateTool._escape_sparql_string(pou_name)
+        q = f"""
+        SELECT ?callerName WHERE {{
+          ?caller rdf:type ag:class_POU ;
+                  dp:hasPOUName ?callerName ;
+                  op:containsPOUCall ?call .
+          ?call op:callsPOU ?callee .
+          ?callee dp:hasPOUName "{pn}" .
+        }} ORDER BY ?callerName LIMIT {int(limit)}
+        """
+        rows = sparql_select_raw(q, max_rows=limit)
+        out = []
+        for r in rows:
+            n = (r.get("callerName") or "").strip()
+            if n:
+                out.append(n)
+        return out
+
+    @staticmethod
+    def _variable_trace(var_name: str) -> List[Dict[str, Any]]:
+        needle = GraphInvestigateTool._escape_sparql_string(var_name)
+        q = f"""
+        SELECT DISTINCT ?name ?type ?addr WHERE {{
+          ?v rdf:type ag:class_Variable ;
+             dp:hasVariableName ?name ;
+             dp:hasVariableType ?type .
+          OPTIONAL {{ ?v dp:hasHardwareAddress ?addr . }}
+          FILTER(LCASE(STR(?name)) = LCASE("{needle}"))
+        }} LIMIT 10
+        """
+        return sparql_select_raw(q, max_rows=10)
+
+    @staticmethod
+    def _code_search_pous(term: str, limit: int = 20) -> List[Dict[str, Any]]:
+        needle = GraphInvestigateTool._escape_sparql_string(term)
+        q = f"""
+        SELECT ?pou_name ?code WHERE {{
+          ?pou rdf:type ag:class_POU ;
+               dp:hasPOUName ?pou_name ;
+               dp:hasPOUCode ?code .
+          FILTER(CONTAINS(LCASE(STR(?code)), LCASE("{needle}")))
+        }} ORDER BY ?pou_name LIMIT {int(limit)}
+        """
+        return sparql_select_raw(q, max_rows=limit)
+
+    def run(
+        self,
+        *,
+        seed_terms: List[str],
+        target_terms: Optional[List[str]] = None,
+        max_iters: int = 40,
+        max_nodes: int = 240,
+        max_pous_per_term: int = 10,
+        max_callers_per_pou: int = 25,
+        snippet_radius: int = 10,
+        max_snips: int = 6,
+    ) -> Dict[str, Any]:
+        """
+        Führt eine iterative Expansion durch (BFS-ähnlich mit Priorität).
+        - seed_terms: Startknoten (Variablen/POUs/Literale/Symbole)
+        - target_terms: optional; wenn gesetzt, versucht der Report diese Targets bevorzugt zu erklären
+        """
+        target_terms = target_terms or []
+        seed_terms = [s for s in (seed_terms or []) if str(s).strip()]
+
+        visited: Set[str] = set()
+        frontier: deque[InvestigationNode] = deque()
+        evidence: Dict[str, Any] = {}
+        edges: List[Dict[str, Any]] = []
+
+        tool_cache: Dict[str, Any] = {}
+
+        def cache_get(k: str) -> Any:
+            return tool_cache.get(k)
+
+        def cache_set(k: str, v: Any) -> Any:
+            tool_cache[k] = v
+            return v
+
+        def push(node: InvestigationNode) -> None:
+            if node.node_id in visited:
+                return
+            # einfache Priorisierung: "Priority queue" via sortierten Insert (kleine Datenmengen)
+            if len(frontier) == 0:
+                frontier.append(node)
+                return
+            inserted = False
+            for i, cur in enumerate(frontier):
+                if node.priority > cur.priority:
+                    frontier.insert(i, node)
+                    inserted = True
+                    break
+            if not inserted:
+                frontier.append(node)
+
+        def add_node(node_type: str, key: str, *, depth: int, priority: int, parent: str, reason: str) -> None:
+            key = str(key).strip()
+            if not key:
+                return
+            node = InvestigationNode(type=node_type, key=key, depth=depth, priority=priority, parent=parent, reason=reason)
+            if node.node_id in visited:
+                return
+            push(node)
+
+        def record_edge(src: InvestigationNode, dst_type: str, dst_key: str, kind: str, meta: Optional[Dict[str, Any]] = None) -> None:
+            edges.append(
+                {
+                    "src": src.node_id,
+                    "dst": f"{dst_type}:{dst_key}",
+                    "kind": kind,
+                    "meta": meta or {},
+                }
+            )
+
+        def expand_term(node: InvestigationNode) -> None:
+            term = node.key
+            # Disambiguate: falls es eindeutig POU/Variable ist, Knoten anlegen
+            ckey = f"general_search:{term}"
+            hits = cache_get(ckey)
+            if hits is None:
+                hits = cache_set(ckey, self._general_search(term, limit=20))
+            for h in hits:
+                cat = (h.get("category") or "").strip()
+                name = (h.get("name") or "").strip()
+                if not cat or not name:
+                    continue
+                if cat == "POU":
+                    add_node("pou", name, depth=node.depth + 1, priority=node.priority, parent=node.node_id, reason="general_search")
+                    record_edge(node, "pou", name, "resolves_to")
+                elif cat == "Variable":
+                    add_node("var", name, depth=node.depth + 1, priority=node.priority, parent=node.node_id, reason="general_search")
+                    record_edge(node, "var", name, "resolves_to")
+                elif cat == "Port":
+                    add_node("port", name, depth=node.depth + 1, priority=node.priority - 1, parent=node.node_id, reason="general_search")
+                    record_edge(node, "port", name, "resolves_to")
+
+            # Immer zusätzlich: Code-Suche nach dem term (um Setter/Guards zu finden)
+            ckey2 = f"code_search:{term}"
+            pou_rows = cache_get(ckey2)
+            if pou_rows is None:
+                pou_rows = cache_set(ckey2, self._code_search_pous(term, limit=max_pous_per_term))
+
+            ev_key = node.node_id
+            ev = evidence.get(ev_key) if isinstance(evidence.get(ev_key), dict) else {}
+            ev = dict(ev)
+            ev.setdefault("code_hits", [])
+
+            for r in pou_rows:
+                pou_name = (r.get("pou_name") or "").strip()
+                code = r.get("code", "") or ""
+                if not pou_name:
+                    continue
+
+                sn_any = self._snippets(code, term, radius=snippet_radius, max_snips=max_snips)
+                sn_true = self._snippets(code, f"{term} := TRUE", radius=snippet_radius, max_snips=max_snips)
+                sn_false = self._snippets(code, f"{term} := FALSE", radius=snippet_radius, max_snips=max_snips)
+                item = {
+                    "pou_name": pou_name,
+                    "snips_TRUE": sn_true,
+                    "snips_FALSE": sn_false,
+                    "snips_any": sn_any,
+                }
+                ev["code_hits"].append(item)
+
+                # Setter-POU ist meistens relevant -> als POU-Knoten hinzufügen
+                add_node("pou", pou_name, depth=node.depth + 1, priority=node.priority - 1, parent=node.node_id, reason="code_search_hit")
+                record_edge(node, "pou", pou_name, "mentioned_in_code")
+
+                # Aus Snippets: IF-Guards extrahieren -> expr + sym
+                for sn in sn_true + sn_any:
+                    conds = self._extract_if_conditions(sn.get("snippet", ""))
+                    for cond in conds:
+                        add_node("expr", cond, depth=node.depth + 1, priority=node.priority + 2, parent=node.node_id, reason="if_guard")
+                        record_edge(node, "expr", cond, "guard_of", meta={"pou": pou_name, "line": sn.get("line")})
+                        for sym in self._extract_symbols(cond):
+                            add_node("term", sym, depth=node.depth + 2, priority=node.priority + 1, parent=f"expr:{cond}", reason="symbol_in_guard")
+
+            evidence[ev_key] = ev
+
+        def expand_var(node: InvestigationNode) -> None:
+            # var-trace + dann wie term expandieren (Setter/Guards)
+            ckey = f"variable_trace:{node.key}"
+            rows = cache_get(ckey)
+            if rows is None:
+                rows = cache_set(ckey, self._variable_trace(node.key))
+            evidence[node.node_id] = {"trace": rows}
+            expand_term(InvestigationNode(type="term", key=node.key, depth=node.depth, priority=node.priority, parent=node.parent, reason=node.reason))
+
+        def expand_pou(node: InvestigationNode) -> None:
+            code_key = f"pou_code:{node.key}"
+            code = cache_get(code_key)
+            if code is None:
+                code = cache_set(code_key, self._pou_code(node.key))
+
+            callers_key = f"pou_callers:{node.key}"
+            callers = cache_get(callers_key)
+            if callers is None:
+                callers = cache_set(callers_key, self._pou_callers(node.key, limit=max_callers_per_pou))
+
+            ev = evidence.get(node.node_id) if isinstance(evidence.get(node.node_id), dict) else {}
+            ev = dict(ev)
+            ev["callers"] = callers
+            evidence[node.node_id] = ev
+
+            # Call-chain nach oben
+            for c in callers:
+                add_node("pou", c, depth=node.depth + 1, priority=node.priority - 2, parent=node.node_id, reason="pou_callers")
+                record_edge(node, "pou", c, "called_by")
+
+            # Deklarationen: wenn es dotted Symbole gibt, Base-Name extrahieren und Typ suchen
+            decls = {}
+            for m in re.finditer(r"(?m)^\s*([A-Za-z_][A-Za-z0-9_]*)\s*:\s*([A-Za-z_][A-Za-z0-9_]*)\s*;", code or ""):
+                decls[m.group(1)] = m.group(2)
+            if decls:
+                ev["decls"] = decls
+
+            # Wenn target_terms im Code vorkommen, extrahiere Snippets + Guards
+            for t in (target_terms or []):
+                if not t or not code:
+                    continue
+                if t not in code:
+                    continue
+                sn = self._snippets(code, t, radius=snippet_radius, max_snips=max_snips)
+                if sn:
+                    ev.setdefault("target_snips", {})[t] = sn
+                    for s in sn:
+                        for cond in self._extract_if_conditions(s.get("snippet", "")):
+                            add_node("expr", cond, depth=node.depth + 1, priority=node.priority + 2, parent=node.node_id, reason="if_guard")
+                            for sym in self._extract_symbols(cond):
+                                add_node("term", sym, depth=node.depth + 2, priority=node.priority + 1, parent=f"expr:{cond}", reason="symbol_in_guard")
+
+            evidence[node.node_id] = ev
+
+            # Wenn im POU Variableninstanzen deklariert sind, die wie Trig/Req/Busy heißen, als Terms hinzufügen
+            for var_name, typ in list(decls.items())[:80]:
+                if any(k in var_name.lower() for k in ["trig", "trigger", "busy", "req", "request", "alarm", "fault", "stoer", "diagnose"]):
+                    add_node("term", var_name, depth=node.depth + 1, priority=node.priority - 1, parent=node.node_id, reason="heuristic_decl")
+                    add_node("term", typ, depth=node.depth + 1, priority=node.priority - 3, parent=node.node_id, reason="decl_type")
+
+        def expand_expr(node: InvestigationNode) -> None:
+            # Expr ist nur ein Symbol-Generator
+            syms = self._extract_symbols(node.key)
+            evidence[node.node_id] = {"symbols": syms}
+            for sym in syms:
+                add_node("term", sym, depth=node.depth + 1, priority=node.priority - 1, parent=node.node_id, reason="expr_symbol")
+
+        def expand_port(node: InvestigationNode) -> None:
+            # Ports können wir aktuell nur als Term weiterverfolgen (Wiring steckt in Code)
+            expand_term(InvestigationNode(type="term", key=node.key, depth=node.depth, priority=node.priority, parent=node.parent, reason=node.reason))
+
+        # seeds
+        for s in seed_terms:
+            add_node("term", s, depth=0, priority=10, parent="", reason="seed")
+        for t in target_terms:
+            add_node("term", t, depth=0, priority=12, parent="", reason="target")
+
+        it = 0
+        while frontier and it < int(max_iters) and len(visited) < int(max_nodes):
+            it += 1
+            node = frontier.popleft()
+            if node.node_id in visited:
+                continue
+            visited.add(node.node_id)
+
+            if node.type == "term":
+                expand_term(node)
+            elif node.type == "var":
+                expand_var(node)
+            elif node.type == "pou":
+                expand_pou(node)
+            elif node.type == "expr":
+                expand_expr(node)
+            elif node.type == "port":
+                expand_port(node)
+            else:
+                expand_term(InvestigationNode(type="term", key=node.key, depth=node.depth, priority=node.priority, parent=node.parent, reason=node.reason))
+
+        return {
+            "stats": {
+                "iterations": it,
+                "visited_count": len(visited),
+                "frontier_left": len(frontier),
+                "cache_size": len(tool_cache),
+            },
+            "visited_nodes": sorted(visited),
+            "edges": edges,
+            "evidence": evidence,
+        }
+
+
 class StringTripleSearchTool(BaseAgentTool):
     name = "string_triple_search"
     description = "Sucht einen String als Substring in allen Tripeln (Subject, Predicate, Object)."
@@ -830,9 +1261,38 @@ class EvD2DiagnosisTool(BaseAgentTool):
             "influencing_signals": {"set": tokens(set_expr), "reset": tokens(reset_expr)},
         }
 
+    @staticmethod
+    def _pick_or_branch(expr: str, active_state: str) -> dict:
+        """
+        Heuristik: Wenn expr eine ODER-Verknüpfung enthält, wähle den Branch, der active_state enthält.
+        Liefert {picked, branches, explanation}.
+        """
+        active_state = (active_state or "").strip()
+        if not expr:
+            return {"picked": "", "branches": [], "explanation": ""}
+
+        branches = [b.strip() for b in str(expr).split("ODER")]
+        if len(branches) <= 1 or not active_state:
+            return {"picked": "", "branches": branches if len(branches) > 1 else [], "explanation": ""}
+
+        for b in branches:
+            if re.search(rf"\\b{re.escape(active_state)}\\b", b):
+                return {
+                    "picked": b,
+                    "branches": branches,
+                    "explanation": f"Active GEMMA state hint '{active_state}' matches this OR-branch.",
+                }
+
+        return {
+            "picked": "",
+            "branches": branches,
+            "explanation": f"Active GEMMA state hint '{active_state}' did not match any OR-branch.",
+        }
+
     def run(
         self,
         last_skill: str = "",
+        last_gemma_state: str = "",
         trigger_var: str = "OPCUA.TriggerD2",
         event_name: str = "evD2",
         port_name_contains: str = "D2",
@@ -1014,6 +1474,39 @@ class EvD2DiagnosisTool(BaseAgentTool):
         skill_setter_names = sorted({r.get("pou_name", "") for r in skill_setters if r.get("pou_name")})
         overlap = sorted(set(d2_callers) & set(skill_setter_names))
 
+        # GEMMA-State-Hint (Snapshot) nutzen, um OR-Branch einzugrenzen (one-hot Annahme)
+        set_expr = ""
+        if isinstance(gemma_fbd_logic, dict):
+            d2_logic = gemma_fbd_logic.get("d2_logic")
+            if isinstance(d2_logic, dict):
+                set_expr = str(d2_logic.get("set_condition") or "")
+        branch_hint = self._pick_or_branch(set_expr, last_gemma_state)
+        inferred_driver = ""
+        if branch_hint.get("picked") and last_gemma_state:
+            picked = str(branch_hint.get("picked") or "")
+            m = re.search(
+                rf"\\b([A-Za-z_][A-Za-z0-9_.]*)\\b\\s+UND\\s+\\b{re.escape(last_gemma_state)}\\b",
+                picked,
+            )
+            if m:
+                inferred_driver = m.group(1)
+
+        executed_gemma_path = []
+        if last_gemma_state:
+            executed_gemma_path.append(
+                {
+                    "from": last_gemma_state,
+                    "to": "D2",
+                    "type": "stable_state_to_error_state",
+                    "assumption": "LastGEMMAStateBeforeFailure ist der letzte stabile Zustand; D2 ist der Fehlerzustand (evD2).",
+                    "evidence": {
+                        "last_gemma_state_before_failure": last_gemma_state,
+                        "picked_set_or_branch": branch_hint.get("picked") or "",
+                        "inferred_driver_signal": inferred_driver,
+                    },
+                }
+            )
+
         plan_steps = [
             {
                 "step": 1,
@@ -1021,6 +1514,7 @@ class EvD2DiagnosisTool(BaseAgentTool):
                 "do": [
                     f"Prüfe im PLC Snapshot, dass {trigger_var} TRUE ist (das löst {event_name} aus).",
                     "Identifiziere lastSkill / lastExecutedSkill aus dem Snapshot.",
+                    "Wenn verfügbar: nutze LastGEMMAStateBeforeFailure als Hinweis, welcher GEMMA-Zweig aktiv war (one-hot).",
                 ],
             },
             {
@@ -1062,6 +1556,12 @@ class EvD2DiagnosisTool(BaseAgentTool):
             "event": event_name,
             "trigger": {"var": trigger_var, "explanation": "Wenn TriggerD2 TRUE wird, wird evD2 ausgelöst."},
             "last_skill": last_skill,
+            "last_gemma_state_before_failure": last_gemma_state,
+            "gemma_assumption": "Im GEMMA ist typischerweise genau 1 Zustand gleichzeitig aktiv (one-hot).",
+            "gemma_architecture_note": (
+                "Das GEMMA-Layer ist die Hauptarchitektur/Steuerungslogik: der aktive Zustand bestimmt, "
+                "welche Zweige/Logikpfade im Programm wirksam sind. D2 ist der Fehlerzustand."
+            ),
             "gemma_state_machines": gemma_rows,
             "d2_output_ports": d2_ports,
             "d2_call_chain": call_chain,
@@ -1070,6 +1570,9 @@ class EvD2DiagnosisTool(BaseAgentTool):
             "skill_setters": skill_setters,
             "skill_instances": skill_instances,
             "gemma_d2_logic": gemma_fbd_logic,
+            "gemma_d2_set_branch_hint": branch_hint,
+            "inferred_d2_driver_signal": inferred_driver,
+            "executed_gemma_path_hint": executed_gemma_path,
             "d2_callers": d2_callers,
             "skill_setter_pous": skill_setter_names,
             "intersection_d2callers_and_skillsetters": overlap,
@@ -1105,6 +1608,11 @@ STRATEGIE BEI PUNKTEN (z.B. "GVL.Start"):
 - Ein Punkt deutet oft auf Variable, Port oder Instanz hin.
 - Nutze 'general_search', um herauszufinden, was es ist (POU vs. Variable).
 - Wenn du sicher bist, dass es eine Variable ist -> 'variable_trace' oder 'search_variables'.
+
+ROOT-CAUSE STRATEGIE (Fixpoint-Search):
+- Wenn der User eine echte Root-Cause-Kette will (Setter -> Guard -> Upstream-Signale), nutze 'graph_investigate'.
+- Gib als seed_terms die wichtigsten Startknoten: Trigger-Variable(n), lastSkill, und Symbole aus Setter-Guards.
+- Nutze die returned evidence/edges, um konkret zu erklären, welche Bedingung den Setter ausführt.
 
 Heuristiken:
 {chr(10).join(heuristics)}
@@ -1250,6 +1758,7 @@ def build_bot(
     registry.register(SearchVariablesTool())
     registry.register(VariableTraceTool())
     registry.register(GeneralSearchTool())
+    registry.register(GraphInvestigateTool())
     registry.register(StringTripleSearchTool(kg_store))
     registry.register(ExceptionAnalysisTool(kg_store, routine_index))
     registry.register(Text2SparqlTool(llm_invoke, sc))

@@ -22,6 +22,7 @@ ag:GVLList_OPCUA a ag:class_GlobalVariableList ;
     op:listsGlobalVariable ag:OPCUA__dot__Alt_abort,
         ag:OPCUA__dot__Alt_found,
         ag:OPCUA__dot__DiagnoseFinished,
+        ag:OPCUA__dot__LastGEMMAStateBeforeFailure,
         ag:OPCUA__dot__M1,
         ag:OPCUA__dot__M2,
         ag:OPCUA__dot__M3,
@@ -59,7 +60,8 @@ ag:StandardFBType_CTD a ag:class_FBType,
         ag:Port_CTD_CV,
         ag:Port_CTD_LD,
         ag:Port_CTD_PV,
-        ag:Port_CTD_Q .
+        ag:Port_CTD_Q ;
+    rdfs:comment "CTD ist ein Abwärtszähler. LD lädt CV mit dem Preset Wert PV. Jede steigende Flanke an CD verringert CV um 1 bis minimal 0. Q wird TRUE, wenn CV gleich 0 ist."@de .
 
 ag:StandardFBType_CTU a ag:class_FBType,
         ag:class_POU,
@@ -72,7 +74,8 @@ ag:StandardFBType_CTU a ag:class_FBType,
         ag:Port_CTU_CV,
         ag:Port_CTU_PV,
         ag:Port_CTU_Q,
-        ag:Port_CTU_R .
+        ag:Port_CTU_R ;
+    rdfs:comment "CTU ist ein Aufwärtszähler. Jede steigende Flanke an CU erhöht CV um 1. R setzt CV auf 0 zurück. Q wird TRUE, sobald CV den Preset Wert PV erreicht oder überschreitet."@de .
 
 ag:StandardFBType_CTUD a ag:class_FBType,
         ag:class_POU,
@@ -88,7 +91,8 @@ ag:StandardFBType_CTUD a ag:class_FBType,
         ag:Port_CTUD_PV,
         ag:Port_CTUD_QD,
         ag:Port_CTUD_QU,
-        ag:Port_CTUD_R .
+        ag:Port_CTUD_R ;
+    rdfs:comment "CTUD ist ein Auf und Abwärtszähler. Steigende Flanken an CU erhöhen CV, steigende Flanken an CD verringern CV. R setzt CV auf 0. LD lädt CV mit PV. QU wird TRUE, wenn CV größer gleich PV ist. QD wird TRUE, wenn CV gleich 0 ist."@de .
 
 ag:StandardFBType_F_TRIG a ag:class_FBType,
         ag:class_POU,
@@ -98,7 +102,8 @@ ag:StandardFBType_F_TRIG a ag:class_FBType,
     dp:hasPOUName "F_TRIG" ;
     dp:hasPOUType "FunctionBlock" ;
     op:hasPort ag:Port_F_TRIG_CLK,
-        ag:Port_F_TRIG_Q .
+        ag:Port_F_TRIG_Q ;
+    rdfs:comment "F_TRIG erkennt eine fallende Flanke an CLK. Q wird genau für einen Programmscan TRUE, wenn CLK von TRUE auf FALSE wechselt. Damit lassen sich Abschalt Ereignisse als Impuls weiterverarbeiten."@de .
 
 ag:StandardFBType_SR a ag:class_FBType,
         ag:class_POU,
@@ -109,7 +114,8 @@ ag:StandardFBType_SR a ag:class_FBType,
     dp:hasPOUType "FunctionBlock" ;
     op:hasPort ag:Port_SR_Q1,
         ag:Port_SR_R,
-        ag:Port_SR_S1 .
+        ag:Port_SR_S1 ;
+    rdfs:comment "SR ist ein bistabiles Speicherglied mit Set Priorität. S1 setzt den gespeicherten Zustand auf TRUE. R setzt ihn auf FALSE. Wenn S1 und R gleichzeitig TRUE sind, dominiert Set und Q1 bleibt TRUE."@de .
 
 ag:StandardFBType_TOF a ag:class_FBType,
         ag:class_POU,
@@ -121,7 +127,8 @@ ag:StandardFBType_TOF a ag:class_FBType,
     op:hasPort ag:Port_TOF_ET,
         ag:Port_TOF_IN,
         ag:Port_TOF_PT,
-        ag:Port_TOF_Q .
+        ag:Port_TOF_Q ;
+    rdfs:comment "TOF ist eine Ausschaltverzögerung. Solange IN TRUE ist, ist Q TRUE. Wenn IN von TRUE auf FALSE wechselt, bleibt Q noch für die Dauer PT TRUE und ET zählt die Nachlaufzeit. Wenn IN während des Nachlaufs wieder TRUE wird, wird der Nachlauf abgebrochen und Q bleibt TRUE."@de .
 
 dp:hasConfidence a owl:DatatypeProperty ;
     rdfs:subPropertyOf dp:hasHypothesisParams .
@@ -130,6 +137,18 @@ dp:hasConsistencyReport a owl:DatatypeProperty ;
     rdfs:domain ag:class_POU ;
     rdfs:range xsd:string ;
     rdfs:subPropertyOf dp:hasPOUAttribute .
+
+dp:hasDefaultPortValue a owl:DatatypeProperty ;
+    rdfs:comment "Default value for Port extracted from dp:hasPOUDeclarationHeader (':= ...')." ;
+    rdfs:domain ag:class_Port ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf dp:hasPortAttribute .
+
+dp:hasDefaultVariableValue a owl:DatatypeProperty ;
+    rdfs:comment "Default value for Variable extracted from dp:hasPOUDeclarationHeader (':= ...')." ;
+    rdfs:domain ag:class_Variable ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf dp:hasVariableAttribute .
 
 dp:hasDescription a owl:DatatypeProperty ;
     rdfs:domain ag:class_Variable ;
@@ -162,6 +181,11 @@ dp:hasPOUCode a owl:DatatypeProperty ;
     rdfs:subPropertyOf dp:hasPOUAttribute .
 
 dp:hasPOUCodeDescription a owl:DatatypeProperty ;
+    rdfs:domain ag:class_POU ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf dp:hasPOUAttribute .
+
+dp:hasPOUDeclarationHeader a owl:DatatypeProperty ;
     rdfs:domain ag:class_POU ;
     rdfs:range xsd:string ;
     rdfs:subPropertyOf dp:hasPOUAttribute .
@@ -754,6 +778,12 @@ ag:OPCUA__dot__Alt_abort a ag:class_SignalSource,
         "OPCUA.Alt_abort" ;
     dp:hasVariableType "BOOL" .
 
+ag:OPCUA__dot__LastGEMMAStateBeforeFailure a ag:class_SignalSource,
+        ag:class_Variable ;
+    dp:hasVariableName "LastGEMMAStateBeforeFailure",
+        "OPCUA.LastGEMMAStateBeforeFailure" ;
+    dp:hasVariableType "STRING" .
+
 ag:OPCUA__dot__M1 a ag:class_SignalSource,
         ag:class_Variable ;
     dp:hasInitialValue "0" ;
@@ -1095,199 +1125,232 @@ ag:Port_CTD_CD a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Input" ;
     dp:hasPortName "CD" ;
-    dp:hasPortType "BOOL" .
+    dp:hasPortType "BOOL" ;
+    rdfs:comment "CD ist der Zähleingang zum Herunterzählen. Jede steigende Flanke verringert CV."@de .
 
 ag:Port_CTD_CV a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Output" ;
     dp:hasPortName "CV" ;
-    dp:hasPortType "INT" .
+    dp:hasPortType "INT" ;
+    rdfs:comment "CV ist der aktuelle Countdown Wert und zeigt die verbleibende Anzahl."@de .
 
 ag:Port_CTD_LD a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Input" ;
     dp:hasPortName "LD" ;
-    dp:hasPortType "BOOL" .
+    dp:hasPortType "BOOL" ;
+    rdfs:comment "LD lädt den Preset Wert PV in CV und initialisiert damit den Countdown."@de .
 
 ag:Port_CTD_PV a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Input" ;
     dp:hasPortName "PV" ;
-    dp:hasPortType "INT" .
+    dp:hasPortType "INT" ;
+    rdfs:comment "PV ist der Preset Wert und typische Startwert für den Countdown."@de .
 
 ag:Port_CTD_Q a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Output" ;
     dp:hasPortName "Q" ;
-    dp:hasPortType "BOOL" .
+    dp:hasPortType "BOOL" ;
+    rdfs:comment "Q wird TRUE, wenn CV gleich 0 ist und der Countdown beendet ist."@de .
 
 ag:Port_CTUD_CD a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Input" ;
     dp:hasPortName "CD" ;
-    dp:hasPortType "BOOL" .
+    dp:hasPortType "BOOL" ;
+    rdfs:comment "CD ist der Zähleingang zum Herunterzählen. Jede steigende Flanke verringert CV."@de .
 
 ag:Port_CTUD_CU a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Input" ;
     dp:hasPortName "CU" ;
-    dp:hasPortType "BOOL" .
+    dp:hasPortType "BOOL" ;
+    rdfs:comment "CU ist der Zähleingang zum Hochzählen. Jede steigende Flanke erhöht CV."@de .
 
 ag:Port_CTUD_CV a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Output" ;
     dp:hasPortName "CV" ;
-    dp:hasPortType "INT" .
+    dp:hasPortType "INT" ;
+    rdfs:comment "CV ist der aktuelle Zählerstand und wird oft für Füllstände oder Stückzahlen genutzt."@de .
 
 ag:Port_CTUD_LD a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Input" ;
     dp:hasPortName "LD" ;
-    dp:hasPortType "BOOL" .
+    dp:hasPortType "BOOL" ;
+    rdfs:comment "LD lädt PV in CV und setzt damit einen definierten Startstand."@de .
 
 ag:Port_CTUD_PV a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Input" ;
     dp:hasPortName "PV" ;
-    dp:hasPortType "INT" .
+    dp:hasPortType "INT" ;
+    rdfs:comment "PV ist der Preset Wert. QU wird TRUE, wenn CV größer gleich PV ist."@de .
 
 ag:Port_CTUD_QD a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Output" ;
     dp:hasPortName "QD" ;
-    dp:hasPortType "BOOL" .
+    dp:hasPortType "BOOL" ;
+    rdfs:comment "QD ist die Meldung für unteren Grenzwert. QD wird TRUE, wenn CV gleich 0 ist."@de .
 
 ag:Port_CTUD_QU a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Output" ;
     dp:hasPortName "QU" ;
-    dp:hasPortType "BOOL" .
+    dp:hasPortType "BOOL" ;
+    rdfs:comment "QU ist die Meldung für oberen Grenzwert. QU wird TRUE, wenn CV größer gleich PV ist."@de .
 
 ag:Port_CTUD_R a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Input" ;
     dp:hasPortName "R" ;
-    dp:hasPortType "BOOL" .
+    dp:hasPortType "BOOL" ;
+    rdfs:comment "R setzt CV auf 0 zurück."@de .
 
 ag:Port_CTU_CU a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Input" ;
     dp:hasPortName "CU" ;
-    dp:hasPortType "BOOL" .
+    dp:hasPortType "BOOL" ;
+    rdfs:comment "CU ist der Zähleingang. Jede steigende Flanke erhöht den Zählerstand CV."@de .
 
 ag:Port_CTU_CV a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Output" ;
     dp:hasPortName "CV" ;
-    dp:hasPortType "INT" .
+    dp:hasPortType "INT" ;
+    rdfs:comment "CV ist der aktuelle Zählerstand. Wird häufig angezeigt oder geloggt."@de .
 
 ag:Port_CTU_PV a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Input" ;
     dp:hasPortName "PV" ;
-    dp:hasPortType "INT" .
+    dp:hasPortType "INT" ;
+    rdfs:comment "PV ist der Preset Wert. Sobald CV größer gleich PV ist, wird Q TRUE."@de .
 
 ag:Port_CTU_Q a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Output" ;
     dp:hasPortName "Q" ;
-    dp:hasPortType "BOOL" .
+    dp:hasPortType "BOOL" ;
+    rdfs:comment "Q ist die Grenzwertmeldung. Q wird TRUE, wenn CV den Preset Wert erreicht oder überschreitet."@de .
 
 ag:Port_CTU_R a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Input" ;
     dp:hasPortName "R" ;
-    dp:hasPortType "BOOL" .
+    dp:hasPortType "BOOL" ;
+    rdfs:comment "R setzt den Zählerstand CV auf 0 zurück."@de .
 
 ag:Port_F_TRIG_CLK a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Input" ;
     dp:hasPortName "CLK" ;
-    dp:hasPortType "BOOL" .
+    dp:hasPortType "BOOL" ;
+    rdfs:comment "CLK ist der BOOL Eingang, der überwacht wird. Bei einer fallenden Flanke wird Q erzeugt."@de .
 
 ag:Port_F_TRIG_Q a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Output" ;
     dp:hasPortName "Q" ;
-    dp:hasPortType "BOOL" .
+    dp:hasPortType "BOOL" ;
+    rdfs:comment "Q ist ein BOOL Impuls für einen Programmscan. Q wird TRUE, wenn CLK von TRUE auf FALSE wechselt."@de .
 
 ag:Port_RS_Q1 a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Output" ;
     dp:hasPortName "Q1" ;
-    dp:hasPortType "BOOL" .
+    dp:hasPortType "BOOL" ;
+    rdfs:comment "Q1 ist der gespeicherte Ausgang. Q1 bleibt erhalten, bis Reset aktiv wird."@de .
 
 ag:Port_RS_R1 a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Input" ;
     dp:hasPortName "R1" ;
-    dp:hasPortType "BOOL" .
+    dp:hasPortType "BOOL" ;
+    rdfs:comment "R1 ist der Reset Eingang mit Priorität. Wenn R1 TRUE ist, wird Q1 FALSE, auch wenn S TRUE ist."@de .
 
 ag:Port_RS_S a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Input" ;
     dp:hasPortName "S" ;
-    dp:hasPortType "BOOL" .
+    dp:hasPortType "BOOL" ;
+    rdfs:comment "S ist der Set Eingang. Wenn S TRUE wird und Reset nicht dominiert, wird Q1 TRUE."@de .
 
 ag:Port_SR_Q1 a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Output" ;
     dp:hasPortName "Q1" ;
-    dp:hasPortType "BOOL" .
+    dp:hasPortType "BOOL" ;
+    rdfs:comment "Q1 ist der gespeicherte Ausgang. Q1 bleibt erhalten, bis Reset aktiv wird."@de .
 
 ag:Port_SR_R a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Input" ;
     dp:hasPortName "R" ;
-    dp:hasPortType "BOOL" .
+    dp:hasPortType "BOOL" ;
+    rdfs:comment "R ist der Reset Eingang. Wenn R TRUE wird, wird Q1 gespeichert FALSE."@de .
 
 ag:Port_SR_S1 a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Input" ;
     dp:hasPortName "S1" ;
-    dp:hasPortType "BOOL" .
+    dp:hasPortType "BOOL" ;
+    rdfs:comment "S1 ist der Set Eingang. Wenn S1 TRUE wird, wird Q1 gespeichert TRUE."@de .
 
 ag:Port_TOF_ET a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Output" ;
     dp:hasPortName "ET" ;
-    dp:hasPortType "TIME" .
+    dp:hasPortType "TIME" ;
+    rdfs:comment "ET ist die verstrichene Nachlaufzeit. ET zählt ab dem Abschalten von IN hoch bis PT."@de .
 
 ag:Port_TOF_IN a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Input" ;
     dp:hasPortName "IN" ;
-    dp:hasPortType "BOOL" .
+    dp:hasPortType "BOOL" ;
+    rdfs:comment "IN ist der BOOL Eingang. Wenn IN TRUE ist, ist Q TRUE. Bei fallender Flanke startet der Nachlauf."@de .
 
 ag:Port_TOF_PT a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Input" ;
     dp:hasPortName "PT" ;
-    dp:hasPortType "TIME" .
+    dp:hasPortType "TIME" ;
+    rdfs:comment "PT ist die Nachlaufzeit. Bestimmt wie lange Q nach dem Abschalten von IN noch TRUE bleibt."@de .
 
 ag:Port_TOF_Q a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Output" ;
     dp:hasPortName "Q" ;
-    dp:hasPortType "BOOL" .
+    dp:hasPortType "BOOL" ;
+    rdfs:comment "Q ist der BOOL Ausgang. Q bleibt nach fallender Flanke an IN noch für PT TRUE."@de .
 
 ag:Port_TON_ET a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Output" ;
     dp:hasPortName "ET" ;
-    dp:hasPortType "TIME" .
+    dp:hasPortType "TIME" ;
+    rdfs:comment "ET ist die verstrichene Zeit seit Start. ET steigt bis maximal PT und dient oft zur Diagnose oder Visualisierung."@de .
 
 ag:Port_TP_ET a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Output" ;
     dp:hasPortName "ET" ;
-    dp:hasPortType "TIME" .
+    dp:hasPortType "TIME" ;
+    rdfs:comment "ET ist die verstrichene Zeit seit Impulsstart. Wird häufig für Anzeige und Diagnose genutzt."@de .
 
 ag:Port_TP_Q a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Output" ;
     dp:hasPortName "Q" ;
-    dp:hasPortType "BOOL" .
+    dp:hasPortType "BOOL" ;
+    rdfs:comment "Q ist der BOOL Ausgang des Impulses. Q ist für die Dauer PT TRUE."@de .
 
 ag:Program_MAIN a ag:class_POU,
         ag:class_Program ;
@@ -1333,6 +1396,32 @@ Init_erreicht := fbInit.Init_erreicht;
 
 fbDiag(Diagnose_gefordert := fbBA.D2);
 alt_found := fbDiag.Alt_gefunden;""" ;
+    dp:hasPOUDeclarationHeader """PROGRAM MAIN
+VAR
+	{attribute 'OPC.UA.DA' := '1'}       // falls Server im Filter-/Symbolmodus
+    fbJob : FB_Methode1Job;              // FB mit {attribute 'OPC.UA.DA.JobMethod' := 'M_Methode1'}
+    fbBA   : FB_Betriebsarten;
+    fbAuto : FB_Automatikbetrieb_F1;
+    fbDiag : FB_Diagnose_D2;
+	fbNot : FB_Notaus_D1;
+	fbInit : FB_InitFahrt_A6_A2;
+	fbProStoer : FB_ProduktionMitStoerung_D3;
+	
+	Init_start : BOOL := TRUE;
+	
+
+    edgeF1    : R_TRIG;  // F1 -> Start Automatik
+    edgeDone  : R_TRIG;  // Diagnose_beendet -> Restart/Weiter
+	alt_abort : BOOL := FALSE;
+	alt_found : BOOL := FALSE;
+    Start_eff  : BOOL := FALSE;
+    Weiter_eff : BOOL := FALSE;
+	A2_angefordert : BOOL := FALSE;
+	D3_angefordert : BOOL := FALSE;
+	Init_erreicht : BOOL := FALSE;
+	Zyklus_beendet : BOOL := FALSE;
+	
+END_VAR"""^^xsd:string ;
     dp:hasPOULanguage "ST" ;
     dp:hasPOUName "MAIN" ;
     dp:hasProgramName "MAIN" ;
@@ -1455,6 +1544,19 @@ running := TRUE;
 t20s(IN := FALSE, PT := T#9S);   
 hdl := 0;                         
 Start := 0;""" ;
+    dp:hasPOUDeclarationHeader """{attribute 'OPC.UA.DA.JobMethod' := 'M_Methode1'} // Dieser FB wird als OPC-UA-Job "M_Methode1" veröffentlicht
+FUNCTION_BLOCK FB_Methode1Job
+VAR
+    running : BOOL := FALSE;
+    counter : DINT := 0;
+    reached : BOOL := FALSE;
+    t20s    : TON;        // 20-s-Timer, läuft zyklisch
+    y       : DINT := 0;  // Ergebnis
+END_VAR
+// Wichtig: Bei Job-Methoden deklariert man den Funktionsbaustein mit
+//{attribute 'OPC.UA.DA.JobMethod' := 'NameDerUAMethod'}
+//und markiert die drei PLC-METHODs Start, CheckState, Abort jeweils mit TcRpcEnable. 
+//CheckState besitzt zwingend das Output bBusy, über das der Server erkennt, ob der Job noch läuft."""^^xsd:string ;
     dp:hasPOULanguage "ST" ;
     dp:hasPOUName "FB_Methode1Job" ;
     op:containsPOUCall ag:POUCall_FB_Methode1Job_t20s_1,
@@ -1528,17 +1630,20 @@ ag:Port_FB_Automatikbetrieb_F1_AutoRestartEnable a ag:class_Port ;
     dp:hasPortType "BOOL" .
 
 ag:Port_FB_Automatikbetrieb_F1_FaultPulse a ag:class_Port ;
+    dp:hasDefaultPortValue "T#100ms"^^xsd:string ;
     dp:hasPortDirection "Input" ;
     dp:hasPortName "FaultPulse" ;
     dp:hasPortType "TIME" .
 
 ag:Port_FB_Automatikbetrieb_F1_PeriodicFaultEnable a ag:class_Port ;
+    dp:hasDefaultPortValue "TRUE"^^xsd:string ;
     dp:hasPortDirection "Input" ;
     dp:hasPortName "PeriodicFaultEnable" ;
     dp:hasPortType "BOOL" ;
     dp:isUnusedPort true .
 
 ag:Port_FB_Automatikbetrieb_F1_PeriodicFaultPeriod a ag:class_Port ;
+    dp:hasDefaultPortValue "T#60s"^^xsd:string ;
     dp:hasPortDirection "Input" ;
     dp:hasPortName "PeriodicFaultPeriod" ;
     dp:hasPortType "TIME" .
@@ -1574,19 +1679,22 @@ ag:Port_TON_Q a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Output" ;
     dp:hasPortName "Q" ;
-    dp:hasPortType "BOOL" .
+    dp:hasPortType "BOOL" ;
+    rdfs:comment "Q ist der BOOL Ausgang. Q wird TRUE, wenn ET die Vorgabezeit PT erreicht und IN weiterhin TRUE ist."@de .
 
 ag:Port_TP_IN a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Input" ;
     dp:hasPortName "IN" ;
-    dp:hasPortType "BOOL" .
+    dp:hasPortType "BOOL" ;
+    rdfs:comment "IN ist der BOOL Trigger Eingang. Eine steigende Flanke startet den Impuls."@de .
 
 ag:Port_TP_PT a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Input" ;
     dp:hasPortName "PT" ;
-    dp:hasPortType "TIME" .
+    dp:hasPortType "TIME" ;
+    rdfs:comment "PT ist die Impulsdauer. Bestimmt wie lange Q TRUE bleibt."@de .
 
 ag:Var_FB_Automatikbetrieb_F1_AutoRestartEnable a ag:class_SignalSource,
         ag:class_Variable ;
@@ -1602,6 +1710,7 @@ ag:Var_FB_Automatikbetrieb_F1_Automatikbetrieb_Fertig a ag:class_SignalSource,
 
 ag:Var_FB_Automatikbetrieb_F1_PeriodicFaultEnable a ag:class_SignalSource,
         ag:class_Variable ;
+    dp:hasDefaultVariableValue "TRUE"^^xsd:string ;
     dp:hasVariableName "PeriodicFaultEnable" ;
     dp:hasVariableType "BOOL" ;
     dp:isUnusedVar true ;
@@ -1633,6 +1742,7 @@ ag:Var_FB_Automatikbetrieb_F1_dbg_Stoerung_Manuell a ag:class_SignalSource,
 
 ag:Var_FB_Automatikbetrieb_F1_lastSkillIsOne a ag:class_SignalSource,
         ag:class_Variable ;
+    dp:hasDefaultVariableValue "FALSE"^^xsd:string ;
     dp:hasVariableName "lastSkillIsOne" ;
     dp:hasVariableType "BOOL" .
 
@@ -1921,12 +2031,14 @@ ag:Var_FB_Betriebsarten_Weiter a ag:class_SignalSource,
 
 ag:Var_FB_Betriebsarten_bFirstScan a ag:class_SignalSource,
         ag:class_Variable ;
+    dp:hasDefaultVariableValue "TRUE"^^xsd:string ;
     dp:hasVariableName "bFirstScan" ;
     dp:hasVariableType "BOOL" ;
     dp:isUnusedVar true .
 
 ag:Var_FB_Diagnose_D2_Alt_gefunden a ag:class_SignalSource,
         ag:class_Variable ;
+    dp:hasDefaultVariableValue "FALSE"^^xsd:string ;
     dp:hasVariableName "Alt_gefunden" ;
     dp:hasVariableType "BOOL" ;
     op:implementsPort ag:Port_FB_Diagnose_D2_Alt_gefunden .
@@ -1958,22 +2070,26 @@ ag:Var_FB_Diagnose_D2_tpPulse a ag:class_SignalSource,
 
 ag:Var_FB_InitFahrt_A6_A2_Init_erreicht a ag:class_SignalSource,
         ag:class_Variable ;
+    dp:hasDefaultVariableValue "FALSE"^^xsd:string ;
     dp:hasVariableName "Init_erreicht" ;
     dp:hasVariableType "BOOL" ;
     op:implementsPort ag:Port_FB_InitFahrt_A6_A2_Init_erreicht .
 
 ag:Var_FB_Methode1Job_counter a ag:class_SignalSource,
         ag:class_Variable ;
+    dp:hasDefaultVariableValue "0"^^xsd:string ;
     dp:hasVariableName "counter" ;
     dp:hasVariableType "DINT" .
 
 ag:Var_FB_Methode1Job_running a ag:class_SignalSource,
         ag:class_Variable ;
+    dp:hasDefaultVariableValue "FALSE"^^xsd:string ;
     dp:hasVariableName "running" ;
     dp:hasVariableType "BOOL" .
 
 ag:Var_FB_Methode1Job_y a ag:class_SignalSource,
         ag:class_Variable ;
+    dp:hasDefaultVariableValue "0"^^xsd:string ;
     dp:hasVariableName "y" ;
     dp:hasVariableType "DINT" .
 
@@ -2028,6 +2144,7 @@ ag:Var_FB_ProduktionMitStoerung_D3_dbg_Stoerung_Manuell a ag:class_SignalSource,
 
 ag:Var_FB_ProduktionMitStoerung_D3_lastSkillIsOne a ag:class_SignalSource,
         ag:class_Variable ;
+    dp:hasDefaultVariableValue "FALSE"^^xsd:string ;
     dp:hasVariableName "lastSkillIsOne" ;
     dp:hasVariableType "BOOL" ;
     dp:isUnusedVar true .
@@ -2081,6 +2198,7 @@ ag:Var_FB_ProduktionMitStoerung_D3_tpRestart a ag:class_SignalSource,
 
 ag:Var_FB_ProduktionMitStoerung_D3_z a ag:class_SignalSource,
         ag:class_Variable ;
+    dp:hasDefaultVariableValue "0"^^xsd:string ;
     dp:hasVariableName "z" ;
     dp:hasVariableType "INT" .
 
@@ -2128,6 +2246,7 @@ rStep1(CLK := Schritt1);
 
 IF (AutoRestartEnable AND NOT (Schritt1 OR Schritt2)) OR (Stoerung_erkannt AND GVL.Weiter) THEN
     
+	OPCUA.LastGEMMAStateBeforeFailure := 'F1';
     Automatikbetrieb_Fertig := FALSE;
     Stoerung_erkannt        := FALSE;
 	GVL.Weiter := FALSE;
@@ -2151,12 +2270,14 @@ IF rStep1.Q THEN
 END_IF
 
 IF rStart.Q AND NOT (Schritt1 OR Schritt2) THEN
+	OPCUA.LastGEMMAStateBeforeFailure := 'F1';
     Automatikbetrieb_Fertig := FALSE;
     Stoerung_erkannt := FALSE;
     GVL.Weiter := FALSE;
     Schritt1 := TRUE;
     Schritt2 := FALSE;
     OPCUA.lastExecutedProcess := 'ExTechnProcess1';
+	OPCUA.LastGEMMAStateBeforeFailure := 'F1';
 END_IF
 
 
@@ -2166,6 +2287,7 @@ IF NOT Stoerung_erkannt THEN
         Schritt1 := FALSE;
         Schritt2 := TRUE;
 		OPCUA.lastExecutedSkill := 'TestSkill2';
+		OPCUA.LastGEMMAStateBeforeFailure := 'F1';
     END_IF
 
     
@@ -2193,6 +2315,41 @@ IF (Schritt1 OR Schritt2) AND pPer.Q THEN
     Stoerung_erkannt := TRUE;
 	GVL.Fehler := TRUE;
 END_IF""" ;
+    dp:hasPOUDeclarationHeader """FUNCTION_BLOCK PUBLIC FB_Automatikbetrieb_F1
+VAR_INPUT
+    Automatikbetrieb_Starten : BOOL;
+	AutoRestartEnable   : BOOL;      // Schalter für Autorestart
+    // <<< NEU: parametrierbarer, periodischer Störgenerator >>>
+    PeriodicFaultEnable : BOOL := TRUE;       // Ein/Aus
+    PeriodicFaultPeriod : TIME := T#60s;      // z. B. jede Minute
+    FaultPulse          : TIME := T#100ms;    // wie lange „Störung“ getriggert wird
+END_VAR
+VAR RETAIN
+    lastSkillIsOne : BOOL := FALSE; // FALSE => erster Start wird TestSkill3 -> wir setzen gleich initial um
+END_VAR
+VAR_OUTPUT
+    Automatikbetrieb_Fertig : BOOL;
+    Stoerung_erkannt        : BOOL;
+END_VAR
+VAR
+    Schritt1 : BOOL;
+    Schritt2 : BOOL;
+	Zwischen : STRING;
+    tSchritt1 : TON;
+    tSchritt2 : TON;
+    rStart   : R_TRIG;
+    rtStoer   : R_TRIG;
+	rStep1 : R_TRIG;
+
+    // <<< NEU >>>
+    tPer   : TON;      // Periodentimer
+    rPer   : R_TRIG;   // Flanke bei Periodenende
+    pPer   : TP;       // kurzer Puls für die Störung
+    perEn  : BOOL;     // Enable nur wenn die Automatik läuft
+    dbg_Stoerung_Manuell : BOOL; // hattest du schon
+	tpRestart: INT;
+	RestartPulseLength: INT;
+END_VAR"""^^xsd:string ;
     dp:hasPOULanguage "ST" ;
     dp:hasPOUName "FB_Automatikbetrieb_F1" ;
     op:containsPOUCall ag:POUCall_FB_Automatikbetrieb_F1_pPer_1,
@@ -2456,6 +2613,63 @@ def FB_Betriebsarten(V_10000000001: bool, D2: bool, A5: bool, GVL.Start: bool, A
     A6 = V_80000000007
     print('Value of A6:', A6)
     return {'D1': D1, 'F1': F1, 'A5': A5, 'D2': D2, 'D3': D3, 'A1': A1, 'A2': A2, 'A6': A6}""" ;
+    dp:hasPOUDeclarationHeader """FUNCTION_BLOCK FB_Betriebsarten
+VAR_INPUT
+	Start, NotStop, Weiter, Fehler, Start_Init : BOOL;
+    Auto_Fertig   : BOOL; // kommt von fbAuto.Automatikbetrieb_Fertig
+    Auto_Stoerung : BOOL; // kommt von fbAuto.Stoerung_erkannt
+	A2_Requested: BOOL;
+	Alt_abort: BOOL;
+	Alt_found: BOOL;
+	D3_Requested: BOOL;
+	Init_reached: BOOL;
+	Cycle_ended: BOOL;
+	//Reset			: BOOL;
+	//Schalter		: BOOL;
+	//Schrittkette_GS : BOOL;
+END_VAR
+VAR_OUTPUT
+	A1 : BOOL; //Initialzustand
+	A2 : BOOL; //Stillstand angefordert am Ende des Zyklus
+//	A3 : BOOL; //Stillstand angefordert in einem bestimmten Zustand
+//	A4 : BOOL; //Erhaltener Stillstand
+	A5 : BOOL; //Vorbereitung zur Wiederaufnahme nach Störung
+	A6 : BOOL; //Fahrt in den Initialzustand
+	F1 : BOOL; //Normalbetrieb
+//	F2 : BOOL; //Anfahren
+//	F3 : BOOL; //Abfahren
+	F4 : BOOL; //Handbetrieb
+//	F5 : BOOL; //Schrittbetrieb
+//	F6 : BOOL; //Testbetrieb
+	D1 : BOOL; //Not-Aus
+	D2 : BOOL; //DIagnose und Störbehandlung
+	D3 : BOOL; //Produktion trotz Störung
+END_VAR
+VAR
+	bFirstScan : BOOL := TRUE;	
+
+	RS_InitialState: RS;	
+	RS_InitialDrive: RS;
+	RS_ManualOperationMode: RS;
+	RS_AutomaticOperationMode: RS;
+	RS_CycleEnded: RS;
+
+	R_TRIG_Manual: R_TRIG;
+	R_TRIG_Automatic: R_TRIG;
+	R_TRIG_InitialDrive: R_TRIG;
+	R_TRIG_CycleEnded: R_TRIG;
+	R_TRIG_Init: R_TRIG;
+	RS_D2: RS;
+	RS_F1: RS;
+	RS_D1: RS;
+	RS_A5: RS;
+	RS_A1: RS;
+
+	RS_D3: RS;
+
+	RS_A2: RS;
+	RS_A6: RS;
+END_VAR"""^^xsd:string ;
     dp:hasPOULanguage "FBD" ;
     dp:hasPOUName "FB_Betriebsarten" ;
     dp:isGEMMAStateMachine true ;
@@ -2598,6 +2812,25 @@ END_IF
 IF rtD3.Q THEN
 	Alt_gefunden := TRUE;
 END_IF""" ;
+    dp:hasPOUDeclarationHeader """FUNCTION_BLOCK PUBLIC FB_Diagnose_D2
+VAR_INPUT
+    Diagnose_gefordert         : BOOL;  // z. B. D2 aus FB_Betriebsarten
+END_VAR
+VAR_OUTPUT
+    Diagnose_beendet           : BOOL;  // geht zurück an FB_Betriebsarten
+	Alt_gefunden			   : BOOL := FALSE;
+END_VAR
+VAR
+    // Steuerung/Handshake intern
+    Busy       : BOOL;
+
+    // Flanken + Puls
+    rtReq      : R_TRIG;    // steigende Flanke auf Diagnose_gefordert
+	rtD3 : R_TRIG;
+    tpPulse    : TP;        // kurzer Puls für OPCUA.TriggerD2 (z. B. 100 ms)
+    rtFinished : R_TRIG;    // steigende Flanke auf OPCUA.DiagnoseFinished
+	 rtAck : R_TRIG;
+END_VAR"""^^xsd:string ;
     dp:hasPOULanguage "ST" ;
     dp:hasPOUName "FB_Diagnose_D2" ;
     op:containsPOUCall ag:POUCall_FB_Diagnose_D2_rtAck_1,
@@ -2632,8 +2865,10 @@ ag:FBType_FB_InitFahrt_A6_A2 a ag:class_CustomFBType,
     dp:hasPOUCode """// POU FB_InitFahrt_A6_A2 body
 IF A6 THEN
 	tInit(IN := A6, PT := T#3S);
+	OPCUA.LastGEMMAStateBeforeFailure := 'A6';
 ELSIF A2 THEN
 	tInit(IN := A2, PT := T#5S);
+	OPCUA.LastGEMMAStateBeforeFailure := 'A2';
 END_IF
 
 IF tInit.Q THEN
@@ -2641,6 +2876,17 @@ IF tInit.Q THEN
 ELSE
 	Init_erreicht := FALSE;
 END_IF""" ;
+    dp:hasPOUDeclarationHeader """FUNCTION_BLOCK FB_InitFahrt_A6_A2
+VAR_INPUT
+	A6 : BOOL := FALSE;
+	A2: BOOL := FALSE;
+END_VAR
+VAR_OUTPUT
+	Init_erreicht : BOOL := FALSE;
+END_VAR
+VAR
+	tInit : TON;
+END_VAR"""^^xsd:string ;
     dp:hasPOULanguage "ST" ;
     dp:hasPOUName "FB_InitFahrt_A6_A2" ;
     op:containsPOUCall ag:POUCall_FB_InitFahrt_A6_A2_tInit_1,
@@ -2676,6 +2922,17 @@ IF ton5s.Q THEN
     GVL.Fehler := FALSE;
     GVL.Weiter := TRUE;
 END_IF;""" ;
+    dp:hasPOUDeclarationHeader """FUNCTION_BLOCK FB_Notaus_D1
+VAR_INPUT
+	D1 : BOOL;
+END_VAR
+VAR_OUTPUT
+	Notaus_Entriegelt : BOOL;
+	Diagnose_gefordert : BOOL;
+END_VAR
+VAR
+	ton5s : TON;
+END_VAR"""^^xsd:string ;
     dp:hasPOULanguage "ST" ;
     dp:hasPOUName "FB_Notaus_D1" ;
     op:containsPOUCall ag:POUCall_FB_Notaus_D1_ton5s_1,
@@ -2731,6 +2988,37 @@ IF tSchritt4.Q THEN
 	Schritt3 := TRUE;
 	OPCUA.lastExecutedSkill := 'TestSkill3';
 END_IF""" ;
+    dp:hasPOUDeclarationHeader """FUNCTION_BLOCK FB_ProduktionMitStoerung_D3
+VAR_INPUT
+    ProduktionMitStoerung_Starten : BOOL;
+END_VAR
+VAR RETAIN
+    lastSkillIsOne : BOOL := FALSE; // FALSE => erster Start wird TestSkill3 -> wir setzen gleich initial um
+END_VAR
+VAR_OUTPUT
+    Fertig : BOOL;
+    Stoerung_erkannt        : BOOL;
+END_VAR
+VAR
+    Schritt3 : BOOL;
+    Schritt4 : BOOL;
+	Zwischen : STRING;
+    tSchritt3 : TON;
+    tSchritt4 : TON;
+    rStart   : R_TRIG;
+    rtStoer   : R_TRIG;
+	rStep1 : R_TRIG;
+	z : INT := 0;
+
+    // <<< NEU >>>
+    tPer   : TON;      // Periodentimer
+    rPer   : R_TRIG;   // Flanke bei Periodenende
+    pPer   : TP;       // kurzer Puls für die Störung
+    perEn  : BOOL;     // Enable nur wenn die Automatik läuft
+    dbg_Stoerung_Manuell : BOOL; // hattest du schon
+	tpRestart: INT;
+	RestartPulseLength: INT;
+END_VAR"""^^xsd:string ;
     dp:hasPOULanguage "ST" ;
     dp:hasPOUName "FB_ProduktionMitStoerung_D3" ;
     op:containsPOUCall ag:POUCall_FB_ProduktionMitStoerung_D3_rStart_1,
@@ -2881,6 +3169,7 @@ ag:Port_FB_Betriebsarten_Start_Init a ag:class_Port ;
     dp:hasPortType "BOOL" .
 
 ag:Port_FB_Diagnose_D2_Alt_gefunden a ag:class_Port ;
+    dp:hasDefaultPortValue "FALSE"^^xsd:string ;
     dp:hasPortDirection "Output" ;
     dp:hasPortName "Alt_gefunden" ;
     dp:hasPortType "BOOL" .
@@ -2896,16 +3185,19 @@ ag:Port_FB_Diagnose_D2_Diagnose_gefordert a ag:class_Port ;
     dp:hasPortType "BOOL" .
 
 ag:Port_FB_InitFahrt_A6_A2_A2 a ag:class_Port ;
+    dp:hasDefaultPortValue "FALSE"^^xsd:string ;
     dp:hasPortDirection "Input" ;
     dp:hasPortName "A2" ;
     dp:hasPortType "BOOL" .
 
 ag:Port_FB_InitFahrt_A6_A2_A6 a ag:class_Port ;
+    dp:hasDefaultPortValue "FALSE"^^xsd:string ;
     dp:hasPortDirection "Input" ;
     dp:hasPortName "A6" ;
     dp:hasPortType "BOOL" .
 
 ag:Port_FB_InitFahrt_A6_A2_Init_erreicht a ag:class_Port ;
+    dp:hasDefaultPortValue "FALSE"^^xsd:string ;
     dp:hasPortDirection "Output" ;
     dp:hasPortName "Init_erreicht" ;
     dp:hasPortType "BOOL" .
@@ -2934,7 +3226,8 @@ ag:Port_R_TRIG_Q a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Output" ;
     dp:hasPortName "Q" ;
-    dp:hasPortType "BOOL" .
+    dp:hasPortType "BOOL" ;
+    rdfs:comment "Q ist ein BOOL Impuls für einen Programmscan. Q wird TRUE, wenn CLK von FALSE auf TRUE wechselt."@de .
 
 ag:Var_FB_Automatikbetrieb_F1_Automatikbetrieb_Starten a ag:class_SignalSource,
         ag:class_Variable ;
@@ -2944,12 +3237,14 @@ ag:Var_FB_Automatikbetrieb_F1_Automatikbetrieb_Starten a ag:class_SignalSource,
 
 ag:Var_FB_Automatikbetrieb_F1_FaultPulse a ag:class_SignalSource,
         ag:class_Variable ;
+    dp:hasDefaultVariableValue "T#100ms"^^xsd:string ;
     dp:hasVariableName "FaultPulse" ;
     dp:hasVariableType "TIME" ;
     op:implementsPort ag:Port_FB_Automatikbetrieb_F1_FaultPulse .
 
 ag:Var_FB_Automatikbetrieb_F1_PeriodicFaultPeriod a ag:class_SignalSource,
         ag:class_Variable ;
+    dp:hasDefaultVariableValue "T#60s"^^xsd:string ;
     dp:hasVariableName "PeriodicFaultPeriod" ;
     dp:hasVariableType "TIME" ;
     op:implementsPort ag:Port_FB_Automatikbetrieb_F1_PeriodicFaultPeriod .
@@ -3027,18 +3322,21 @@ ag:Var_FB_Diagnose_D2_rtReq a ag:class_SignalSource,
 
 ag:Var_FB_InitFahrt_A6_A2_A2 a ag:class_SignalSource,
         ag:class_Variable ;
+    dp:hasDefaultVariableValue "FALSE"^^xsd:string ;
     dp:hasVariableName "A2" ;
     dp:hasVariableType "BOOL" ;
     op:implementsPort ag:Port_FB_InitFahrt_A6_A2_A2 .
 
 ag:Var_FB_InitFahrt_A6_A2_A6 a ag:class_SignalSource,
         ag:class_Variable ;
+    dp:hasDefaultVariableValue "FALSE"^^xsd:string ;
     dp:hasVariableName "A6" ;
     dp:hasVariableType "BOOL" ;
     op:implementsPort ag:Port_FB_InitFahrt_A6_A2_A6 .
 
 ag:Var_FB_Methode1Job_reached a ag:class_SignalSource,
         ag:class_Variable ;
+    dp:hasDefaultVariableValue "FALSE"^^xsd:string ;
     dp:hasVariableName "reached" ;
     dp:hasVariableType "BOOL" .
 
@@ -3078,31 +3376,37 @@ ag:Var_FB_ProduktionMitStoerung_D3_tSchritt4 a ag:class_SignalSource,
 
 ag:Var_MAIN_A2_angefordert a ag:class_SignalSource,
         ag:class_Variable ;
+    dp:hasDefaultVariableValue "FALSE"^^xsd:string ;
     dp:hasVariableName "A2_angefordert" ;
     dp:hasVariableType "BOOL" .
 
 ag:Var_MAIN_D3_angefordert a ag:class_SignalSource,
         ag:class_Variable ;
+    dp:hasDefaultVariableValue "FALSE"^^xsd:string ;
     dp:hasVariableName "D3_angefordert" ;
     dp:hasVariableType "BOOL" .
 
 ag:Var_MAIN_Init_start a ag:class_SignalSource,
         ag:class_Variable ;
+    dp:hasDefaultVariableValue "TRUE"^^xsd:string ;
     dp:hasVariableName "Init_start" ;
     dp:hasVariableType "BOOL" .
 
 ag:Var_MAIN_Start_eff a ag:class_SignalSource,
         ag:class_Variable ;
+    dp:hasDefaultVariableValue "FALSE"^^xsd:string ;
     dp:hasVariableName "Start_eff" ;
     dp:hasVariableType "BOOL" .
 
 ag:Var_MAIN_Weiter_eff a ag:class_SignalSource,
         ag:class_Variable ;
+    dp:hasDefaultVariableValue "FALSE"^^xsd:string ;
     dp:hasVariableName "Weiter_eff" ;
     dp:hasVariableType "BOOL" .
 
 ag:Var_MAIN_Zyklus_beendet a ag:class_SignalSource,
         ag:class_Variable ;
+    dp:hasDefaultVariableValue "FALSE"^^xsd:string ;
     dp:hasVariableName "Zyklus_beendet" ;
     dp:hasVariableType "BOOL" .
 
@@ -3165,11 +3469,6 @@ ag:class_Skill a owl:Class .
 
 ag:class_SkillImplementationHypothesis a owl:Class .
 
-dp:hasPortAttribute a owl:DatatypeProperty .
-
-dp:hasVariableAttribute a owl:DatatypeProperty ;
-    rdfs:subPropertyOf dp:hasSignalSourceAttribute .
-
 ag:Port_FB_Betriebsarten_Fehler a ag:class_Port ;
     dp:hasPortDirection "Input" ;
     dp:hasPortName "Fehler" ;
@@ -3198,7 +3497,8 @@ ag:StandardFBType_TP a ag:class_FBType,
     op:hasPort ag:Port_TP_ET,
         ag:Port_TP_IN,
         ag:Port_TP_PT,
-        ag:Port_TP_Q .
+        ag:Port_TP_Q ;
+    rdfs:comment "TP ist ein Impulsbaustein. Eine steigende Flanke an IN startet einen Impuls. Q wird für genau die Dauer PT TRUE, unabhängig davon wie lange IN TRUE bleibt. ET zeigt die verstrichene Impulszeit."@de .
 
 ag:Var_FB_Automatikbetrieb_F1_Schritt1 a ag:class_SignalSource,
         ag:class_Variable ;
@@ -3225,21 +3525,29 @@ ag:Var_FB_Notaus_D1_ton5s a ag:class_SignalSource,
 
 ag:Var_MAIN_Init_erreicht a ag:class_SignalSource,
         ag:class_Variable ;
+    dp:hasDefaultVariableValue "FALSE"^^xsd:string ;
     dp:hasVariableName "Init_erreicht" ;
     dp:hasVariableType "BOOL" .
 
 ag:Var_MAIN_alt_abort a ag:class_SignalSource,
         ag:class_Variable ;
+    dp:hasDefaultVariableValue "FALSE"^^xsd:string ;
     dp:hasVariableName "alt_abort" ;
     dp:hasVariableType "BOOL" .
 
 ag:Var_MAIN_alt_found a ag:class_SignalSource,
         ag:class_Variable ;
+    dp:hasDefaultVariableValue "FALSE"^^xsd:string ;
     dp:hasVariableName "alt_found" ;
     dp:hasVariableType "BOOL" .
 
 ag:class_GlobalVariableList a owl:Class ;
     rdfs:comment "Diese Klasse beschreibt eine globale Variablenliste als Container, der projektweit zugängliche Variablen zusammenfasst. GlobalVariableLists werden in SPS Projekten verwendet, um gemeinsame Signale, Zustände oder Hardwarezuordnungen zentral zu verwalten und in mehreren Programmen oder Function Blocks nutzbar zu machen. Im Knowledge Graph ermöglicht diese Klasse eine klare Gruppierung der globalen Symbolik und erleichtert Abfragen, die sich auf globale Signale beziehen, etwa auf Safety Signale, Betriebsartenflags oder I O Variablen. Aus PLCopen XML wird eine solche Liste typischerweise aus GVL Bereichen abgeleitet, wobei jede enthaltene Variable separat als class_Variable modelliert wird. Die Klasse unterstützt außerdem die Nachvollziehbarkeit, weil sichtbar wird, welche Variablen tatsächlich global sind und welche nur lokal innerhalb eines Bausteins existieren. Für die Dokumentation ist class_GlobalVariableList hilfreich, um globale Schnittstellen der Anlage zu beschreiben und zentrale Signalgruppen systematisch zu erläutern. Außerdem lassen sich hieraus automatisch Listen für Hardwaremapping oder Schnittstellendokumente erzeugen."@de .
+
+dp:hasPortAttribute a owl:DatatypeProperty .
+
+dp:hasVariableAttribute a owl:DatatypeProperty ;
+    rdfs:subPropertyOf dp:hasSignalSourceAttribute .
 
 dp:hasHypothesisParams a owl:DatatypeProperty ;
     rdfs:domain ag:class_SkillImplementationHypothesis ;
@@ -3256,30 +3564,33 @@ ag:class_SourceLiteral a owl:Class ;
     rdfs:comment "Diese Klasse repräsentiert konstante Literalwerte, die in einem SPS Netzwerk direkt als Eingangswerte verwendet werden, zum Beispiel TRUE, FALSE, 0 oder Zeitkonstanten. Sie wird im Knowledge Graph als spezielle Form einer Signalquelle modelliert, damit Parameterzuweisungen auch dann sauber abgebildet werden können, wenn kein Variablenname existiert. Literale sind in vielen Steuerungslogiken wichtig, etwa um Defaultwerte zu setzen, Zustandsautomaten zu initialisieren oder Zeitparameter für Timer vorzugeben. Aus PLCopen XML lassen sich solche Literale häufig aus Parameterbelegungen erkennen, wenn ein Eingang nicht verdrahtet ist oder explizit mit einem konstanten Wert verbunden wird. Die Klasse ermöglicht es, den Datenfluss vollständig zu rekonstruieren, da sonst ein Teil der Eingänge als undefiniert erscheinen würde. In Skill Analysen helfen SourceLiterals dabei, feste Konfigurationen sichtbar zu machen, zum Beispiel konstante Verfahrzeiten oder feste Betriebsartenparameter. Damit trägt class_SourceLiteral zur Vollständigkeit und Nachvollziehbarkeit der Modellierung bei."@de ;
     rdfs:subClassOf ag:class_SignalSource .
 
-dp:hasPOUAttribute a owl:DatatypeProperty ;
-    rdfs:domain ag:class_POU .
-
 ag:Port_R_TRIG_CLK a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Input" ;
     dp:hasPortName "CLK" ;
-    dp:hasPortType "BOOL" .
+    dp:hasPortType "BOOL" ;
+    rdfs:comment "CLK ist der BOOL Eingang, der überwacht wird. Bei einer steigenden Flanke wird Q erzeugt."@de .
 
 ag:class_StandardFBType a owl:Class ;
     rdfs:comment "Diese Klasse beschreibt Standard Function Block Typen, die typischerweise aus der SPS Bibliothek oder dem IEC 61131 3 Standard stammen, zum Beispiel RS Speicher, Triggerbausteine oder Zeitfunktionen. Sie wird eingesetzt, um wiederkehrende Basiskomponenten gesondert zu behandeln und nicht mit den projekt spezifischen Skill Bausteinen zu vermischen. StandardFBTypes dienen häufig als Infrastruktur für Zustandsbildung, Flankenerkennung, Zeitverhalten und Zählfunktionen und sind daher in vielen CustomFBTypes als interne Aufrufe enthalten. Im Knowledge Graph ermöglicht diese Klasse eine robuste Erkennung typischer Muster, etwa dass ein Skill durch einen R_TRIG gestartet wird, durch einen RS gehalten wird und durch Timerbedingungen gestoppt wird. Für die Analyse des Signalflusses sind Standardbausteine besonders relevant, weil sie häufig die eigentlichen Zustandswechsel erzwingen, auch wenn sie fachlich nicht als eigener Skill gelten. Aus PLCopen XML werden sie als POUCalls sichtbar, die innerhalb eines Bausteins auf solche Standardtypen verweisen. Die explizite Modellierung als StandardFBType verbessert außerdem das Filtering in Abfragen, sodass sich beispielsweise reine Skill Graphen ohne Bibliothekslogik erzeugen lassen."@de ;
     rdfs:subClassOf ag:class_FBType .
 
+dp:hasPOUAttribute a owl:DatatypeProperty ;
+    rdfs:domain ag:class_POU .
+
 ag:Port_TON_IN a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Input" ;
     dp:hasPortName "IN" ;
-    dp:hasPortType "BOOL" .
+    dp:hasPortType "BOOL" ;
+    rdfs:comment "IN ist der BOOL Eingang zum Starten der Einschaltverzögerung. Wenn IN TRUE wird, läuft ET hoch."@de .
 
 ag:Port_TON_PT a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Input" ;
     dp:hasPortName "PT" ;
-    dp:hasPortType "TIME" .
+    dp:hasPortType "TIME" ;
+    rdfs:comment "PT ist die Vorgabezeit. IN muss mindestens so lange TRUE sein, damit Q TRUE wird."@de .
 
 ag:StandardFBType_RS a ag:class_FBType,
         ag:class_POU,
@@ -3290,7 +3601,8 @@ ag:StandardFBType_RS a ag:class_FBType,
     dp:hasPOUType "FunctionBlock" ;
     op:hasPort ag:Port_RS_Q1,
         ag:Port_RS_R1,
-        ag:Port_RS_S .
+        ag:Port_RS_S ;
+    rdfs:comment "RS ist ein bistabiles Speicherglied mit Reset Priorität. S setzt den gespeicherten Zustand auf TRUE. R1 setzt ihn auf FALSE. Wenn S und R1 gleichzeitig TRUE sind, dominiert Reset und Q1 wird FALSE."@de .
 
 ag:class_PortInstance a owl:Class ;
     rdfs:comment "Diese Klasse bildet die konkrete Ausprägung eines Ports innerhalb einer spezifischen Function Block Instanz ab und entspricht damit einem realen Pin in einem FBD Netzwerk. Während class_Port nur den abstrakten Parameter eines Typs beschreibt, ist die PortInstance der tatsächliche Anschluss, der im Netzwerk verdrahtet wird und Signale empfängt oder ausgibt. Im Knowledge Graph wird diese Klasse benötigt, weil Signalverbindungen immer an eine konkrete Instanz gebunden sind und nicht nur an den Typ. Eine PortInstance verweist einerseits auf die zugehörige FBInstance und andererseits auf den Port des zugrunde liegenden FBTypes, wodurch eine eindeutige Zuordnung möglich ist. Aus PLCopen XML ergibt sich dieses Konzept aus Block Pins und deren Verbindungen im FBD, die erst im Kontext der Instanz vollständig spezifiziert sind. PortInstanzen sind besonders wichtig für die Rekonstruktion von Signalflüssen, da Parameterzuweisungen genau diese Knoten als Ziel besitzen. Damit ermöglicht class_PortInstance eine vollständige Analyse, welche Variable oder welches Zwischensignal tatsächlich an welchen Bausteinpin angeschlossen ist."@de ;
@@ -3306,7 +3618,8 @@ ag:StandardFBType_TON a ag:class_FBType,
     op:hasPort ag:Port_TON_ET,
         ag:Port_TON_IN,
         ag:Port_TON_PT,
-        ag:Port_TON_Q .
+        ag:Port_TON_Q ;
+    rdfs:comment "TON ist eine Einschaltverzögerung. Wenn IN TRUE wird, startet die Zeitmessung. ET zählt die verstrichene Zeit hoch. Sobald ET die Vorgabezeit PT erreicht und IN weiterhin TRUE ist, wird Q TRUE. Wenn IN FALSE wird, wird der Baustein zurückgesetzt und Q wird FALSE."@de .
 
 ag:class_FBType a owl:Class ;
     rdfs:comment "Diese Klasse beschreibt einen Function Block Typ als wiederverwendbaren Baustein mit fest definierter Schnittstelle und interner Logik. Ein FBType enthält typischerweise Eingänge, Ausgänge und interne Variablen sowie entweder ST Code oder eine aus dem FBD Netzwerk rekonstruierte Darstellung. Im Knowledge Graph wird der Baustein als Typ modelliert, damit einzelne Instanzen desselben Bausteins konsistent beschrieben und analysiert werden können. Die Ports eines FBType werden über class_Port repräsentiert und definieren Richtung und Datentyp der jeweiligen Parameter, wodurch eine saubere Typanalyse der Verdrahtung möglich ist. Darüber hinaus kann ein FBType selbst weitere POUs aufrufen, etwa Standardbausteine wie Trigger oder Timer, was über POUCalls nachvollzogen wird. Die Klasse ist zentral, um das Projekt modular zu verstehen, da sie die fachliche Logik kapselt, zum Beispiel Bewegungssteuerungen, Sensor Auswertungen oder Betriebsartenautomaten. Bei der Analyse von Skills ist class_FBType besonders wertvoll, weil sie die wiederkehrenden Muster einer Skill Implementierung sichtbar macht, etwa Start Trigger, Zustandsautomaten, Reset Mechanismen und Sicherheitsabfragen."@de ;
@@ -3320,7 +3633,8 @@ ag:StandardFBType_R_TRIG a ag:class_FBType,
     dp:hasPOUName "R_TRIG" ;
     dp:hasPOUType "FunctionBlock" ;
     op:hasPort ag:Port_R_TRIG_CLK,
-        ag:Port_R_TRIG_Q .
+        ag:Port_R_TRIG_Q ;
+    rdfs:comment "R_TRIG erkennt eine steigende Flanke an CLK. Q wird genau für einen Programmscan TRUE, wenn CLK von FALSE auf TRUE wechselt. Damit lassen sich aus einem Signal einzelne Ereignisimpulse ableiten."@de .
 
 ag:class_POUCall a owl:Class ;
     rdfs:comment "Diese Klasse beschreibt einen konkreten Aufruf einer Program Organisation Unit innerhalb eines Programms oder eines Function Blocks. Ein POUCall macht sichtbar, dass ein bestimmter Baustein nicht nur als Typ existiert, sondern an einer konkreten Stelle tatsächlich verwendet wird. Im Knowledge Graph ist dies essenziell, um Abhängigkeitsstrukturen zu rekonstruieren, also welche Bausteine intern voneinander abhängen und wie tief verschachtelte Logik aufgebaut ist. Ein POUCall kann mit einer FBInstance und deren PortInstanzen verknüpft werden, sodass klar wird, welche konkrete Instanz eines Bausteintyps gemeint ist. Aus PLCopen XML ergibt sich ein POUCall aus einem Bausteinblock im FBD oder aus einem Funktionsaufruf in ST Code, je nach Darstellung. Für die Skill Analyse kann damit nachvollzogen werden, welche Standardbausteine ein Skill verwendet, beispielsweise Trigger, Speicher oder Timer, und welche Unterbausteine die eigentliche Prozesslogik realisieren. Insgesamt macht class_POUCall die Ausführungsstruktur explizit, wodurch sich Skill Ketten, Signalpfade und interne Architektur systematisch untersuchen lassen."@de .

@@ -1,0 +1,28 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ag: <http://www.semanticweb.org/AgentProgramParams/>
+SELECT *
+WHERE {
+?pou a ag:class_CustomFBType;
+ ag:dp_isGEMMAStateMachine "true"^^xsd:boolean;
+ag:op_hasPort ?port.
+#Port finden
+?port ag:dp_hasPortName "Auto_Stoerung"^^xsd:string;
+#PortDirection ansehen
+ ag:dp_hasPortDirection ?port_dir.
+#Wenn ?port_die input^^xsd:string ist, dann muss es einen Aufruf gegeben haben.
+?assignment ag:op_assignsToPort ?port.
+#Jetzt die Instanz suchen, die verbunden wurde
+?assignment ag:op_assignsFrom ?port_instance_caller.
+?port_instance_caller ag:op_instantiatesPort ?callerPort.
+#Jetzt ist klar, mit welchem Wert von welchem Port dieser Port belegt wurde. Jetzt hole ich die POU-URI und den Namen des Output-Ports im Aufrufer, checke aber vorher, ob es ein Output-Port ist. Wenn es ein Input-Port ist, soll mit derselben Logik vorgegangen werden, um den konkreten Aufrufer dafür zu finden, bis auf den Output-port gestoßen wird.
+?callerPort ag:dp_hasPortDirection ?caller_dir;
+# Ist Output, also wurde der Aufrufer gefunden.
+ ag:dp_hasPortName ?callerPortName.
+#Jetzt ist klar, woher genau der Aufruf dieser Variable gestammt hat.
+?callerPOU ag:op_hasPort ?callerPort;
+	ag:dp_hasPOUCode ?callerCode.
+}
+

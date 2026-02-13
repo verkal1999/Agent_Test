@@ -213,6 +213,20 @@ ag:dp_hasConsistencyReport rdf:type owl:DatatypeProperty ;
                            rdfs:range xsd:string .
 
 
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasDefaultPortValue
+ag:dp_hasDefaultPortValue rdf:type owl:DatatypeProperty ;
+                          rdfs:subPropertyOf ag:dp_hasPortAttribute ;
+                          rdfs:domain ag:class_Port ;
+                          rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasDefaultVariableValue
+ag:dp_hasDefaultVariableValue rdf:type owl:DatatypeProperty ;
+                              rdfs:subPropertyOf ag:dp_hasVariableAttribute ;
+                              rdfs:domain ag:class_Variable ;
+                              rdfs:range xsd:string .
+
+
 ###  http://www.semanticweb.org/AgentProgramParams/dp_hasDescription
 ag:dp_hasDescription rdf:type owl:DatatypeProperty ;
                      rdfs:domain ag:class_Variable ;
@@ -273,6 +287,13 @@ ag:dp_hasPOUCodeDescription rdf:type owl:DatatypeProperty ;
                             rdfs:subPropertyOf ag:dp_hasPOUAttribute ;
                             rdfs:domain ag:class_POU ;
                             rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasPOUDeclarationHeader
+ag:dp_hasPOUDeclarationHeader rdf:type owl:DatatypeProperty ;
+                              rdfs:subPropertyOf ag:dp_hasPOUAttribute ;
+                              rdfs:domain ag:class_POU ;
+                              rdfs:range xsd:string .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/dp_hasPOULanguage
@@ -545,7 +566,8 @@ ag:Port_CTD_CD rdf:type owl:NamedIndividual ,
                         ag:class_Port ;
                ag:dp_hasPortDirection "Input" ;
                ag:dp_hasPortName "CD" ;
-               ag:dp_hasPortType "BOOL" .
+               ag:dp_hasPortType "BOOL" ;
+               rdfs:comment "CD ist der Zähleingang zum Herunterzählen. Jede steigende Flanke verringert CV."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_CTD_CV
@@ -553,7 +575,8 @@ ag:Port_CTD_CV rdf:type owl:NamedIndividual ,
                         ag:class_Port ;
                ag:dp_hasPortDirection "Output" ;
                ag:dp_hasPortName "CV" ;
-               ag:dp_hasPortType "INT" .
+               ag:dp_hasPortType "INT" ;
+               rdfs:comment "CV ist der aktuelle Countdown Wert und zeigt die verbleibende Anzahl."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_CTD_LD
@@ -561,7 +584,8 @@ ag:Port_CTD_LD rdf:type owl:NamedIndividual ,
                         ag:class_Port ;
                ag:dp_hasPortDirection "Input" ;
                ag:dp_hasPortName "LD" ;
-               ag:dp_hasPortType "BOOL" .
+               ag:dp_hasPortType "BOOL" ;
+               rdfs:comment "LD lädt den Preset Wert PV in CV und initialisiert damit den Countdown."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_CTD_PV
@@ -569,7 +593,8 @@ ag:Port_CTD_PV rdf:type owl:NamedIndividual ,
                         ag:class_Port ;
                ag:dp_hasPortDirection "Input" ;
                ag:dp_hasPortName "PV" ;
-               ag:dp_hasPortType "INT" .
+               ag:dp_hasPortType "INT" ;
+               rdfs:comment "PV ist der Preset Wert und typische Startwert für den Countdown."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_CTD_Q
@@ -577,7 +602,8 @@ ag:Port_CTD_Q rdf:type owl:NamedIndividual ,
                        ag:class_Port ;
               ag:dp_hasPortDirection "Output" ;
               ag:dp_hasPortName "Q" ;
-              ag:dp_hasPortType "BOOL" .
+              ag:dp_hasPortType "BOOL" ;
+              rdfs:comment "Q wird TRUE, wenn CV gleich 0 ist und der Countdown beendet ist."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_CTUD_CD
@@ -585,7 +611,8 @@ ag:Port_CTUD_CD rdf:type owl:NamedIndividual ,
                          ag:class_Port ;
                 ag:dp_hasPortDirection "Input" ;
                 ag:dp_hasPortName "CD" ;
-                ag:dp_hasPortType "BOOL" .
+                ag:dp_hasPortType "BOOL" ;
+                rdfs:comment "CD ist der Zähleingang zum Herunterzählen. Jede steigende Flanke verringert CV."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_CTUD_CU
@@ -593,7 +620,8 @@ ag:Port_CTUD_CU rdf:type owl:NamedIndividual ,
                          ag:class_Port ;
                 ag:dp_hasPortDirection "Input" ;
                 ag:dp_hasPortName "CU" ;
-                ag:dp_hasPortType "BOOL" .
+                ag:dp_hasPortType "BOOL" ;
+                rdfs:comment "CU ist der Zähleingang zum Hochzählen. Jede steigende Flanke erhöht CV."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_CTUD_CV
@@ -601,7 +629,8 @@ ag:Port_CTUD_CV rdf:type owl:NamedIndividual ,
                          ag:class_Port ;
                 ag:dp_hasPortDirection "Output" ;
                 ag:dp_hasPortName "CV" ;
-                ag:dp_hasPortType "INT" .
+                ag:dp_hasPortType "INT" ;
+                rdfs:comment "CV ist der aktuelle Zählerstand und wird oft für Füllstände oder Stückzahlen genutzt."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_CTUD_LD
@@ -609,7 +638,8 @@ ag:Port_CTUD_LD rdf:type owl:NamedIndividual ,
                          ag:class_Port ;
                 ag:dp_hasPortDirection "Input" ;
                 ag:dp_hasPortName "LD" ;
-                ag:dp_hasPortType "BOOL" .
+                ag:dp_hasPortType "BOOL" ;
+                rdfs:comment "LD lädt PV in CV und setzt damit einen definierten Startstand."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_CTUD_PV
@@ -617,7 +647,8 @@ ag:Port_CTUD_PV rdf:type owl:NamedIndividual ,
                          ag:class_Port ;
                 ag:dp_hasPortDirection "Input" ;
                 ag:dp_hasPortName "PV" ;
-                ag:dp_hasPortType "INT" .
+                ag:dp_hasPortType "INT" ;
+                rdfs:comment "PV ist der Preset Wert. QU wird TRUE, wenn CV größer gleich PV ist."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_CTUD_QD
@@ -625,7 +656,8 @@ ag:Port_CTUD_QD rdf:type owl:NamedIndividual ,
                          ag:class_Port ;
                 ag:dp_hasPortDirection "Output" ;
                 ag:dp_hasPortName "QD" ;
-                ag:dp_hasPortType "BOOL" .
+                ag:dp_hasPortType "BOOL" ;
+                rdfs:comment "QD ist die Meldung für unteren Grenzwert. QD wird TRUE, wenn CV gleich 0 ist."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_CTUD_QU
@@ -633,7 +665,8 @@ ag:Port_CTUD_QU rdf:type owl:NamedIndividual ,
                          ag:class_Port ;
                 ag:dp_hasPortDirection "Output" ;
                 ag:dp_hasPortName "QU" ;
-                ag:dp_hasPortType "BOOL" .
+                ag:dp_hasPortType "BOOL" ;
+                rdfs:comment "QU ist die Meldung für oberen Grenzwert. QU wird TRUE, wenn CV größer gleich PV ist."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_CTUD_R
@@ -641,7 +674,8 @@ ag:Port_CTUD_R rdf:type owl:NamedIndividual ,
                         ag:class_Port ;
                ag:dp_hasPortDirection "Input" ;
                ag:dp_hasPortName "R" ;
-               ag:dp_hasPortType "BOOL" .
+               ag:dp_hasPortType "BOOL" ;
+               rdfs:comment "R setzt CV auf 0 zurück."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_CTU_CU
@@ -649,7 +683,8 @@ ag:Port_CTU_CU rdf:type owl:NamedIndividual ,
                         ag:class_Port ;
                ag:dp_hasPortDirection "Input" ;
                ag:dp_hasPortName "CU" ;
-               ag:dp_hasPortType "BOOL" .
+               ag:dp_hasPortType "BOOL" ;
+               rdfs:comment "CU ist der Zähleingang. Jede steigende Flanke erhöht den Zählerstand CV."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_CTU_CV
@@ -657,7 +692,8 @@ ag:Port_CTU_CV rdf:type owl:NamedIndividual ,
                         ag:class_Port ;
                ag:dp_hasPortDirection "Output" ;
                ag:dp_hasPortName "CV" ;
-               ag:dp_hasPortType "INT" .
+               ag:dp_hasPortType "INT" ;
+               rdfs:comment "CV ist der aktuelle Zählerstand. Wird häufig angezeigt oder geloggt."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_CTU_PV
@@ -665,7 +701,8 @@ ag:Port_CTU_PV rdf:type owl:NamedIndividual ,
                         ag:class_Port ;
                ag:dp_hasPortDirection "Input" ;
                ag:dp_hasPortName "PV" ;
-               ag:dp_hasPortType "INT" .
+               ag:dp_hasPortType "INT" ;
+               rdfs:comment "PV ist der Preset Wert. Sobald CV größer gleich PV ist, wird Q TRUE."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_CTU_Q
@@ -673,7 +710,8 @@ ag:Port_CTU_Q rdf:type owl:NamedIndividual ,
                        ag:class_Port ;
               ag:dp_hasPortDirection "Output" ;
               ag:dp_hasPortName "Q" ;
-              ag:dp_hasPortType "BOOL" .
+              ag:dp_hasPortType "BOOL" ;
+              rdfs:comment "Q ist die Grenzwertmeldung. Q wird TRUE, wenn CV den Preset Wert erreicht oder überschreitet."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_CTU_R
@@ -681,7 +719,8 @@ ag:Port_CTU_R rdf:type owl:NamedIndividual ,
                        ag:class_Port ;
               ag:dp_hasPortDirection "Input" ;
               ag:dp_hasPortName "R" ;
-              ag:dp_hasPortType "BOOL" .
+              ag:dp_hasPortType "BOOL" ;
+              rdfs:comment "R setzt den Zählerstand CV auf 0 zurück."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_F_TRIG_CLK
@@ -689,7 +728,8 @@ ag:Port_F_TRIG_CLK rdf:type owl:NamedIndividual ,
                             ag:class_Port ;
                    ag:dp_hasPortDirection "Input" ;
                    ag:dp_hasPortName "CLK" ;
-                   ag:dp_hasPortType "BOOL" .
+                   ag:dp_hasPortType "BOOL" ;
+                   rdfs:comment "CLK ist der BOOL Eingang, der überwacht wird. Bei einer fallenden Flanke wird Q erzeugt."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_F_TRIG_Q
@@ -697,7 +737,8 @@ ag:Port_F_TRIG_Q rdf:type owl:NamedIndividual ,
                           ag:class_Port ;
                  ag:dp_hasPortDirection "Output" ;
                  ag:dp_hasPortName "Q" ;
-                 ag:dp_hasPortType "BOOL" .
+                 ag:dp_hasPortType "BOOL" ;
+                 rdfs:comment "Q ist ein BOOL Impuls für einen Programmscan. Q wird TRUE, wenn CLK von TRUE auf FALSE wechselt."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_RS_Q1
@@ -705,7 +746,8 @@ ag:Port_RS_Q1 rdf:type owl:NamedIndividual ,
                        ag:class_Port ;
               ag:dp_hasPortDirection "Output" ;
               ag:dp_hasPortName "Q1" ;
-              ag:dp_hasPortType "BOOL" .
+              ag:dp_hasPortType "BOOL" ;
+              rdfs:comment "Q1 ist der gespeicherte Ausgang. Q1 bleibt erhalten, bis Reset aktiv wird."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_RS_R1
@@ -713,7 +755,8 @@ ag:Port_RS_R1 rdf:type owl:NamedIndividual ,
                        ag:class_Port ;
               ag:dp_hasPortDirection "Input" ;
               ag:dp_hasPortName "R1" ;
-              ag:dp_hasPortType "BOOL" .
+              ag:dp_hasPortType "BOOL" ;
+              rdfs:comment "R1 ist der Reset Eingang mit Priorität. Wenn R1 TRUE ist, wird Q1 FALSE, auch wenn S TRUE ist."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_RS_S
@@ -721,7 +764,8 @@ ag:Port_RS_S rdf:type owl:NamedIndividual ,
                       ag:class_Port ;
              ag:dp_hasPortDirection "Input" ;
              ag:dp_hasPortName "S" ;
-             ag:dp_hasPortType "BOOL" .
+             ag:dp_hasPortType "BOOL" ;
+             rdfs:comment "S ist der Set Eingang. Wenn S TRUE wird und Reset nicht dominiert, wird Q1 TRUE."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_R_TRIG_CLK
@@ -729,7 +773,8 @@ ag:Port_R_TRIG_CLK rdf:type owl:NamedIndividual ,
                             ag:class_Port ;
                    ag:dp_hasPortDirection "Input" ;
                    ag:dp_hasPortName "CLK" ;
-                   ag:dp_hasPortType "BOOL" .
+                   ag:dp_hasPortType "BOOL" ;
+                   rdfs:comment "CLK ist der BOOL Eingang, der überwacht wird. Bei einer steigenden Flanke wird Q erzeugt."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_R_TRIG_Q
@@ -737,7 +782,8 @@ ag:Port_R_TRIG_Q rdf:type owl:NamedIndividual ,
                           ag:class_Port ;
                  ag:dp_hasPortDirection "Output" ;
                  ag:dp_hasPortName "Q" ;
-                 ag:dp_hasPortType "BOOL" .
+                 ag:dp_hasPortType "BOOL" ;
+                 rdfs:comment "Q ist ein BOOL Impuls für einen Programmscan. Q wird TRUE, wenn CLK von FALSE auf TRUE wechselt."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_SR_Q1
@@ -745,7 +791,8 @@ ag:Port_SR_Q1 rdf:type owl:NamedIndividual ,
                        ag:class_Port ;
               ag:dp_hasPortDirection "Output" ;
               ag:dp_hasPortName "Q1" ;
-              ag:dp_hasPortType "BOOL" .
+              ag:dp_hasPortType "BOOL" ;
+              rdfs:comment "Q1 ist der gespeicherte Ausgang. Q1 bleibt erhalten, bis Reset aktiv wird."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_SR_R
@@ -753,7 +800,8 @@ ag:Port_SR_R rdf:type owl:NamedIndividual ,
                       ag:class_Port ;
              ag:dp_hasPortDirection "Input" ;
              ag:dp_hasPortName "R" ;
-             ag:dp_hasPortType "BOOL" .
+             ag:dp_hasPortType "BOOL" ;
+             rdfs:comment "R ist der Reset Eingang. Wenn R TRUE wird, wird Q1 gespeichert FALSE."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_SR_S1
@@ -761,7 +809,8 @@ ag:Port_SR_S1 rdf:type owl:NamedIndividual ,
                        ag:class_Port ;
               ag:dp_hasPortDirection "Input" ;
               ag:dp_hasPortName "S1" ;
-              ag:dp_hasPortType "BOOL" .
+              ag:dp_hasPortType "BOOL" ;
+              rdfs:comment "S1 ist der Set Eingang. Wenn S1 TRUE wird, wird Q1 gespeichert TRUE."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_TOF_ET
@@ -769,7 +818,8 @@ ag:Port_TOF_ET rdf:type owl:NamedIndividual ,
                         ag:class_Port ;
                ag:dp_hasPortDirection "Output" ;
                ag:dp_hasPortName "ET" ;
-               ag:dp_hasPortType "TIME" .
+               ag:dp_hasPortType "TIME" ;
+               rdfs:comment "ET ist die verstrichene Nachlaufzeit. ET zählt ab dem Abschalten von IN hoch bis PT."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_TOF_IN
@@ -777,7 +827,8 @@ ag:Port_TOF_IN rdf:type owl:NamedIndividual ,
                         ag:class_Port ;
                ag:dp_hasPortDirection "Input" ;
                ag:dp_hasPortName "IN" ;
-               ag:dp_hasPortType "BOOL" .
+               ag:dp_hasPortType "BOOL" ;
+               rdfs:comment "IN ist der BOOL Eingang. Wenn IN TRUE ist, ist Q TRUE. Bei fallender Flanke startet der Nachlauf."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_TOF_PT
@@ -785,7 +836,8 @@ ag:Port_TOF_PT rdf:type owl:NamedIndividual ,
                         ag:class_Port ;
                ag:dp_hasPortDirection "Input" ;
                ag:dp_hasPortName "PT" ;
-               ag:dp_hasPortType "TIME" .
+               ag:dp_hasPortType "TIME" ;
+               rdfs:comment "PT ist die Nachlaufzeit. Bestimmt wie lange Q nach dem Abschalten von IN noch TRUE bleibt."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_TOF_Q
@@ -793,7 +845,8 @@ ag:Port_TOF_Q rdf:type owl:NamedIndividual ,
                        ag:class_Port ;
               ag:dp_hasPortDirection "Output" ;
               ag:dp_hasPortName "Q" ;
-              ag:dp_hasPortType "BOOL" .
+              ag:dp_hasPortType "BOOL" ;
+              rdfs:comment "Q ist der BOOL Ausgang. Q bleibt nach fallender Flanke an IN noch für PT TRUE."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_TON_ET
@@ -801,7 +854,8 @@ ag:Port_TON_ET rdf:type owl:NamedIndividual ,
                         ag:class_Port ;
                ag:dp_hasPortDirection "Output" ;
                ag:dp_hasPortName "ET" ;
-               ag:dp_hasPortType "TIME" .
+               ag:dp_hasPortType "TIME" ;
+               rdfs:comment "ET ist die verstrichene Zeit seit Start. ET steigt bis maximal PT und dient oft zur Diagnose oder Visualisierung."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_TON_IN
@@ -809,7 +863,8 @@ ag:Port_TON_IN rdf:type owl:NamedIndividual ,
                         ag:class_Port ;
                ag:dp_hasPortDirection "Input" ;
                ag:dp_hasPortName "IN" ;
-               ag:dp_hasPortType "BOOL" .
+               ag:dp_hasPortType "BOOL" ;
+               rdfs:comment "IN ist der BOOL Eingang zum Starten der Einschaltverzögerung. Wenn IN TRUE wird, läuft ET hoch."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_TON_PT
@@ -817,7 +872,8 @@ ag:Port_TON_PT rdf:type owl:NamedIndividual ,
                         ag:class_Port ;
                ag:dp_hasPortDirection "Input" ;
                ag:dp_hasPortName "PT" ;
-               ag:dp_hasPortType "TIME" .
+               ag:dp_hasPortType "TIME" ;
+               rdfs:comment "PT ist die Vorgabezeit. IN muss mindestens so lange TRUE sein, damit Q TRUE wird."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_TON_Q
@@ -825,7 +881,8 @@ ag:Port_TON_Q rdf:type owl:NamedIndividual ,
                        ag:class_Port ;
               ag:dp_hasPortDirection "Output" ;
               ag:dp_hasPortName "Q" ;
-              ag:dp_hasPortType "BOOL" .
+              ag:dp_hasPortType "BOOL" ;
+              rdfs:comment "Q ist der BOOL Ausgang. Q wird TRUE, wenn ET die Vorgabezeit PT erreicht und IN weiterhin TRUE ist."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_TP_ET
@@ -833,7 +890,8 @@ ag:Port_TP_ET rdf:type owl:NamedIndividual ,
                        ag:class_Port ;
               ag:dp_hasPortDirection "Output" ;
               ag:dp_hasPortName "ET" ;
-              ag:dp_hasPortType "TIME" .
+              ag:dp_hasPortType "TIME" ;
+              rdfs:comment "ET ist die verstrichene Zeit seit Impulsstart. Wird häufig für Anzeige und Diagnose genutzt."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_TP_IN
@@ -841,7 +899,8 @@ ag:Port_TP_IN rdf:type owl:NamedIndividual ,
                        ag:class_Port ;
               ag:dp_hasPortDirection "Input" ;
               ag:dp_hasPortName "IN" ;
-              ag:dp_hasPortType "BOOL" .
+              ag:dp_hasPortType "BOOL" ;
+              rdfs:comment "IN ist der BOOL Trigger Eingang. Eine steigende Flanke startet den Impuls."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_TP_PT
@@ -849,7 +908,8 @@ ag:Port_TP_PT rdf:type owl:NamedIndividual ,
                        ag:class_Port ;
               ag:dp_hasPortDirection "Input" ;
               ag:dp_hasPortName "PT" ;
-              ag:dp_hasPortType "TIME" .
+              ag:dp_hasPortType "TIME" ;
+              rdfs:comment "PT ist die Impulsdauer. Bestimmt wie lange Q TRUE bleibt."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/Port_TP_Q
@@ -857,7 +917,8 @@ ag:Port_TP_Q rdf:type owl:NamedIndividual ,
                       ag:class_Port ;
              ag:dp_hasPortDirection "Output" ;
              ag:dp_hasPortName "Q" ;
-             ag:dp_hasPortType "BOOL" .
+             ag:dp_hasPortType "BOOL" ;
+             rdfs:comment "Q ist der BOOL Ausgang des Impulses. Q ist für die Dauer PT TRUE."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_CTD
@@ -871,7 +932,8 @@ ag:StandardFBType_CTD rdf:type owl:NamedIndividual ,
                                     ag:Port_CTD_Q ;
                       ag:dp_hasPOULanguage "ST" ;
                       ag:dp_hasPOUName "CTD" ;
-                      ag:dp_hasPOUType "FunctionBlock" .
+                      ag:dp_hasPOUType "FunctionBlock" ;
+                      rdfs:comment "CTD ist ein Abwärtszähler. LD lädt CV mit dem Preset Wert PV. Jede steigende Flanke an CD verringert CV um 1 bis minimal 0. Q wird TRUE, wenn CV gleich 0 ist."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_CTU
@@ -885,7 +947,8 @@ ag:StandardFBType_CTU rdf:type owl:NamedIndividual ,
                                     ag:Port_CTU_R ;
                       ag:dp_hasPOULanguage "ST" ;
                       ag:dp_hasPOUName "CTU" ;
-                      ag:dp_hasPOUType "FunctionBlock" .
+                      ag:dp_hasPOUType "FunctionBlock" ;
+                      rdfs:comment "CTU ist ein Aufwärtszähler. Jede steigende Flanke an CU erhöht CV um 1. R setzt CV auf 0 zurück. Q wird TRUE, sobald CV den Preset Wert PV erreicht oder überschreitet."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_CTUD
@@ -902,7 +965,8 @@ ag:StandardFBType_CTUD rdf:type owl:NamedIndividual ,
                                      ag:Port_CTUD_R ;
                        ag:dp_hasPOULanguage "ST" ;
                        ag:dp_hasPOUName "CTUD" ;
-                       ag:dp_hasPOUType "FunctionBlock" .
+                       ag:dp_hasPOUType "FunctionBlock" ;
+                       rdfs:comment "CTUD ist ein Auf und Abwärtszähler. Steigende Flanken an CU erhöhen CV, steigende Flanken an CD verringern CV. R setzt CV auf 0. LD lädt CV mit PV. QU wird TRUE, wenn CV größer gleich PV ist. QD wird TRUE, wenn CV gleich 0 ist."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_F_TRIG
@@ -913,7 +977,8 @@ ag:StandardFBType_F_TRIG rdf:type owl:NamedIndividual ,
                                        ag:Port_F_TRIG_Q ;
                          ag:dp_hasPOULanguage "ST" ;
                          ag:dp_hasPOUName "F_TRIG" ;
-                         ag:dp_hasPOUType "FunctionBlock" .
+                         ag:dp_hasPOUType "FunctionBlock" ;
+                         rdfs:comment "F_TRIG erkennt eine fallende Flanke an CLK. Q wird genau für einen Programmscan TRUE, wenn CLK von TRUE auf FALSE wechselt. Damit lassen sich Abschalt Ereignisse als Impuls weiterverarbeiten."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_RS
@@ -925,7 +990,8 @@ ag:StandardFBType_RS rdf:type owl:NamedIndividual ,
                                    ag:Port_RS_S ;
                      ag:dp_hasPOULanguage "ST" ;
                      ag:dp_hasPOUName "RS" ;
-                     ag:dp_hasPOUType "FunctionBlock" .
+                     ag:dp_hasPOUType "FunctionBlock" ;
+                     rdfs:comment "RS ist ein bistabiles Speicherglied mit Reset Priorität. S setzt den gespeicherten Zustand auf TRUE. R1 setzt ihn auf FALSE. Wenn S und R1 gleichzeitig TRUE sind, dominiert Reset und Q1 wird FALSE."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_R_TRIG
@@ -936,7 +1002,8 @@ ag:StandardFBType_R_TRIG rdf:type owl:NamedIndividual ,
                                        ag:Port_R_TRIG_Q ;
                          ag:dp_hasPOULanguage "ST" ;
                          ag:dp_hasPOUName "R_TRIG" ;
-                         ag:dp_hasPOUType "FunctionBlock" .
+                         ag:dp_hasPOUType "FunctionBlock" ;
+                         rdfs:comment "R_TRIG erkennt eine steigende Flanke an CLK. Q wird genau für einen Programmscan TRUE, wenn CLK von FALSE auf TRUE wechselt. Damit lassen sich aus einem Signal einzelne Ereignisimpulse ableiten."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_SR
@@ -948,7 +1015,8 @@ ag:StandardFBType_SR rdf:type owl:NamedIndividual ,
                                    ag:Port_SR_S1 ;
                      ag:dp_hasPOULanguage "ST" ;
                      ag:dp_hasPOUName "SR" ;
-                     ag:dp_hasPOUType "FunctionBlock" .
+                     ag:dp_hasPOUType "FunctionBlock" ;
+                     rdfs:comment "SR ist ein bistabiles Speicherglied mit Set Priorität. S1 setzt den gespeicherten Zustand auf TRUE. R setzt ihn auf FALSE. Wenn S1 und R gleichzeitig TRUE sind, dominiert Set und Q1 bleibt TRUE."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_TOF
@@ -961,7 +1029,8 @@ ag:StandardFBType_TOF rdf:type owl:NamedIndividual ,
                                     ag:Port_TOF_Q ;
                       ag:dp_hasPOULanguage "ST" ;
                       ag:dp_hasPOUName "TOF" ;
-                      ag:dp_hasPOUType "FunctionBlock" .
+                      ag:dp_hasPOUType "FunctionBlock" ;
+                      rdfs:comment "TOF ist eine Ausschaltverzögerung. Solange IN TRUE ist, ist Q TRUE. Wenn IN von TRUE auf FALSE wechselt, bleibt Q noch für die Dauer PT TRUE und ET zählt die Nachlaufzeit. Wenn IN während des Nachlaufs wieder TRUE wird, wird der Nachlauf abgebrochen und Q bleibt TRUE."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_TON
@@ -974,7 +1043,8 @@ ag:StandardFBType_TON rdf:type owl:NamedIndividual ,
                                     ag:Port_TON_Q ;
                       ag:dp_hasPOULanguage "ST" ;
                       ag:dp_hasPOUName "TON" ;
-                      ag:dp_hasPOUType "FunctionBlock" .
+                      ag:dp_hasPOUType "FunctionBlock" ;
+                      rdfs:comment "TON ist eine Einschaltverzögerung. Wenn IN TRUE wird, startet die Zeitmessung. ET zählt die verstrichene Zeit hoch. Sobald ET die Vorgabezeit PT erreicht und IN weiterhin TRUE ist, wird Q TRUE. Wenn IN FALSE wird, wird der Baustein zurückgesetzt und Q wird FALSE."@de .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/StandardFBType_TP
@@ -987,7 +1057,8 @@ ag:StandardFBType_TP rdf:type owl:NamedIndividual ,
                                    ag:Port_TP_Q ;
                      ag:dp_hasPOULanguage "ST" ;
                      ag:dp_hasPOUName "TP" ;
-                     ag:dp_hasPOUType "FunctionBlock" .
+                     ag:dp_hasPOUType "FunctionBlock" ;
+                     rdfs:comment "TP ist ein Impulsbaustein. Eine steigende Flanke an IN startet einen Impuls. Q wird für genau die Dauer PT TRUE, unabhängig davon wie lange IN TRUE bleibt. ET zeigt die verstrichene Impulszeit."@de .
 
 
 ###  Generated by the OWL API (version 4.5.29.2024-05-13T12:11:03Z) https://github.com/owlcs/owlapi

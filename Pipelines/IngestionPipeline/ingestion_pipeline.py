@@ -276,6 +276,12 @@ class KGAnalyzeStep(Step):
             case_sensitive=False,
         )
         mgr.load()
+
+        mgr.enrich_default_values_from_declaration_headers(
+            overwrite=True,
+            create_missing_variables=True,
+        )
+        
         mgr.analyze_calls()
         mgr.save(ctx.cfg.kg_final_path)
         ctx.set("kg_manager", mgr)

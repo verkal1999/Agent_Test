@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Tuple, List, Optional, Any
-
+import xml.etree.ElementTree as ET
 import json
 from rdflib import Graph, Namespace, RDF, URIRef, Literal, OWL
 from rdflib.namespace import XSD
@@ -59,7 +59,7 @@ class KGLoader:
         self.AG = Namespace('http://www.semanticweb.org/AgentProgramParams/')
         self.DP = Namespace('http://www.semanticweb.org/AgentProgramParams/dp_')
         self.OP = Namespace('http://www.semanticweb.org/AgentProgramParams/op_')
-
+        self.pou_decl_headers: Dict[str, str] = {}
         self.kg = Graph()
         if self.config.kg_cleaned_path.exists():
             with open(self.config.kg_cleaned_path, "r", encoding="utf-8") as fkg:
@@ -197,18 +197,25 @@ class KGLoader:
 
     def build_gvl_index_from_objects(self) -> None:
         objects_path = self.config.objects_path
-        if not objects_path.exists(): return
-        objects_data = json.loads(objects_path.read_text(encoding="utf-8"))
+        objects_data = []
+
+        if objects_path.exists():
+            objects_data = json.loads(objects_path.read_text(encoding="utf-8"))
+        else:
+            # Kein early return, damit wir später zumindest export.xml als Fallback nutzen können
+            objects_data = []
 
         gvl_short_to_full: Dict[str, set[str]] = {}
         gvl_full_to_type: Dict[str, str] = {}
+        pou_decl_headers: Dict[str, str] = {}
 
         for obj in objects_data:
             if obj.get("kind") == "GVL":
                 gvl_name = obj.get("name")
                 for glob in obj.get("globals", []):
                     short = glob.get("name")
-                    if not short: continue
+                    if not short:
+                        continue
                     if gvl_name == "GVL":
                         full = f"GVL.{short}"
                     else:
@@ -218,8 +225,129 @@ class KGLoader:
                     if vtype:
                         gvl_full_to_type[full] = vtype
 
+            # NEU: POU Declaration Header aus TcPOU Scan übernehmen
+            if obj.get("kind") == "POU":
+                name = obj.get("name")
+                decl = obj.get("declaration")
+                if name and decl and str(decl).strip():
+                    pou_decl_headers[name.lower()] = str(decl).strip()
+
         self.gvl_short_to_full = gvl_short_to_full
         self.gvl_full_to_type = gvl_full_to_type
+        self.pou_decl_headers = pou_decl_headers
+
+        # NEU: Fallback/Ergänzung über export.xml
+        self._merge_pou_decl_headers_from_export_xml()
+
+
+        self.gvl_short_to_full = gvl_short_to_full
+        self.gvl_full_to_type = gvl_full_to_type
+    
+    def _merge_pou_decl_headers_from_export_xml(self) -> None:
+        export_path = self.config.twincat_folder / "export.xml"
+        if not export_path.exists():
+            return
+
+        xml_text = export_path.read_text(encoding="utf-8", errors="replace")
+        try:
+            root = ET.fromstring(xml_text)
+        except Exception:
+            return
+
+        NS = {"ns": "http://www.plcopen.org/xml/tc6_0200"}
+
+        for pou in root.findall(".//ns:pou", NS):
+            name = pou.get("name")
+            if not name:
+                continue
+
+            key = name.lower()
+            if key in self.pou_decl_headers and self.pou_decl_headers[key].strip():
+                continue
+
+            decl = self._build_decl_header_from_export_pou(pou, NS)
+            if decl.strip():
+                self.pou_decl_headers[key] = decl.strip()
+
+
+    def _build_decl_header_from_export_pou(self, pou_elem: ET.Element, NS: Dict[str, str]) -> str:
+        interface = pou_elem.find("ns:interface", NS)
+        if interface is None:
+            return ""
+
+        sections = [
+            ("inputVars", "VAR_INPUT"),
+            ("outputVars", "VAR_OUTPUT"),
+            ("inOutVars", "VAR_IN_OUT"),
+            ("localVars", "VAR"),
+            ("tempVars", "VAR_TEMP"),
+        ]
+
+        parts: List[str] = []
+
+        for sect_tag, st_kw in sections:
+            vars_: List[ET.Element] = []
+            for sect in interface.findall(f"ns:{sect_tag}", NS):
+                vars_.extend(sect.findall("ns:variable", NS))
+
+            if not vars_:
+                continue
+
+            parts.append(st_kw)
+            for var in vars_:
+                line = self._export_var_to_st_line(var, NS)
+                if line:
+                    parts.append(line)
+            parts.append("END_VAR")
+            parts.append("")
+
+        return "\n".join(parts).strip()
+
+
+    def _export_var_to_st_line(self, var: ET.Element, NS: Dict[str, str]) -> str:
+        name = var.get("name")
+        if not name:
+            return ""
+
+        vtype = self._get_export_var_type(var, NS) or "UNKNOWN"
+        init = self._get_export_var_init(var, NS)
+
+        if init is not None and str(init).strip() != "":
+            return f"    {name} : {vtype} := {init};"
+        return f"    {name} : {vtype};"
+
+
+    def _get_export_var_type(self, var: ET.Element, NS: Dict[str, str]) -> Optional[str]:
+        tnode = var.find("ns:type", NS)
+        if tnode is None:
+            return None
+
+        derived = tnode.find("ns:derived", NS)
+        if derived is not None:
+            return derived.attrib.get("name")
+
+        for child in tnode:
+            tag = child.tag
+            local = tag.split("}", 1)[1] if "}" in tag else tag
+            return local
+        return None
+
+
+    def _get_export_var_init(self, var: ET.Element, NS: Dict[str, str]) -> Optional[str]:
+        init_node = var.find("ns:initialValue", NS)
+        if init_node is None:
+            return None
+
+        simple = init_node.find("ns:simpleValue", NS)
+        if simple is not None:
+            return simple.attrib.get("value")
+
+        # generischer Fallback falls andere Struktur
+        for n in init_node.iter():
+            if "value" in getattr(n, "attrib", {}):
+                return n.attrib.get("value")
+        return None
+
 
     def _pick_var(self, item: Dict[str, Any]) -> Optional[str]:
         ext = item.get("external")
@@ -263,6 +391,8 @@ class KGLoader:
 
         # NEUE Property definieren (Sicherstellen, dass sie existiert)
         self.kg.add((self.OP.implementsPort, RDF.type, OWL.ObjectProperty))
+        #Neue Property für POU Declaration Header
+        self.kg.add((self.DP.hasPOUDeclarationHeader, RDF.type, OWL.DatatypeProperty))
 
         for entry in prog_data:
             prog_name = entry.get("Programm_Name")
@@ -281,6 +411,9 @@ class KGLoader:
                 pou_uri = self.get_program_uri(prog_name)
 
             self.kg.add((pou_uri, self.DP.hasPOUName, Literal(prog_name)))
+            decl = self.pou_decl_headers.get(prog_name.lower())
+            if decl:
+                self.kg.add((pou_uri, self.DP.hasPOUDeclarationHeader, Literal(decl, datatype=XSD.string)))
             if pou_uri is None: continue
 
             project_name = entry.get("PLCProject_Name")

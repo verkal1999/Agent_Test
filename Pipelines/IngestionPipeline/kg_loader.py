@@ -460,6 +460,11 @@ class KGLoader:
                             self.kg.add((target_uri, self.OP.isBoundToPort, port_uri))
                             clean_ext = self._clean_expression(external)
                             self.pending_ext_hw_links.append((target_uri, clean_ext))
+                    
+                    if var.get("opcua_da"):
+                        self.kg.add((internal_var_uri, self.DP.hasOPCUADataAccess, Literal(True)))
+                    if var.get("opcua_write"):
+                        self.kg.add((internal_var_uri, self.DP.hasOPCUAWriteAccess, Literal(True)))
 
             # B. TEMPS (Lokale Variablen, keine Ports)
             for temp in entry.get("temps", []):
@@ -469,6 +474,10 @@ class KGLoader:
                 v_uri = self.get_local_var_uri(prog_name, vname)
                 self.kg.add((pou_uri, self.OP.usesVariable, v_uri))
                 self.kg.add((pou_uri, self.OP.hasInternalVariable, v_uri))
+                if temp.get("opcua_da"):
+                    self.kg.add((v_uri, self.DP.hasOPCUADataAccess, Literal(True)))
+                if temp.get("opcua_write"):
+                    self.kg.add((v_uri, self.DP.hasOPCUAWriteAccess, Literal(True)))
                 
                 ttype = temp.get("type")
                 if ttype:
@@ -556,6 +565,10 @@ class KGLoader:
                     self.kg.add((var_uri, self.DP.hasInitialValue, Literal(gv["init"])))
                 if gv.get("address"):
                     self.kg.add((var_uri, self.DP.hasHardwareAddress, Literal(gv["address"])))
+                if gv.get("opcua_da"):
+                    self.kg.add((var_uri, self.DP.hasOPCUADataAccess, Literal(True)))
+                if gv.get("opcua_write"):
+                    self.kg.add((var_uri, self.DP.hasOPCUAWriteAccess, Literal(True)))
 
     def get_or_create_plc_project(self, project_name: str) -> URIRef:
         proj_uri = self.make_uri(f"PLCProject__{project_name}")

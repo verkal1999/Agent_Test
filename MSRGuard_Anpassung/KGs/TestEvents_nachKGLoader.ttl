@@ -166,6 +166,16 @@ dp:hasHardwareAddress a owl:DatatypeProperty ;
     rdfs:range xsd:string ;
     rdfs:subPropertyOf owl:topDataProperty .
 
+dp:hasOPCUADataAccess a owl:DatatypeProperty ;
+    rdfs:domain ag:class_SignalSource ;
+    rdfs:range xsd:boolean ;
+    rdfs:subPropertyOf dp:hasSignalSourceAttribute .
+
+dp:hasOPCUAWriteAccess a owl:DatatypeProperty ;
+    rdfs:domain ag:class_SignalSource ;
+    rdfs:range xsd:boolean ;
+    rdfs:subPropertyOf dp:hasSignalSourceAttribute .
+
 dp:hasPLCProjectName a owl:DatatypeProperty ;
     rdfs:domain ag:class_PLCProject ;
     rdfs:range xsd:string .
@@ -589,107 +599,143 @@ ag:GVL__dot__Weiter a ag:class_Variable ;
 
 ag:OPCUA__dot__Alt_abort a ag:class_Variable ;
     dp:hasInitialValue "FALSE" ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
     dp:hasVariableName "Alt_abort",
         "OPCUA.Alt_abort" ;
     dp:hasVariableType "BOOL" .
 
 ag:OPCUA__dot__Alt_found a ag:class_Variable ;
     dp:hasInitialValue "FALSE" ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
     dp:hasVariableName "Alt_found",
         "OPCUA.Alt_found" ;
     dp:hasVariableType "BOOL" .
 
 ag:OPCUA__dot__DiagnoseFinished a ag:class_Variable ;
     dp:hasInitialValue "FALSE" ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
     dp:hasVariableName "DiagnoseFinished",
         "OPCUA.DiagnoseFinished" ;
     dp:hasVariableType "BOOL" .
 
 ag:OPCUA__dot__LastGEMMAStateBeforeFailure a ag:class_Variable ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
     dp:hasVariableName "LastGEMMAStateBeforeFailure",
         "OPCUA.LastGEMMAStateBeforeFailure" ;
     dp:hasVariableType "STRING" .
 
 ag:OPCUA__dot__M1 a ag:class_Variable ;
     dp:hasInitialValue "0" ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
     dp:hasVariableName "M1",
         "OPCUA.M1" ;
     dp:hasVariableType "INT" .
 
 ag:OPCUA__dot__M2 a ag:class_Variable ;
     dp:hasInitialValue "0" ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
     dp:hasVariableName "M2",
         "OPCUA.M2" ;
     dp:hasVariableType "INT" .
 
 ag:OPCUA__dot__M3 a ag:class_Variable ;
     dp:hasInitialValue "0" ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
     dp:hasVariableName "M3",
         "OPCUA.M3" ;
     dp:hasVariableType "INT" .
 
 ag:OPCUA__dot__TriggerD1 a ag:class_Variable ;
     dp:hasInitialValue "FALSE" ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
     dp:hasVariableName "OPCUA.TriggerD1",
         "TriggerD1" ;
     dp:hasVariableType "BOOL" .
 
 ag:OPCUA__dot__TriggerD2 a ag:class_Variable ;
     dp:hasInitialValue "FALSE" ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
     dp:hasVariableName "OPCUA.TriggerD2",
         "TriggerD2" ;
     dp:hasVariableType "BOOL" .
 
 ag:OPCUA__dot__TriggerD3 a ag:class_Variable ;
     dp:hasInitialValue "FALSE" ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
     dp:hasVariableName "OPCUA.TriggerD3",
         "TriggerD3" ;
     dp:hasVariableType "BOOL" .
 
 ag:OPCUA__dot__Z1 a ag:class_Variable ;
     dp:hasInitialValue "0" ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
     dp:hasVariableName "OPCUA.Z1",
         "Z1" ;
     dp:hasVariableType "INT" .
 
 ag:OPCUA__dot__Z2 a ag:class_Variable ;
     dp:hasInitialValue "0" ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
     dp:hasVariableName "OPCUA.Z2",
         "Z2" ;
     dp:hasVariableType "INT" .
 
 ag:OPCUA__dot__Z3 a ag:class_Variable ;
     dp:hasInitialValue "0" ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
     dp:hasVariableName "OPCUA.Z3",
         "Z3" ;
     dp:hasVariableType "INT" .
 
 ag:OPCUA__dot__bool1 a ag:class_Variable ;
     dp:hasInitialValue "FALSE" ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
     dp:hasVariableName "OPCUA.bool1",
         "bool1" ;
     dp:hasVariableType "BOOL" .
 
 ag:OPCUA__dot__bool2 a ag:class_Variable ;
     dp:hasInitialValue "FALSE" ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
     dp:hasVariableName "OPCUA.bool2",
         "bool2" ;
     dp:hasVariableType "BOOL" .
 
 ag:OPCUA__dot__bool3 a ag:class_Variable ;
     dp:hasInitialValue "FALSE" ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
     dp:hasVariableName "OPCUA.bool3",
         "bool3" ;
     dp:hasVariableType "BOOL" .
 
 ag:OPCUA__dot__lastExecutedProcess a ag:class_Variable ;
     dp:hasInitialValue "''" ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
     dp:hasVariableName "OPCUA.lastExecutedProcess",
         "lastExecutedProcess" ;
     dp:hasVariableType "STRING" .
 
 ag:OPCUA__dot__lastExecutedSkill a ag:class_Variable ;
     dp:hasInitialValue "''" ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
     dp:hasVariableName "OPCUA.lastExecutedSkill",
         "lastExecutedSkill" ;
     dp:hasVariableType "STRING" .
@@ -2714,6 +2760,8 @@ ag:Var_MAIN_fbInit a ag:class_Variable ;
     ag:op_representsFBInstance ag:FBInst_MAIN_fbInit .
 
 ag:Var_MAIN_fbJob a ag:class_Variable ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
     dp:hasVariableName "fbJob" ;
     dp:hasVariableType "FB_Methode1Job" ;
     ag:op_representsFBInstance ag:FBInst_MAIN_fbJob .
@@ -2731,8 +2779,6 @@ ag:Var_MAIN_fbProStoer a ag:class_Variable ;
 ag:class_Expression a owl:Class ;
     rdfs:comment "Bbehandelt Ausrücke, wie z.B. AND, OR etc. aus mehreren Variablen oder Werten. Hat zudem immer ExpressionText und einen Verweis auf die erzeugenden Elemente." ;
     rdfs:subClassOf ag:class_SignalSource .
-
-dp:hasSignalSourceAttribute a owl:DatatypeProperty .
 
 dp:isSpecificLayer a owl:DatatypeProperty ;
     rdfs:comment "Hier wird gespeichert, ob etwas ein spezifisches Layer ist oder nicht. Damit wird insbesondere vom KGManager anhand des Programmcodes festgestellt, ob es sich bei diesem POU um ein GEMMA-Layer oder ein Output-Layer handelt, denn es wird von einer GEMMA-Steuerungsarchitektur ausgegangen, bei der es ein GEMMA-Layer als Steuerungsarchitektur gibt und ein Output-Layer,bei dem die Outputs in Abhängigkeit von den GEMMA-Zuständen ausgegeben werden." ;
@@ -2796,6 +2842,8 @@ ag:class_POUCall a owl:Class ;
     rdfs:comment "Diese Klasse beschreibt einen konkreten Aufruf einer Program Organisation Unit innerhalb eines Programms oder eines Function Blocks. Ein POUCall macht sichtbar, dass ein bestimmter Baustein nicht nur als Typ existiert, sondern an einer konkreten Stelle tatsächlich verwendet wird. Im Knowledge Graph ist dies essenziell, um Abhängigkeitsstrukturen zu rekonstruieren, also welche Bausteine intern voneinander abhängen und wie tief verschachtelte Logik aufgebaut ist. Ein POUCall kann mit einer FBInstance und deren PortInstanzen verknüpft werden, sodass klar wird, welche konkrete Instanz eines Bausteintyps gemeint ist. Aus PLCopen XML ergibt sich ein POUCall aus einem Bausteinblock im FBD oder aus einem Funktionsaufruf in ST Code, je nach Darstellung. Für die Skill Analyse kann damit nachvollzogen werden, welche Standardbausteine ein Skill verwendet, beispielsweise Trigger, Speicher oder Timer, und welche Unterbausteine die eigentliche Prozesslogik realisieren. Insgesamt macht class_POUCall die Ausführungsstruktur explizit, wodurch sich Skill Ketten, Signalpfade und interne Architektur systematisch untersuchen lassen."@de .
 
 dp:hasPortAttribute a owl:DatatypeProperty .
+
+dp:hasSignalSourceAttribute a owl:DatatypeProperty .
 
 dp:hasVariableAttribute a owl:DatatypeProperty ;
     rdfs:subPropertyOf dp:hasSignalSourceAttribute .

@@ -26,3 +26,28 @@ ag:op_hasPort ?port.
 	ag:dp_hasPOUCode ?callerCode.
 }
 
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ag: <http://www.semanticweb.org/AgentProgramParams/>
+SELECT *
+WHERE {
+#Hier den Namen der aufrufenden Instanz dynamisch einfügen und auf die Instanz kommen, die damit verwendet wird
+?instVar ag:dp_hasVariableName "fbBA"^^xsd:string;
+ ag:op_representsFBInstance ?inst.
+#Dann von der Instanz den Typ bzw. den FB ermitteln, den die Instanz instanziiert
+?inst ag:op_isInstanceOfFBType ?searchFB.
+#Und jetzt hier die Sprache ermitteln, wodurch später der richtige Algorithmus verwendet werden kann, um Assignments zu prüfen. Hier kann bisher FBD oder ST herauskommen.
+?searchFB ag:dp_hasPOULanguage ?lang.
+#Der Name hier würde der Name des FB_Type sein, der beim Aufruf der Methode eingefügt wird.
+#<http://www.semanticweb.org/AgentProgramParams/FBType_FB_Automatikbetrieb_F1> ?property ?searchObj.
+#Der String ist der Name der gesuchten Instanz
+#?searchObj ?property2 "Automatikbetrieb_Starten"^^xsd:string.
+#Damit suche in die FB-Instanz, auf die von dieser Variable gezeigt wird und was diese FB-Instanz genau ist.
+#?searchObj ag:op_representsFBInstance ?fbinst.
+#Hier kommt heraus FBInst_FB_Automatikbetrieb_F1_pPer
+#?fbinst ag:op_isInstanceOfFBType ?fbinst_type.
+#?fbinst_type rdfs:comment ?descr.
+}
+

@@ -525,6 +525,9 @@ class KGManager:
         
         # Reports erstellen
         self.generate_reports()
+
+        #GVLs verlinken
+        self.link_global_variables_in_code()
         
         print("Analyse vollständig abgeschlossen.")
 
@@ -1268,5 +1271,69 @@ class KGManager:
                     self.graph.add((URIRef(pou_uri), DP.isGEMMAOutputLayer, Literal(True, datatype=XSD.boolean)))
                     break
         """
+    #GVLs verlinken
+    def link_global_variables_in_code(self) -> None:
+        """
+        Sucht in allen POU-Codes (dp:hasPOUCode) nach Verwendungen von globalen Variablen
+        im Format GVL_Name.Variablen_Name (z.B. 'GVL.Start') und erzeugt die
+        entsprechenden op:usesVariable Verknüpfungen zwischen POU und Variable.
+        """
+        if not self.graph:
+            return
+
+        print("Verknüpfe GVL-Variablen aus dem POU-Code (op:usesVariable)...")
+
+        # 1. Map aller GVLs und ihrer Variablen aufbauen
+        # Struktur: { "GVL": { "Start": var_uri, "GVL.Start": var_uri }, "OPCUA": {...} }
+        gvl_map: Dict[str, Dict[str, URIRef]] = {}
+
+        for gvl_uri in self.graph.subjects(RDF.type, AG.class_GlobalVariableList):
+            # Name der GVL holen (z.B. "GVL" oder "OPCUA")
+            gvl_name_lit = next(self.graph.objects(gvl_uri, DP.hasGlobalVariableListName), None)
+            if not gvl_name_lit:
+                continue
+            
+            gvl_name = str(gvl_name_lit)
+            gvl_map[gvl_name] = {}
+
+            # Alle Variablen dieser GVL holen (über op:listsGlobalVariable)
+            for var_uri in self.graph.objects(gvl_uri, OP.listsGlobalVariable):
+                # Eine Variable kann mehrere Namen haben (siehe TestEvents.ttl)
+                for var_name_lit in self.graph.objects(var_uri, DP.hasVariableName):
+                    v_name = str(var_name_lit)
+                    gvl_map[gvl_name][v_name] = var_uri
+                    
+                    # Falls der Name "GVL.Start" ist, auch "Start" als Key mappen
+                    if "." in v_name:
+                        suffix = v_name.split(".", 1)[1]
+                        gvl_map[gvl_name][suffix] = var_uri
+
+        links_added = 0
+
+        # 2. Durch alle POUs iterieren, die Code haben
+        for pou_uri, code_lit in self.graph.subject_objects(DP.hasPOUCode):
+            code = str(code_lit)
+
+            # Für jede bekannte GVL den Code nach dem Muster "GVL_Name.Variable" absuchen
+            for gvl_name, vars_in_gvl in gvl_map.items():
+                # \b stellt sicher, dass wir nur ganze Bezeichner finden (Wortgrenze)
+                pattern = r"\b" + re.escape(gvl_name) + r"\.([A-Za-z_][A-Za-z0-9_]*)\b"
+                
+                for match in re.finditer(pattern, code):
+                    full_match = match.group(0)  # z.B. "GVL.Start"
+                    var_suffix = match.group(1)  # z.B. "Start"
+
+                    # Prüfen, ob die Variable in der GVL-Map existiert
+                    var_uri = vars_in_gvl.get(full_match) or vars_in_gvl.get(var_suffix)
+                    
+                    if var_uri:
+                        # Tripel hinzufügen: op:usesVariable(POU, Variable)
+                        if (pou_uri, OP.usesVariable, var_uri) not in self.graph:
+                            self.graph.add((pou_uri, OP.usesVariable, var_uri))
+                            links_added += 1
+                            if self.debug:
+                                print(f"  -> Verknüpft: {self._get_local_name(str(pou_uri))} nutzt {full_match}")
+
+        print(f"Abgeschlossen: {links_added} globale Variablenaufrufe (op:usesVariable) verknüpft.")
     
     

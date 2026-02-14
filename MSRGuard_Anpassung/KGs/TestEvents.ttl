@@ -171,6 +171,16 @@ dp:hasHardwareAddress a owl:DatatypeProperty ;
     rdfs:range xsd:string ;
     rdfs:subPropertyOf owl:topDataProperty .
 
+dp:hasOPCUADataAccess a owl:DatatypeProperty ;
+    rdfs:domain ag:class_SignalSource ;
+    rdfs:range xsd:boolean ;
+    rdfs:subPropertyOf dp:hasSignalSourceAttribute .
+
+dp:hasOPCUAWriteAccess a owl:DatatypeProperty ;
+    rdfs:domain ag:class_SignalSource ;
+    rdfs:range xsd:boolean ;
+    rdfs:subPropertyOf dp:hasSignalSourceAttribute .
+
 dp:hasPLCProjectName a owl:DatatypeProperty ;
     rdfs:domain ag:class_PLCProject ;
     rdfs:range xsd:string .
@@ -742,14 +752,6 @@ ag:FBInst_MAIN_edgeDone a ag:class_FBInstance ;
 ag:FBInst_MAIN_fbJob a ag:class_FBInstance ;
     op:isInstanceOfFBType ag:FBType_FB_Methode1Job .
 
-ag:GVL__dot__Start a ag:class_SignalSource,
-        ag:class_Variable ;
-    dp:hasVariableName "GVL.Start",
-        "Start" ;
-    dp:hasVariableScope "global" ;
-    dp:hasVariableType "BOOL" ;
-    op:isBoundToPort ag:Port_FB_Betriebsarten_Start .
-
 ag:GVL__dot__Stopp a ag:class_SignalSource,
         ag:class_Variable ;
     dp:hasInitialValue "FALSE" ;
@@ -757,36 +759,17 @@ ag:GVL__dot__Stopp a ag:class_SignalSource,
         "Stopp" ;
     dp:hasVariableType "BOOL" .
 
-ag:GVL__dot__Weiter a ag:class_SignalSource,
-        ag:class_Variable ;
-    dp:hasVariableName "GVL.Weiter",
-        "Weiter" ;
-    dp:hasVariableScope "global" ;
-    dp:hasVariableType "BOOL" ;
-    op:isBoundToPort ag:Port_FB_Betriebsarten_Weiter .
-
 ag:Literal_TRUE a ag:class_SignalSource,
         ag:class_SourceLiteral .
 
 ag:Literal_T_3S a ag:class_SignalSource,
         ag:class_SourceLiteral .
 
-ag:OPCUA__dot__Alt_abort a ag:class_SignalSource,
-        ag:class_Variable ;
-    dp:hasInitialValue "FALSE" ;
-    dp:hasVariableName "Alt_abort",
-        "OPCUA.Alt_abort" ;
-    dp:hasVariableType "BOOL" .
-
-ag:OPCUA__dot__LastGEMMAStateBeforeFailure a ag:class_SignalSource,
-        ag:class_Variable ;
-    dp:hasVariableName "LastGEMMAStateBeforeFailure",
-        "OPCUA.LastGEMMAStateBeforeFailure" ;
-    dp:hasVariableType "STRING" .
-
 ag:OPCUA__dot__M1 a ag:class_SignalSource,
         ag:class_Variable ;
     dp:hasInitialValue "0" ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
     dp:hasVariableName "M1",
         "OPCUA.M1" ;
     dp:hasVariableType "INT" .
@@ -794,6 +777,8 @@ ag:OPCUA__dot__M1 a ag:class_SignalSource,
 ag:OPCUA__dot__M2 a ag:class_SignalSource,
         ag:class_Variable ;
     dp:hasInitialValue "0" ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
     dp:hasVariableName "M2",
         "OPCUA.M2" ;
     dp:hasVariableType "INT" .
@@ -801,27 +786,17 @@ ag:OPCUA__dot__M2 a ag:class_SignalSource,
 ag:OPCUA__dot__M3 a ag:class_SignalSource,
         ag:class_Variable ;
     dp:hasInitialValue "0" ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
     dp:hasVariableName "M3",
         "OPCUA.M3" ;
     dp:hasVariableType "INT" .
 
-ag:OPCUA__dot__TriggerD1 a ag:class_SignalSource,
-        ag:class_Variable ;
-    dp:hasInitialValue "FALSE" ;
-    dp:hasVariableName "OPCUA.TriggerD1",
-        "TriggerD1" ;
-    dp:hasVariableType "BOOL" .
-
-ag:OPCUA__dot__TriggerD2 a ag:class_SignalSource,
-        ag:class_Variable ;
-    dp:hasInitialValue "FALSE" ;
-    dp:hasVariableName "OPCUA.TriggerD2",
-        "TriggerD2" ;
-    dp:hasVariableType "BOOL" .
-
 ag:OPCUA__dot__TriggerD3 a ag:class_SignalSource,
         ag:class_Variable ;
     dp:hasInitialValue "FALSE" ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
     dp:hasVariableName "OPCUA.TriggerD3",
         "TriggerD3" ;
     dp:hasVariableType "BOOL" .
@@ -829,6 +804,8 @@ ag:OPCUA__dot__TriggerD3 a ag:class_SignalSource,
 ag:OPCUA__dot__Z1 a ag:class_SignalSource,
         ag:class_Variable ;
     dp:hasInitialValue "0" ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
     dp:hasVariableName "OPCUA.Z1",
         "Z1" ;
     dp:hasVariableType "INT" .
@@ -836,6 +813,8 @@ ag:OPCUA__dot__Z1 a ag:class_SignalSource,
 ag:OPCUA__dot__Z2 a ag:class_SignalSource,
         ag:class_Variable ;
     dp:hasInitialValue "0" ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
     dp:hasVariableName "OPCUA.Z2",
         "Z2" ;
     dp:hasVariableType "INT" .
@@ -843,44 +822,20 @@ ag:OPCUA__dot__Z2 a ag:class_SignalSource,
 ag:OPCUA__dot__Z3 a ag:class_SignalSource,
         ag:class_Variable ;
     dp:hasInitialValue "0" ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
     dp:hasVariableName "OPCUA.Z3",
         "Z3" ;
     dp:hasVariableType "INT" .
 
-ag:OPCUA__dot__bool1 a ag:class_SignalSource,
-        ag:class_Variable ;
-    dp:hasInitialValue "FALSE" ;
-    dp:hasVariableName "OPCUA.bool1",
-        "bool1" ;
-    dp:hasVariableType "BOOL" .
-
-ag:OPCUA__dot__bool2 a ag:class_SignalSource,
-        ag:class_Variable ;
-    dp:hasInitialValue "FALSE" ;
-    dp:hasVariableName "OPCUA.bool2",
-        "bool2" ;
-    dp:hasVariableType "BOOL" .
-
 ag:OPCUA__dot__bool3 a ag:class_SignalSource,
         ag:class_Variable ;
     dp:hasInitialValue "FALSE" ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
     dp:hasVariableName "OPCUA.bool3",
         "bool3" ;
     dp:hasVariableType "BOOL" .
-
-ag:OPCUA__dot__lastExecutedProcess a ag:class_SignalSource,
-        ag:class_Variable ;
-    dp:hasInitialValue "''" ;
-    dp:hasVariableName "OPCUA.lastExecutedProcess",
-        "lastExecutedProcess" ;
-    dp:hasVariableType "STRING" .
-
-ag:OPCUA__dot__lastExecutedSkill a ag:class_SignalSource,
-        ag:class_Variable ;
-    dp:hasInitialValue "''" ;
-    dp:hasVariableName "OPCUA.lastExecutedSkill",
-        "lastExecutedSkill" ;
-    dp:hasVariableType "STRING" .
 
 ag:POUCall_FB_Automatikbetrieb_F1_pPer_1 a ag:class_POUCall ;
     op:callsPOU ag:StandardFBType_TP ;
@@ -1451,7 +1406,12 @@ END_VAR"""^^xsd:string ;
         ag:Var_MAIN_fbJob,
         ag:Var_MAIN_fbNot,
         ag:Var_MAIN_fbProStoer ;
-    op:usesVariable ag:Var_MAIN_A2_angefordert,
+    op:usesVariable ag:GVL__dot__DiagnoseRequested,
+        ag:GVL__dot__Fehler,
+        ag:GVL__dot__NotStopp,
+        ag:GVL__dot__Start,
+        ag:GVL__dot__Weiter,
+        ag:Var_MAIN_A2_angefordert,
         ag:Var_MAIN_D3_angefordert,
         ag:Var_MAIN_Init_erreicht,
         ag:Var_MAIN_Init_start,
@@ -1572,27 +1532,6 @@ END_VAR
         ag:Var_FB_Methode1Job_t20s,
         ag:Var_FB_Methode1Job_y .
 
-ag:GVL__dot__DiagnoseRequested a ag:class_SignalSource,
-        ag:class_Variable ;
-    dp:hasVariableName "DiagnoseRequested",
-        "GVL.DiagnoseRequested" ;
-    dp:hasVariableType "BOOL" .
-
-ag:GVL__dot__Fehler a ag:class_SignalSource,
-        ag:class_Variable ;
-    dp:hasVariableName "Fehler",
-        "GVL.Fehler" ;
-    dp:hasVariableScope "global" ;
-    dp:hasVariableType "BOOL" ;
-    op:isBoundToPort ag:Port_FB_Betriebsarten_Fehler .
-
-ag:GVL__dot__NotStopp a ag:class_SignalSource,
-        ag:class_Variable ;
-    dp:hasInitialValue "TRUE" ;
-    dp:hasVariableName "GVL.NotStopp",
-        "NotStopp" ;
-    dp:hasVariableType "BOOL" .
-
 ag:Literal_FALSE a ag:class_SignalSource,
         ag:class_SourceLiteral .
 
@@ -1605,18 +1544,49 @@ ag:Literal_T_55S a ag:class_SignalSource,
 ag:Literal_T_9S a ag:class_SignalSource,
         ag:class_SourceLiteral .
 
-ag:OPCUA__dot__Alt_found a ag:class_SignalSource,
+ag:OPCUA__dot__Alt_abort a ag:class_SignalSource,
         ag:class_Variable ;
     dp:hasInitialValue "FALSE" ;
-    dp:hasVariableName "Alt_found",
-        "OPCUA.Alt_found" ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
+    dp:hasVariableName "Alt_abort",
+        "OPCUA.Alt_abort" ;
     dp:hasVariableType "BOOL" .
 
-ag:OPCUA__dot__DiagnoseFinished a ag:class_SignalSource,
+ag:OPCUA__dot__TriggerD1 a ag:class_SignalSource,
         ag:class_Variable ;
     dp:hasInitialValue "FALSE" ;
-    dp:hasVariableName "DiagnoseFinished",
-        "OPCUA.DiagnoseFinished" ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
+    dp:hasVariableName "OPCUA.TriggerD1",
+        "TriggerD1" ;
+    dp:hasVariableType "BOOL" .
+
+ag:OPCUA__dot__TriggerD2 a ag:class_SignalSource,
+        ag:class_Variable ;
+    dp:hasInitialValue "FALSE" ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
+    dp:hasVariableName "OPCUA.TriggerD2",
+        "TriggerD2" ;
+    dp:hasVariableType "BOOL" .
+
+ag:OPCUA__dot__bool1 a ag:class_SignalSource,
+        ag:class_Variable ;
+    dp:hasInitialValue "FALSE" ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
+    dp:hasVariableName "OPCUA.bool1",
+        "bool1" ;
+    dp:hasVariableType "BOOL" .
+
+ag:OPCUA__dot__bool2 a ag:class_SignalSource,
+        ag:class_Variable ;
+    dp:hasInitialValue "FALSE" ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
+    dp:hasVariableName "OPCUA.bool2",
+        "bool2" ;
     dp:hasVariableType "BOOL" .
 
 ag:PortInstance_FBInst_FB_Automatikbetrieb_F1_tPer_Q a ag:class_PortInstance,
@@ -2204,6 +2174,8 @@ ag:Var_FB_ProduktionMitStoerung_D3_z a ag:class_SignalSource,
 
 ag:Var_MAIN_fbJob a ag:class_SignalSource,
         ag:class_Variable ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
     dp:hasVariableName "fbJob" ;
     dp:hasVariableType "FB_Methode1Job" ;
     dp:isUnusedVar true ;
@@ -2212,8 +2184,6 @@ ag:Var_MAIN_fbJob a ag:class_SignalSource,
 ag:class_Expression a owl:Class ;
     rdfs:comment "Bbehandelt Ausrücke, wie z.B. AND, OR etc. aus mehreren Variablen oder Werten. Hat zudem immer ExpressionText und einen Verweis auf die erzeugenden Elemente." ;
     rdfs:subClassOf ag:class_SignalSource .
-
-dp:hasSignalSourceAttribute a owl:DatatypeProperty .
 
 dp:isSpecificLayer a owl:DatatypeProperty ;
     rdfs:comment "Hier wird gespeichert, ob etwas ein spezifisches Layer ist oder nicht. Damit wird insbesondere vom KGManager anhand des Programmcodes festgestellt, ob es sich bei diesem POU um ein GEMMA-Layer oder ein Output-Layer handelt, denn es wird von einer GEMMA-Steuerungsarchitektur ausgegangen, bei der es ein GEMMA-Layer als Steuerungsarchitektur gibt und ein Output-Layer,bei dem die Outputs in Abhängigkeit von den GEMMA-Zuständen ausgegeben werden." ;
@@ -2389,7 +2359,13 @@ END_VAR"""^^xsd:string ;
         ag:Port_FB_Automatikbetrieb_F1_PeriodicFaultEnable,
         ag:Port_FB_Automatikbetrieb_F1_PeriodicFaultPeriod,
         ag:Port_FB_Automatikbetrieb_F1_Stoerung_erkannt ;
-    op:usesVariable ag:Var_FB_Automatikbetrieb_F1_AutoRestartEnable,
+    op:usesVariable ag:GVL__dot__Fehler,
+        ag:GVL__dot__Start,
+        ag:GVL__dot__Weiter,
+        ag:OPCUA__dot__LastGEMMAStateBeforeFailure,
+        ag:OPCUA__dot__lastExecutedProcess,
+        ag:OPCUA__dot__lastExecutedSkill,
+        ag:Var_FB_Automatikbetrieb_F1_AutoRestartEnable,
         ag:Var_FB_Automatikbetrieb_F1_Automatikbetrieb_Fertig,
         ag:Var_FB_Automatikbetrieb_F1_Automatikbetrieb_Starten,
         ag:Var_FB_Automatikbetrieb_F1_FaultPulse,
@@ -2736,7 +2712,11 @@ END_VAR"""^^xsd:string ;
         ag:Port_FB_Betriebsarten_Start,
         ag:Port_FB_Betriebsarten_Start_Init,
         ag:Port_FB_Betriebsarten_Weiter ;
-    op:usesVariable ag:Var_FB_Betriebsarten_A1,
+    op:usesVariable ag:GVL__dot__DiagnoseRequested,
+        ag:GVL__dot__NotStopp,
+        ag:GVL__dot__Start,
+        ag:GVL__dot__Weiter,
+        ag:Var_FB_Betriebsarten_A1,
         ag:Var_FB_Betriebsarten_A2,
         ag:Var_FB_Betriebsarten_A2_Requested,
         ag:Var_FB_Betriebsarten_A5,
@@ -2848,7 +2828,15 @@ END_VAR"""^^xsd:string ;
     op:hasPort ag:Port_FB_Diagnose_D2_Alt_gefunden,
         ag:Port_FB_Diagnose_D2_Diagnose_beendet,
         ag:Port_FB_Diagnose_D2_Diagnose_gefordert ;
-    op:usesVariable ag:Var_FB_Diagnose_D2_Alt_gefunden,
+    op:usesVariable ag:GVL__dot__DiagnoseRequested,
+        ag:GVL__dot__Fehler,
+        ag:GVL__dot__Weiter,
+        ag:OPCUA__dot__Alt_found,
+        ag:OPCUA__dot__DiagnoseFinished,
+        ag:OPCUA__dot__TriggerD2,
+        ag:OPCUA__dot__bool1,
+        ag:OPCUA__dot__bool2,
+        ag:Var_FB_Diagnose_D2_Alt_gefunden,
         ag:Var_FB_Diagnose_D2_Busy,
         ag:Var_FB_Diagnose_D2_Diagnose_beendet,
         ag:Var_FB_Diagnose_D2_Diagnose_gefordert,
@@ -2898,7 +2886,8 @@ END_VAR"""^^xsd:string ;
     op:hasPort ag:Port_FB_InitFahrt_A6_A2_A2,
         ag:Port_FB_InitFahrt_A6_A2_A6,
         ag:Port_FB_InitFahrt_A6_A2_Init_erreicht ;
-    op:usesVariable ag:Var_FB_InitFahrt_A6_A2_A2,
+    op:usesVariable ag:OPCUA__dot__LastGEMMAStateBeforeFailure,
+        ag:Var_FB_InitFahrt_A6_A2_A2,
         ag:Var_FB_InitFahrt_A6_A2_A6,
         ag:Var_FB_InitFahrt_A6_A2_Init_erreicht,
         ag:Var_FB_InitFahrt_A6_A2_tInit .
@@ -2944,7 +2933,11 @@ END_VAR"""^^xsd:string ;
     op:hasPort ag:Port_FB_Notaus_D1_D1,
         ag:Port_FB_Notaus_D1_Diagnose_gefordert,
         ag:Port_FB_Notaus_D1_Notaus_Entriegelt ;
-    op:usesVariable ag:Var_FB_Notaus_D1_D1,
+    op:usesVariable ag:GVL__dot__Fehler,
+        ag:GVL__dot__NotStopp,
+        ag:GVL__dot__Weiter,
+        ag:OPCUA__dot__TriggerD1,
+        ag:Var_FB_Notaus_D1_D1,
         ag:Var_FB_Notaus_D1_Diagnose_gefordert,
         ag:Var_FB_Notaus_D1_Notaus_Entriegelt,
         ag:Var_FB_Notaus_D1_ton5s .
@@ -3047,7 +3040,10 @@ END_VAR"""^^xsd:string ;
     op:hasPort ag:Port_FB_ProduktionMitStoerung_D3_Fertig,
         ag:Port_FB_ProduktionMitStoerung_D3_ProduktionMitStoerung_Starten,
         ag:Port_FB_ProduktionMitStoerung_D3_Stoerung_erkannt ;
-    op:usesVariable ag:Var_FB_ProduktionMitStoerung_D3_Fertig,
+    op:usesVariable ag:OPCUA__dot__Alt_abort,
+        ag:OPCUA__dot__lastExecutedProcess,
+        ag:OPCUA__dot__lastExecutedSkill,
+        ag:Var_FB_ProduktionMitStoerung_D3_Fertig,
         ag:Var_FB_ProduktionMitStoerung_D3_ProduktionMitStoerung_Starten,
         ag:Var_FB_ProduktionMitStoerung_D3_RestartPulseLength,
         ag:Var_FB_ProduktionMitStoerung_D3_Schritt3,
@@ -3070,6 +3066,50 @@ END_VAR"""^^xsd:string ;
 
 ag:Literal_T_5S a ag:class_SignalSource,
         ag:class_SourceLiteral .
+
+ag:OPCUA__dot__Alt_found a ag:class_SignalSource,
+        ag:class_Variable ;
+    dp:hasInitialValue "FALSE" ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
+    dp:hasVariableName "Alt_found",
+        "OPCUA.Alt_found" ;
+    dp:hasVariableType "BOOL" .
+
+ag:OPCUA__dot__DiagnoseFinished a ag:class_SignalSource,
+        ag:class_Variable ;
+    dp:hasInitialValue "FALSE" ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
+    dp:hasVariableName "DiagnoseFinished",
+        "OPCUA.DiagnoseFinished" ;
+    dp:hasVariableType "BOOL" .
+
+ag:OPCUA__dot__LastGEMMAStateBeforeFailure a ag:class_SignalSource,
+        ag:class_Variable ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
+    dp:hasVariableName "LastGEMMAStateBeforeFailure",
+        "OPCUA.LastGEMMAStateBeforeFailure" ;
+    dp:hasVariableType "STRING" .
+
+ag:OPCUA__dot__lastExecutedProcess a ag:class_SignalSource,
+        ag:class_Variable ;
+    dp:hasInitialValue "''" ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
+    dp:hasVariableName "OPCUA.lastExecutedProcess",
+        "lastExecutedProcess" ;
+    dp:hasVariableType "STRING" .
+
+ag:OPCUA__dot__lastExecutedSkill a ag:class_SignalSource,
+        ag:class_Variable ;
+    dp:hasInitialValue "''" ;
+    dp:hasOPCUADataAccess true ;
+    dp:hasOPCUAWriteAccess true ;
+    dp:hasVariableName "OPCUA.lastExecutedSkill",
+        "lastExecutedSkill" ;
+    dp:hasVariableType "STRING" .
 
 ag:Port_FB_Automatikbetrieb_F1_Automatikbetrieb_Fertig a ag:class_Port ;
     dp:hasPortDirection "Output" ;
@@ -3469,6 +3509,14 @@ ag:class_Skill a owl:Class .
 
 ag:class_SkillImplementationHypothesis a owl:Class .
 
+ag:GVL__dot__Start a ag:class_SignalSource,
+        ag:class_Variable ;
+    dp:hasVariableName "GVL.Start",
+        "Start" ;
+    dp:hasVariableScope "global" ;
+    dp:hasVariableType "BOOL" ;
+    op:isBoundToPort ag:Port_FB_Betriebsarten_Start .
+
 ag:Port_FB_Betriebsarten_Fehler a ag:class_Port ;
     dp:hasPortDirection "Input" ;
     dp:hasPortName "Fehler" ;
@@ -3546,12 +3594,43 @@ ag:class_GlobalVariableList a owl:Class ;
 
 dp:hasPortAttribute a owl:DatatypeProperty .
 
+dp:hasSignalSourceAttribute a owl:DatatypeProperty .
+
 dp:hasVariableAttribute a owl:DatatypeProperty ;
     rdfs:subPropertyOf dp:hasSignalSourceAttribute .
+
+ag:GVL__dot__DiagnoseRequested a ag:class_SignalSource,
+        ag:class_Variable ;
+    dp:hasVariableName "DiagnoseRequested",
+        "GVL.DiagnoseRequested" ;
+    dp:hasVariableType "BOOL" .
+
+ag:GVL__dot__NotStopp a ag:class_SignalSource,
+        ag:class_Variable ;
+    dp:hasInitialValue "TRUE" ;
+    dp:hasVariableName "GVL.NotStopp",
+        "NotStopp" ;
+    dp:hasVariableType "BOOL" .
 
 dp:hasHypothesisParams a owl:DatatypeProperty ;
     rdfs:domain ag:class_SkillImplementationHypothesis ;
     rdfs:range xsd:string .
+
+ag:GVL__dot__Fehler a ag:class_SignalSource,
+        ag:class_Variable ;
+    dp:hasVariableName "Fehler",
+        "GVL.Fehler" ;
+    dp:hasVariableScope "global" ;
+    dp:hasVariableType "BOOL" ;
+    op:isBoundToPort ag:Port_FB_Betriebsarten_Fehler .
+
+ag:GVL__dot__Weiter a ag:class_SignalSource,
+        ag:class_Variable ;
+    dp:hasVariableName "GVL.Weiter",
+        "Weiter" ;
+    dp:hasVariableScope "global" ;
+    dp:hasVariableType "BOOL" ;
+    op:isBoundToPort ag:Port_FB_Betriebsarten_Weiter .
 
 ag:FBInst_MAIN_fbBA a ag:class_FBInstance ;
     op:isInstanceOfFBType ag:FBType_FB_Betriebsarten .

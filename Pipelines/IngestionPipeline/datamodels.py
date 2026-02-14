@@ -10,6 +10,8 @@ class GlobalVar:
     type: str
     init: Optional[str] = None
     address: Optional[str] = None
+    opcua_da: bool = False      
+    opcua_write: bool = False   
 
 
 @dataclass
@@ -23,12 +25,16 @@ class IOEntry:
     internal: Optional[str]
     external: Optional[str]
     internal_type: Optional[str] = None
+    opcua_da: bool = False      
+    opcua_write: bool = False   
 
 
 @dataclass
 class TempEntry:
     name: str
     type: Optional[str] = None
+    opcua_da: bool = False      
+    opcua_write: bool = False   
 
 
 @dataclass

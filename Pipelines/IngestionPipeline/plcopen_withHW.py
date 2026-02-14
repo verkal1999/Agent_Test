@@ -417,7 +417,74 @@ class PLCOpenXMLParser:
         self._dte = dte
         return dte
 
+    def _parse_opcua_flags_from_xml(self) -> Dict[str, Dict[str, Dict[str, bool]]]:
+        """
+        Sucht in der export.xml nach allen Variablen (GVLs und POUs) und liest deren OPC UA Attribute.
+        Beachtet explizite Strings (readwrite), numerische Codes (3) und den Default-Fallback.
+        Rückgabe: { 'POU_oder_GVL_Name': { 'VarName': {'da': True, 'write': True} } }
+        """
+        if not self.export_xml_path.exists():
+            return {}
 
+        xml_text = self._read_text(self.export_xml_path)
+        root = ET.fromstring(self._strip_ns(xml_text))
+        opcua_map = {}
+
+        def extract_flags(var_node: ET.Element) -> Tuple[bool, bool]:
+            is_da = False
+            is_write = False
+            has_access_attr = False # Merker, ob Access explizit gesetzt wurde
+
+            for data_node in var_node.findall(".//addData/data"):
+                if "attributes" in data_node.get("name", "").lower():
+                    for attr in data_node.findall(".//Attribute"):
+                        a_name = attr.get("Name", "")
+                        a_val = str(attr.get("Value", "")).lower()
+
+                        # 1. Sichtbarkeit (Data Access)
+                        if a_name == "OPC.UA.DA" and a_val == "1":
+                            is_da = True
+                        
+                        # 2. Zugriffsrechte (Access)
+                        # TwinCAT unterstützt teils unterschiedliche Benennungen je nach Version
+                        if a_name in ["opc.ua.access", "opc.ua.da.access", "OPC.UA.Access", "OPC.UA.DA.Access"]:
+                            has_access_attr = True
+                            # Check auf Schreibrechte (Strings "readwrite", "writeonly" oder Zahlen "3", "2")
+                            if "write" in a_val or a_val in ["3", "2"]:
+                                is_write = True
+            
+            # 3. Fallback: Wenn sichtbar (DA=1) aber KEIN Access-Attribut da ist -> Default ist Read/Write
+            if is_da and not has_access_attr:
+                is_write = True
+                
+            return is_da, is_write
+
+        # 1. GVLs parsen
+        for gvl_node in root.findall(".//globalVars"):
+            gvl_name = gvl_node.get("name")
+            if not gvl_name: continue
+            opcua_map[gvl_name] = {}
+            for var_node in gvl_node.findall("variable"):
+                v_name = var_node.get("name")
+                if v_name:
+                    da, wr = extract_flags(var_node)
+                    if da or wr: opcua_map[gvl_name][v_name] = {"da": da, "write": wr}
+
+        # 2. POUs parsen (lokale, in, out)
+        for pou_node in root.findall(".//pou"):
+            pou_name = pou_node.get("name")
+            if not pou_name: continue
+            opcua_map[pou_name] = {}
+            interface = pou_node.find("interface")
+            if interface is not None:
+                for var_node in interface.findall(".//variable"):
+                    v_name = var_node.get("name")
+                    if v_name:
+                        da, wr = extract_flags(var_node)
+                        if da or wr: opcua_map[pou_name][v_name] = {"da": da, "write": wr}
+                        
+        return opcua_map
+    
     def _get_solution_cached(self):
         """
         Öffnet die Solution genau einmal pro Pipeline-Run und cached sie.
@@ -900,22 +967,43 @@ class PLCOpenXMLParser:
         except:
             pass
 
+        opcua_map = self._parse_opcua_flags_from_xml()
         for entry in mapping:
             name = entry["Programm_Name"]
             types = pou_var_types.get(name, {})
             locals_list = pou_info.get(name, {}).get("locals", [])
+            pou_opcua = opcua_map.get(name, {})
             
-            entry["temps"] = [{"name": lv, "type": types.get(lv)} for lv in locals_list]
+            #entry["temps"] = [{"name": lv, "type": types.get(lv)} for lv in locals_list]
+            temps = []
+            for lv in locals_list:
+                flags = pou_opcua.get(lv, {})
+                temps.append({
+                    "name": lv, 
+                    "type": types.get(lv),
+                    "opcua_da": flags.get("da", False),
+                    "opcua_write": flags.get("write", False)
+                })
+            entry["temps"] = temps
 
-            for inp in entry.get("inputs", []):
-                vname = inp.get("internal")
-                if vname in types: inp["internal_type"] = types[vname]
-            for out in entry.get("outputs", []):
-                vname = out.get("internal")
-                if vname in types: out["internal_type"] = types[vname]
-            for inout in entry.get("inouts", []):
-                vname = inout.get("internal")
-                if vname in types: inout["internal_type"] = types[vname]
+            for sec in ["inputs", "outputs", "inouts"]:
+                for io_var in entry.get(sec, []):
+                    vname = io_var.get("internal")
+                    flags = pou_opcua.get(vname, {})
+                    io_var["opcua_da"] = flags.get("da", False)
+                    io_var["opcua_write"] = flags.get("write", False)
+                    if vname in types: 
+                        io_var["internal_type"] = types[vname]
+
+            #for inp in entry.get("inputs", []):
+               # vname = inp.get("internal")
+               # if vname in types: inp["internal_type"] = types[vname]
+            #for out in entry.get("outputs", []):
+                #vname = out.get("internal")
+                #if vname in types: out["internal_type"] = types[vname]
+            #for inout in entry.get("inouts", []):
+                #vname = inout.get("internal")
+                #if vname in types: inout["internal_type"] = types[vname]
 
             lang = pou_lang.get(name)
             code_text = ""
@@ -1056,6 +1144,7 @@ class PLCOpenXMLParser:
         gvl_json_file = self.gvl_globals_path
 
         objects_data = json.loads(objects_file.read_text(encoding="utf-8"))
+        opcua_map = self._parse_opcua_flags_from_xml()
 
         gvl_list: List[GVL] = []
         for obj in objects_data:
@@ -1067,12 +1156,17 @@ class PLCOpenXMLParser:
             globals_raw = obj.get("globals", [])
             globals_dc: List[GlobalVar] = []
             for gv in globals_raw:
+                v_name = gv["name"]
+                flags = opcua_map.get(gvl_name, {}).get(v_name, {}) # NEU
+                
                 globals_dc.append(
                     GlobalVar(
-                        name=gv["name"],
+                        name=v_name,
                         type=gv.get("type", ""),
                         init=gv.get("init"),
                         address=gv.get("address"),
+                        opcua_da=flags.get("da", False),     # NEU
+                        opcua_write=flags.get("write", False) # NEU
                     )
                 )
             gvl_list.append(GVL(name=gvl_name, globals=globals_dc))

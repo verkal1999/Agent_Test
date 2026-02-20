@@ -6,7 +6,7 @@ from typing import Dict, Tuple, List, Optional, Any
 import xml.etree.ElementTree as ET
 import json
 from rdflib import Graph, Namespace, RDF, URIRef, Literal, OWL
-from rdflib.namespace import XSD
+from rdflib.namespace import XSD, RDFS
 
 
 @dataclass
@@ -378,6 +378,7 @@ class KGLoader:
                 p_inst_uri = self.get_port_instance_uri(caller_prog, instance_name, port_name)
                 self.kg.add((p_inst_uri, RDF.type, self.AG.class_PortInstance))
                 self.kg.add((p_inst_uri, self.OP.isPortOfInstance, fb_inst_uri))
+                self.kg.add((p_inst_uri, self.DP.hasExpressionText, Literal(f"{instance_name}.{port_name}", datatype=XSD.string)))
                 return p_inst_uri
 
         return self.get_local_var_uri(caller_prog, external)
@@ -393,6 +394,10 @@ class KGLoader:
         self.kg.add((self.OP.implementsPort, RDF.type, OWL.ObjectProperty))
         #Neue Property für POU Declaration Header
         self.kg.add((self.DP.hasPOUDeclarationHeader, RDF.type, OWL.DatatypeProperty))
+        # Neue Property für FB-Instanznamen (wichtig für spätere SPARQL-Auflösung)
+        self.kg.add((self.DP.hasFBInstanceName, RDF.type, OWL.DatatypeProperty))
+        self.kg.add((self.DP.hasFBInstanceName, RDFS.domain, self.AG.class_FBInstance))
+        self.kg.add((self.DP.hasFBInstanceName, RDFS.range, XSD.string))
 
         for entry in prog_data:
             prog_name = entry.get("Programm_Name")
@@ -486,6 +491,7 @@ class KGLoader:
                     if not self._is_standard_type(ttype):
                         fb_inst_uri = self.get_fb_instance_uri(prog_name, vname)
                         self.kg.add((fb_inst_uri, RDF.type, self.AG.class_FBInstance))
+                        self.kg.add((fb_inst_uri, self.DP.hasFBInstanceName, Literal(vname, datatype=XSD.string)))
                         self.kg.add((v_uri, self.OP.representsFBInstance, fb_inst_uri))
                         
                         fb_type_uri = self.get_fb_uri(ttype) 

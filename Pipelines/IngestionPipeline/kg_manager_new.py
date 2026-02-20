@@ -457,6 +457,11 @@ class KGManager:
         self._clean_previous_analysis()
         self.mark_custom_fbtypes()
         self.mark_gemma_layers()
+
+        # Sicherstellen, dass jede FB-Instanz einen stabilen Namen für SPARQL-basierte
+        # Auflösung hat (dp:hasFBInstanceName).
+        self.ensure_fb_instance_names()
+
         # 1. Calls analysieren
         print(f"Starte POU Call Analyse (Case Sensitive: {self.case_sensitive})...")
         call_re = re.compile(r"([A-Za-z_0-9\.]+)\s*\(([^;]*?)\);", re.S)
@@ -513,6 +518,11 @@ class KGManager:
         
         # Calls sind jetzt im KG -> jetzt ST Assignments parsen und an Calls hängen
         self.analyze_st_assignments()
+
+        # Zusätzliche Materialisierung:
+        # Instanz.Port in IF/ELSIF/WHILE/UNTIL-Bedingungen als PortInstance erfassen.
+        # Wichtig: läuft NACH analyze_st_assignments(), damit FB-Instanzbezüge bereits stabil sind.
+        self.materialize_port_instances_from_conditions()
 
         #OutputLayer hardwarebasiert markieren (benötigt Calls + STAssigns)
         self.mark_gemma_output_layer_by_hardware()
@@ -619,6 +629,186 @@ class KGManager:
                     if candidate_calls:
                         candidate_calls.sort(key=lambda u: self._get_local_name(str(u)))
                         self.graph.add((candidate_calls[0], OP.hasAssignment, assign_uri))
+
+
+    def _ensure_fb_instance_name_schema(self) -> None:
+        """Stellt dp:hasFBInstanceName als DatatypeProperty bereit."""
+        if not self.graph:
+            return
+        self.graph.add((DP.hasFBInstanceName, RDF.type, OWL.DatatypeProperty))
+        self.graph.add((DP.hasFBInstanceName, RDFS.domain, AG.class_FBInstance))
+        self.graph.add((DP.hasFBInstanceName, RDFS.range, XSD.string))
+
+    def _infer_fb_instance_name(self, fb_inst_uri: URIRef) -> Optional[str]:
+        """
+        Ermittelt einen FB-Instanznamen bevorzugt über die repräsentierende Variable.
+        Fallback: URI-Lokalname.
+        """
+        if not self.graph:
+            return None
+
+        var_uri = next(self.graph.subjects(OP.representsFBInstance, fb_inst_uri), None)
+        if var_uri:
+            var_name = next(self.graph.objects(var_uri, DP.hasVariableName), None)
+            if var_name and str(var_name).strip():
+                return str(var_name).strip()
+
+        local = self._get_local_name(str(fb_inst_uri))
+        if local.startswith("FBInst_"):
+            suffix = local[len("FBInst_"):]
+            if "_" in suffix:
+                return suffix.rsplit("_", 1)[-1]
+            return suffix
+        return local
+
+    def _ensure_fb_instance_name_for_instance(self, fb_inst_uri: URIRef, inst_name: Optional[str] = None) -> None:
+        """Schreibt dp:hasFBInstanceName an eine konkrete FB-Instanz."""
+        if not self.graph:
+            return
+
+        self._ensure_fb_instance_name_schema()
+        name = (inst_name or "").strip() or self._infer_fb_instance_name(fb_inst_uri)
+        if not name:
+            return
+
+        self.graph.remove((fb_inst_uri, DP.hasFBInstanceName, None))
+        self.graph.add((fb_inst_uri, DP.hasFBInstanceName, Literal(name, datatype=XSD.string)))
+
+    def ensure_fb_instance_names(self) -> None:
+        """Backfill: stellt sicher, dass alle FBInstanzen dp:hasFBInstanceName tragen."""
+        if not self.graph:
+            return
+
+        self._ensure_fb_instance_name_schema()
+        filled = 0
+        for fb_inst_uri in set(self.graph.subjects(RDF.type, AG.class_FBInstance)):
+            existing = next(self.graph.objects(fb_inst_uri, DP.hasFBInstanceName), None)
+            if existing and str(existing).strip():
+                continue
+            self._ensure_fb_instance_name_for_instance(URIRef(fb_inst_uri))
+            filled += 1
+
+        if self.debug:
+            print(f"[fbinst] dp:hasFBInstanceName ergänzt: {filled}")
+
+    def _find_fb_instance_in_pou_by_name_sparql(self, pou_uri: URIRef, inst_name: str) -> Optional[URIRef]:
+        """
+        Sucht per SPARQL eine FBInstance in einer konkreten POU anhand dp:hasFBInstanceName.
+        """
+        if not self.graph:
+            return None
+
+        query = """
+        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX ag:  <http://www.semanticweb.org/AgentProgramParams/>
+        PREFIX op:  <http://www.semanticweb.org/AgentProgramParams/op_>
+        PREFIX dp:  <http://www.semanticweb.org/AgentProgramParams/dp_>
+        SELECT ?fb_inst ?fb_name
+        WHERE {
+            ?pou op:hasInternalVariable ?var .
+            ?var op:representsFBInstance ?fb_inst .
+            ?fb_inst rdf:type ag:class_FBInstance ;
+                     dp:hasFBInstanceName ?fb_name .
+            FILTER(?pou = ?target_pou)
+        }
+        """
+
+        target_norm = self._normalize_name(inst_name.strip())
+        for row in self.graph.query(query, initBindings={"target_pou": URIRef(pou_uri)}):
+            cand_name = str(row[1]).strip()
+            if self._normalize_name(cand_name) == target_norm:
+                return URIRef(row[0])
+        return None
+
+    def materialize_port_instances_from_conditions(self) -> None:
+        """
+        Extrahiert Instanz.Port aus ST-Bedingungen und materialisiert PortInstances.
+
+        Guard (dynamisch, ohne hartcodierte Global-Präfixe):
+        - Für den Prefix vor dem Punkt wird per SPARQL geprüft, ob in der aktuellen POU
+          eine ag:class_FBInstance mit passendem dp:hasFBInstanceName existiert.
+        - Nur dann wird die PortInstance erzeugt.
+        """
+        if not self.graph:
+            return
+
+        # Sicherstellen, dass SPARQL auf dp:hasFBInstanceName arbeiten kann.
+        self.ensure_fb_instance_names()
+
+        # Multi-line ST-Bedingungen; non-greedy bis THEN/DO bzw. ';' bei UNTIL
+        cond_block_re = re.compile(
+            r"\b(?:IF|ELSIF|WHILE)\b(?P<cond>.*?)(?:\bTHEN\b|\bDO\b)",
+            flags=re.I | re.S,
+        )
+        until_re = re.compile(
+            r"\bUNTIL\b(?P<cond>.*?);",
+            flags=re.I | re.S,
+        )
+        inst_port_re = re.compile(
+            r"\b(?P<inst>[A-Za-z_][A-Za-z0-9_]*)\s*\.\s*(?P<port>[A-Za-z_][A-Za-z0-9_]*)\b"
+        )
+
+        def strip_comments_and_strings(text: str) -> str:
+            # Block-Kommentare
+            out = re.sub(r"\(\*.*?\*\)", " ", text, flags=re.S)
+            # Zeilen-Kommentare
+            out = re.sub(r"//.*", " ", out)
+            # ST-Strings, damit keine Dot-Tokens aus Textinhalten erkannt werden
+            out = re.sub(r"'[^']*'", "''", out)
+            return out
+
+        created_count = 0
+        seen: Set[Tuple[str, str, str]] = set()
+        fb_inst_cache: Dict[Tuple[str, str], Optional[URIRef]] = {}
+
+        # Alle POUs mit Code (Programme und FBs)
+        for pou_uri in set(self.graph.subjects(DP.hasPOUCode, None)):
+            if not any((pou_uri, RDF.type, t) in self.graph for t in [AG.class_Program, AG.class_FBType, AG.class_StandardFBType]):
+                continue
+
+            code_lit = next(self.graph.objects(pou_uri, DP.hasPOUCode), None)
+            if not code_lit:
+                continue
+
+            caller_name = self._get_name(pou_uri, [DP.hasProgramName, DP.hasPOUName])
+            code = strip_comments_and_strings(str(code_lit))
+
+            cond_chunks: List[str] = []
+            cond_chunks.extend(m.group("cond") for m in cond_block_re.finditer(code))
+            cond_chunks.extend(m.group("cond") for m in until_re.finditer(code))
+
+            for cond in cond_chunks:
+                for m in inst_port_re.finditer(cond):
+                    inst_name = m.group("inst").strip()
+                    port_name = m.group("port").strip()
+
+                    norm_inst = self._normalize_name(inst_name)
+                    norm_port = self._normalize_name(port_name)
+                    dedup_key = (self._normalize_name(caller_name), norm_inst, norm_port)
+                    if dedup_key in seen:
+                        continue
+                    seen.add(dedup_key)
+
+                    cache_key = (str(pou_uri), norm_inst)
+                    if cache_key not in fb_inst_cache:
+                        fb_inst_cache[cache_key] = self._find_fb_instance_in_pou_by_name_sparql(
+                            URIRef(pou_uri), inst_name
+                        )
+                    fb_inst_uri = fb_inst_cache[cache_key]
+                    if not fb_inst_uri:
+                        continue
+
+                    fb_type_uri = next(self.graph.objects(fb_inst_uri, OP.isInstanceOfFBType), None)
+                    fb_type_uri = URIRef(fb_type_uri) if fb_type_uri else None
+
+                    pi_uri = self._make_uri(f"PortInstance_{self._get_local_name(str(fb_inst_uri))}_{port_name}")
+                    existed = (pi_uri, RDF.type, AG.class_PortInstance) in self.graph
+                    self._ensure_port_instance(fb_inst_uri, fb_type_uri, port_name)
+                    if not existed:
+                        created_count += 1
+
+        if self.debug:
+            print(f"[conditions] Zusätzliche PortInstances materialisiert: {created_count}")
 
 
         # Property ergänzen, weil es bisher nur assignsToPort gibt
@@ -1024,16 +1214,45 @@ class KGManager:
                 formal_port = self._port_lookup.get(key)
                 if formal_port:
                     self.graph.add((pi_uri, OP.instantiatesPort, formal_port))
+
+        # Für jede PortInstance den aufgelösten Ausdruck mitschreiben, z.B. "rStep1.Q".
+        # Das läuft auch bei bereits existierenden PortInstances (idempotent).
+        self._set_port_instance_expression_text(pi_uri, parent_inst_uri, port_name)
         return pi_uri
+
+    def _set_port_instance_expression_text(self, pi_uri: URIRef, parent_inst_uri: URIRef, port_name: str) -> None:
+        """Setzt dp:hasExpressionText für eine PortInstance auf '<Instanzname>.<Portname>'."""
+        if not self.graph:
+            return
+
+        inst_name_lit = next(self.graph.objects(parent_inst_uri, DP.hasFBInstanceName), None)
+        if inst_name_lit and str(inst_name_lit).strip():
+            inst_name = str(inst_name_lit).strip()
+        else:
+            inferred = self._infer_fb_instance_name(parent_inst_uri)
+            if inferred and inferred.strip():
+                inst_name = inferred.strip()
+            else:
+                inst_name = self._get_local_name(str(parent_inst_uri))
+
+        expr_text = f"{inst_name}.{port_name}"
+        self.graph.remove((pi_uri, DP.hasExpressionText, None))
+        self.graph.add((pi_uri, DP.hasExpressionText, Literal(expr_text, datatype=XSD.string)))
 
     def _ensure_fb_instance(self, inst_var_uri: URIRef) -> URIRef:
         existing = next(self.graph.objects(inst_var_uri, OP.representsFBInstance), None)
-        if existing: return URIRef(existing)
+        if existing:
+            existing_uri = URIRef(existing)
+            inst_name = self._get_name(inst_var_uri, DP.hasVariableName)
+            self._ensure_fb_instance_name_for_instance(existing_uri, inst_name=inst_name)
+            return existing_uri
         
         base_name = self._get_local_name(str(inst_var_uri))
         fb_inst_uri = self._make_uri(f"FBInst_{base_name}")
         self.graph.add((fb_inst_uri, RDF.type, AG.class_FBInstance))
         self.graph.add((inst_var_uri, OP.representsFBInstance, fb_inst_uri))
+        inst_name = self._get_name(inst_var_uri, DP.hasVariableName)
+        self._ensure_fb_instance_name_for_instance(fb_inst_uri, inst_name=inst_name)
         
         vtype = next(self.graph.objects(inst_var_uri, DP.hasVariableType), None)
         if vtype:

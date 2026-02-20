@@ -1,5 +1,12 @@
-# excH_agent_ui.py
-# Modern CustomTkinter UI for MSRGuard ExcH Agent
+"""
+Streamlit UI für den MSRGuard ExcH Agent (Chat + JSON Side Panels).
+
+Start (mit optionalen Script-Args):
+  streamlit run python/msrguard/excH_agent_ui.py -- --event_json_path <event.json> --out_json <result.json>
+
+Alternativ: Event JSON im UI laden (Upload oder Pfad) und dann auf „Weiter“ klicken.
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -7,25 +14,27 @@ import json
 import os
 import subprocess
 import sys
-import threading
-from datetime import datetime, timezone
+import webbrowser
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, Optional, List
+from typing import Any, Dict, List, Optional
 
-# --- CustomTkinter ---
 try:
-    import customtkinter as ctk
+    import streamlit as st
 except Exception as e:
     raise RuntimeError(
-        "customtkinter ist nicht installiert. Bitte in deiner venv installieren:\n"
-        "  pip install customtkinter\n"
-        "Optional (für Icons): pip install pillow\n"
+        "streamlit ist nicht installiert. Bitte in deiner venv installieren:\n"
+        "  pip install streamlit\n"
         f"\nImport-Fehler: {e}"
     ) from e
 
 
 DEFAULT_CONFIG_NAME = "excH_agent_config.json"
+
+USER_AVATAR = "👤"
+BOT_AVATAR = "🤖"
+SYSTEM_AVATAR = "ℹ️"
 
 
 @dataclass
@@ -48,8 +57,6 @@ class UiConfig:
     openai_api_key_file: str = ""
     pipeline: PipelineConfig = field(default_factory=PipelineConfig)
     chatbot: ChatbotConfig = field(default_factory=ChatbotConfig)
-    appearance_mode: str = "System"   # "Light" | "Dark" | "System"
-    color_theme: str = "dark-blue"    # customtkinter themes
 
 
 def ensure_python_root_on_sys_path() -> None:
@@ -65,6 +72,10 @@ def ensure_python_root_on_sys_path() -> None:
             sys.path.insert(0, str(python_root))
     except Exception:
         pass
+
+
+def _utc_now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat()
 
 
 def _load_json(path: Path) -> Dict[str, Any]:
@@ -118,8 +129,6 @@ def load_ui_config() -> UiConfig:
         openai_api_key_file=str(raw.get("openai_api_key_file", "")),
         pipeline=pipeline,
         chatbot=chatbot,
-        appearance_mode=str(raw.get("appearance_mode", "System")),
-        color_theme=str(raw.get("color_theme", "dark-blue")),
     )
 
 
@@ -154,10 +163,21 @@ def _read_kg_final_path_from_config(config_path: str) -> str:
 
 
 def parse_args() -> argparse.Namespace:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--event_json_path", required=True, help="Pfad zur Event JSON (Input)")
+    """
+    Streamlit startet das Script selbst und übergibt ggf. zusätzliche CLI-Flags.
+    Deshalb nur bekannte Argumente parsen und alles andere ignorieren.
+
+    Übergabe in Streamlit:
+      streamlit run python/msrguard/excH_agent_ui.py -- --event_json_path <...> --out_json <...>
+    """
+    ap = argparse.ArgumentParser(add_help=False)
+    ap.add_argument("--event_json_path", required=False, default="", help="Pfad zur Event JSON (Input)")
     ap.add_argument("--out_json", required=False, default="", help="Pfad zur Result JSON (Output)")
-    return ap.parse_args()
+    ap.add_argument("--server_port", required=False, type=int, default=8501, help="Streamlit Port (default: 8501)")
+    ap.add_argument("--no_open_browser", action="store_false", dest="open_browser", help="Browser nicht automatisch öffnen")
+    ap.set_defaults(open_browser=True)
+    ns, _unknown = ap.parse_known_args()
+    return ns
 
 
 def read_event(event_json_path: str) -> Dict[str, Any]:
@@ -165,574 +185,6 @@ def read_event(event_json_path: str) -> Dict[str, Any]:
     if not p.exists():
         raise FileNotFoundError(f"event_json_path nicht gefunden: {p}")
     return _load_json(p)
-
-
-class ExcHAgentUI(ctk.CTk):
-    def __init__(self, event: Dict[str, Any], out_json_path: str, cfg: UiConfig):
-        super().__init__()
-
-        self.cfg = cfg
-        self.event: Dict[str, Any] = event
-        self.out_json_path = out_json_path or ""
-        self.chat_log_path: Optional[Path] = None
-
-        self._pipeline_started = False
-        self._pipeline_done_evt = threading.Event()
-        self._pipeline_ok: Optional[bool] = None
-        self._pipeline_error: str = ""
-        self._pipeline_stdout: str = ""
-        self._pipeline_stderr: str = ""
-
-        self.analysis_started = False
-        self.analysis_done = False
-
-        self.agent_result: Optional[Dict[str, Any]] = None
-        self.chatbot_session = None
-        self.chatbot_last_error: str = ""
-        self.chat_transcript: List[Dict[str, Any]] = []
-        self.ui_events: List[Dict[str, Any]] = []
-
-        self.title("MSRGuard ExcH Agent UI")
-        self.geometry("1280x780")
-        self.minsize(1100, 650)
-
-        try:
-            ctk.set_appearance_mode(self.cfg.appearance_mode)
-        except Exception:
-            ctk.set_appearance_mode("System")
-        try:
-            ctk.set_default_color_theme(self.cfg.color_theme)
-        except Exception:
-            pass
-
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_columnconfigure(0, weight=1, uniform="cols")
-        # Chat-Bereich breiter machen (mittlere Spalte).
-        self.grid_columnconfigure(1, weight=4, uniform="cols")
-        self.grid_columnconfigure(2, weight=1, uniform="cols")
-
-        # Left: Event
-        self.left = ctk.CTkFrame(self, corner_radius=12)
-        self.left.grid(row=0, column=0, padx=12, pady=12, sticky="nsew")
-        self.left.grid_rowconfigure(1, weight=1)
-        self.left.grid_columnconfigure(0, weight=1)
-
-        self.lbl_event = ctk.CTkLabel(self.left, text="Event (Input)", font=ctk.CTkFont(size=16, weight="bold"))
-        self.lbl_event.grid(row=0, column=0, padx=12, pady=(12, 6), sticky="w")
-
-        self.event_box = ctk.CTkTextbox(self.left, wrap="none")
-        self.event_box.grid(row=1, column=0, padx=12, pady=6, sticky="nsew")
-
-        # Middle: Chat
-        self.mid = ctk.CTkFrame(self, corner_radius=12)
-        self.mid.grid(row=0, column=1, padx=12, pady=12, sticky="nsew")
-        self.mid.grid_rowconfigure(1, weight=1)
-        self.mid.grid_columnconfigure(0, weight=1)
-
-        self.chat_header = ctk.CTkFrame(self.mid, fg_color="transparent")
-        self.chat_header.grid(row=0, column=0, padx=12, pady=(12, 6), sticky="ew")
-        self.chat_header.grid_columnconfigure(0, weight=1)
-        self.chat_header.grid_columnconfigure(1, weight=0)
-
-        self.lbl_chat = ctk.CTkLabel(self.chat_header, text="ChatBot", font=ctk.CTkFont(size=16, weight="bold"))
-        self.lbl_chat.grid(row=0, column=0, sticky="w")
-
-        self.chat_status = ctk.CTkLabel(self.chat_header, text="Bereit.", anchor="e")
-        self.chat_status.grid(row=0, column=1, sticky="e")
-
-        self.chat_scroll = ctk.CTkScrollableFrame(self.mid, corner_radius=10)
-        self.chat_scroll.grid(row=1, column=0, padx=12, pady=6, sticky="nsew")
-        self.chat_scroll.grid_columnconfigure(0, weight=1)
-
-        self.input_row = ctk.CTkFrame(self.mid, fg_color="transparent")
-        self.input_row.grid(row=2, column=0, padx=12, pady=(6, 12), sticky="ew")
-        self.input_row.grid_columnconfigure(0, weight=1)
-
-        self.entry = ctk.CTkEntry(self.input_row, placeholder_text="Frage an den ChatBot…")
-        self.entry.grid(row=0, column=0, padx=(0, 8), pady=0, sticky="ew")
-        self.entry.bind("<Return>", lambda _e: self.on_send())
-
-        self.btn_send = ctk.CTkButton(self.input_row, text="Senden", width=100, command=self.on_send)
-        self.btn_send.grid(row=0, column=1, padx=0, pady=0)
-
-        # Right: Agent Output
-        self.right = ctk.CTkFrame(self, corner_radius=12)
-        self.right.grid(row=0, column=2, padx=12, pady=12, sticky="nsew")
-        self.right.grid_rowconfigure(1, weight=1)
-        self.right.grid_columnconfigure(0, weight=1)
-
-        self.lbl_out = ctk.CTkLabel(self.right, text="Agent Output", font=ctk.CTkFont(size=16, weight="bold"))
-        self.lbl_out.grid(row=0, column=0, padx=12, pady=(12, 6), sticky="w")
-
-        self.out_box = ctk.CTkTextbox(self.right, wrap="none")
-        self.out_box.grid(row=1, column=0, padx=12, pady=6, sticky="nsew")
-
-        # Bottom bar
-        self.bottom = ctk.CTkFrame(self, corner_radius=0)
-        self.bottom.grid(row=1, column=0, columnspan=3, padx=0, pady=0, sticky="ew")
-        self.bottom.grid_columnconfigure(0, weight=1)
-
-        self.status = ctk.CTkLabel(self.bottom, text="Bereit.", anchor="w")
-        self.status.grid(row=0, column=0, padx=12, pady=10, sticky="ew")
-
-        self.pb = ctk.CTkProgressBar(self.bottom)
-        self.pb.grid(row=0, column=1, padx=12, pady=10, sticky="ew")
-        self.pb.set(0.0)
-
-        self.btn_abort = ctk.CTkButton(self.bottom, text="Abbrechen", command=self.on_abort, width=140)
-        self.btn_abort.grid(row=0, column=2, padx=(12, 6), pady=10)
-
-        self.btn_continue = ctk.CTkButton(self.bottom, text="Weiter", command=self.on_continue, width=140)
-        self.btn_continue.grid(row=0, column=3, padx=(6, 12), pady=10)
-
-        self.populate_event_box()
-        self._post_initial_system_messages()
-        self._init_chat_log()
-
-        if self.cfg.pipeline.enabled:
-            self._start_pipeline_async()
-
-        self.set_chat_enabled(False)
-
-    def populate_event_box(self) -> None:
-        self.event_box.delete("1.0", "end")
-        self.event_box.insert("end", json.dumps(self.event, indent=2, ensure_ascii=False))
-
-    def set_status(self, text: str) -> None:
-        self.status.configure(text=text)
-
-    def set_chat_enabled(self, enabled: bool) -> None:
-        state = "normal" if enabled else "disabled"
-        self.entry.configure(state=state)
-        self.btn_send.configure(state=state)
-
-    def set_chat_status(self, text: str) -> None:
-        self._log_ui_event("chat_status", {"text": text})
-        try:
-            self.chat_status.configure(text=text)
-        except Exception:
-            pass
-
-    def _utc_now_iso(self) -> str:
-        return datetime.now(timezone.utc).isoformat()
-
-    def _log_ui_event(self, kind: str, data: Optional[Dict[str, Any]] = None) -> None:
-        try:
-            self.ui_events.append(
-                {
-                    "ts_utc": self._utc_now_iso(),
-                    "kind": str(kind),
-                    "data": data or {},
-                }
-            )
-            self._flush_chat_log()
-        except Exception:
-            pass
-
-    def _sanitize_for_path(self, s: str) -> str:
-        s = (s or "").strip()
-        s = "".join(ch if ch.isalnum() or ch in ("-", "_") else "_" for ch in s)
-        return s[:80] if s else "noid"
-
-    def _init_chat_log(self) -> None:
-        """
-        Legt pro UI-Session einen neuen Ordner unter python/agent_results an und schreibt
-        dort eine chatBot_verlauf.json, die während der Session fortlaufend aktualisiert wird.
-        """
-        try:
-            here = Path(__file__).resolve()
-            python_root = here.parent.parent  # .../python
-            out_dir = python_root / "agent_results"
-            out_dir.mkdir(parents=True, exist_ok=True)
-
-            payload = self.event.get("payload") if isinstance(self.event.get("payload"), dict) else {}
-            corr = self._sanitize_for_path(str(payload.get("correlationId") or payload.get("corr") or ""))
-            ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
-            session_dir = out_dir / f"chat_{ts}_{corr}"
-            session_dir.mkdir(parents=True, exist_ok=True)
-            self.chat_log_path = session_dir / "chatBot_verlauf.json"
-
-            self._flush_chat_log()
-        except Exception:
-            self.chat_log_path = None
-
-    def _flush_chat_log(self) -> None:
-        if not self.chat_log_path:
-            return
-        try:
-            payload = self.event.get("payload") if isinstance(self.event.get("payload"), dict) else {}
-            meta = {
-                "started_at_utc": getattr(self, "_chat_started_at_utc", None) or self._utc_now_iso(),
-                "event_type": self.event.get("type", ""),
-                "correlationId": payload.get("correlationId") or payload.get("corr") or "",
-                "processName": payload.get("processName") or payload.get("process") or payload.get("lastProcessName") or "",
-                "out_json_path": self.out_json_path,
-            }
-            if not getattr(self, "_chat_started_at_utc", None):
-                self._chat_started_at_utc = meta["started_at_utc"]
-
-            blob = {
-                "meta": meta,
-                "transcript": self.chat_transcript,
-                "events": self.ui_events,
-            }
-            self.chat_log_path.write_text(json.dumps(blob, indent=2, ensure_ascii=False), encoding="utf-8")
-        except Exception:
-            pass
-
-    def _add_chat_bubble(self, role: str, text: str) -> None:
-        role = role.strip() or "System"
-
-        outer = ctk.CTkFrame(self.chat_scroll, fg_color="transparent")
-        outer.grid(sticky="ew", padx=6, pady=4)
-        outer.grid_columnconfigure(0, weight=1)
-
-        is_user = role.lower() in ("user", "benutzer")
-        bubble_color = ("#E8E8E8", "#2A2A2A") if not is_user else ("#DCEBFF", "#1E3A5F")
-
-        bubble = ctk.CTkFrame(outer, corner_radius=12, fg_color=bubble_color)
-        # Assistant/System-Bubbles sollen die verfügbare Breite nutzen.
-        bubble.grid(row=0, column=0, sticky="ew" if not is_user else "e", padx=4)
-        bubble.grid_columnconfigure(0, weight=1)
-
-        lbl_role = ctk.CTkLabel(bubble, text=role, font=ctk.CTkFont(size=12, weight="bold"))
-        lbl_role.grid(row=0, column=0, padx=10, pady=(8, 0), sticky="w")
-
-        # CTkLabel ist nicht selektierbar -> CTkTextbox macht Text kopierbar (Markieren + Ctrl+C).
-        line_count = (text or "").count("\n") + 1
-        height_px = max(48, min(520, 18 * line_count + 18))
-
-        txt = ctk.CTkTextbox(bubble, wrap="word", height=height_px)
-        txt.grid(row=1, column=0, padx=10, pady=(4, 10), sticky="ew")
-        txt.insert("1.0", text or "")
-        txt.configure(state="disabled")
-
-        self.chat_transcript.append({"ts_utc": self._utc_now_iso(), "role": role, "text": text})
-        self._flush_chat_log()
-
-        try:
-            self.chat_scroll._parent_canvas.yview_moveto(1.0)
-        except Exception:
-            pass
-
-    def _chat_threadsafe(self, role: str, text: str) -> None:
-        self.after(0, lambda: self._add_chat_bubble(role, text))
-
-    @staticmethod
-    def _tool_results_look_empty(tool_results: Any) -> bool:
-        if not isinstance(tool_results, dict) or not tool_results:
-            return True
-        for val in tool_results.values():
-            if isinstance(val, dict) and "error" in val:
-                return False
-            if isinstance(val, list) and len(val) > 0:
-                return False
-            if val:
-                return False
-        return True
-
-    def _show_chatbot_debug_in_chat(self, res: Any) -> None:
-        """
-        Zeigt Debug-Infos (Plan) im Chat an und meldet sichtbar, wenn der Planner/Tools
-        keine verwertbaren Ergebnisse geliefert haben.
-        """
-        if not isinstance(res, dict):
-            return
-
-        plan = res.get("plan")
-        tool_results = res.get("tool_results")
-
-        if isinstance(plan, dict):
-            steps = plan.get("steps")
-            if isinstance(steps, list) and len(steps) == 0:
-                self._chat_threadsafe("System", "Hinweis: Planner hat keine Tool-Schritte geplant (steps=[]).")
-
-            self._chat_threadsafe(
-                "System",
-                "Plan (Tool-Aufrufe):\n" + json.dumps(plan, ensure_ascii=False, indent=2),
-            )
-
-        # Tool-Fehler sichtbar machen
-        if isinstance(tool_results, dict):
-            err_steps = [k for k, v in tool_results.items() if isinstance(v, dict) and "error" in v]
-            if err_steps:
-                self._chat_threadsafe("System", "Hinweis: Tool-Fehler in: " + ", ".join(err_steps))
-
-        if self._tool_results_look_empty(tool_results):
-            self._chat_threadsafe(
-                "System",
-                "Hinweis: Keine/zu wenige Tool-Ergebnisse für eine konkrete Antwort. "
-                "Der ChatBot konnte vermutlich nicht die richtigen Tools auswählen oder das KG enthält die Info nicht.",
-            )
-
-    def _post_initial_system_messages(self) -> None:
-        payload = self.event.get("payload") if isinstance(self.event.get("payload"), dict) else {}
-        last_skill = payload.get("lastSkill") or payload.get("lastExecutedSkill") or payload.get("interruptedSkill") or ""
-        proc = payload.get("processName") or payload.get("lastExecutedProcess") or ""
-        summary = payload.get("summary") or ""
-
-        msg1 = "Unbekannter Fehler wurde erkannt."
-        if last_skill:
-            msg1 += f" lastSkill={last_skill}"
-        if proc:
-            msg1 += f" process={proc}"
-        if summary:
-            msg1 += f" | {summary}"
-
-        self._add_chat_bubble("System", msg1)
-
-        if self.cfg.pipeline.enabled:
-            self._add_chat_bubble("System", "Pipeline startet automatisch. Klicke 'Weiter' um Analyse zu starten oder 'Abbrechen'.")
-        else:
-            self._add_chat_bubble("System", "Klicke 'Weiter' um Analyse zu starten oder 'Abbrechen'.")
-
-    def _start_pipeline_async(self) -> None:
-        if self._pipeline_started:
-            return
-        self._pipeline_started = True
-
-        p = self.cfg.pipeline
-        self.set_status("Starte Ingestion Pipeline…")
-        self.pb.configure(mode="indeterminate")
-        self.pb.start()
-
-        self._chat_threadsafe("System", f"Starte Ingestion Pipeline: {p.runner}")
-
-        def worker():
-            try:
-                runner = Path(p.runner).expanduser().resolve()
-                if not runner.exists():
-                    raise FileNotFoundError(f"Pipeline runner nicht gefunden: {runner}")
-
-                cwd = Path(p.dir).expanduser().resolve()
-                if not cwd.exists():
-                    raise FileNotFoundError(f"Pipeline dir nicht gefunden: {cwd}")
-
-                cmd = [sys.executable, str(runner)]
-
-                kw = dict(cwd=str(cwd), capture_output=True, text=True)
-                if p.timeout_sec is not None:
-                    kw["timeout"] = int(p.timeout_sec)
-
-                proc = subprocess.run(cmd, **kw)  # type: ignore[arg-type]
-
-                self._pipeline_stdout = proc.stdout or ""
-                self._pipeline_stderr = proc.stderr or ""
-
-                if proc.returncode != 0:
-                    raise RuntimeError(
-                        f"Pipeline returncode={proc.returncode}\n"
-                        f"STDOUT:\n{self._pipeline_stdout[-2000:]}\n"
-                        f"STDERR:\n{self._pipeline_stderr[-2000:]}"
-                    )
-
-                kg_path = _read_kg_final_path_from_config(p.config)
-                if not kg_path:
-                    raise RuntimeError(f"kg_final_path fehlt in {p.config}")
-
-                payload = self.event.get("payload") if isinstance(self.event.get("payload"), dict) else {}
-                payload = dict(payload)
-                payload["kg_ttl_path"] = kg_path
-                self.event["payload"] = payload
-                os.environ["MSRGUARD_KG_TTL"] = kg_path
-
-                self._pipeline_ok = True
-                self._pipeline_error = ""
-                self._chat_threadsafe("System", f"Pipeline OK. KG: {kg_path}")
-
-                self.after(0, self.populate_event_box)
-
-            except Exception as e:
-                self._pipeline_ok = False
-                self._pipeline_error = str(e)
-                self._chat_threadsafe("System", f"Pipeline FEHLER: {e}")
-            finally:
-                self._pipeline_done_evt.set()
-                self.after(0, self._pipeline_ui_done)
-
-        threading.Thread(target=worker, daemon=True).start()
-
-    def _pipeline_ui_done(self) -> None:
-        self.pb.stop()
-        self.pb.configure(mode="determinate")
-        self.pb.set(1.0 if self._pipeline_ok else 0.0)
-
-        if self._pipeline_ok:
-            self.set_status("Pipeline OK. Bereit für Analyse.")
-        else:
-            self.set_status("Pipeline Fehler. Analyse kann ggf. trotzdem gestartet werden (ohne KG Update).")
-
-    def on_continue(self) -> None:
-        if not self.analysis_started:
-            self.start_analysis_async()
-            return
-
-        if self.analysis_done:
-            self._write_result_and_close(True, "user_continue_after_analysis")
-            return
-
-        self._chat_threadsafe("System", "Analyse läuft noch…")
-
-    def on_abort(self) -> None:
-        self._write_result_and_close(False, "user_abort")
-
-    def _import_handle_event(self):
-        ensure_python_root_on_sys_path()
-        try:
-            from msrguard.excH_agent_core import handle_event  # type: ignore
-            return handle_event
-        except Exception:
-            from excH_agent_core import handle_event  # type: ignore
-            return handle_event
-
-    def _import_chatbot_pieces(self):
-        ensure_python_root_on_sys_path()
-        try:
-            from msrguard.excH_chatbot import IncidentContext, ExcHChatBotSession, run_initial_analysis  # type: ignore
-        except Exception:
-            from excH_chatbot import IncidentContext, ExcHChatBotSession, run_initial_analysis  # type: ignore
-
-        try:
-            from msrguard.chatbot_core import build_bot  # type: ignore
-        except Exception:
-            from chatbot_core import build_bot  # type: ignore
-
-        return IncidentContext, ExcHChatBotSession, run_initial_analysis, build_bot
-
-    def start_analysis_async(self) -> None:
-        if self.analysis_started:
-            return
-        self.analysis_started = True
-        self.set_status("Analyse wird gestartet...")
-        self._chat_threadsafe("System", "Analyse wird gestartet...")
-        self.set_chat_status("Analyse läuft…")
-
-        err = try_set_openai_key_from_file(self.cfg.openai_api_key_file)
-        if err:
-            self._chat_threadsafe("System", f"⚠️ ChatBot Key Hinweis: {err}")
-
-        def worker():
-            if self.cfg.pipeline.enabled:
-                self._chat_threadsafe("System", "Warte auf Pipeline-Finish...")
-                self._pipeline_done_evt.wait()
-
-            try:
-                handle_event = self._import_handle_event()
-                self.agent_result = handle_event(self.event)
-                self.after(0, self._render_agent_output)
-                self._log_ui_event("agent_core_done", {"ok": True})
-            except Exception as e:
-                self.agent_result = {"status": "error", "error": str(e)}
-                self.after(0, self._render_agent_output)
-                self._chat_threadsafe("System", f"Agent Fehler: {e}")
-                self._log_ui_event("agent_core_done", {"ok": False, "error": str(e)})
-
-            try:
-                IncidentContext, ExcHChatBotSession, run_initial_analysis, build_bot = self._import_chatbot_pieces()
-
-                ctx = IncidentContext.from_event(self.event)
-                payload = self.event.get("payload") if isinstance(self.event.get("payload"), dict) else {}
-                kg_path = payload.get("kg_ttl_path") or os.environ.get("MSRGUARD_KG_TTL", "")
-
-                bot = build_bot(
-                    kg_ttl_path=str(kg_path),
-                    openai_model=self.cfg.chatbot.model,
-                    openai_temperature=self.cfg.chatbot.temperature,
-                )
-                self.chatbot_session = ExcHChatBotSession(bot=bot, ctx=ctx)
-
-                res = run_initial_analysis(self.chatbot_session, debug=True)
-                if isinstance(res, dict):
-                    self._log_ui_event(
-                        "chatbot_initial_debug",
-                        {
-                            "plan": res.get("plan"),
-                            "tool_results": res.get("tool_results"),
-                        },
-                    )
-                answer = res.get("answer") if isinstance(res, dict) else None
-                self._chat_threadsafe("Assistant", answer or _json_or_str(res))
-                self._show_chatbot_debug_in_chat(res)
-                self.after(0, lambda: self.set_chat_enabled(True))
-                self.after(0, lambda: self.set_chat_status("Bereit."))
-
-            except Exception as e:
-                self.chatbot_session = None
-                self.chatbot_last_error = str(e)
-                self._chat_threadsafe("System", f"ChatBot init Fehler: {e}")
-                self.after(0, lambda: self.set_chat_enabled(False))
-                self.after(0, lambda: self.set_chat_status("ChatBot Fehler."))
-
-            self.analysis_done = True
-            self.after(0, lambda: self.set_status("Analyse abgeschlossen. Du kannst noch Fragen stellen oder 'Weiter' drücken."))
-
-        threading.Thread(target=worker, daemon=True).start()
-
-    def _render_agent_output(self) -> None:
-        self.out_box.delete("1.0", "end")
-        self.out_box.insert("end", json.dumps(self.agent_result, indent=2, ensure_ascii=False))
-
-    def on_send(self) -> None:
-        msg = self.entry.get().strip()
-        if not msg:
-            return
-        self.entry.delete(0, "end")
-        self._add_chat_bubble("User", msg)
-
-        if not self.chatbot_session:
-            self._chat_threadsafe("System", "ChatBot ist nicht initialisiert. Bitte zuerst 'Weiter' drücken oder Key/Config prüfen.")
-            return
-
-        self.set_chat_enabled(False)
-        self.set_status("ChatBot antwortet...")
-        self.set_chat_status("ChatBot denkt…")
-
-        def worker():
-            try:
-                res = self.chatbot_session.ask(msg, debug=True)
-                if isinstance(res, dict):
-                    self._log_ui_event(
-                        "chatbot_message_debug",
-                        {
-                            "plan": res.get("plan"),
-                            "tool_results": res.get("tool_results"),
-                        },
-                    )
-                answer = res.get("answer") if isinstance(res, dict) else None
-                self._chat_threadsafe("Assistant", answer or _json_or_str(res))
-                self._show_chatbot_debug_in_chat(res)
-            except Exception as e:
-                self._chat_threadsafe("System", f"ChatBot Fehler: {e}")
-            finally:
-                self.after(0, lambda: self.set_chat_enabled(True))
-                self.after(0, lambda: self.set_status("Bereit."))
-                self.after(0, lambda: self.set_chat_status("Bereit."))
-
-        threading.Thread(target=worker, daemon=True).start()
-
-    def _write_result_and_close(self, continue_flag: bool, reason: str) -> None:
-        if self.out_json_path:
-            outp = Path(self.out_json_path).expanduser().resolve()
-            outp.parent.mkdir(parents=True, exist_ok=True)
-
-            result = {
-                "continue": bool(continue_flag),
-                "reason": reason,
-                "agent_result": self.agent_result,
-                "chatbot": {"ok": self.chatbot_session is not None, "error": self.chatbot_last_error},
-                "chatbot_transcript": self.chat_transcript,
-                "pipeline": {
-                    "enabled": self.cfg.pipeline.enabled,
-                    "ok": self._pipeline_ok,
-                    "error": self._pipeline_error,
-                    "stdout_tail": self._pipeline_stdout[-4000:],
-                    "stderr_tail": self._pipeline_stderr[-4000:],
-                },
-                "event": self.event,
-            }
-            outp.write_text(json.dumps(result, indent=2, ensure_ascii=False), encoding="utf-8")
-
-        self.destroy()
 
 
 def _json_or_str(obj: Any) -> str:
@@ -746,13 +198,773 @@ def _json_or_str(obj: Any) -> str:
         return str(obj)
 
 
+def streamlit_main() -> None:
+    st.set_page_config(page_title="MSRGuard ExcH Agent", layout="wide")
+
+    def sanitize_for_path(s: str) -> str:
+        s = (s or "").strip()
+        s = "".join(ch if ch.isalnum() or ch in ("-", "_") else "_" for ch in s)
+        return s[:80] if s else "noid"
+
+    def make_session_dir(event: Dict[str, Any]) -> Optional[Path]:
+        try:
+            here = Path(__file__).resolve()
+            python_root = here.parent.parent  # .../python
+            out_dir = python_root / "agent_results"
+            out_dir.mkdir(parents=True, exist_ok=True)
+
+            payload = event.get("payload") if isinstance(event.get("payload"), dict) else {}
+            corr = sanitize_for_path(str(payload.get("correlationId") or payload.get("corr") or ""))
+            ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+            session_dir = out_dir / f"streamlit_{ts}_{corr}"
+            session_dir.mkdir(parents=True, exist_ok=True)
+            return session_dir
+        except Exception:
+            return None
+
+    def ensure_state_defaults() -> None:
+        if "cfg" not in st.session_state:
+            st.session_state["cfg"] = load_ui_config()
+        if "event" not in st.session_state:
+            st.session_state["event"] = {}
+        if "event_json_path" not in st.session_state:
+            st.session_state["event_json_path"] = ""
+        if "event_loaded_from_path" not in st.session_state:
+            st.session_state["event_loaded_from_path"] = ""
+        if "event_autoload_error" not in st.session_state:
+            st.session_state["event_autoload_error"] = ""
+        if "out_json_path" not in st.session_state:
+            st.session_state["out_json_path"] = ""
+        if "pipeline_enabled" not in st.session_state:
+            st.session_state["pipeline_enabled"] = bool(st.session_state["cfg"].pipeline.enabled)
+        if "pipeline_status" not in st.session_state:
+            st.session_state["pipeline_status"] = {"ok": None, "error": "", "stdout": "", "stderr": "", "kg_path": ""}
+        if "analysis_started" not in st.session_state:
+            st.session_state["analysis_started"] = False
+        if "analysis_done" not in st.session_state:
+            st.session_state["analysis_done"] = False
+        if "agent_result" not in st.session_state:
+            st.session_state["agent_result"] = None
+        if "chatbot_session" not in st.session_state:
+            st.session_state["chatbot_session"] = None
+        if "chatbot_last_error" not in st.session_state:
+            st.session_state["chatbot_last_error"] = ""
+        if "chat_transcript" not in st.session_state:
+            st.session_state["chat_transcript"] = []
+        if "ui_events" not in st.session_state:
+            st.session_state["ui_events"] = []
+        if "posted_initial_system_messages" not in st.session_state:
+            st.session_state["posted_initial_system_messages"] = False
+        if "chat_log_path" not in st.session_state:
+            st.session_state["chat_log_path"] = ""
+        if "chat_started_at_utc" not in st.session_state:
+            st.session_state["chat_started_at_utc"] = ""
+        if "last_chatbot_debug" not in st.session_state:
+            st.session_state["last_chatbot_debug"] = {"plan": None, "tool_results": None}
+        if "last_result_blob" not in st.session_state:
+            st.session_state["last_result_blob"] = None
+        if "auto_followup_enabled" not in st.session_state:
+            st.session_state["auto_followup_enabled"] = True
+        if "pending_auto_followup_prompt" not in st.session_state:
+            st.session_state["pending_auto_followup_prompt"] = ""
+        if "auto_followup_done" not in st.session_state:
+            st.session_state["auto_followup_done"] = False
+
+    def flush_chat_log() -> None:
+        path = (st.session_state.get("chat_log_path") or "").strip()
+        if not path:
+            return
+        try:
+            event = st.session_state.get("event") or {}
+            payload = event.get("payload") if isinstance(event.get("payload"), dict) else {}
+            meta = {
+                "started_at_utc": st.session_state.get("chat_started_at_utc") or _utc_now_iso(),
+                "event_type": event.get("type", ""),
+                "correlationId": payload.get("correlationId") or payload.get("corr") or "",
+                "processName": payload.get("processName") or payload.get("process") or payload.get("lastProcessName") or "",
+                "out_json_path": st.session_state.get("out_json_path") or "",
+            }
+            if not st.session_state.get("chat_started_at_utc"):
+                st.session_state["chat_started_at_utc"] = meta["started_at_utc"]
+
+            blob = {
+                "meta": meta,
+                "transcript": st.session_state.get("chat_transcript") or [],
+                "events": st.session_state.get("ui_events") or [],
+            }
+            Path(path).write_text(json.dumps(blob, indent=2, ensure_ascii=False), encoding="utf-8")
+        except Exception:
+            pass
+
+    def log_ui_event(kind: str, data: Optional[Dict[str, Any]] = None) -> None:
+        try:
+            st.session_state["ui_events"].append({"ts_utc": _utc_now_iso(), "kind": kind, "data": data or {}})
+            flush_chat_log()
+        except Exception:
+            pass
+
+    def add_message(role: str, text: str) -> None:
+        st.session_state["chat_transcript"].append({"ts_utc": _utc_now_iso(), "role": role, "text": text})
+        flush_chat_log()
+
+    def tool_results_look_empty(tool_results: Any) -> bool:
+        if not isinstance(tool_results, dict) or not tool_results:
+            return True
+        for val in tool_results.values():
+            if isinstance(val, dict) and "error" in val:
+                return False
+            if isinstance(val, list) and len(val) > 0:
+                return False
+            if val:
+                return False
+        return True
+
+    def render_chat() -> None:
+        for m in st.session_state.get("chat_transcript") or []:
+            role = (m.get("role") or "").strip()
+            text = m.get("text") or ""
+            role_l = role.lower()
+
+            if role_l in {"user", "benutzer"}:
+                with st.chat_message("user", avatar=USER_AVATAR):
+                    st.write(text)
+                continue
+
+            avatar = BOT_AVATAR if role_l in {"assistant", "bot"} else SYSTEM_AVATAR
+            with st.chat_message("assistant", avatar=avatar):
+                if role_l not in {"assistant", "bot"}:
+                    st.markdown(f"**{role}**")
+                st.markdown(str(text))
+
+    def show_debug_hints(plan: Any, tool_results: Any) -> None:
+        if isinstance(plan, dict):
+            steps = plan.get("steps")
+            if isinstance(steps, list) and len(steps) == 0:
+                add_message("System", "Hinweis: Planner hat keine Tool-Schritte geplant (steps=[]).")
+
+        if isinstance(tool_results, dict):
+            err_steps = [k for k, v in tool_results.items() if isinstance(v, dict) and "error" in v]
+            if err_steps:
+                add_message("System", "Hinweis: Tool-Fehler in: " + ", ".join(err_steps))
+
+        if tool_results_look_empty(tool_results):
+            add_message(
+                "System",
+                "Hinweis: Keine/zu wenige Tool-Ergebnisse für eine konkrete Antwort. "
+                "Der ChatBot konnte vermutlich nicht die richtigen Tools auswählen oder das KG enthält die Info nicht.",
+            )
+
+    def run_pending_auto_followup_if_needed() -> None:
+        prompt = str(st.session_state.get("pending_auto_followup_prompt") or "").strip()
+        if not prompt:
+            return
+
+        session = st.session_state.get("chatbot_session")
+        if session is None:
+            st.session_state["pending_auto_followup_prompt"] = ""
+            st.session_state["auto_followup_done"] = False
+            return
+
+        with st.chat_message("assistant", avatar=BOT_AVATAR):
+            with st.spinner("Automatische Folgeanalyse läuft…"):
+                try:
+                    res = session.ask(prompt, debug=True)
+                    plan = res.get("plan") if isinstance(res, dict) else None
+                    tool_results = res.get("tool_results") if isinstance(res, dict) else None
+                    st.session_state["last_chatbot_debug"] = {"plan": plan, "tool_results": tool_results}
+                    log_ui_event(
+                        "chatbot_auto_followup_debug",
+                        {"has_plan": bool(plan), "has_tool_results": bool(tool_results)},
+                    )
+
+                    answer = res.get("answer") if isinstance(res, dict) else None
+                    out_text = answer or _json_or_str(res)
+                    add_message(
+                        "Assistant",
+                        "Automatische Folgeanalyse (Pfad-Erklärung + Vermeidungsmaßnahmen):\n\n" + out_text,
+                    )
+                    show_debug_hints(plan, tool_results)
+                    st.session_state["auto_followup_done"] = True
+                    log_ui_event("chatbot_auto_followup_done", {"ok": True})
+                except Exception as e:
+                    add_message("System", f"Auto-Folgeanalyse Fehler: {e}")
+                    st.session_state["auto_followup_done"] = False
+                    log_ui_event("chatbot_auto_followup_done", {"ok": False, "error": str(e)})
+
+        st.session_state["pending_auto_followup_prompt"] = ""
+        st.rerun()
+
+    def import_handle_event():
+        ensure_python_root_on_sys_path()
+        try:
+            from msrguard.excH_agent_core import handle_event  # type: ignore
+
+            return handle_event
+        except Exception:
+            from excH_agent_core import handle_event  # type: ignore
+
+            return handle_event
+
+    def import_chatbot_pieces():
+        ensure_python_root_on_sys_path()
+        try:
+            from msrguard.excH_chatbot import IncidentContext, ExcHChatBotSession, run_initial_analysis  # type: ignore
+        except Exception:
+            from excH_chatbot import IncidentContext, ExcHChatBotSession, run_initial_analysis  # type: ignore
+
+        try:
+            from msrguard.chatbot_core import build_bot  # type: ignore
+        except Exception:
+            from chatbot_core import build_bot  # type: ignore
+
+        return IncidentContext, ExcHChatBotSession, run_initial_analysis, build_bot
+
+    def run_pipeline(cfg: PipelineConfig, event: Dict[str, Any]) -> Dict[str, Any]:
+        runner = Path(cfg.runner).expanduser().resolve()
+        if not runner.exists():
+            raise FileNotFoundError(f"Pipeline runner nicht gefunden: {runner}")
+
+        cwd = Path(cfg.dir).expanduser().resolve()
+        if not cwd.exists():
+            raise FileNotFoundError(f"Pipeline dir nicht gefunden: {cwd}")
+
+        cmd = [sys.executable, str(runner)]
+        kw: Dict[str, Any] = dict(cwd=str(cwd), capture_output=True, text=True)
+        if cfg.timeout_sec is not None:
+            kw["timeout"] = int(cfg.timeout_sec)
+
+        proc = subprocess.run(cmd, **kw)  # type: ignore[arg-type]
+        stdout = proc.stdout or ""
+        stderr = proc.stderr or ""
+
+        if proc.returncode != 0:
+            raise RuntimeError(
+                f"Pipeline returncode={proc.returncode}\n"
+                f"STDOUT:\n{stdout[-2000:]}\n"
+                f"STDERR:\n{stderr[-2000:]}"
+            )
+
+        kg_path = _read_kg_final_path_from_config(cfg.config)
+        if not kg_path:
+            raise RuntimeError(f"kg_final_path fehlt in {cfg.config}")
+
+        payload = event.get("payload") if isinstance(event.get("payload"), dict) else {}
+        payload = dict(payload)
+        payload["kg_ttl_path"] = kg_path
+        event["payload"] = payload
+        os.environ["MSRGUARD_KG_TTL"] = kg_path
+
+        return {"ok": True, "kg_path": kg_path, "stdout": stdout, "stderr": stderr}
+
+    def init_chat_log_if_needed(event: Dict[str, Any]) -> None:
+        if (st.session_state.get("chat_log_path") or "").strip():
+            return
+        session_dir = make_session_dir(event)
+        if not session_dir:
+            return
+        st.session_state["chat_log_path"] = str(session_dir / "chatBot_verlauf.json")
+        flush_chat_log()
+
+    def post_initial_system_messages(event: Dict[str, Any], pipeline_enabled: bool) -> None:
+        if st.session_state.get("posted_initial_system_messages"):
+            return
+
+        payload = event.get("payload") if isinstance(event.get("payload"), dict) else {}
+        last_skill = payload.get("lastSkill") or payload.get("lastExecutedSkill") or payload.get("interruptedSkill") or ""
+        proc = payload.get("processName") or payload.get("lastExecutedProcess") or ""
+        summary = payload.get("summary") or ""
+
+        msg1 = "Unbekannter Fehler wurde erkannt."
+        if last_skill:
+            msg1 += f" lastSkill={last_skill}"
+        if proc:
+            msg1 += f" process={proc}"
+        if summary:
+            msg1 += f" | {summary}"
+        add_message("System", msg1)
+
+        if pipeline_enabled:
+            add_message("System", "Pipeline wird vor der Analyse ausgeführt. Klicke 'Weiter' um zu starten oder 'Abbrechen'.")
+        else:
+            add_message("System", "Klicke 'Weiter' um Analyse zu starten oder 'Abbrechen'.")
+
+        st.session_state["posted_initial_system_messages"] = True
+
+    def autoload_event_from_path_if_needed() -> None:
+        raw_path = (st.session_state.get("event_json_path") or "").strip()
+        if not raw_path:
+            return
+
+        try:
+            resolved = str(Path(raw_path).expanduser().resolve())
+        except Exception:
+            resolved = raw_path
+
+        loaded_from = str(st.session_state.get("event_loaded_from_path") or "")
+        has_event = bool(st.session_state.get("event"))
+        if has_event and loaded_from == "__manual__":
+            return
+        if has_event and loaded_from == resolved:
+            return
+
+        try:
+            event_obj = read_event(resolved)
+        except Exception as e:
+            st.session_state["event_autoload_error"] = str(e)
+            return
+
+        st.session_state["event"] = event_obj
+        st.session_state["event_json_path"] = resolved
+        st.session_state["event_loaded_from_path"] = resolved
+        st.session_state["event_autoload_error"] = ""
+        init_chat_log_if_needed(event_obj)
+        post_initial_system_messages(event_obj, bool(st.session_state.get("pipeline_enabled")))
+        log_ui_event("event_autoloaded_path", {"path": resolved})
+
+    def build_result_blob(*, continue_flag: bool, reason: str) -> Dict[str, Any]:
+        cfg: UiConfig = st.session_state["cfg"]
+        pipeline_status = st.session_state.get("pipeline_status") or {}
+        return {
+            "continue": bool(continue_flag),
+            "reason": reason,
+            "agent_result": st.session_state.get("agent_result"),
+            "chatbot": {
+                "ok": st.session_state.get("chatbot_session") is not None,
+                "error": st.session_state.get("chatbot_last_error") or "",
+            },
+            "chatbot_transcript": st.session_state.get("chat_transcript") or [],
+            "pipeline": {
+                "enabled": bool(st.session_state.get("pipeline_enabled")),
+                "ok": pipeline_status.get("ok"),
+                "error": pipeline_status.get("error", ""),
+                "stdout_tail": (pipeline_status.get("stdout") or "")[-4000:],
+                "stderr_tail": (pipeline_status.get("stderr") or "")[-4000:],
+            },
+            "event": st.session_state.get("event"),
+            "ui": {
+                "config": {
+                    "openai_api_key_file": cfg.openai_api_key_file,
+                    "pipeline": {
+                        "enabled": cfg.pipeline.enabled,
+                        "dir": cfg.pipeline.dir,
+                        "runner": cfg.pipeline.runner,
+                        "config": cfg.pipeline.config,
+                        "timeout_sec": cfg.pipeline.timeout_sec,
+                    },
+                    "chatbot": {"model": cfg.chatbot.model, "temperature": cfg.chatbot.temperature},
+                }
+            },
+        }
+
+    def write_out_json(blob: Dict[str, Any]) -> Optional[str]:
+        out_json_path = (st.session_state.get("out_json_path") or "").strip()
+        if not out_json_path:
+            return None
+        outp = Path(out_json_path).expanduser().resolve()
+        outp.parent.mkdir(parents=True, exist_ok=True)
+        outp.write_text(json.dumps(blob, indent=2, ensure_ascii=False), encoding="utf-8")
+        return str(outp)
+
+    def start_analysis(event: Dict[str, Any]) -> None:
+        cfg: UiConfig = st.session_state["cfg"]
+        st.session_state["analysis_started"] = True
+        log_ui_event("analysis_started", {"pipeline_enabled": bool(st.session_state.get("pipeline_enabled"))})
+
+        err = try_set_openai_key_from_file(cfg.openai_api_key_file)
+        if err:
+            add_message("System", f"ChatBot Key Hinweis: {err}")
+
+        if st.session_state.get("pipeline_enabled"):
+            with st.chat_message("assistant", avatar=SYSTEM_AVATAR):
+                with st.spinner("Pipeline läuft…"):
+                    try:
+                        status = run_pipeline(cfg.pipeline, event)
+                        st.session_state["pipeline_status"] = status
+                        add_message("System", f"Pipeline OK. KG: {status.get('kg_path')}")
+                        log_ui_event("pipeline_done", {"ok": True, "kg_path": status.get("kg_path")})
+                    except Exception as e:
+                        st.session_state["pipeline_status"] = {
+                            "ok": False,
+                            "error": str(e),
+                            "stdout": "",
+                            "stderr": "",
+                            "kg_path": "",
+                        }
+                        add_message("System", f"Pipeline FEHLER: {e}")
+                        log_ui_event("pipeline_done", {"ok": False, "error": str(e)})
+
+        with st.chat_message("assistant", avatar=BOT_AVATAR):
+            with st.spinner("Agent-Analyse läuft…"):
+                try:
+                    handle_event = import_handle_event()
+                    st.session_state["agent_result"] = handle_event(event)
+                    log_ui_event("agent_core_done", {"ok": True})
+                except Exception as e:
+                    st.session_state["agent_result"] = {"status": "error", "error": str(e)}
+                    add_message("System", f"Agent Fehler: {e}")
+                    log_ui_event("agent_core_done", {"ok": False, "error": str(e)})
+
+        with st.chat_message("assistant", avatar=BOT_AVATAR):
+            with st.spinner("ChatBot initialisiert und denkt…"):
+                try:
+                    IncidentContext, ExcHChatBotSession, run_initial_analysis, build_bot = import_chatbot_pieces()
+                    ctx = IncidentContext.from_event(event)
+
+                    payload = event.get("payload") if isinstance(event.get("payload"), dict) else {}
+                    kg_path = payload.get("kg_ttl_path") or os.environ.get("MSRGUARD_KG_TTL", "")
+
+                    bot = build_bot(
+                        kg_ttl_path=str(kg_path),
+                        openai_model=cfg.chatbot.model,
+                        openai_temperature=cfg.chatbot.temperature,
+                    )
+                    session = ExcHChatBotSession(bot=bot, ctx=ctx)
+                    st.session_state["chatbot_session"] = session
+
+                    res = run_initial_analysis(session, debug=True)
+                    plan = res.get("plan") if isinstance(res, dict) else None
+                    tool_results = res.get("tool_results") if isinstance(res, dict) else None
+                    st.session_state["last_chatbot_debug"] = {"plan": plan, "tool_results": tool_results}
+                    log_ui_event("chatbot_initial_debug", {"has_plan": bool(plan), "has_tool_results": bool(tool_results)})
+
+                    answer = res.get("answer") if isinstance(res, dict) else None
+                    add_message("Assistant", answer or _json_or_str(res))
+                    show_debug_hints(plan, tool_results)
+
+                    if st.session_state.get("auto_followup_enabled"):
+                        st.session_state["pending_auto_followup_prompt"] = (
+                            "Bitte erklaere jetzt den Fehlerpfad aus der Initialanalyse im Detail. "
+                            "Fokus: Welche Rolle spielt `PeriodicFaultPeriod` in `FB_Automatikbetrieb_F1`, "
+                            "wie fuehrt der Pfad bis `OPCUA.TriggerD2`, und ob eine periodische Ausloesung "
+                            "aus den vorhandenen Trace-Belegen abgeleitet werden kann (ohne Annahmen ohne Evidenz). "
+                            "Nutze Code + Variablendeklaration von `FB_Automatikbetrieb_F1`, die bereits im KG liegen. "
+                            "Danach nenne konkrete Vermeidungsmaßnahmen, priorisiert, und begruende sie nur mit "
+                            "der vorhandenen softwareseitigen Evidenz des Triggerpfads."
+                        )
+                        st.session_state["auto_followup_done"] = False
+                        add_message(
+                            "System",
+                            "Automatische Folgeanalyse wird gestartet (Pfad-Erklärung + Vermeidungsmaßnahmen).",
+                        )
+                        log_ui_event("chatbot_auto_followup_queued", {"enabled": True})
+                except Exception as e:
+                    st.session_state["chatbot_session"] = None
+                    st.session_state["chatbot_last_error"] = str(e)
+                    add_message("System", f"ChatBot init Fehler: {e}")
+                    log_ui_event("chatbot_init_failed", {"error": str(e)})
+
+        st.session_state["analysis_done"] = True
+        log_ui_event("analysis_done", {})
+
+    def reset_session() -> None:
+        keep_cfg = st.session_state.get("cfg")
+        st.session_state.clear()
+        st.session_state["cfg"] = keep_cfg or load_ui_config()
+        ensure_state_defaults()
+
+    ensure_state_defaults()
+
+    args = parse_args()
+    if args.event_json_path and not st.session_state.get("event_json_path"):
+        st.session_state["event_json_path"] = str(Path(args.event_json_path).expanduser().resolve())
+    if args.out_json and not st.session_state.get("out_json_path"):
+        st.session_state["out_json_path"] = args.out_json
+    autoload_event_from_path_if_needed()
+
+    cfg: UiConfig = st.session_state["cfg"]
+
+    st.title("MSRGuard ExcH Agent")
+
+    with st.sidebar:
+        st.subheader("Einstellungen")
+        st.checkbox("Pipeline vor Analyse ausführen", key="pipeline_enabled")
+        st.checkbox(
+            "Automatische Folgeanalyse (Pfad-Erklärung + Maßnahmen)",
+            key="auto_followup_enabled",
+        )
+        st.text_input("Result JSON (out_json)", key="out_json_path", placeholder="optional: Pfad zur Result JSON")
+
+        with st.expander("UI Config (excH_agent_config.json)"):
+            st.json(
+                {
+                    "openai_api_key_file": cfg.openai_api_key_file,
+                    "pipeline": {
+                        "enabled": cfg.pipeline.enabled,
+                        "dir": cfg.pipeline.dir,
+                        "runner": cfg.pipeline.runner,
+                        "config": cfg.pipeline.config,
+                        "timeout_sec": cfg.pipeline.timeout_sec,
+                    },
+                    "chatbot": {"model": cfg.chatbot.model, "temperature": cfg.chatbot.temperature},
+                }
+            )
+
+        st.subheader("Event laden")
+        st.text_input("event_json_path", key="event_json_path", placeholder="Pfad zur Event JSON")
+        if (st.session_state.get("event_autoload_error") or "").strip():
+            st.warning(f"Auto-Load Fehler: {st.session_state.get('event_autoload_error')}")
+        uploaded = st.file_uploader("oder Upload (Event JSON)", type=["json"])
+        col_a, col_b = st.columns(2)
+        load_clicked = col_a.button("Laden", use_container_width=True)
+        reset_clicked = col_b.button("Reset", use_container_width=True)
+
+        if reset_clicked:
+            reset_session()
+            st.rerun()
+
+        if uploaded is not None:
+            try:
+                st.session_state["event"] = json.loads(uploaded.getvalue().decode("utf-8"))
+                st.session_state["event_loaded_from_path"] = "__manual__"
+                st.session_state["event_autoload_error"] = ""
+                init_chat_log_if_needed(st.session_state["event"])
+                post_initial_system_messages(st.session_state["event"], bool(st.session_state.get("pipeline_enabled")))
+                log_ui_event("event_loaded_upload", {"name": uploaded.name})
+            except Exception as e:
+                st.error(f"Upload JSON konnte nicht gelesen werden: {e}")
+
+        if load_clicked and (st.session_state.get("event_json_path") or "").strip():
+            try:
+                resolved = str(Path(st.session_state["event_json_path"]).expanduser().resolve())
+                st.session_state["event"] = read_event(resolved)
+                st.session_state["event_json_path"] = resolved
+                st.session_state["event_loaded_from_path"] = resolved
+                st.session_state["event_autoload_error"] = ""
+                init_chat_log_if_needed(st.session_state["event"])
+                post_initial_system_messages(st.session_state["event"], bool(st.session_state.get("pipeline_enabled")))
+                log_ui_event("event_loaded_path", {"path": st.session_state["event_json_path"]})
+                st.success("Event geladen.")
+            except Exception as e:
+                st.error(str(e))
+
+    event: Dict[str, Any] = st.session_state.get("event") or {}
+
+    left, mid, right = st.columns([1.2, 2.6, 1.2], gap="large")
+
+    with left:
+        st.subheader("Event (Input)")
+        if event:
+            st.json(event)
+        else:
+            st.info("Noch kein Event geladen.")
+
+        with st.expander("Event JSON bearbeiten"):
+            raw = st.text_area("Event JSON", value=json.dumps(event or {}, ensure_ascii=False, indent=2), height=260)
+            if st.button("Übernehmen", use_container_width=True):
+                try:
+                    st.session_state["event"] = json.loads(raw)
+                    st.session_state["event_loaded_from_path"] = "__manual__"
+                    st.session_state["event_autoload_error"] = ""
+                    init_chat_log_if_needed(st.session_state["event"])
+                    post_initial_system_messages(st.session_state["event"], bool(st.session_state.get("pipeline_enabled")))
+                    log_ui_event("event_edited", {})
+                    st.success("Event aktualisiert.")
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"Ungültiges JSON: {e}")
+
+    with mid:
+        st.subheader("ChatBot")
+
+        btn_c1, btn_c2, btn_c3 = st.columns([1, 1, 1])
+        if not st.session_state.get("analysis_started"):
+            start_label = "Weiter (Analyse starten)"
+        elif st.session_state.get("analysis_done"):
+            start_label = "Weiter (Result schreiben)"
+        else:
+            start_label = "Analyse läuft…"
+
+        start_clicked = btn_c1.button(start_label, use_container_width=True)
+        abort_clicked = btn_c2.button("Abbrechen", use_container_width=True)
+        download_clicked = btn_c3.button("Result herunterladen", use_container_width=True)
+
+        if abort_clicked:
+            blob = build_result_blob(continue_flag=False, reason="user_abort")
+            wrote = write_out_json(blob)
+            if wrote:
+                st.info(f"Result geschrieben: {wrote}")
+            st.session_state["last_result_blob"] = blob
+            log_ui_event("user_abort", {"wrote": bool(wrote)})
+
+        if start_clicked:
+            if not event:
+                st.error("Kein Event geladen.")
+            elif not st.session_state.get("analysis_started"):
+                init_chat_log_if_needed(event)
+                post_initial_system_messages(event, bool(st.session_state.get("pipeline_enabled")))
+                start_analysis(event)
+                st.rerun()
+            elif st.session_state.get("analysis_done"):
+                blob = build_result_blob(continue_flag=True, reason="user_continue_after_analysis")
+                wrote = write_out_json(blob)
+                if wrote:
+                    st.success(f"Result geschrieben: {wrote}")
+                st.session_state["last_result_blob"] = blob
+                log_ui_event("user_continue", {"wrote": bool(wrote)})
+
+        if download_clicked:
+            blob = st.session_state.get("last_result_blob") or build_result_blob(
+                continue_flag=bool(st.session_state.get("analysis_done")),
+                reason="download_snapshot",
+            )
+            st.download_button(
+                "Download result.json",
+                data=json.dumps(blob, indent=2, ensure_ascii=False).encode("utf-8"),
+                file_name="exch_agent_result.json",
+                mime="application/json",
+                use_container_width=True,
+            )
+
+        render_chat()
+        run_pending_auto_followup_if_needed()
+
+        chatbot_ready = st.session_state.get("chatbot_session") is not None
+        user_msg = st.chat_input("Frage an den ChatBot…", disabled=not chatbot_ready)
+        if user_msg:
+            add_message("User", user_msg)
+            session = st.session_state.get("chatbot_session")
+            if session is None:
+                add_message("System", "ChatBot ist nicht initialisiert. Bitte zuerst 'Weiter' drücken oder Key/Config prüfen.")
+                st.rerun()
+
+            with st.chat_message("assistant", avatar=BOT_AVATAR):
+                with st.spinner("Denke…"):
+                    try:
+                        res = session.ask(user_msg, debug=True)
+                        plan = res.get("plan") if isinstance(res, dict) else None
+                        tool_results = res.get("tool_results") if isinstance(res, dict) else None
+                        st.session_state["last_chatbot_debug"] = {"plan": plan, "tool_results": tool_results}
+                        log_ui_event(
+                            "chatbot_message_debug",
+                            {"has_plan": bool(plan), "has_tool_results": bool(tool_results)},
+                        )
+
+                        answer = res.get("answer") if isinstance(res, dict) else None
+                        add_message("Assistant", answer or _json_or_str(res))
+                        show_debug_hints(plan, tool_results)
+                    except Exception as e:
+                        add_message("System", f"ChatBot Fehler: {e}")
+            st.rerun()
+
+    with right:
+        st.subheader("Agent Output")
+        if st.session_state.get("agent_result") is not None:
+            st.json(st.session_state.get("agent_result"))
+        else:
+            st.info("Noch keine Analyse ausgeführt.")
+
+        with st.expander("Pipeline"):
+            st.json(st.session_state.get("pipeline_status") or {})
+
+        with st.expander("ChatBot Debug (Plan/Tool Results)"):
+            dbg = st.session_state.get("last_chatbot_debug") or {}
+            if dbg.get("plan") is not None:
+                st.markdown("**Plan**")
+                st.json(dbg.get("plan"))
+            if dbg.get("tool_results") is not None:
+                st.markdown("**Tool Results**")
+                st.json(dbg.get("tool_results"))
+
+        with st.expander("UI Events"):
+            st.json(st.session_state.get("ui_events") or [])
+
+
 def main() -> None:
     ensure_python_root_on_sys_path()
-    args = parse_args()
-    event = read_event(args.event_json_path)
-    cfg = load_ui_config()
-    app = ExcHAgentUI(event=event, out_json_path=args.out_json, cfg=cfg)
-    app.mainloop()
+    try:
+        from streamlit.runtime.scriptrunner import get_script_run_ctx  # type: ignore
+
+        in_runtime = get_script_run_ctx() is not None
+    except Exception:
+        in_runtime = False
+
+    if not in_runtime:
+        args = parse_args()
+
+        if not (args.event_json_path or "").strip():
+            print(
+                "Direktstart ohne Streamlit-Context erkannt, aber --event_json_path fehlt.\n"
+                "Bitte starten mit:\n"
+                "  streamlit run python/msrguard/excH_agent_ui.py -- --event_json_path <event.json> --out_json <result.json>\n"
+            )
+            return
+
+        out_json_path = (args.out_json or "").strip()
+        out_json_file = Path(out_json_path).expanduser().resolve() if out_json_path else None
+        if out_json_file:
+            try:
+                out_json_file.unlink(missing_ok=True)  # ensure we do not consume stale output
+            except Exception:
+                pass
+
+        script_path = Path(__file__).resolve()
+        server_port = int(getattr(args, "server_port", 8501) or 8501)
+        ui_url = f"http://localhost:{server_port}"
+        cmd: List[str] = [
+            sys.executable,
+            "-m",
+            "streamlit",
+            "run",
+            str(script_path),
+            "--server.headless=false",
+            "--server.address=localhost",
+            f"--server.port={server_port}",
+            "--",
+            "--event_json_path",
+            str(Path(args.event_json_path).expanduser().resolve()),
+        ]
+        if out_json_path:
+            cmd.extend(["--out_json", str(Path(out_json_path).expanduser().resolve())])
+        cmd.extend(["--server_port", str(server_port)])
+        if not bool(getattr(args, "open_browser", True)):
+            cmd.append("--no_open_browser")
+
+        print("[excH_agent_ui] Bare-mode detected, starting Streamlit runner...")
+        proc = subprocess.Popen(cmd)
+        if bool(getattr(args, "open_browser", True)):
+            try:
+                webbrowser.open_new_tab(ui_url)
+                print(f"[excH_agent_ui] UI geöffnet: {ui_url}")
+            except Exception as e:
+                print(f"[excH_agent_ui] Konnte Browser nicht automatisch öffnen ({ui_url}): {e}")
+        wrote_out_json = False
+        try:
+            if out_json_file is None:
+                # If no out_json is requested, behave like a regular streamlit run.
+                rc = proc.wait()
+                if rc != 0:
+                    sys.exit(rc)
+                return
+
+            import time
+
+            while True:
+                if proc.poll() is not None:
+                    # Streamlit exited before writing out_json.
+                    break
+                if out_json_file.exists() and out_json_file.stat().st_size > 0:
+                    # UI finished and wrote the expected handshake file.
+                    wrote_out_json = True
+                    break
+                time.sleep(0.2)
+        finally:
+            if proc.poll() is None:
+                proc.terminate()
+                try:
+                    proc.wait(timeout=3)
+                except Exception:
+                    proc.kill()
+                    proc.wait(timeout=3)
+        if out_json_file is not None and not wrote_out_json:
+            child_rc = proc.returncode if proc.returncode is not None else 1
+            print(
+                f"[excH_agent_ui] Streamlit exited without writing out_json: {out_json_file} (rc={child_rc})",
+                file=sys.stderr,
+            )
+            sys.exit(child_rc if child_rc != 0 else 2)
+        return
+
+    streamlit_main()
 
 
 if __name__ == "__main__":

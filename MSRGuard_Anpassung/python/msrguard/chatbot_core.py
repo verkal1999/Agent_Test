@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import json
 import os
@@ -12,6 +12,13 @@ from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
 from rdflib import Graph, URIRef, Literal, Namespace
 from rdflib.namespace import RDF
+from .d2_trace_analysis import (
+    run_unified_set_and_condition_trace,
+    build_requirement_tables,
+    extract_assignments_st,
+    condition_to_truth_paths,
+    trace_condition_paths_from_pou,
+)
 
 # ----------------------------
 # Prefixes / Guardrails
@@ -475,21 +482,52 @@ class SearchVariablesTool(BaseAgentTool):
 
 class VariableTraceTool(BaseAgentTool):
     name = "variable_trace"
-    description = "Gibt Details zu einer Variable (Typ, ggf. HW-Adresse) zurück."
-    usage_guide = "Wenn du zu einer Variable Debug Infos brauchst."
+    description = (
+        "Gibt Details zu einem Symbol zurück: Variable (Typ/HW-Adresse) oder "
+        "PortInstance-Ausdruck (z.B. rStep1.Q über dp:hasExpressionText)."
+    )
+    usage_guide = "Wenn du zu einer Variable oder einem Instanz-Portausdruck Debug-Infos brauchst."
 
     def run(self, var_name: str, **kwargs) -> List[Dict[str, Any]]:
         needle = var_name.replace('"', '\\"')
         q = f"""
-        SELECT DISTINCT ?name ?type ?addr WHERE {{
-          ?v rdf:type ag:class_Variable ;
-             dp:hasVariableName ?name ;
-             dp:hasVariableType ?type .
-          OPTIONAL {{ ?v dp:hasHardwareAddress ?addr . }}
-          FILTER(LCASE(STR(?name)) = LCASE("{needle}"))
-        }} LIMIT 10
+        SELECT DISTINCT ?category ?name ?type ?addr ?expr ?fb_instance ?fb_type ?pou WHERE {{
+          {{
+            ?v rdf:type ag:class_Variable ;
+               dp:hasVariableName ?name .
+            OPTIONAL {{ ?v dp:hasVariableType ?type . }}
+            OPTIONAL {{ ?v dp:hasHardwareAddress ?addr . }}
+            BIND("" AS ?expr)
+            BIND("" AS ?fb_instance)
+            BIND("" AS ?fb_type)
+            BIND("" AS ?pou)
+            BIND("Variable" AS ?category)
+            FILTER(LCASE(STR(?name)) = LCASE("{needle}"))
+          }}
+          UNION
+          {{
+            ?pi rdf:type ag:class_PortInstance ;
+                dp:hasExpressionText ?expr ;
+                op:isPortOfInstance ?fbInst .
+            OPTIONAL {{ ?fbInst dp:hasFBInstanceName ?fb_instance . }}
+            OPTIONAL {{
+              ?fbInst op:isInstanceOfFBType ?fbTypeUri .
+              OPTIONAL {{ ?fbTypeUri dp:hasPOUName ?fb_type . }}
+            }}
+            OPTIONAL {{
+              ?var op:representsFBInstance ?fbInst .
+              ?pouUri (op:hasInternalVariable|op:usesVariable) ?var .
+              OPTIONAL {{ ?pouUri dp:hasPOUName ?pou . }}
+            }}
+            BIND(?expr AS ?name)
+            BIND("" AS ?type)
+            BIND("" AS ?addr)
+            BIND("PortInstance" AS ?category)
+            FILTER(LCASE(STR(?expr)) = LCASE("{needle}"))
+          }}
+        }} LIMIT 30
         """
-        return sparql_select_raw(q)
+        return sparql_select_raw(q, max_rows=30)
 
 
 class ExceptionAnalysisTool(BaseAgentTool):
@@ -633,6 +671,13 @@ class GeneralSearchTool(BaseAgentTool):
                dp:hasPortType ?type .
             BIND("Port" AS ?category)
           }}
+          UNION
+          {{
+            ?s rdf:type ag:class_PortInstance ;
+               dp:hasExpressionText ?name .
+            BIND("" AS ?type)
+            BIND("PortInstance" AS ?category)
+          }}
           FILTER(
             CONTAINS(LCASE(STR(?name)), LCASE("{needle}")) ||
             CONTAINS(LCASE(STR(?s)), LCASE("{needle_dot}"))
@@ -759,6 +804,13 @@ class GraphInvestigateTool(BaseAgentTool):
                dp:hasPortType ?type .
             BIND("Port" AS ?category)
           }}
+          UNION
+          {{
+            ?s rdf:type ag:class_PortInstance ;
+               dp:hasExpressionText ?name .
+            BIND("" AS ?type)
+            BIND("PortInstance" AS ?category)
+          }}
           FILTER(
             CONTAINS(LCASE(STR(?name)), LCASE("{needle}")) ||
             CONTAINS(LCASE(STR(?s)), LCASE("{needle_dot}"))
@@ -804,15 +856,43 @@ class GraphInvestigateTool(BaseAgentTool):
     def _variable_trace(var_name: str) -> List[Dict[str, Any]]:
         needle = GraphInvestigateTool._escape_sparql_string(var_name)
         q = f"""
-        SELECT DISTINCT ?name ?type ?addr WHERE {{
-          ?v rdf:type ag:class_Variable ;
-             dp:hasVariableName ?name ;
-             dp:hasVariableType ?type .
-          OPTIONAL {{ ?v dp:hasHardwareAddress ?addr . }}
-          FILTER(LCASE(STR(?name)) = LCASE("{needle}"))
-        }} LIMIT 10
+        SELECT DISTINCT ?category ?name ?type ?addr ?expr ?fb_instance ?fb_type ?pou WHERE {{
+          {{
+            ?v rdf:type ag:class_Variable ;
+               dp:hasVariableName ?name .
+            OPTIONAL {{ ?v dp:hasVariableType ?type . }}
+            OPTIONAL {{ ?v dp:hasHardwareAddress ?addr . }}
+            BIND("" AS ?expr)
+            BIND("" AS ?fb_instance)
+            BIND("" AS ?fb_type)
+            BIND("" AS ?pou)
+            BIND("Variable" AS ?category)
+            FILTER(LCASE(STR(?name)) = LCASE("{needle}"))
+          }}
+          UNION
+          {{
+            ?pi rdf:type ag:class_PortInstance ;
+                dp:hasExpressionText ?expr ;
+                op:isPortOfInstance ?fbInst .
+            OPTIONAL {{ ?fbInst dp:hasFBInstanceName ?fb_instance . }}
+            OPTIONAL {{
+              ?fbInst op:isInstanceOfFBType ?fbTypeUri .
+              OPTIONAL {{ ?fbTypeUri dp:hasPOUName ?fb_type . }}
+            }}
+            OPTIONAL {{
+              ?var op:representsFBInstance ?fbInst .
+              ?pouUri (op:hasInternalVariable|op:usesVariable) ?var .
+              OPTIONAL {{ ?pouUri dp:hasPOUName ?pou . }}
+            }}
+            BIND(?expr AS ?name)
+            BIND("" AS ?type)
+            BIND("" AS ?addr)
+            BIND("PortInstance" AS ?category)
+            FILTER(LCASE(STR(?expr)) = LCASE("{needle}"))
+          }}
+        }} LIMIT 30
         """
-        return sparql_select_raw(q, max_rows=10)
+        return sparql_select_raw(q, max_rows=30)
 
     @staticmethod
     def _code_search_pous(term: str, limit: int = 20) -> List[Dict[str, Any]]:
@@ -917,6 +997,9 @@ class GraphInvestigateTool(BaseAgentTool):
                 elif cat == "Port":
                     add_node("port", name, depth=node.depth + 1, priority=node.priority - 1, parent=node.node_id, reason="general_search")
                     record_edge(node, "port", name, "resolves_to")
+                elif cat == "PortInstance":
+                    add_node("var", name, depth=node.depth + 1, priority=node.priority, parent=node.node_id, reason="general_search")
+                    record_edge(node, "var", name, "resolves_to")
 
             # Immer zusätzlich: Code-Suche nach dem term (um Setter/Guards zu finden)
             ckey2 = f"code_search:{term}"
@@ -1578,6 +1661,1130 @@ class EvD2DiagnosisTool(BaseAgentTool):
             "intersection_d2callers_and_skillsetters": overlap,
             "diagnose_plan": plan_steps,
         }
+class EvD2UnifiedTraceTool(BaseAgentTool):
+    name = "evd2_unified_trace"
+    description = (
+        "Deterministische Tiefenanalyse (Zelle-3 Logik): verfolgt die dominante TRUE-Bedingung "
+        "bis in Call-/Port-/Variable-Pfade mit ausführlichem Trace-Log."
+    )
+    usage_guide = (
+        "Nutzen, wenn du für D2/evD2 die konkrete Kette der Bedingungen sehen willst "
+        "(inkl. IF-Pfade, Instanzports, Timer/Trigger-Parameter, Loops, Defaults). "
+        "target_var leer lassen für Auto-Ziel (typisch: Stoerung_erkannt)."
+    )
+
+    def run(
+        self,
+        last_gemma_state: str = "",
+        state_name: str = "D2",
+        target_var: str = "",
+        max_depth: int = 12,
+        trace_each_truth_path: bool = True,
+        assumed_false_states: str = "D1,D2,D3",
+        verbose_trace: bool = False,
+        **kwargs,
+    ) -> Dict[str, Any]:
+        if "g" not in globals():
+            return {"error": "Global graph 'g' nicht gesetzt. build_bot(...) zuerst aufrufen."}
+        graph = globals()["g"]
+        if not isinstance(graph, Graph):
+            return {"error": "Global 'g' ist kein rdflib.Graph."}
+        if isinstance(assumed_false_states, (list, tuple, set)):
+            assumed = [str(x).strip() for x in assumed_false_states if str(x).strip()]
+        else:
+            assumed = [x.strip() for x in str(assumed_false_states or "").split(",") if x.strip()]
+        return run_unified_set_and_condition_trace(
+            graph,
+            last_gemma_state=last_gemma_state,
+            state_name=state_name,
+            target_var=target_var,
+            max_depth=int(max_depth),
+            trace_each_truth_path=bool(trace_each_truth_path),
+            assumed_false_states_in_betriebsarten=assumed,
+            verbose_trace=bool(verbose_trace),
+        )
+
+
+class EvD2RequirementPathsTool(BaseAgentTool):
+    name = "evd2_requirement_paths"
+    description = (
+        "Tabellarische Pfad-Sicht (Zelle-4 Logik): gibt pro Pfad die notwendigen "
+        "Port/Variablen-Werte inkl. POU, Typ und Herleitung aus."
+    )
+    usage_guide = (
+        "Nutzen, wenn du aus der Detailanalyse eine kompakte Tabelle pro Pfad brauchst "
+        "(Spalten: Port/Variable, Wert, POU, Herleitung). "
+        "target_var leer lassen für Auto-Ziel (typisch: Stoerung_erkannt)."
+    )
+
+    def run(
+        self,
+        last_gemma_state: str = "",
+        state_name: str = "D2",
+        target_var: str = "",
+        max_depth: int = 12,
+        trace_each_truth_path: bool = True,
+        assumed_false_states: str = "D1,D2,D3",
+        verbose_trace: bool = False,
+        **kwargs,
+    ) -> Dict[str, Any]:
+        if "g" not in globals():
+            return {"error": "Global graph 'g' nicht gesetzt. build_bot(...) zuerst aufrufen."}
+        graph = globals()["g"]
+        if not isinstance(graph, Graph):
+            return {"error": "Global 'g' ist kein rdflib.Graph."}
+        if isinstance(assumed_false_states, (list, tuple, set)):
+            assumed = [str(x).strip() for x in assumed_false_states if str(x).strip()]
+        else:
+            assumed = [x.strip() for x in str(assumed_false_states or "").split(",") if x.strip()]
+        analysis = run_unified_set_and_condition_trace(
+            graph,
+            last_gemma_state=last_gemma_state,
+            state_name=state_name,
+            target_var=target_var,
+            max_depth=int(max_depth),
+            trace_each_truth_path=bool(trace_each_truth_path),
+            assumed_false_states_in_betriebsarten=assumed,
+            verbose_trace=bool(verbose_trace),
+        )
+        return build_requirement_tables(analysis)
+
+
+class EvD2PathTracingTool(BaseAgentTool):
+    name = "evd2_path_trace"
+    description = (
+        "Komplette evD2-Hauptanalyse: Trigger-Setter, Skill-Kontext und "
+        "zeitlich plausibles State-Path-Matching (inkl. Skill-Case TestSkill3)."
+    )
+    usage_guide = (
+        "Nutzen als Haupttool für evD2. Liefert Punkt 1/2/3 der Analyse in einer "
+        "deterministischen JSON-Struktur inkl. ausgewähltem State-Path."
+    )
+
+    @staticmethod
+    def _sparql_escape(text: str) -> str:
+        return str(text or "").replace("\\", "\\\\").replace('"', '\\"')
+
+    @staticmethod
+    def _normalize_skill_literal(rhs: str) -> str:
+        s = str(rhs or "").strip()
+        if len(s) >= 2 and ((s.startswith("'") and s.endswith("'")) or (s.startswith('"') and s.endswith('"'))):
+            s = s[1:-1]
+        return s.strip()
+
+    @staticmethod
+    def _condition_entry_to_expr(entry: str) -> Optional[str]:
+        e = str(entry or "").strip()
+        if not e:
+            return None
+        m_if = re.match(r"^(?:IF|ELSIF)@\d+\s*:\s*(.+)$", e, flags=re.I)
+        if m_if:
+            return m_if.group(1).strip()
+        m_else = re.match(r"^ELSE@\d+\s*\(zu IF:\s*(.+)\)$", e, flags=re.I)
+        if m_else:
+            return f"NOT ({m_else.group(1).strip()})"
+        return None
+
+    @staticmethod
+    def _conditions_to_expr(conditions: List[str]) -> str:
+        parts: List[str] = []
+        for c in conditions or []:
+            expr = EvD2PathTracingTool._condition_entry_to_expr(c)
+            if expr:
+                parts.append(f"({expr})")
+        return " AND ".join(parts)
+
+    @staticmethod
+    def _split_top_level_csv(text: str) -> List[str]:
+        out: List[str] = []
+        cur: List[str] = []
+        depth = 0
+        for ch in str(text or ""):
+            if ch == "(":
+                depth += 1
+                cur.append(ch)
+                continue
+            if ch == ")":
+                depth = max(0, depth - 1)
+                cur.append(ch)
+                continue
+            if ch == "," and depth == 0:
+                part = "".join(cur).strip()
+                if part:
+                    out.append(part)
+                cur = []
+                continue
+            cur.append(ch)
+        part = "".join(cur).strip()
+        if part:
+            out.append(part)
+        return out
+
+    @staticmethod
+    def _find_call_param_expr(st_code: str, instance_name: str, param_name: str) -> str:
+        if not st_code or not instance_name or not param_name:
+            return ""
+        pat = re.compile(rf"{re.escape(instance_name)}\s*\((.*?)\)\s*;", flags=re.I | re.S)
+        m = pat.search(st_code)
+        if not m:
+            return ""
+        inside = m.group(1)
+        for part in EvD2PathTracingTool._split_top_level_csv(inside):
+            mm = re.match(rf"^\s*{re.escape(param_name)}\s*:=\s*(.+?)\s*$", part, flags=re.I)
+            if mm:
+                return mm.group(1).strip()
+        return ""
+
+    @staticmethod
+    def _req_key(symbol: str, phase: str, value: str) -> Tuple[str, str, str]:
+        return (str(symbol or "").strip(), str(phase or "").strip(), str(value or "").strip().upper())
+
+    @staticmethod
+    def _add_requirement(
+        reqs: List[Dict[str, str]],
+        *,
+        symbol: str,
+        value: str,
+        phase: str,
+        reason: str,
+    ) -> None:
+        if not symbol:
+            return
+        key = EvD2PathTracingTool._req_key(symbol, phase, value)
+        for r in reqs:
+            if EvD2PathTracingTool._req_key(r.get("symbol", ""), r.get("phase", ""), r.get("value", "")) == key:
+                return
+        reqs.append({"symbol": symbol, "value": str(value).upper(), "phase": phase, "reason": reason})
+
+    @staticmethod
+    def _path_to_clauses(path: List[Tuple[str, bool]]) -> List[str]:
+        out: List[str] = []
+        for token, req in path:
+            t = str(token or "").strip()
+            if not t:
+                continue
+            out.append(t if req else f"NOT {t}")
+        return out
+
+    @staticmethod
+    def _extract_if_expr_from_snippet(snippet: str) -> str:
+        m = re.search(r"\bIF\s+(.*?)\s+THEN\b", str(snippet or ""), flags=re.I | re.S)
+        return m.group(1).strip() if m else ""
+
+    def _resolve_skill_identity(self, skill_name: str) -> Dict[str, Any]:
+        skill = str(skill_name or "").strip()
+        if not skill:
+            return {"skill_name": "", "as_class_skill": False, "class_skill_iris": [], "interpretation": "Kein lastSkill im Event."}
+
+        esc = self._sparql_escape(skill)
+        esc_rx = re.escape(skill)
+
+        q_cls = f"""
+        SELECT ?s WHERE {{
+          ?s rdf:type ag:class_Skill .
+          FILTER(REGEX(STR(?s), "(^|[#/]){esc_rx}$"))
+        }}
+        """
+        cls_rows = sparql_select_raw(q_cls, max_rows=20)
+
+        q_any = f"""
+        SELECT ?s ?type WHERE {{
+          ?s ?p ?o .
+          FILTER(REGEX(STR(?s), "(^|[#/]){esc_rx}$"))
+          OPTIONAL {{ ?s rdf:type ?type . }}
+        }}
+        """
+        any_rows = sparql_select_raw(q_any, max_rows=50)
+
+        as_class_skill = len(cls_rows) > 0
+        if as_class_skill:
+            interpretation = "Skill-IRI als ag:class_Skill im KG vorhanden."
+        else:
+            interpretation = (
+                "Kein ag:class_Skill-Treffer für diesen Namen im aktuellen Steuerungs-KG; "
+                "der Name tritt typischerweise als Stringliteral in OPCUA.lastExecutedSkill-Zuweisungen auf."
+            )
+
+        return {
+            "skill_name": skill,
+            "as_class_skill": as_class_skill,
+            "class_skill_iris": [r.get("s", "") for r in cls_rows if isinstance(r, dict)],
+            "entity_hits": any_rows,
+            "interpretation": interpretation,
+        }
+
+    def _build_skill_trace(
+        self,
+        *,
+        last_skill: str,
+        preferred_pous: List[str],
+        process_name: str,
+    ) -> Dict[str, Any]:
+        skill = str(last_skill or "").strip()
+        if not skill:
+            return {"error": "last_skill ist leer."}
+
+        esc_skill = self._sparql_escape(skill)
+        q = f"""
+        SELECT ?pou ?pou_name ?code WHERE {{
+          ?pou rdf:type ag:class_POU ;
+               dp:hasPOUName ?pou_name ;
+               dp:hasPOUCode ?code .
+          FILTER(CONTAINS(STR(?code), "OPCUA.lastExecutedSkill"))
+          FILTER(CONTAINS(STR(?code), "'{esc_skill}'"))
+        }}
+        ORDER BY ?pou_name
+        """
+        rows = sparql_select_raw(q, max_rows=30)
+        if not rows:
+            return {"error": f"Kein Skill-Setter für '{skill}' gefunden."}
+
+        pref = {str(x) for x in (preferred_pous or []) if str(x)}
+        proc = str(process_name or "").strip()
+
+        def score(row: Dict[str, Any]) -> Tuple[int, str]:
+            code = str(row.get("code", "") or "")
+            name = str(row.get("pou_name", "") or "")
+            s = 0
+            if name in pref:
+                s += 4
+            if re.search(r"\b([A-Za-z_][A-Za-z0-9_\.]*)\s*:=\s*NOT\s+\1\s*;", code):
+                s += 3
+            if re.search(r"\b[A-Za-z_][A-Za-z0-9_]*\s*\(\s*CLK\s*:=", code):
+                s += 2
+            if proc and proc in code:
+                s += 1
+            return (s, name)
+
+        chosen_row = sorted(rows, key=score, reverse=True)[0]
+        pou_name = str(chosen_row.get("pou_name", "") or "")
+        pou_uri = str(chosen_row.get("pou", "") or "")
+        code = str(chosen_row.get("code", "") or "")
+
+        assigns = extract_assignments_st(code, "OPCUA.lastExecutedSkill", trace=None)
+        target_assigns = [a for a in assigns if self._normalize_skill_literal(a.get("rhs", "")).lower() == skill.lower()]
+        if not target_assigns:
+            return {"error": f"POU '{pou_name}' enthält '{skill}', aber keine passende Zuweisung gefunden."}
+        chosen = target_assigns[-1]
+
+        expr = self._conditions_to_expr(chosen.get("conditions", []))
+        truth_paths = condition_to_truth_paths(expr) if expr else []
+        clauses_first = self._path_to_clauses(truth_paths[0]) if truth_paths else []
+
+        requirements: List[Dict[str, str]] = []
+        req_map_t1: Dict[str, str] = {}
+        for token, req_true in (truth_paths[0] if truth_paths else []):
+            value = "TRUE" if req_true else "FALSE"
+            self._add_requirement(
+                requirements,
+                symbol=str(token),
+                value=value,
+                phase="t-1",
+                reason=f"Skill-Klausel: {token if req_true else f'NOT {token}'}",
+            )
+            req_map_t1[str(token)] = value
+
+        toggle_hints: List[Dict[str, Any]] = []
+        rx_toggle = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_\.]*)\s*:=\s*NOT\s+\1\s*;\s*$", flags=re.I)
+        for idx, ln in enumerate(code.splitlines(), start=1):
+            if idx >= int(chosen.get("line_no", 0)):
+                break
+            m = rx_toggle.match(ln.strip())
+            if not m:
+                continue
+            var_name = str(m.group(1) or "").strip()
+            if var_name not in req_map_t1:
+                continue
+            post = req_map_t1.get(var_name, "TRUE")
+            pre = "FALSE" if post == "TRUE" else "TRUE"
+            toggle_hints.append(
+                {
+                    "line_no": idx,
+                    "var": var_name,
+                    "pre": pre,
+                    "post": post,
+                    "assignment": f"{var_name} := NOT {var_name};",
+                }
+            )
+            self._add_requirement(
+                requirements,
+                symbol=var_name,
+                value=pre,
+                phase="t-2",
+                reason=f"Vor Toggle ({var_name} := NOT {var_name})",
+            )
+            self._add_requirement(
+                requirements,
+                symbol=var_name,
+                value=post,
+                phase="t-1",
+                reason=f"Nach Toggle ({var_name} im Skill-Pfad)",
+            )
+
+        q_output_rx = re.compile(r"^([A-Za-z_][A-Za-z0-9_]*)\.Q$")
+        for symbol, req_value in list(req_map_t1.items()):
+            if str(req_value).upper() != "TRUE":
+                continue
+            m_q = q_output_rx.match(str(symbol))
+            if not m_q:
+                continue
+            inst = str(m_q.group(1))
+            driver_expr = self._find_call_param_expr(code, inst, "CLK")
+            driver_param = "CLK"
+            if not driver_expr:
+                driver_expr = self._find_call_param_expr(code, inst, "IN")
+                driver_param = "IN"
+            if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_\.]*", driver_expr or ""):
+                continue
+            self._add_requirement(
+                requirements,
+                symbol=driver_expr,
+                value="TRUE",
+                phase="t-1",
+                reason=f"{inst}.Q-Heuristik: {driver_param}=TRUE",
+            )
+            req_map_t1[str(driver_expr)] = "TRUE"
+
+        overwrite_blockers: List[str] = []
+        later_assigns = [
+            a
+            for a in assigns
+            if int(a.get("line_no", 0)) > int(chosen.get("line_no", 0))
+            and self._normalize_skill_literal(a.get("rhs", "")).lower() != skill.lower()
+        ]
+        for la in later_assigns:
+            la_expr = self._conditions_to_expr(la.get("conditions", []))
+            if not la_expr:
+                continue
+            la_paths = condition_to_truth_paths(la_expr)
+            for lp in la_paths:
+                if not isinstance(lp, list) or not lp:
+                    continue
+                path_already_blocked = False
+                unconstrained_literals: List[Tuple[str, bool]] = []
+                for tok, req_true in lp:
+                    token = str(tok or "").strip()
+                    if not token:
+                        continue
+                    path_val = "TRUE" if bool(req_true) else "FALSE"
+                    existing = req_map_t1.get(token)
+                    if existing is None:
+                        unconstrained_literals.append((token, bool(req_true)))
+                    elif str(existing).upper() != path_val:
+                        path_already_blocked = True
+                        break
+
+                if path_already_blocked:
+                    overwrite_blockers.append(f"Path already blocked: NOT ({' AND '.join(self._path_to_clauses(lp))})")
+                    continue
+                if not unconstrained_literals:
+                    overwrite_blockers.append(f"Unresolved overwrite risk: {la_expr}")
+                    continue
+
+                def _blocker_rank(item: Tuple[str, bool]) -> Tuple[int, int, int, str]:
+                    token, req_true = item
+                    t = str(token or "").strip()
+                    # Dynamic priority:
+                    # 1) Prefer blocking positive literals (X) via X=FALSE over negated literals (NOT X) via X=TRUE.
+                    # 2) Prefer event-like outputs (*.Q), then other dotted tokens, then plain tokens.
+                    # 3) Prefer shorter token names as weak tie-breaker.
+                    pos_prio = 0 if req_true else 1
+                    if t.endswith(".Q"):
+                        kind_prio = 0
+                    elif "." in t:
+                        kind_prio = 1
+                    else:
+                        kind_prio = 2
+                    return (pos_prio, kind_prio, len(t), t)
+
+                blocker_token, blocker_req_true = sorted(unconstrained_literals, key=_blocker_rank)[0]
+                blocker_value = "FALSE" if blocker_req_true else "TRUE"
+                self._add_requirement(
+                    requirements,
+                    symbol=blocker_token,
+                    value=blocker_value,
+                    phase="t-1",
+                    reason=f"Blockiert spätere Skill-Überschreibung: NOT ({la_expr})",
+                )
+                req_map_t1[blocker_token] = blocker_value
+                blocker_clause = blocker_token if blocker_value == "TRUE" else f"NOT {blocker_token}"
+                overwrite_blockers.append(blocker_clause)
+                break
+
+        reqs_sorted = sorted(
+            requirements,
+            key=lambda r: (0 if r.get("phase") == "t-1" else 1 if r.get("phase") == "t-2" else 2, r.get("symbol", "")),
+        )
+        expr_parts: List[str] = []
+        for r in reqs_sorted:
+            if r.get("phase") != "t-1":
+                continue
+            sym = str(r.get("symbol", "")).strip()
+            if not sym:
+                continue
+            expr_parts.append(sym if str(r.get("value", "")).upper() == "TRUE" else f"NOT {sym}")
+        skill_expr = " AND ".join(expr_parts)
+
+        return {
+            "setter_pou_name": pou_name,
+            "setter_pou_uri": pou_uri,
+            "dominant_assignment": chosen,
+            "condition_expr": expr,
+            "condition_paths": [self._path_to_clauses(p) for p in truth_paths],
+            "skill_expr": skill_expr,
+            "requirements": reqs_sorted,
+            "toggle_hint": toggle_hints[0] if toggle_hints else {},
+            "toggle_hints": toggle_hints,
+            "overwrite_blockers": overwrite_blockers,
+        }
+
+    @staticmethod
+    def _extract_hw_addresses_from_req_rows(rows: List[Dict[str, Any]]) -> List[str]:
+        if not isinstance(rows, list):
+            return []
+        out: List[str] = []
+        seen: Set[str] = set()
+        for r in rows:
+            if not isinstance(r, dict):
+                continue
+            text = " | ".join(
+                [
+                    str(r.get("Port/Variable", "") or ""),
+                    str(r.get("Herleitung", "") or ""),
+                    str(r.get("Assignment", "") or ""),
+                ]
+            )
+            for m in re.finditer(r"hardware_address['\"]?\s*:\s*['\"]([^'\"]+)['\"]", text, flags=re.I):
+                hw = str(m.group(1) or "").strip()
+                if hw and hw not in seen:
+                    seen.add(hw)
+                    out.append(hw)
+            for m in re.finditer(r"(%[IQM][XWDB]?[0-9\.\[\]]+)", text, flags=re.I):
+                hw = str(m.group(1) or "").strip()
+                if hw and hw not in seen:
+                    seen.add(hw)
+                    out.append(hw)
+        return out
+
+    def _score_state_paths(
+        self,
+        req: Dict[str, Any],
+        skill_trace: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        def _to_bool_str(v: Any) -> Optional[str]:
+            s = str(v or "").strip().upper()
+            has_true = "TRUE" in s
+            has_false = "FALSE" in s
+            if has_true and not has_false:
+                return "TRUE"
+            if has_false and not has_true:
+                return "FALSE"
+            return None
+
+        paths = req.get("paths") if isinstance(req.get("paths"), list) else []
+        skill_reqs = skill_trace.get("requirements") if isinstance(skill_trace.get("requirements"), list) else []
+
+        req_t1: Dict[str, str] = {}
+        for r in skill_reqs:
+            if not isinstance(r, dict):
+                continue
+            if str(r.get("phase", "")) != "t-1":
+                continue
+            b = _to_bool_str(r.get("value", ""))
+            if not b:
+                continue
+            req_t1[str(r.get("symbol", ""))] = b
+
+        evaluations: List[Dict[str, Any]] = []
+        for p in paths:
+            if not isinstance(p, dict):
+                continue
+            path_id = str(p.get("path_id", ""))
+            path_expr = str(p.get("path_expr", ""))
+            path_rows = p.get("rows") if isinstance(p.get("rows"), list) else []
+            hardware_addresses = self._extract_hw_addresses_from_req_rows(path_rows)
+            has_default_terminator = any(
+                isinstance(r, dict)
+                and (
+                    "defaultvalue" in str(r.get("Herleitung", "")).lower()
+                    or str(r.get("Quelle", "")).lower() == "default"
+                )
+                for r in path_rows
+            )
+            dnf = condition_to_truth_paths(path_expr)
+            lit_map: Dict[str, str] = {}
+            for tok, req_true in (dnf[0] if dnf else []):
+                lit_map[str(tok)] = "TRUE" if req_true else "FALSE"
+
+            mutual_exclusion_map: Dict[str, str] = {}
+            token_bool_sets: Dict[str, Set[str]] = {}
+            for row in path_rows:
+                if not isinstance(row, dict):
+                    continue
+                token = str(row.get("Port/Variable", "")).strip()
+                if not token:
+                    continue
+                row_val = _to_bool_str(row.get("Wert", ""))
+                if not row_val:
+                    continue
+                reason_l = str(row.get("Herleitung", "")).lower()
+                if "max_depth" in reason_l or "loop detected" in reason_l:
+                    continue
+                token_bool_sets.setdefault(token, set()).add(row_val)
+                if "mutual exclusion" in reason_l:
+                    mutual_exclusion_map[token] = row_val
+
+            strong_row_map: Dict[str, str] = {}
+            for token, vals in token_bool_sets.items():
+                if len(vals) == 1:
+                    strong_row_map[token] = list(vals)[0]
+
+            conflicts: List[str] = []
+            score = 0
+            exact = 0
+            soft = 0
+            unresolved = 0
+
+            for token, req_val in req_t1.items():
+                t = str(token or "").strip()
+                if not t:
+                    continue
+                path_val = lit_map.get(t)
+                if path_val in {"TRUE", "FALSE"}:
+                    if path_val == req_val:
+                        exact += 1
+                        score += 2
+                    else:
+                        conflicts.append(f"{t}: skill@t-1={req_val}, state@t0={path_val}")
+                    continue
+
+                me_val = mutual_exclusion_map.get(t)
+                if me_val in {"TRUE", "FALSE"}:
+                    if me_val == req_val:
+                        soft += 1
+                        score += 1
+                    else:
+                        conflicts.append(f"{t}: skill@t-1={req_val}, state@t0(mutual_exclusion)={me_val}")
+                    continue
+
+                strong_val = strong_row_map.get(t)
+                if strong_val in {"TRUE", "FALSE"}:
+                    if strong_val == req_val:
+                        soft += 1
+                        score += 1
+                    else:
+                        conflicts.append(f"{t}: skill@t-1={req_val}, state(path_rows)={strong_val}")
+                    continue
+
+                unresolved += 1
+
+            possible = len(conflicts) == 0
+            evaluations.append(
+                {
+                    "state_path": path_id,
+                    "path_expr": path_expr,
+                    "possible": possible,
+                    "score": score - 4 * len(conflicts),
+                    "conflicts": conflicts,
+                    "literal_map_t0": lit_map,
+                    "mutual_exclusion_map_t0": mutual_exclusion_map,
+                    "row_bool_map_t0": strong_row_map,
+                    "exact": exact,
+                    "soft": soft,
+                    "unresolved": unresolved,
+                    "hardware_addresses": hardware_addresses,
+                    "has_hardware_address": len(hardware_addresses) > 0,
+                    "has_default_terminator": has_default_terminator,
+                }
+            )
+
+        evaluations.sort(key=lambda e: (not e.get("possible", False), -int(e.get("score", 0)), str(e.get("state_path", ""))))
+        possible_paths = [e["state_path"] for e in evaluations if e.get("possible")]
+        best_paths: List[str] = []
+        if possible_paths:
+            best_score = max(int(e.get("score", 0)) for e in evaluations if e.get("possible"))
+            best_paths = [e["state_path"] for e in evaluations if e.get("possible") and int(e.get("score", 0)) == best_score]
+
+        return {
+            "skill_requirements": skill_reqs,
+            "path_evaluations": evaluations,
+            "possible_paths": possible_paths,
+            "best_paths": best_paths,
+        }
+
+    @staticmethod
+    def _select_trigger_setter(core: Dict[str, Any], trigger_var: str) -> Dict[str, Any]:
+        setters = core.get("trigger_setters") if isinstance(core.get("trigger_setters"), list) else []
+        if not setters:
+            return {}
+        with_true = [s for s in setters if isinstance(s, dict) and isinstance(s.get("snips_TRUE"), list) and s.get("snips_TRUE")]
+        chosen = with_true[0] if with_true else setters[0]
+        snip_obj = (chosen.get("snips_TRUE") or [{}])[0] if isinstance(chosen, dict) else {}
+        snippet = str(snip_obj.get("snippet", "") or "")
+        condition = EvD2PathTracingTool._extract_if_expr_from_snippet(snippet)
+        return {
+            "trigger_var": trigger_var,
+            "pou_name": chosen.get("pou_name", "") if isinstance(chosen, dict) else "",
+            "snippet_true": snippet,
+            "condition_expr": condition,
+        }
+
+    @staticmethod
+    def _compact_trigger_condition_trace(trace_data: Dict[str, Any], max_rows_per_path: int = 80) -> Dict[str, Any]:
+        if not isinstance(trace_data, dict):
+            return {}
+        if trace_data.get("error"):
+            return {"error": trace_data.get("error")}
+
+        out_paths: List[Dict[str, Any]] = []
+        for p in trace_data.get("paths", []) or []:
+            if not isinstance(p, dict):
+                continue
+            compact_rows: List[Dict[str, Any]] = []
+            seen_row: Set[Tuple[str, str, str, str]] = set()
+            for r in (p.get("rows") or [])[:max_rows_per_path]:
+                if not isinstance(r, dict):
+                    continue
+                val = str(r.get("Wert", "")).strip()
+                tok = str(r.get("Port/Variable", "")).strip()
+                if not tok:
+                    continue
+                if not val:
+                    continue
+                assignment = str(r.get("Assignment", "") or "").strip()
+                row_key = (tok, val, str(r.get("POU", "")), assignment)
+                if row_key in seen_row:
+                    continue
+                seen_row.add(row_key)
+                compact_rows.append(
+                    {
+                        "token": tok,
+                        "value": val,
+                        "pou": r.get("POU", ""),
+                        "assignment": assignment,
+                        "fb_type": r.get("FBType", ""),
+                        "fb_type_description": r.get("FBTypeDescription", ""),
+                        "kind": r.get("Typ", ""),
+                        "reason": r.get("Herleitung", ""),
+                        "source": r.get("Quelle", ""),
+                        "depth": r.get("Tiefe", ""),
+                    }
+                )
+            compact_rows.sort(
+                key=lambda x: (
+                    int(x.get("depth", 9999)) if str(x.get("depth", "")).isdigit() else 9999,
+                    str(x.get("token", "")),
+                )
+            )
+            out_paths.append(
+                {
+                    "path_id": str(p.get("path_id", "")),
+                    "path_expr": str(p.get("path_expr", "")),
+                    "rows": compact_rows,
+                }
+            )
+
+        return {
+            "context": trace_data.get("context", {}),
+            "summary": trace_data.get("summary", {}),
+            "paths": out_paths,
+            "trace_log": trace_data.get("trace_log", []),
+        }
+
+    @staticmethod
+    def _compact_state_path(
+        req: Dict[str, Any],
+        path_id: str,
+        state_fit: Optional[Dict[str, Any]] = None,
+        skill_trace: Optional[Dict[str, Any]] = None,
+        max_rows: int = 14,
+    ) -> List[Dict[str, Any]]:
+        def _to_boolish(v: Any) -> Optional[bool]:
+            s = str(v or "").strip().upper()
+            has_true = "TRUE" in s
+            has_false = "FALSE" in s
+            if has_true and not has_false:
+                return True
+            if has_false and not has_true:
+                return False
+            return None
+
+        def _phase_rank(phase: str) -> int:
+            p = str(phase or "").strip().lower()
+            if p == "t0":
+                return 0
+            m = re.match(r"t-(\d+)$", p)
+            if m:
+                try:
+                    return int(m.group(1))
+                except Exception:
+                    return 999
+            return 999
+
+        def _eval_simple_expr(expr: str, constraints: Dict[str, str]) -> Optional[bool]:
+            text = str(expr or "").strip()
+            if not text:
+                return None
+            text = text.strip("()").strip()
+            up = text.upper()
+            if up == "TRUE":
+                return True
+            if up == "FALSE":
+                return False
+            m_not = re.match(r"(?i)^NOT\s+([A-Za-z_][A-Za-z0-9_.]*)$", text)
+            if m_not:
+                base = m_not.group(1)
+                b = _to_boolish(constraints.get(base))
+                return (not b) if b is not None else None
+            if re.match(r"^[A-Za-z_][A-Za-z0-9_.]*$", text):
+                return _to_boolish(constraints.get(text))
+            return None
+
+        paths = req.get("paths") if isinstance(req.get("paths"), list) else []
+        selected_eval: Dict[str, Any] = {}
+        if isinstance(state_fit, dict):
+            for ev in (state_fit.get("path_evaluations") if isinstance(state_fit.get("path_evaluations"), list) else []):
+                if not isinstance(ev, dict):
+                    continue
+                if str(ev.get("state_path", "")) == str(path_id):
+                    selected_eval = ev
+                    break
+
+        phase_constraints: Dict[str, Dict[str, str]] = {"t0": {}}
+        lit_map_t0 = selected_eval.get("literal_map_t0") if isinstance(selected_eval.get("literal_map_t0"), dict) else {}
+        for token, val in lit_map_t0.items():
+            t = str(token or "").strip()
+            vv = str(val or "").strip().upper()
+            if not t or not vv:
+                continue
+            phase_constraints.setdefault("t0", {})[t] = vv
+
+        symbol_phase: Dict[str, str] = {}
+        if isinstance(skill_trace, dict):
+            reqs = skill_trace.get("requirements") if isinstance(skill_trace.get("requirements"), list) else []
+            for r in reqs:
+                if not isinstance(r, dict):
+                    continue
+                sym = str(r.get("symbol", "")).strip()
+                val = str(r.get("value", "")).strip().upper()
+                ph = str(r.get("phase", "")).strip()
+                if not sym or not val or not ph:
+                    continue
+                phase_constraints.setdefault(ph, {})[sym] = val
+                prev = symbol_phase.get(sym)
+                if prev is None or _phase_rank(ph) <= _phase_rank(prev):
+                    symbol_phase[sym] = ph
+
+        for p in paths:
+            if not isinstance(p, dict):
+                continue
+            if str(p.get("path_id", "")) != str(path_id):
+                continue
+            local_t0_constraints: Dict[str, str] = dict(phase_constraints.get("t0", {}))
+            for rr in (p.get("rows") or []):
+                if not isinstance(rr, dict):
+                    continue
+                tok0 = str(rr.get("Port/Variable", "")).strip()
+                val0 = str(rr.get("Wert", "")).strip()
+                reason0 = str(rr.get("Herleitung", "")).lower()
+                b0 = _to_boolish(val0)
+                if not tok0 or b0 is None:
+                    continue
+                if "mutual exclusion" in reason0 and tok0 not in local_t0_constraints:
+                    local_t0_constraints[tok0] = "TRUE" if b0 else "FALSE"
+
+            candidates: List[Dict[str, Any]] = []
+            for r in (p.get("rows") or []):
+                if not isinstance(r, dict):
+                    continue
+                val = str(r.get("Wert", "")).strip()
+                if not val or val.lower() in {"unbekannt", "none", "-"}:
+                    continue
+                token = str(r.get("Port/Variable", "")).strip()
+                if not token:
+                    continue
+
+                typ = str(r.get("Typ", "")).strip()
+                reason = str(r.get("Herleitung", "")).strip()
+                source = str(r.get("Quelle", "")).strip()
+                try:
+                    depth = int(r.get("Tiefe", 9999))
+                except Exception:
+                    depth = 9999
+
+                typ_l = typ.lower()
+                reason_l = reason.lower()
+                source_l = source.lower()
+                skip_low_conf = (
+                    typ_l == "stop"
+                    or "max_depth" in reason_l
+                    or "max_depth" in source_l
+                    or "loop detected" in reason_l
+                    or "loop detected" in source_l
+                )
+                if skip_low_conf:
+                    continue
+
+                score = 100
+                score -= min(depth, 999) * 2
+                if typ_l == "internal_variable":
+                    score += 20
+                elif typ_l == "instance_port":
+                    score += 18
+                elif typ_l == "std_fb_dependency":
+                    score += 14
+                elif typ_l == "local_port":
+                    score += 10
+                elif typ_l == "terminal":
+                    score -= 8
+                if "abgelaufen" in val.lower():
+                    score += 6
+                assignment = str(r.get("Assignment", "")).strip()
+                fb_type = str(r.get("FBType", "")).strip()
+                fb_type_description = str(r.get("FBTypeDescription", "")).strip()
+                ton_in_expr = ""
+                ton_instance = ""
+                if fb_type.upper() == "TON":
+                    if "." in token:
+                        ton_instance = token.split(".", 1)[0]
+                    m_in = re.search(r"(?i)\bIN\s*:=\s*([^,)\r\n]+)", assignment)
+                    ton_in_expr = str(m_in.group(1)).strip() if m_in else ""
+                phase = symbol_phase.get(token) or ("t0" if token in phase_constraints.get("t0", {}) else "t0")
+                token_constraints = local_t0_constraints if phase == "t0" else phase_constraints.get(phase, {})
+                req_val = token_constraints.get(token)
+                req_b = _to_boolish(req_val) if req_val is not None else None
+                val_b = _to_boolish(val)
+                if req_b is not None and val_b is not None and req_b != val_b:
+                    continue
+
+                if fb_type.upper() == "TON" and token.endswith(".Q") and val_b is True:
+                    in_expr = ton_in_expr
+                    in_val = _eval_simple_expr(in_expr, token_constraints)
+                    if in_val is False:
+                        continue
+
+                if assignment:
+                    score += 4
+                if fb_type:
+                    score += 3
+                if source_l == "default":
+                    score += 2
+
+                candidates.append(
+                    {
+                        "token": token,
+                        "value": val,
+                        "pou": r.get("POU", ""),
+                        "assignment": assignment,
+                        "fb_type": fb_type,
+                        "fb_type_description": fb_type_description,
+                        "reason": reason,
+                        "source": source,
+                        "kind": typ,
+                        "phase": phase,
+                        "_ton_instance": ton_instance,
+                        "_ton_in_expr": ton_in_expr,
+                        "depth": depth,
+                        "_score": score,
+                    }
+                )
+
+            ton_in_by_instance: Dict[str, str] = {}
+            for c in candidates:
+                inst = str(c.get("_ton_instance", "")).strip()
+                in_expr = str(c.get("_ton_in_expr", "")).strip()
+                if inst and in_expr and inst not in ton_in_by_instance:
+                    ton_in_by_instance[inst] = in_expr
+
+            filtered_candidates: List[Dict[str, Any]] = []
+            for c in candidates:
+                token_c = str(c.get("token", "")).strip()
+                fb_c = str(c.get("fb_type", "")).strip().upper()
+                phase_c = str(c.get("phase", "t0")).strip()
+                val_c = str(c.get("value", "")).strip()
+                constraints_c = local_t0_constraints if phase_c == "t0" else phase_constraints.get(phase_c, {})
+                if fb_c == "TON":
+                    inst = str(c.get("_ton_instance", "")).strip()
+                    if not inst and "." in token_c:
+                        inst = token_c.split(".", 1)[0]
+                    in_expr = str(c.get("_ton_in_expr", "")).strip() or ton_in_by_instance.get(inst, "")
+                    q_req = _to_boolish(constraints_c.get(f"{inst}.Q")) if inst else None
+
+                    if token_c.endswith(".PT") and "abgelaufen" in val_c.lower() and q_req is False:
+                        continue
+
+                    if (token_c.endswith(".Q") and _to_boolish(val_c) is True) or (
+                        token_c.endswith(".PT") and "abgelaufen" in val_c.lower()
+                    ):
+                        in_val = _eval_simple_expr(in_expr, constraints_c)
+                        if in_val is False:
+                            continue
+
+                filtered_candidates.append(c)
+            candidates = filtered_candidates
+
+            best_by_token: Dict[str, Dict[str, Any]] = {}
+            for c in candidates:
+                tok = str(c.get("token", ""))
+                prev = best_by_token.get(tok)
+                if prev is None:
+                    best_by_token[tok] = c
+                    continue
+                if int(c.get("_score", 0)) > int(prev.get("_score", 0)):
+                    best_by_token[tok] = c
+                elif int(c.get("_score", 0)) == int(prev.get("_score", 0)):
+                    if int(c.get("depth", 9999)) < int(prev.get("depth", 9999)):
+                        best_by_token[tok] = c
+
+            out = list(best_by_token.values())
+            out.sort(
+                key=lambda x: (
+                    _phase_rank(str(x.get("phase", "t0"))),
+                    int(x.get("depth", 9999)),
+                    -int(x.get("_score", 0)),
+                    str(x.get("token", "")),
+                )
+            )
+            compact: List[Dict[str, Any]] = []
+            for row in out[:max_rows]:
+                compact.append(
+                    {
+                        "token": row.get("token", ""),
+                        "value": row.get("value", ""),
+                        "pou": row.get("pou", ""),
+                        "assignment": row.get("assignment", ""),
+                        "fb_type": row.get("fb_type", ""),
+                        "fb_type_description": row.get("fb_type_description", ""),
+                        "reason": row.get("reason", ""),
+                        "source": row.get("source", ""),
+                        "kind": row.get("kind", ""),
+                        "phase": row.get("phase", "t0"),
+                    }
+                )
+            return compact
+        return []
+
+    def run(
+        self,
+        last_skill: str = "",
+        last_gemma_state: str = "",
+        process_name: str = "",
+        trigger_var: str = "OPCUA.TriggerD2",
+        state_name: str = "D2",
+        skill_case: str = "",
+        max_depth: int = 18,
+        assumed_false_states: str = "D1,D2,D3",
+        **kwargs,
+    ) -> Dict[str, Any]:
+        if "g" not in globals():
+            return {"error": "Global graph 'g' nicht gesetzt. build_bot(...) zuerst aufrufen."}
+        graph = globals()["g"]
+        if not isinstance(graph, Graph):
+            return {"error": "Global 'g' ist kein rdflib.Graph."}
+
+        if isinstance(assumed_false_states, (list, tuple, set)):
+            assumed = [str(x).strip() for x in assumed_false_states if str(x).strip()]
+        else:
+            assumed = [x.strip() for x in str(assumed_false_states or "").split(",") if x.strip()]
+
+        core = EvD2DiagnosisTool().run(
+            last_skill=last_skill,
+            last_gemma_state=last_gemma_state,
+            trigger_var=trigger_var,
+            event_name="evD2",
+            port_name_contains=state_name,
+            max_rows=250,
+        )
+        unified = run_unified_set_and_condition_trace(
+            graph,
+            last_gemma_state=last_gemma_state,
+            state_name=state_name,
+            target_var="",
+            max_depth=int(max_depth),
+            trace_each_truth_path=True,
+            assumed_false_states_in_betriebsarten=assumed,
+            verbose_trace=False,
+        )
+        req = build_requirement_tables(unified)
+
+        trigger_info = self._select_trigger_setter(core, trigger_var)
+        trigger_chain_raw: Dict[str, Any] = {}
+        if trigger_info.get("pou_name") and trigger_info.get("condition_expr"):
+            trigger_overrides: Dict[str, str] = {}
+            auto_port = unified.get("auto_port") if isinstance(unified, dict) else {}
+            candidates = auto_port.get("next_trace_candidates") if isinstance(auto_port, dict) else []
+            if isinstance(candidates, list):
+                cands = [str(c).strip() for c in candidates if str(c).strip()]
+                if cands:
+                    trigger_overrides[str(state_name)] = " AND ".join(cands)
+            assumed_for_trigger = [s for s in assumed if str(s).strip().upper() != str(state_name).strip().upper()]
+            trigger_chain_raw = trace_condition_paths_from_pou(
+                graph,
+                pou_name=str(trigger_info.get("pou_name", "")),
+                condition_expr=str(trigger_info.get("condition_expr", "")),
+                max_depth=int(max_depth),
+                assumed_false_states=assumed_for_trigger,
+                token_true_overrides=trigger_overrides or None,
+                verbose_trace=False,
+            )
+        trigger_info["condition_chain"] = self._compact_trigger_condition_trace(trigger_chain_raw)
+        skill_name = str(last_skill or skill_case or "").strip()
+        skill_identity = self._resolve_skill_identity(skill_name) if skill_name else {}
+        preferred_pous = core.get("skill_setter_pous") if isinstance(core.get("skill_setter_pous"), list) else []
+        skill_trace = self._build_skill_trace(
+            last_skill=str(skill_case or skill_name),
+            preferred_pous=[str(x) for x in preferred_pous if str(x)],
+            process_name=process_name,
+        )
+        fit = self._score_state_paths(req, skill_trace if isinstance(skill_trace, dict) else {})
+
+        best_paths = fit.get("best_paths", []) if isinstance(fit, dict) else []
+        selected_path = best_paths[0] if best_paths else ""
+        compact_selected = (
+            self._compact_state_path(req, selected_path, state_fit=fit, skill_trace=skill_trace)
+            if selected_path
+            else []
+        )
+
+        point_2 = {
+            "last_skill": skill_name,
+            "process_name": process_name,
+            "abort_statement": (
+                f"Letzter ausgeführter Skill war '{skill_name}'. "
+                + (f"Der Prozess '{process_name}' wurde danach durch evD2 unterbrochen." if process_name else "Danach wurde die Ausführung durch evD2 unterbrochen.")
+            ).strip(),
+            "skill_identity": skill_identity,
+        }
+
+        return {
+            "context": {
+                "trigger_var": trigger_var,
+                "state_name": state_name,
+                "last_skill": skill_name,
+                "last_gemma_state_before_failure": last_gemma_state,
+                "process_name": process_name,
+            },
+            "point_1_trigger_setter": trigger_info,
+            "point_2_last_skill": point_2,
+            "point_3_path_trace": {
+                "timeline": [
+                    {"phase": "t0", "desc": "Zyklus, in dem TriggerD2/Fehler gesetzt wurde."},
+                    {"phase": "t-1", "desc": "Unmittelbar davor (typisch LastGEMMAStateBeforeFailure, Skill-Kontext)."},
+                    {"phase": "t-2", "desc": "Vorgeschichte (z. B. vor Toggle / vor Flankenereignis)."},
+                ],
+                "skill_trace": skill_trace,
+                "state_fit": fit,
+                "selected_state_path": selected_path,
+                "selected_state_path_rows": compact_selected,
+            },
+            "raw": {
+                "core": core,
+                "unified_trace": unified,
+                "requirement_paths": req,
+            },
+        }
+
+
 # ----------------------------
 # ChatBot Planner
 # ----------------------------
@@ -1587,6 +2794,245 @@ class ChatBot:
         self.registry = registry
         self.llm = llm_invoke_fn
         self.history: List[Dict[str, Any]] = []
+
+    @staticmethod
+    def _extract_current_user_question(user_msg: str) -> str:
+        text = str(user_msg or "")
+        marker = "User Frage:\n"
+        if marker in text:
+            return text.rsplit(marker, 1)[-1].strip()
+        return text.strip()
+
+    @staticmethod
+    def _short_text(text: Any, max_chars: int = 700) -> str:
+        s = "" if text is None else str(text)
+        s = re.sub(r"\s+", " ", s).strip()
+        if len(s) <= max_chars:
+            return s
+        return s[:max_chars] + " ..."
+
+    @staticmethod
+    def _question_wants_chain(question: str) -> bool:
+        q = (question or "").lower()
+        keys = [
+            "woher",
+            "herkommt",
+            "wo kommt",
+            "wo gesetzt",
+            "gesetzt wird",
+            "ursprung",
+            "origin",
+            "kette",
+            "trace",
+            "call chain",
+        ]
+        return any(k in q for k in keys)
+
+    @staticmethod
+    def _question_wants_root_cause(question: str, *, first_turn: bool) -> bool:
+        if first_turn:
+            return True
+        q = (question or "").lower()
+        keys = [
+            "root-cause",
+            "root cause",
+            "ursache",
+            "gesamtanalyse",
+            "warum evd2",
+            "warum triggerd2",
+            "triggerd2",
+            "opcua.triggerd2",
+            "gemma",
+        ]
+        return any(k in q for k in keys)
+
+    @staticmethod
+    def _extract_focus_symbols(question: str, max_symbols: int = 4) -> List[str]:
+        text = question or ""
+        tokens = re.findall(r"[A-Za-z_][A-Za-z0-9_.]*", text)
+        stop = {
+            "ok",
+            "bitte",
+            "wo",
+            "wie",
+            "warum",
+            "was",
+            "und",
+            "oder",
+            "die",
+            "der",
+            "das",
+            "von",
+            "mit",
+            "kette",
+            "komplette",
+            "frage",
+            "user",
+            "diagnose",
+            "trigger",
+            "root",
+            "cause",
+            "false",
+            "true",
+        }
+        out: List[str] = []
+        seen: Set[str] = set()
+        for t in tokens:
+            tl = t.lower()
+            if tl in stop:
+                continue
+            keep = (
+                ("_" in t)
+                or ("." in t)
+                or t.startswith("OPCUA")
+                or t.startswith("GVL")
+                or bool(re.search(r"\d", t))                 # z.B. Schritt1, rStep1
+                or bool(re.search(r"[a-z][A-Z]", t))         # camelCase, z.B. lastSkillIsOne
+                or bool(re.search(r"[A-Z][a-z]+[A-Z]", t))   # Pascal/camel mixed
+            )
+            if not keep:
+                continue
+            if t not in seen:
+                seen.add(t)
+                out.append(t)
+            if len(out) >= max_symbols:
+                break
+        return out
+
+    @staticmethod
+    def _extract_symbol_from_question(question: str) -> str:
+        q = question or ""
+        m = re.search(r"([A-Za-z_][A-Za-z0-9_.]*)\s*=", q)
+        if m:
+            return m.group(1)
+        m = re.search(r"(?i)(?:woher\s+kommt|wo\s+kommt|ursprung\s+von)\s+([A-Za-z_][A-Za-z0-9_.]*)", q)
+        if m:
+            return m.group(1)
+        return ""
+
+    def _recent_history_text(self, max_turns: int = 3) -> str:
+        if not self.history:
+            return "Keine vorherigen Turns."
+        tail = self.history[-max_turns:]
+        lines: List[str] = []
+        for i, h in enumerate(tail, start=1):
+            prev_user = self._extract_current_user_question(str(h.get("user", "")))
+            prev_ans = self._short_text(h.get("resp", {}).get("answer", ""), max_chars=500)
+            lines.append(f"{i}. Q: {self._short_text(prev_user, max_chars=350)}")
+            lines.append(f"{i}. A: {prev_ans}")
+        return "\n".join(lines)
+
+    def _augment_plan_for_followup(self, plan: Dict[str, Any], question: str) -> Dict[str, Any]:
+        if not isinstance(plan, dict):
+            return plan
+        steps = plan.get("steps")
+        if not isinstance(steps, list):
+            return plan
+
+        if not self._question_wants_chain(question):
+            return plan
+
+        question_l = question.lower()
+        asks_full_d2 = any(k in question_l for k in ["evd2", "triggerd2", "gemma", "root-cause", "ursache"])
+
+        filtered_steps = steps
+        if not asks_full_d2:
+            filtered_steps = [
+                s
+                for s in steps
+                if str(s.get("tool", "")) not in {"evd2_diagnoseplan", "evd2_unified_trace", "evd2_requirement_paths", "evd2_path_trace"}
+            ]
+
+        focus_symbols = self._extract_focus_symbols(question)
+        target = focus_symbols[0] if focus_symbols else self._extract_symbol_from_question(question)
+        existing_tools = {str(s.get("tool", "")) for s in steps if isinstance(s, dict)}
+
+        prepend_steps: List[Dict[str, Any]] = []
+        if target and "search_variables" not in existing_tools:
+            prepend_steps.append({"tool": "search_variables", "args": {"name_contains": target}})
+        if target and "variable_trace" not in existing_tools:
+            prepend_steps.append({"tool": "variable_trace", "args": {"var_name": target}})
+        if target and "graph_investigate" not in existing_tools:
+            prepend_steps.append(
+                {
+                    "tool": "graph_investigate",
+                    "args": {
+                        "seed_terms": [target, "OPCUA.TriggerD2", "OPCUA.lastExecutedSkill"],
+                        "target_terms": [target],
+                        "max_iters": 30,
+                        "max_nodes": 220,
+                    },
+                }
+            )
+
+        if not prepend_steps and filtered_steps:
+            new_plan = dict(plan)
+            new_plan["steps"] = filtered_steps
+            return new_plan
+
+        if not prepend_steps and not filtered_steps:
+            fallback_term = target or "Schritt1"
+            new_plan = dict(plan)
+            new_plan["steps"] = [{"tool": "general_search", "args": {"name_contains": fallback_term}}]
+            return new_plan
+
+        if not prepend_steps:
+            return plan
+
+        new_plan = dict(plan)
+        new_plan["steps"] = prepend_steps + filtered_steps
+        return new_plan
+
+    def _prefer_evd2_path_trace_plan(self, plan: Dict[str, Any], question: str) -> Dict[str, Any]:
+        if not isinstance(plan, dict):
+            return plan
+        steps = plan.get("steps")
+        if not isinstance(steps, list) or not steps:
+            return plan
+
+        evd2_tools = {"evd2_diagnoseplan", "evd2_unified_trace", "evd2_requirement_paths", "evd2_path_trace"}
+        has_evd2_tool = any(str(s.get("tool", "")) in evd2_tools for s in steps if isinstance(s, dict))
+        q = (question or "").lower()
+        asks_evd2 = any(k in q for k in ["evd2", "triggerd2", "opcua.triggerd2", "gemma", "root-cause", "ursache"])
+        if not has_evd2_tool and not asks_evd2:
+            return plan
+
+        merged_args: Dict[str, Any] = {
+            "trigger_var": "OPCUA.TriggerD2",
+            "state_name": "D2",
+            "max_depth": 18,
+            "assumed_false_states": "D1,D2,D3",
+        }
+
+        for s in steps:
+            if not isinstance(s, dict):
+                continue
+            tool = str(s.get("tool", ""))
+            args = s.get("args", {}) if isinstance(s.get("args"), dict) else {}
+            if tool == "evd2_path_trace":
+                merged_args.update(args)
+            elif tool == "evd2_diagnoseplan":
+                if args.get("last_skill"):
+                    merged_args["last_skill"] = args.get("last_skill")
+                if args.get("last_gemma_state"):
+                    merged_args["last_gemma_state"] = args.get("last_gemma_state")
+                if args.get("trigger_var"):
+                    merged_args["trigger_var"] = args.get("trigger_var")
+                if args.get("event_name") and not merged_args.get("event_name"):
+                    merged_args["event_name"] = args.get("event_name")
+            elif tool in {"evd2_unified_trace", "evd2_requirement_paths"}:
+                if args.get("last_gemma_state"):
+                    merged_args["last_gemma_state"] = args.get("last_gemma_state")
+                if args.get("state_name"):
+                    merged_args["state_name"] = args.get("state_name")
+                if args.get("max_depth"):
+                    merged_args["max_depth"] = args.get("max_depth")
+                if args.get("assumed_false_states"):
+                    merged_args["assumed_false_states"] = args.get("assumed_false_states")
+
+        new_plan = dict(plan)
+        new_plan["steps"] = [{"tool": "evd2_path_trace", "args": merged_args}]
+        return new_plan
 
     def _get_dynamic_planner_prompt(self, retry_hint: str = "") -> str:
         tool_docs = self.registry.get_system_prompt_part()
@@ -1613,6 +3059,7 @@ ROOT-CAUSE STRATEGIE (Fixpoint-Search):
 - Wenn der User eine echte Root-Cause-Kette will (Setter -> Guard -> Upstream-Signale), nutze 'graph_investigate'.
 - Gib als seed_terms die wichtigsten Startknoten: Trigger-Variable(n), lastSkill, und Symbole aus Setter-Guards.
 - Nutze die returned evidence/edges, um konkret zu erklären, welche Bedingung den Setter ausführt.
+- Bei evD2-Analysen zuerst nur 'evd2_path_trace' planen (Single-Source-Analyse), nicht mehrere evd2_* Tools parallel.
 
 Heuristiken:
 {chr(10).join(heuristics)}
@@ -1667,48 +3114,96 @@ Ausgabeformat (NUR JSON):
         return out
 
     def chat(self, user_msg: str, debug: bool = True) -> Dict[str, Any]:
+        current_question = self._extract_current_user_question(user_msg)
+        first_turn = len(self.history) == 0
+        wants_root = self._question_wants_root_cause(current_question, first_turn=first_turn)
+        wants_chain = self._question_wants_chain(current_question)
+
+        planner_input = current_question if current_question else user_msg
+        if not first_turn and not (wants_chain and not wants_root):
+            planner_input = (
+                "Aktuelle Userfrage:\n"
+                f"{current_question}\n\n"
+                "Vorherige kurze Historie:\n"
+                f"{self._recent_history_text(max_turns=2)}"
+            )
+
         # 1) Plan
-        plan = self._planner(user_msg)
+        plan = self._planner(planner_input)
         if "error" in plan:
             return {"answer": f"Planner error: {plan.get('error')}", "plan": plan, "tool_results": {}}
+        plan = self._augment_plan_for_followup(plan, current_question)
+        if wants_root:
+            plan = self._prefer_evd2_path_trace_plan(plan, current_question)
 
         # 2) Execute
         tool_results = self._execute_plan(plan)
 
         # 3) Smart retry: wenn alles leer ist -> general_search/string fallback
         if self._is_result_empty(tool_results):
-            retry_plan = self._planner(user_msg, retry_hint="No results from first tool plan. Try broader search.")
+            retry_plan = self._planner(planner_input, retry_hint="No results from first tool plan. Try broader search.")
             if "error" not in retry_plan:
+                retry_plan = self._augment_plan_for_followup(retry_plan, current_question)
+                if wants_root:
+                    retry_plan = self._prefer_evd2_path_trace_plan(retry_plan, current_question)
                 tool_results = self._execute_plan(retry_plan)
                 plan = retry_plan
 
         # 4) Final answer synthesis
-        # 4) Final answer synthesis
         system = (
-            "Du bist ein PLC Knowledge-Graph Assistant für Root-Cause-Analysen. "
-            "Antworte ausschließlich auf Deutsch. "
-            "Ziel ist eine belastbare Root-Cause-Analyse: nicht nur wiederholen, dass ein Trigger TRUE wurde, "
-            "sondern die konkrete Code-Stelle(n) und Bedingungen benennen, unter denen `OPCUA.TriggerD2 := TRUE` ausgeführt wird. "
-            "Wenn es mehrere Setter gibt: priorisiere die wahrscheinlichste(n) anhand Call-Chain/MAIN-Verdrahtung/lastSkill "
-            "und kennzeichne Hypothesen klar. "
+            "Du bist ein PLC Knowledge-Graph Assistant fuer Root-Cause-Analysen. "
+            "Antworte ausschliesslich auf Deutsch. "
+            "Prioritaet 1: Beantworte die AKTUELLE Userfrage direkt und spezifisch. "
+            "Wiederhole keine generischen Standardabschnitte, wenn sie nicht explizit gefragt sind. "
+            "Nutze nur Fakten aus Tool-Ergebnissen; keine erfundenen Ketten oder Variablenwege. "
             "Verweise explizit auf Tool-Ergebnisse (POU-Namen, Variablen, Ports, Snippets, Zeilennummern). "
-            "Wenn etwas im KG nicht gefunden wird, sage das klar und nenne den nächsten konkreten Debug-Schritt."
+            "Wenn etwas im KG nicht gefunden wird, sage das klar und nenne den naechsten konkreten Debug-Schritt."
         )
+
+        history_ctx = self._recent_history_text(max_turns=3)
+        if wants_chain and not wants_root and self.history:
+            last_q = self._extract_current_user_question(str(self.history[-1].get("user", "")))
+            history_ctx = f"Letzte Userfrage davor: {self._short_text(last_q, max_chars=320)}"
+
+        if wants_chain and not wants_root:
+            answer_format = (
+                "Antwortmodus: gezielte Follow-up Frage zur Herkunft/Kette.\n"
+                "Liefer bitte in dieser Reihenfolge:\n"
+                "1) Direkte Antwort auf die Frage in 1-3 Saetzen.\n"
+                "2) Kette als konkrete Pfeilkette (A -> B -> C), nur mit belegten Kanten.\n"
+                "3) Pro Kettenschritt: POU/Code-Stelle/Bedingung aus Tool-Ergebnissen.\n"
+                "4) Falls eine Kante fehlt: explizit als Luecke markieren und 1-3 naechste Tool-Calls nennen.\n"
+                "Wichtig: Keine Wiederholung der generischen evD2-Standardantwort."
+            )
+        elif wants_root:
+            answer_format = (
+                "Antwortmodus: Root-Cause-Analyse.\n"
+                "Bitte liefere strukturiert:\n"
+                "1) `OPCUA.TriggerD2 := TRUE` - wo genau (POU + Snippet) und unter welcher Bedingung?\n"
+                "2) Kurz: letzter Skill + Prozessabbruch + Skill-Einordnung im KG "
+                "(ag:class_Skill Treffer ja/nein, sonst Stringliteral-Setter im Code).\n"
+                "3) Komplette Pfad-Rekonstruktion (rueckwaerts): Skill-Pfad -> State-Pfad -> Trigger-Pfad "
+                "mit Zeitphasen t0/t-1/t-2, inklusive Timer/Flanken-Bedingungen und gewaehltem Best-Path.\n"
+                "4) Konkrete naechste Debug-Schritte (welche Variablen beobachten, welche POUs oeffnen, welche Tool-Calls als naechstes)."
+            )
+        else:
+            answer_format = (
+                "Antwortmodus: normale Follow-up Frage.\n"
+                "Beantworte nur die aktuelle Frage praezise und knapp. "
+                "Keine Standard-Wiederholung aus vorherigen Antworten."
+            )
+
         user = (
-            f"Frage des Users:\n{user_msg}\n\n"
+            f"Aktuelle Frage:\n{current_question}\n\n"
+            f"Vorherige Turns (Kurzkontext):\n{history_ctx}\n\n"
             f"Tool-Ergebnisse (JSON):\n{json.dumps(tool_results, ensure_ascii=False, indent=2)[:16000]}\n\n"
-            "Bitte liefere eine strukturierte Antwort in Deutsch mit Fokus auf Root-Cause:\n"
-            "1) `OPCUA.TriggerD2 := TRUE` – wo genau (POU + Snippet) und unter welcher Bedingung?\n"
-            "2) Welche upstream Variablen/Signale treiben diese Bedingung (und wo werden sie gesetzt)?\n"
-            "3) Wie hängt das mit `lastSkill` und der GEMMA D2-Logik zusammen (nur wenn relevant)?\n"
-            "4) Konkrete nächste Debug-Schritte (welche Variablen beobachten, welche POUs öffnen, welche Tool-Calls als nächstes).\n"
+            f"{answer_format}\n"
         )
         answer = self.llm(system, user)
 
         resp = {"answer": answer, "plan": plan if debug else None, "tool_results": tool_results if debug else None}
         self.history.append({"user": user_msg, "resp": resp})
         return resp
-
 
 # ----------------------------
 # build_bot entry
@@ -1752,6 +3247,9 @@ def build_bot(
     registry = ToolRegistry()
     registry.register(ListProgramsTool())
     registry.register(EvD2DiagnosisTool())
+    registry.register(EvD2UnifiedTraceTool())
+    registry.register(EvD2RequirementPathsTool())
+    registry.register(EvD2PathTracingTool())
     registry.register(CalledPousTool())
     registry.register(PouCallersTool())
     registry.register(PouCodeTool())
@@ -1769,3 +3267,5 @@ def build_bot(
             registry.register(SemanticSearchTool(vs))
 
     return ChatBot(registry, llm_invoke)
+
+

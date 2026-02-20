@@ -49,6 +49,96 @@ ag:PLCProject__Proj1 a ag:class_PLCProject ;
         ag:FBType_FB_ProduktionMitStoerung_D3,
         ag:Program_MAIN .
 
+ag:PortInstance_FBInst_FB_Automatikbetrieb_F1_pPer_Q a ag:class_PortInstance,
+        ag:class_SignalSource ;
+    dp:hasExpressionText "pPer.Q"^^xsd:string ;
+    op:instantiatesPort ag:Port_TP_Q ;
+    op:isPortOfInstance ag:FBInst_FB_Automatikbetrieb_F1_pPer .
+
+ag:PortInstance_FBInst_FB_Automatikbetrieb_F1_rStart_Q a ag:class_PortInstance,
+        ag:class_SignalSource ;
+    dp:hasExpressionText "rStart.Q"^^xsd:string ;
+    op:instantiatesPort ag:Port_R_TRIG_Q ;
+    op:isPortOfInstance ag:FBInst_FB_Automatikbetrieb_F1_rStart .
+
+ag:PortInstance_FBInst_FB_Automatikbetrieb_F1_rStep1_Q a ag:class_PortInstance,
+        ag:class_SignalSource ;
+    dp:hasExpressionText "rStep1.Q"^^xsd:string ;
+    op:instantiatesPort ag:Port_R_TRIG_Q ;
+    op:isPortOfInstance ag:FBInst_FB_Automatikbetrieb_F1_rStep1 .
+
+ag:PortInstance_FBInst_FB_Automatikbetrieb_F1_rtStoer_Q a ag:class_PortInstance,
+        ag:class_SignalSource ;
+    dp:hasExpressionText "rtStoer.Q"^^xsd:string ;
+    op:instantiatesPort ag:Port_R_TRIG_Q ;
+    op:isPortOfInstance ag:FBInst_FB_Automatikbetrieb_F1_rtStoer .
+
+ag:PortInstance_FBInst_FB_Automatikbetrieb_F1_tSchritt1_Q a ag:class_PortInstance,
+        ag:class_SignalSource ;
+    dp:hasExpressionText "tSchritt1.Q"^^xsd:string ;
+    op:instantiatesPort ag:Port_TON_Q ;
+    op:isPortOfInstance ag:FBInst_FB_Automatikbetrieb_F1_tSchritt1 .
+
+ag:PortInstance_FBInst_FB_Automatikbetrieb_F1_tSchritt2_Q a ag:class_PortInstance,
+        ag:class_SignalSource ;
+    dp:hasExpressionText "tSchritt2.Q"^^xsd:string ;
+    op:instantiatesPort ag:Port_TON_Q ;
+    op:isPortOfInstance ag:FBInst_FB_Automatikbetrieb_F1_tSchritt2 .
+
+ag:PortInstance_FBInst_FB_Diagnose_D2_rtAck_Q a ag:class_PortInstance,
+        ag:class_SignalSource ;
+    dp:hasExpressionText "rtAck.Q"^^xsd:string ;
+    op:instantiatesPort ag:Port_R_TRIG_Q ;
+    op:isPortOfInstance ag:FBInst_FB_Diagnose_D2_rtAck .
+
+ag:PortInstance_FBInst_FB_Diagnose_D2_rtD3_Q a ag:class_PortInstance,
+        ag:class_SignalSource ;
+    dp:hasExpressionText "rtD3.Q"^^xsd:string ;
+    op:instantiatesPort ag:Port_R_TRIG_Q ;
+    op:isPortOfInstance ag:FBInst_FB_Diagnose_D2_rtD3 .
+
+ag:PortInstance_FBInst_FB_Diagnose_D2_rtReq_Q a ag:class_PortInstance,
+        ag:class_SignalSource ;
+    dp:hasExpressionText "rtReq.Q"^^xsd:string ;
+    op:instantiatesPort ag:Port_R_TRIG_Q ;
+    op:isPortOfInstance ag:FBInst_FB_Diagnose_D2_rtReq .
+
+ag:PortInstance_FBInst_FB_InitFahrt_A6_A2_tInit_Q a ag:class_PortInstance,
+        ag:class_SignalSource ;
+    dp:hasExpressionText "tInit.Q"^^xsd:string ;
+    op:instantiatesPort ag:Port_TON_Q ;
+    op:isPortOfInstance ag:FBInst_FB_InitFahrt_A6_A2_tInit .
+
+ag:PortInstance_FBInst_FB_Methode1Job_t20s_Q a ag:class_PortInstance,
+        ag:class_SignalSource ;
+    dp:hasExpressionText "t20s.Q"^^xsd:string ;
+    op:instantiatesPort ag:Port_TON_Q ;
+    op:isPortOfInstance ag:FBInst_FB_Methode1Job_t20s .
+
+ag:PortInstance_FBInst_FB_Notaus_D1_ton5s_Q a ag:class_PortInstance,
+        ag:class_SignalSource ;
+    dp:hasExpressionText "ton5s.Q"^^xsd:string ;
+    op:instantiatesPort ag:Port_TON_Q ;
+    op:isPortOfInstance ag:FBInst_FB_Notaus_D1_ton5s .
+
+ag:PortInstance_FBInst_FB_ProduktionMitStoerung_D3_rStart_Q a ag:class_PortInstance,
+        ag:class_SignalSource ;
+    dp:hasExpressionText "rStart.Q"^^xsd:string ;
+    op:instantiatesPort ag:Port_R_TRIG_Q ;
+    op:isPortOfInstance ag:FBInst_FB_ProduktionMitStoerung_D3_rStart .
+
+ag:PortInstance_FBInst_FB_ProduktionMitStoerung_D3_tSchritt3_Q a ag:class_PortInstance,
+        ag:class_SignalSource ;
+    dp:hasExpressionText "tSchritt3.Q"^^xsd:string ;
+    op:instantiatesPort ag:Port_TON_Q ;
+    op:isPortOfInstance ag:FBInst_FB_ProduktionMitStoerung_D3_tSchritt3 .
+
+ag:PortInstance_FBInst_FB_ProduktionMitStoerung_D3_tSchritt4_Q a ag:class_PortInstance,
+        ag:class_SignalSource ;
+    dp:hasExpressionText "tSchritt4.Q"^^xsd:string ;
+    op:instantiatesPort ag:Port_TON_Q ;
+    op:isPortOfInstance ag:FBInst_FB_ProduktionMitStoerung_D3_tSchritt4 .
+
 ag:StandardFBType_CTD a ag:class_FBType,
         ag:class_POU,
         ag:class_StandardFBType,
@@ -161,6 +251,10 @@ dp:hasExpressionText a owl:DatatypeProperty ;
     rdfs:domain ag:class_Expression ;
     rdfs:range xsd:string ;
     rdfs:subPropertyOf dp:hasSignalSourceAttribute .
+
+dp:hasFBInstanceName a owl:DatatypeProperty ;
+    rdfs:domain ag:class_FBInstance ;
+    rdfs:range xsd:string .
 
 dp:hasGlobalVariableListName a owl:DatatypeProperty ;
     rdfs:domain ag:class_GlobalVariableList ;
@@ -349,6 +443,10 @@ op:hasPort a owl:ObjectProperty ;
     rdfs:domain ag:class_FBType ;
     rdfs:range ag:class_Port .
 
+op:implementsMonAct a owl:ObjectProperty ;
+    rdfs:domain ag:class_POU ;
+    rdfs:range ag:class_MonitoringReaction .
+
 op:implementsPort a owl:ObjectProperty ;
     rdfs:comment "Verbindet eine interne Variable eines FBs mit dem Port, den sie repräsentiert" ;
     rdfs:domain ag:class_Variable ;
@@ -357,6 +455,10 @@ op:implementsPort a owl:ObjectProperty ;
 op:implementsSkill a owl:ObjectProperty ;
     rdfs:domain ag:class_POU ;
     rdfs:range ag:class_Skill .
+
+op:implementsSysReact a owl:ObjectProperty ;
+    rdfs:domain ag:class_POU ;
+    rdfs:range ag:class_SystemReaction .
 
 op:instantiatesPort a owl:ObjectProperty ;
     rdfs:domain ag:class_PortInstance ;
@@ -626,130 +728,112 @@ ag:Assign_MAIN_fbProStoer_ProduktionMitStoerung_Starten_1 a ag:class_ParameterAs
     op:assignsFrom ag:PortInstance_FBInst_MAIN_fbBA_D3 ;
     op:assignsToPort ag:Port_FB_ProduktionMitStoerung_D3_ProduktionMitStoerung_Starten .
 
-ag:FBInst_FB_Automatikbetrieb_F1_pPer a ag:class_FBInstance ;
-    op:isInstanceOfFBType ag:StandardFBType_TP .
-
-ag:FBInst_FB_Automatikbetrieb_F1_rStart a ag:class_FBInstance ;
-    op:isInstanceOfFBType ag:StandardFBType_R_TRIG .
-
-ag:FBInst_FB_Automatikbetrieb_F1_rStep1 a ag:class_FBInstance ;
-    op:isInstanceOfFBType ag:StandardFBType_R_TRIG .
-
-ag:FBInst_FB_Automatikbetrieb_F1_rtStoer a ag:class_FBInstance ;
-    op:isInstanceOfFBType ag:StandardFBType_R_TRIG .
-
-ag:FBInst_FB_Automatikbetrieb_F1_tSchritt1 a ag:class_FBInstance ;
-    op:isInstanceOfFBType ag:StandardFBType_TON .
-
-ag:FBInst_FB_Automatikbetrieb_F1_tSchritt2 a ag:class_FBInstance ;
-    op:isInstanceOfFBType ag:StandardFBType_TON .
-
 ag:FBInst_FB_Betriebsarten_RS_A1 a ag:class_FBInstance ;
+    dp:hasFBInstanceName "RS_A1"^^xsd:string ;
     op:isInstanceOfFBType ag:StandardFBType_RS .
 
 ag:FBInst_FB_Betriebsarten_RS_A2 a ag:class_FBInstance ;
+    dp:hasFBInstanceName "RS_A2"^^xsd:string ;
     op:isInstanceOfFBType ag:StandardFBType_RS .
 
 ag:FBInst_FB_Betriebsarten_RS_A5 a ag:class_FBInstance ;
+    dp:hasFBInstanceName "RS_A5"^^xsd:string ;
     op:isInstanceOfFBType ag:StandardFBType_RS .
 
 ag:FBInst_FB_Betriebsarten_RS_A6 a ag:class_FBInstance ;
+    dp:hasFBInstanceName "RS_A6"^^xsd:string ;
     op:isInstanceOfFBType ag:StandardFBType_RS .
 
 ag:FBInst_FB_Betriebsarten_RS_AutomaticOperationMode a ag:class_FBInstance ;
+    dp:hasFBInstanceName "RS_AutomaticOperationMode"^^xsd:string ;
     op:isInstanceOfFBType ag:StandardFBType_RS .
 
 ag:FBInst_FB_Betriebsarten_RS_CycleEnded a ag:class_FBInstance ;
+    dp:hasFBInstanceName "RS_CycleEnded"^^xsd:string ;
     op:isInstanceOfFBType ag:StandardFBType_RS .
 
 ag:FBInst_FB_Betriebsarten_RS_D1 a ag:class_FBInstance ;
+    dp:hasFBInstanceName "RS_D1"^^xsd:string ;
     op:isInstanceOfFBType ag:StandardFBType_RS .
 
 ag:FBInst_FB_Betriebsarten_RS_D2 a ag:class_FBInstance ;
+    dp:hasFBInstanceName "RS_D2"^^xsd:string ;
     op:isInstanceOfFBType ag:StandardFBType_RS .
 
 ag:FBInst_FB_Betriebsarten_RS_D3 a ag:class_FBInstance ;
+    dp:hasFBInstanceName "RS_D3"^^xsd:string ;
     op:isInstanceOfFBType ag:StandardFBType_RS .
 
 ag:FBInst_FB_Betriebsarten_RS_F1 a ag:class_FBInstance ;
+    dp:hasFBInstanceName "RS_F1"^^xsd:string ;
     op:isInstanceOfFBType ag:StandardFBType_RS .
 
 ag:FBInst_FB_Betriebsarten_RS_InitialDrive a ag:class_FBInstance ;
+    dp:hasFBInstanceName "RS_InitialDrive"^^xsd:string ;
     op:isInstanceOfFBType ag:StandardFBType_RS .
 
 ag:FBInst_FB_Betriebsarten_RS_InitialState a ag:class_FBInstance ;
+    dp:hasFBInstanceName "RS_InitialState"^^xsd:string ;
     op:isInstanceOfFBType ag:StandardFBType_RS .
 
 ag:FBInst_FB_Betriebsarten_RS_ManualOperationMode a ag:class_FBInstance ;
+    dp:hasFBInstanceName "RS_ManualOperationMode"^^xsd:string ;
     op:isInstanceOfFBType ag:StandardFBType_RS .
 
 ag:FBInst_FB_Betriebsarten_R_TRIG_Automatic a ag:class_FBInstance ;
+    dp:hasFBInstanceName "R_TRIG_Automatic"^^xsd:string ;
     op:isInstanceOfFBType ag:StandardFBType_R_TRIG .
 
 ag:FBInst_FB_Betriebsarten_R_TRIG_CycleEnded a ag:class_FBInstance ;
+    dp:hasFBInstanceName "R_TRIG_CycleEnded"^^xsd:string ;
     op:isInstanceOfFBType ag:StandardFBType_R_TRIG .
 
 ag:FBInst_FB_Betriebsarten_R_TRIG_Init a ag:class_FBInstance ;
+    dp:hasFBInstanceName "R_TRIG_Init"^^xsd:string ;
     op:isInstanceOfFBType ag:StandardFBType_R_TRIG .
 
 ag:FBInst_FB_Betriebsarten_R_TRIG_InitialDrive a ag:class_FBInstance ;
+    dp:hasFBInstanceName "R_TRIG_InitialDrive"^^xsd:string ;
     op:isInstanceOfFBType ag:StandardFBType_R_TRIG .
 
 ag:FBInst_FB_Betriebsarten_R_TRIG_Manual a ag:class_FBInstance ;
-    op:isInstanceOfFBType ag:StandardFBType_R_TRIG .
-
-ag:FBInst_FB_Diagnose_D2_rtAck a ag:class_FBInstance ;
-    op:isInstanceOfFBType ag:StandardFBType_R_TRIG .
-
-ag:FBInst_FB_Diagnose_D2_rtD3 a ag:class_FBInstance ;
+    dp:hasFBInstanceName "R_TRIG_Manual"^^xsd:string ;
     op:isInstanceOfFBType ag:StandardFBType_R_TRIG .
 
 ag:FBInst_FB_Diagnose_D2_rtFinished a ag:class_FBInstance ;
-    op:isInstanceOfFBType ag:StandardFBType_R_TRIG .
-
-ag:FBInst_FB_Diagnose_D2_rtReq a ag:class_FBInstance ;
+    dp:hasFBInstanceName "rtFinished"^^xsd:string ;
     op:isInstanceOfFBType ag:StandardFBType_R_TRIG .
 
 ag:FBInst_FB_Diagnose_D2_tpPulse a ag:class_FBInstance ;
+    dp:hasFBInstanceName "tpPulse"^^xsd:string ;
     op:isInstanceOfFBType ag:StandardFBType_TP .
 
-ag:FBInst_FB_InitFahrt_A6_A2_tInit a ag:class_FBInstance ;
-    op:isInstanceOfFBType ag:StandardFBType_TON .
-
-ag:FBInst_FB_Methode1Job_t20s a ag:class_FBInstance ;
-    op:isInstanceOfFBType ag:StandardFBType_TON .
-
-ag:FBInst_FB_Notaus_D1_ton5s a ag:class_FBInstance ;
-    op:isInstanceOfFBType ag:StandardFBType_TON .
-
 ag:FBInst_FB_ProduktionMitStoerung_D3_pPer a ag:class_FBInstance ;
+    dp:hasFBInstanceName "pPer"^^xsd:string ;
     op:isInstanceOfFBType ag:StandardFBType_TP .
 
 ag:FBInst_FB_ProduktionMitStoerung_D3_rPer a ag:class_FBInstance ;
-    op:isInstanceOfFBType ag:StandardFBType_R_TRIG .
-
-ag:FBInst_FB_ProduktionMitStoerung_D3_rStart a ag:class_FBInstance ;
+    dp:hasFBInstanceName "rPer"^^xsd:string ;
     op:isInstanceOfFBType ag:StandardFBType_R_TRIG .
 
 ag:FBInst_FB_ProduktionMitStoerung_D3_rStep1 a ag:class_FBInstance ;
+    dp:hasFBInstanceName "rStep1"^^xsd:string ;
     op:isInstanceOfFBType ag:StandardFBType_R_TRIG .
 
 ag:FBInst_FB_ProduktionMitStoerung_D3_rtStoer a ag:class_FBInstance ;
+    dp:hasFBInstanceName "rtStoer"^^xsd:string ;
     op:isInstanceOfFBType ag:StandardFBType_R_TRIG .
 
 ag:FBInst_FB_ProduktionMitStoerung_D3_tPer a ag:class_FBInstance ;
-    op:isInstanceOfFBType ag:StandardFBType_TON .
-
-ag:FBInst_FB_ProduktionMitStoerung_D3_tSchritt3 a ag:class_FBInstance ;
-    op:isInstanceOfFBType ag:StandardFBType_TON .
-
-ag:FBInst_FB_ProduktionMitStoerung_D3_tSchritt4 a ag:class_FBInstance ;
+    dp:hasFBInstanceName "tPer"^^xsd:string ;
     op:isInstanceOfFBType ag:StandardFBType_TON .
 
 ag:FBInst_MAIN_edgeDone a ag:class_FBInstance ;
+    dp:hasFBInstanceName "edgeDone"^^xsd:string ;
     op:isInstanceOfFBType ag:StandardFBType_R_TRIG .
 
 ag:FBInst_MAIN_fbJob a ag:class_FBInstance ;
+    dp:hasFBInstanceName "fbJob"^^xsd:string ;
     op:isInstanceOfFBType ag:FBType_FB_Methode1Job .
 
 ag:GVL__dot__Stopp a ag:class_SignalSource,
@@ -1003,76 +1087,91 @@ ag:POUCall_MAIN_fbProStoer_1 a ag:class_POUCall ;
 
 ag:PortInstance_FBInst_FB_Automatikbetrieb_F1_rPer_Q a ag:class_PortInstance,
         ag:class_SignalSource ;
+    dp:hasExpressionText "rPer.Q"^^xsd:string ;
     op:instantiatesPort ag:Port_R_TRIG_Q ;
     op:isPortOfInstance ag:FBInst_FB_Automatikbetrieb_F1_rPer .
 
 ag:PortInstance_FBInst_MAIN_edgeF1_Q a ag:class_PortInstance,
         ag:class_SignalSource ;
+    dp:hasExpressionText "edgeF1.Q"^^xsd:string ;
     op:instantiatesPort ag:Port_R_TRIG_Q ;
     op:isPortOfInstance ag:FBInst_MAIN_edgeF1 .
 
 ag:PortInstance_FBInst_MAIN_fbAuto_Automatikbetrieb_Fertig a ag:class_PortInstance,
         ag:class_SignalSource ;
+    dp:hasExpressionText "fbAuto.Automatikbetrieb_Fertig"^^xsd:string ;
     op:instantiatesPort ag:Port_FB_Automatikbetrieb_F1_Automatikbetrieb_Fertig ;
     op:isPortOfInstance ag:FBInst_MAIN_fbAuto .
 
 ag:PortInstance_FBInst_MAIN_fbAuto_Stoerung_erkannt a ag:class_PortInstance,
         ag:class_SignalSource ;
+    dp:hasExpressionText "fbAuto.Stoerung_erkannt"^^xsd:string ;
     op:instantiatesPort ag:Port_FB_Automatikbetrieb_F1_Stoerung_erkannt ;
     op:isPortOfInstance ag:FBInst_MAIN_fbAuto .
 
 ag:PortInstance_FBInst_MAIN_fbBA_A2 a ag:class_PortInstance,
         ag:class_SignalSource ;
+    dp:hasExpressionText "fbBA.A2"^^xsd:string ;
     op:instantiatesPort ag:Port_FB_Betriebsarten_A2 ;
     op:isPortOfInstance ag:FBInst_MAIN_fbBA .
 
 ag:PortInstance_FBInst_MAIN_fbBA_A6 a ag:class_PortInstance,
         ag:class_SignalSource ;
+    dp:hasExpressionText "fbBA.A6"^^xsd:string ;
     op:instantiatesPort ag:Port_FB_Betriebsarten_A6 ;
     op:isPortOfInstance ag:FBInst_MAIN_fbBA .
 
 ag:PortInstance_FBInst_MAIN_fbBA_D1 a ag:class_PortInstance,
         ag:class_SignalSource ;
+    dp:hasExpressionText "fbBA.D1"^^xsd:string ;
     op:instantiatesPort ag:Port_FB_Betriebsarten_D1 ;
     op:isPortOfInstance ag:FBInst_MAIN_fbBA .
 
 ag:PortInstance_FBInst_MAIN_fbBA_D2 a ag:class_PortInstance,
         ag:class_SignalSource ;
+    dp:hasExpressionText "fbBA.D2"^^xsd:string ;
     op:instantiatesPort ag:Port_FB_Betriebsarten_D2 ;
     op:isPortOfInstance ag:FBInst_MAIN_fbBA .
 
 ag:PortInstance_FBInst_MAIN_fbBA_D3 a ag:class_PortInstance,
         ag:class_SignalSource ;
+    dp:hasExpressionText "fbBA.D3"^^xsd:string ;
     op:instantiatesPort ag:Port_FB_Betriebsarten_D3 ;
     op:isPortOfInstance ag:FBInst_MAIN_fbBA .
 
 ag:PortInstance_FBInst_MAIN_fbBA_F1 a ag:class_PortInstance,
         ag:class_SignalSource ;
+    dp:hasExpressionText "fbBA.F1"^^xsd:string ;
     op:instantiatesPort ag:Port_FB_Betriebsarten_F1 ;
     op:isPortOfInstance ag:FBInst_MAIN_fbBA .
 
 ag:PortInstance_FBInst_MAIN_fbDiag_Alt_gefunden a ag:class_PortInstance,
         ag:class_SignalSource ;
+    dp:hasExpressionText "fbDiag.Alt_gefunden"^^xsd:string ;
     op:instantiatesPort ag:Port_FB_Diagnose_D2_Alt_gefunden ;
     op:isPortOfInstance ag:FBInst_MAIN_fbDiag .
 
 ag:PortInstance_FBInst_MAIN_fbDiag_Diagnose_beendet a ag:class_PortInstance,
         ag:class_SignalSource ;
+    dp:hasExpressionText "fbDiag.Diagnose_beendet"^^xsd:string ;
     op:instantiatesPort ag:Port_FB_Diagnose_D2_Diagnose_beendet ;
     op:isPortOfInstance ag:FBInst_MAIN_fbDiag .
 
 ag:PortInstance_FBInst_MAIN_fbInit_Init_erreicht a ag:class_PortInstance,
         ag:class_SignalSource ;
+    dp:hasExpressionText "fbInit.Init_erreicht"^^xsd:string ;
     op:instantiatesPort ag:Port_FB_InitFahrt_A6_A2_Init_erreicht ;
     op:isPortOfInstance ag:FBInst_MAIN_fbInit .
 
 ag:PortInstance_FBInst_MAIN_fbNot_Diagnose_gefordert a ag:class_PortInstance,
         ag:class_SignalSource ;
+    dp:hasExpressionText "fbNot.Diagnose_gefordert"^^xsd:string ;
     op:instantiatesPort ag:Port_FB_Notaus_D1_Diagnose_gefordert ;
     op:isPortOfInstance ag:FBInst_MAIN_fbNot .
 
 ag:PortInstance_FBInst_MAIN_fbProStoer_Stoerung_erkannt a ag:class_PortInstance,
         ag:class_SignalSource ;
+    dp:hasExpressionText "fbProStoer.Stoerung_erkannt"^^xsd:string ;
     op:instantiatesPort ag:Port_FB_ProduktionMitStoerung_D3_Stoerung_erkannt ;
     op:isPortOfInstance ag:FBInst_MAIN_fbProStoer .
 
@@ -1300,13 +1399,6 @@ ag:Port_TP_ET a ag:class_Port,
     dp:hasPortType "TIME" ;
     rdfs:comment "ET ist die verstrichene Zeit seit Impulsstart. Wird häufig für Anzeige und Diagnose genutzt."@de .
 
-ag:Port_TP_Q a ag:class_Port,
-        owl:NamedIndividual ;
-    dp:hasPortDirection "Output" ;
-    dp:hasPortName "Q" ;
-    dp:hasPortType "BOOL" ;
-    rdfs:comment "Q ist der BOOL Ausgang des Impulses. Q ist für die Dauer PT TRUE."@de .
-
 ag:Program_MAIN a ag:class_POU,
         ag:class_Program ;
     dp:hasConsistencyReport "Baustein: MAIN | Ruft auf: FB_Automatikbetrieb_F1, FB_Betriebsarten, FB_Diagnose_D2, FB_InitFahrt_A6_A2, FB_Notaus_D1, FB_ProduktionMitStoerung_D3, R_TRIG | UNGENUTZTE Variablen (1): fbJob" ;
@@ -1449,22 +1541,92 @@ ag:STAssign_MAIN_fbProStoer_Stoerung_erkannt_2 a ag:class_ParameterAssignment ;
 ag:class_IOChannel a owl:Class ;
     rdfs:comment "Diese Klasse repräsentiert einen Hardwarekanal, also einen physikalischen Ein oder Ausgang, der in der Steuerung adressiert und mit Variablen verbunden werden kann. Ein IOChannel bildet damit die Brücke zwischen der semantischen Logik im Knowledge Graph und der realen Peripherie, etwa Sensoren, Ventile, Motoren oder Signallampen. Im Knowledge Graph wird ein IOChannel häufig genutzt, um Variablen mit Hardwareadressen zu verknüpfen und dadurch nachvollziehbar zu machen, welcher Code welche reale Komponente beeinflusst. Aus PLCopen XML kann ein IOChannel entweder direkt aus Hardwarezuordnungen oder indirekt aus Rohinformationen des Exports rekonstruiert werden, abhängig davon, wie vollständig das Mapping exportiert wurde. Die Klasse ist besonders wertvoll für Analysen, die Skill Ausführung mit physikalischen Effekten verbinden, da so sichtbar wird, welche Ausgänge ein Skill setzt und welche Eingänge er überwacht. Außerdem unterstützt sie Plausibilitätsprüfungen, beispielsweise ob ein Ausgang nur von einem Skill kontrolliert wird oder ob Konflikte zwischen mehreren Bausteinen existieren. Insgesamt macht class_IOChannel den Knowledge Graph hardware nah und damit für reale Automatisierungsszenarien aussagekräftig."@de .
 
+ag:class_MonitoringReaction a owl:Class .
+
+ag:class_SystemReaction a owl:Class .
+
+ag:FBInst_FB_Automatikbetrieb_F1_pPer a ag:class_FBInstance ;
+    dp:hasFBInstanceName "pPer"^^xsd:string ;
+    op:isInstanceOfFBType ag:StandardFBType_TP .
+
 ag:FBInst_FB_Automatikbetrieb_F1_rPer a ag:class_FBInstance ;
+    dp:hasFBInstanceName "rPer"^^xsd:string ;
+    op:isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+ag:FBInst_FB_Automatikbetrieb_F1_rStart a ag:class_FBInstance ;
+    dp:hasFBInstanceName "rStart"^^xsd:string ;
+    op:isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+ag:FBInst_FB_Automatikbetrieb_F1_rStep1 a ag:class_FBInstance ;
+    dp:hasFBInstanceName "rStep1"^^xsd:string ;
+    op:isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+ag:FBInst_FB_Automatikbetrieb_F1_rtStoer a ag:class_FBInstance ;
+    dp:hasFBInstanceName "rtStoer"^^xsd:string ;
     op:isInstanceOfFBType ag:StandardFBType_R_TRIG .
 
 ag:FBInst_FB_Automatikbetrieb_F1_tPer a ag:class_FBInstance ;
+    dp:hasFBInstanceName "tPer"^^xsd:string ;
+    op:isInstanceOfFBType ag:StandardFBType_TON .
+
+ag:FBInst_FB_Automatikbetrieb_F1_tSchritt1 a ag:class_FBInstance ;
+    dp:hasFBInstanceName "tSchritt1"^^xsd:string ;
+    op:isInstanceOfFBType ag:StandardFBType_TON .
+
+ag:FBInst_FB_Automatikbetrieb_F1_tSchritt2 a ag:class_FBInstance ;
+    dp:hasFBInstanceName "tSchritt2"^^xsd:string ;
+    op:isInstanceOfFBType ag:StandardFBType_TON .
+
+ag:FBInst_FB_Diagnose_D2_rtAck a ag:class_FBInstance ;
+    dp:hasFBInstanceName "rtAck"^^xsd:string ;
+    op:isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+ag:FBInst_FB_Diagnose_D2_rtD3 a ag:class_FBInstance ;
+    dp:hasFBInstanceName "rtD3"^^xsd:string ;
+    op:isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+ag:FBInst_FB_Diagnose_D2_rtReq a ag:class_FBInstance ;
+    dp:hasFBInstanceName "rtReq"^^xsd:string ;
+    op:isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+ag:FBInst_FB_InitFahrt_A6_A2_tInit a ag:class_FBInstance ;
+    dp:hasFBInstanceName "tInit"^^xsd:string ;
+    op:isInstanceOfFBType ag:StandardFBType_TON .
+
+ag:FBInst_FB_Methode1Job_t20s a ag:class_FBInstance ;
+    dp:hasFBInstanceName "t20s"^^xsd:string ;
+    op:isInstanceOfFBType ag:StandardFBType_TON .
+
+ag:FBInst_FB_Notaus_D1_ton5s a ag:class_FBInstance ;
+    dp:hasFBInstanceName "ton5s"^^xsd:string ;
+    op:isInstanceOfFBType ag:StandardFBType_TON .
+
+ag:FBInst_FB_ProduktionMitStoerung_D3_rStart a ag:class_FBInstance ;
+    dp:hasFBInstanceName "rStart"^^xsd:string ;
+    op:isInstanceOfFBType ag:StandardFBType_R_TRIG .
+
+ag:FBInst_FB_ProduktionMitStoerung_D3_tSchritt3 a ag:class_FBInstance ;
+    dp:hasFBInstanceName "tSchritt3"^^xsd:string ;
+    op:isInstanceOfFBType ag:StandardFBType_TON .
+
+ag:FBInst_FB_ProduktionMitStoerung_D3_tSchritt4 a ag:class_FBInstance ;
+    dp:hasFBInstanceName "tSchritt4"^^xsd:string ;
     op:isInstanceOfFBType ag:StandardFBType_TON .
 
 ag:FBInst_MAIN_edgeF1 a ag:class_FBInstance ;
+    dp:hasFBInstanceName "edgeF1"^^xsd:string ;
     op:isInstanceOfFBType ag:StandardFBType_R_TRIG .
 
 ag:FBInst_MAIN_fbInit a ag:class_FBInstance ;
+    dp:hasFBInstanceName "fbInit"^^xsd:string ;
     op:isInstanceOfFBType ag:FBType_FB_InitFahrt_A6_A2 .
 
 ag:FBInst_MAIN_fbNot a ag:class_FBInstance ;
+    dp:hasFBInstanceName "fbNot"^^xsd:string ;
     op:isInstanceOfFBType ag:FBType_FB_Notaus_D1 .
 
 ag:FBInst_MAIN_fbProStoer a ag:class_FBInstance ;
+    dp:hasFBInstanceName "fbProStoer"^^xsd:string ;
     op:isInstanceOfFBType ag:FBType_FB_ProduktionMitStoerung_D3 .
 
 ag:FBType_FB_Methode1Job a ag:class_CustomFBType,
@@ -1591,6 +1753,7 @@ ag:OPCUA__dot__bool2 a ag:class_SignalSource,
 
 ag:PortInstance_FBInst_FB_Automatikbetrieb_F1_tPer_Q a ag:class_PortInstance,
         ag:class_SignalSource ;
+    dp:hasExpressionText "tPer.Q"^^xsd:string ;
     op:instantiatesPort ag:Port_TON_Q ;
     op:isPortOfInstance ag:FBInst_FB_Automatikbetrieb_F1_tPer .
 
@@ -1645,13 +1808,6 @@ ag:Port_FB_ProduktionMitStoerung_D3_Fertig a ag:class_Port ;
     dp:hasPortName "Fertig" ;
     dp:hasPortType "BOOL" .
 
-ag:Port_TON_Q a ag:class_Port,
-        owl:NamedIndividual ;
-    dp:hasPortDirection "Output" ;
-    dp:hasPortName "Q" ;
-    dp:hasPortType "BOOL" ;
-    rdfs:comment "Q ist der BOOL Ausgang. Q wird TRUE, wenn ET die Vorgabezeit PT erreicht und IN weiterhin TRUE ist."@de .
-
 ag:Port_TP_IN a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Input" ;
@@ -1665,6 +1821,13 @@ ag:Port_TP_PT a ag:class_Port,
     dp:hasPortName "PT" ;
     dp:hasPortType "TIME" ;
     rdfs:comment "PT ist die Impulsdauer. Bestimmt wie lange Q TRUE bleibt."@de .
+
+ag:Port_TP_Q a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "Q" ;
+    dp:hasPortType "BOOL" ;
+    rdfs:comment "Q ist der BOOL Ausgang des Impulses. Q ist für die Dauer PT TRUE."@de .
 
 ag:Var_FB_Automatikbetrieb_F1_AutoRestartEnable a ag:class_SignalSource,
         ag:class_Variable ;
@@ -2015,6 +2178,7 @@ ag:Var_FB_Diagnose_D2_Alt_gefunden a ag:class_SignalSource,
 
 ag:Var_FB_Diagnose_D2_Busy a ag:class_SignalSource,
         ag:class_Variable ;
+    dp:hasDefaultVariableValue "FALSE"^^xsd:string ;
     dp:hasVariableName "Busy" ;
     dp:hasVariableType "BOOL" .
 
@@ -2196,9 +2360,11 @@ dp:isUnused a owl:DatatypeProperty .
 op:HypothesisConnections a owl:ObjectProperty .
 
 ag:FBInst_MAIN_fbAuto a ag:class_FBInstance ;
+    dp:hasFBInstanceName "fbAuto"^^xsd:string ;
     op:isInstanceOfFBType ag:FBType_FB_Automatikbetrieb_F1 .
 
 ag:FBInst_MAIN_fbDiag a ag:class_FBInstance ;
+    dp:hasFBInstanceName "fbDiag"^^xsd:string ;
     op:isInstanceOfFBType ag:FBType_FB_Diagnose_D2 .
 
 ag:FBType_FB_Automatikbetrieb_F1 a ag:class_CustomFBType,
@@ -2802,7 +2968,7 @@ VAR_OUTPUT
 END_VAR
 VAR
     // Steuerung/Handshake intern
-    Busy       : BOOL;
+    Busy       : BOOL := FALSE;
 
     // Flanken + Puls
     rtReq      : R_TRIG;    // steigende Flanke auf Diagnose_gefordert
@@ -3262,13 +3428,6 @@ ag:Port_FB_ProduktionMitStoerung_D3_Stoerung_erkannt a ag:class_Port ;
     dp:hasPortName "Stoerung_erkannt" ;
     dp:hasPortType "BOOL" .
 
-ag:Port_R_TRIG_Q a ag:class_Port,
-        owl:NamedIndividual ;
-    dp:hasPortDirection "Output" ;
-    dp:hasPortName "Q" ;
-    dp:hasPortType "BOOL" ;
-    rdfs:comment "Q ist ein BOOL Impuls für einen Programmscan. Q wird TRUE, wenn CLK von FALSE auf TRUE wechselt."@de .
-
 ag:Var_FB_Automatikbetrieb_F1_Automatikbetrieb_Starten a ag:class_SignalSource,
         ag:class_Variable ;
     dp:hasVariableName "Automatikbetrieb_Starten" ;
@@ -3633,6 +3792,7 @@ ag:GVL__dot__Weiter a ag:class_SignalSource,
     op:isBoundToPort ag:Port_FB_Betriebsarten_Weiter .
 
 ag:FBInst_MAIN_fbBA a ag:class_FBInstance ;
+    dp:hasFBInstanceName "fbBA"^^xsd:string ;
     op:isInstanceOfFBType ag:FBType_FB_Betriebsarten .
 
 ag:class_CustomFBType a owl:Class ;
@@ -3643,12 +3803,26 @@ ag:class_SourceLiteral a owl:Class ;
     rdfs:comment "Diese Klasse repräsentiert konstante Literalwerte, die in einem SPS Netzwerk direkt als Eingangswerte verwendet werden, zum Beispiel TRUE, FALSE, 0 oder Zeitkonstanten. Sie wird im Knowledge Graph als spezielle Form einer Signalquelle modelliert, damit Parameterzuweisungen auch dann sauber abgebildet werden können, wenn kein Variablenname existiert. Literale sind in vielen Steuerungslogiken wichtig, etwa um Defaultwerte zu setzen, Zustandsautomaten zu initialisieren oder Zeitparameter für Timer vorzugeben. Aus PLCopen XML lassen sich solche Literale häufig aus Parameterbelegungen erkennen, wenn ein Eingang nicht verdrahtet ist oder explizit mit einem konstanten Wert verbunden wird. Die Klasse ermöglicht es, den Datenfluss vollständig zu rekonstruieren, da sonst ein Teil der Eingänge als undefiniert erscheinen würde. In Skill Analysen helfen SourceLiterals dabei, feste Konfigurationen sichtbar zu machen, zum Beispiel konstante Verfahrzeiten oder feste Betriebsartenparameter. Damit trägt class_SourceLiteral zur Vollständigkeit und Nachvollziehbarkeit der Modellierung bei."@de ;
     rdfs:subClassOf ag:class_SignalSource .
 
+ag:Port_TON_Q a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "Q" ;
+    dp:hasPortType "BOOL" ;
+    rdfs:comment "Q ist der BOOL Ausgang. Q wird TRUE, wenn ET die Vorgabezeit PT erreicht und IN weiterhin TRUE ist."@de .
+
 ag:Port_R_TRIG_CLK a ag:class_Port,
         owl:NamedIndividual ;
     dp:hasPortDirection "Input" ;
     dp:hasPortName "CLK" ;
     dp:hasPortType "BOOL" ;
     rdfs:comment "CLK ist der BOOL Eingang, der überwacht wird. Bei einer steigenden Flanke wird Q erzeugt."@de .
+
+ag:Port_R_TRIG_Q a ag:class_Port,
+        owl:NamedIndividual ;
+    dp:hasPortDirection "Output" ;
+    dp:hasPortName "Q" ;
+    dp:hasPortType "BOOL" ;
+    rdfs:comment "Q ist ein BOOL Impuls für einen Programmscan. Q wird TRUE, wenn CLK von FALSE auf TRUE wechselt."@de .
 
 ag:class_StandardFBType a owl:Class ;
     rdfs:comment "Diese Klasse beschreibt Standard Function Block Typen, die typischerweise aus der SPS Bibliothek oder dem IEC 61131 3 Standard stammen, zum Beispiel RS Speicher, Triggerbausteine oder Zeitfunktionen. Sie wird eingesetzt, um wiederkehrende Basiskomponenten gesondert zu behandeln und nicht mit den projekt spezifischen Skill Bausteinen zu vermischen. StandardFBTypes dienen häufig als Infrastruktur für Zustandsbildung, Flankenerkennung, Zeitverhalten und Zählfunktionen und sind daher in vielen CustomFBTypes als interne Aufrufe enthalten. Im Knowledge Graph ermöglicht diese Klasse eine robuste Erkennung typischer Muster, etwa dass ein Skill durch einen R_TRIG gestartet wird, durch einen RS gehalten wird und durch Timerbedingungen gestoppt wird. Für die Analyse des Signalflusses sind Standardbausteine besonders relevant, weil sie häufig die eigentlichen Zustandswechsel erzwingen, auch wenn sie fachlich nicht als eigener Skill gelten. Aus PLCopen XML werden sie als POUCalls sichtbar, die innerhalb eines Bausteins auf solche Standardtypen verweisen. Die explizite Modellierung als StandardFBType verbessert außerdem das Filtering in Abfragen, sodass sich beispielsweise reine Skill Graphen ohne Bibliothekslogik erzeugen lassen."@de ;
@@ -3683,10 +3857,6 @@ ag:StandardFBType_RS a ag:class_FBType,
         ag:Port_RS_S ;
     rdfs:comment "RS ist ein bistabiles Speicherglied mit Reset Priorität. S setzt den gespeicherten Zustand auf TRUE. R1 setzt ihn auf FALSE. Wenn S und R1 gleichzeitig TRUE sind, dominiert Reset und Q1 wird FALSE."@de .
 
-ag:class_PortInstance a owl:Class ;
-    rdfs:comment "Diese Klasse bildet die konkrete Ausprägung eines Ports innerhalb einer spezifischen Function Block Instanz ab und entspricht damit einem realen Pin in einem FBD Netzwerk. Während class_Port nur den abstrakten Parameter eines Typs beschreibt, ist die PortInstance der tatsächliche Anschluss, der im Netzwerk verdrahtet wird und Signale empfängt oder ausgibt. Im Knowledge Graph wird diese Klasse benötigt, weil Signalverbindungen immer an eine konkrete Instanz gebunden sind und nicht nur an den Typ. Eine PortInstance verweist einerseits auf die zugehörige FBInstance und andererseits auf den Port des zugrunde liegenden FBTypes, wodurch eine eindeutige Zuordnung möglich ist. Aus PLCopen XML ergibt sich dieses Konzept aus Block Pins und deren Verbindungen im FBD, die erst im Kontext der Instanz vollständig spezifiziert sind. PortInstanzen sind besonders wichtig für die Rekonstruktion von Signalflüssen, da Parameterzuweisungen genau diese Knoten als Ziel besitzen. Damit ermöglicht class_PortInstance eine vollständige Analyse, welche Variable oder welches Zwischensignal tatsächlich an welchen Bausteinpin angeschlossen ist."@de ;
-    rdfs:subClassOf ag:class_SignalSource .
-
 ag:StandardFBType_TON a ag:class_FBType,
         ag:class_POU,
         ag:class_StandardFBType,
@@ -3717,6 +3887,10 @@ ag:StandardFBType_R_TRIG a ag:class_FBType,
 
 ag:class_POUCall a owl:Class ;
     rdfs:comment "Diese Klasse beschreibt einen konkreten Aufruf einer Program Organisation Unit innerhalb eines Programms oder eines Function Blocks. Ein POUCall macht sichtbar, dass ein bestimmter Baustein nicht nur als Typ existiert, sondern an einer konkreten Stelle tatsächlich verwendet wird. Im Knowledge Graph ist dies essenziell, um Abhängigkeitsstrukturen zu rekonstruieren, also welche Bausteine intern voneinander abhängen und wie tief verschachtelte Logik aufgebaut ist. Ein POUCall kann mit einer FBInstance und deren PortInstanzen verknüpft werden, sodass klar wird, welche konkrete Instanz eines Bausteintyps gemeint ist. Aus PLCopen XML ergibt sich ein POUCall aus einem Bausteinblock im FBD oder aus einem Funktionsaufruf in ST Code, je nach Darstellung. Für die Skill Analyse kann damit nachvollzogen werden, welche Standardbausteine ein Skill verwendet, beispielsweise Trigger, Speicher oder Timer, und welche Unterbausteine die eigentliche Prozesslogik realisieren. Insgesamt macht class_POUCall die Ausführungsstruktur explizit, wodurch sich Skill Ketten, Signalpfade und interne Architektur systematisch untersuchen lassen."@de .
+
+ag:class_PortInstance a owl:Class ;
+    rdfs:comment "Diese Klasse bildet die konkrete Ausprägung eines Ports innerhalb einer spezifischen Function Block Instanz ab und entspricht damit einem realen Pin in einem FBD Netzwerk. Während class_Port nur den abstrakten Parameter eines Typs beschreibt, ist die PortInstance der tatsächliche Anschluss, der im Netzwerk verdrahtet wird und Signale empfängt oder ausgibt. Im Knowledge Graph wird diese Klasse benötigt, weil Signalverbindungen immer an eine konkrete Instanz gebunden sind und nicht nur an den Typ. Eine PortInstance verweist einerseits auf die zugehörige FBInstance und andererseits auf den Port des zugrunde liegenden FBTypes, wodurch eine eindeutige Zuordnung möglich ist. Aus PLCopen XML ergibt sich dieses Konzept aus Block Pins und deren Verbindungen im FBD, die erst im Kontext der Instanz vollständig spezifiziert sind. PortInstanzen sind besonders wichtig für die Rekonstruktion von Signalflüssen, da Parameterzuweisungen genau diese Knoten als Ziel besitzen. Damit ermöglicht class_PortInstance eine vollständige Analyse, welche Variable oder welches Zwischensignal tatsächlich an welchen Bausteinpin angeschlossen ist."@de ;
+    rdfs:subClassOf ag:class_SignalSource .
 
 ag:class_POU a owl:Class ;
     rdfs:comment "Diese Klasse bildet das allgemeine Konzept einer Program Organisation Unit ab und dient als Oberbegriff für Programme und Function Blocks im Sinne der IEC 61131 3 Struktur. Sie wird im Knowledge Graph verwendet, um eine gemeinsame Abstraktion für alle ausführbaren oder wiederverwendbaren Bausteine bereitzustellen, unabhängig davon, ob sie zyklisch laufen oder innerhalb anderer Bausteine aufgerufen werden. Dadurch lassen sich Analyseoperationen vereinheitlichen, zum Beispiel die Suche nach Aufrufbeziehungen, der Vergleich von Schnittstellen oder das Auffinden von internen Abhängigkeiten. In einem PLCopen XML Export entsprechen POUs typischerweise den Elementen, die eine Bausteindefinition samt Interface und Code oder Netzwerkstruktur enthalten. In diesem Modell ist class_POU vor allem eine semantische Klammer, die eine saubere Spezialisierung zu class_Program und class_FBType ermöglicht. In praktischen Abfragen wird diese Klasse häufig indirekt genutzt, um alle ausführbaren Einheiten zusammenzufassen und anschließend nach Typ oder Sprache zu filtern."@de .

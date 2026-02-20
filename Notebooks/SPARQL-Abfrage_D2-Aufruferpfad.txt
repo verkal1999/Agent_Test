@@ -1,3 +1,16 @@
+Codex Chat Traceauswahl letzte Notebook-Zelle "Ok, der Algorithmus läuft wieder falsch. Er müsste jetzt eigentlich wie folgt vorgehen: Erstmal muss er den Eintrag finden, wo OPCUA.lastExecutedSkill auf 'TestSkill3' gesetzt wird und das passiert in "OPCUA.lastExecutedSkill := 'TestSkill3';" Jetzt muss geprüft werden, was die Bedingung dafür ist. Dann soll dieses IF gefunden werden "IF lastSkillIsOne THEN
+        OPCUA.lastExecutedSkill := 'TestSkill3';
+    ELSE
+        OPCUA.lastExecutedSkill := 'TestSkill1';
+    END_IF" Dann ist klar, lastSkillIsOne muss := TRUE sein. Dann wurd geschaut, wo es gesetzt wird und es wird  lastSkillIsOne := NOT lastSkillIsOne;" gefunden. Daraus  muss jetzt klar sein, dass lastSkillIsOne = FALSE sein musste, weil es hier invertiert wird. Dann wird die Bedingung dafür gesucht und man findet  "IF rStep1.Q THEN 
+    lastSkillIsOne := NOT lastSkillIsOne;
+    IF lastSkillIsOne THEN
+        OPCUA.lastExecutedSkill := 'TestSkill3';
+    ELSE
+        OPCUA.lastExecutedSkill := 'TestSkill1';
+    END_IF
+END_IF". Dann wird daraus herausgefunden, dass rStep1.Q = TRUE sein muss. Anhand des Punktes identifiziert man das dann aus dem KG mit "
+
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -51,3 +64,12 @@ WHERE {
 #?fbinst_type rdfs:comment ?descr.
 }
 
+Erstmal aus "IF rStep1.Q THEN
+    lastSkillIsOne := NOT lastSkillIsOne;
+    IF lastSkillIsOne THEN
+        OPCUA.lastExecutedSkill := 'TestSkill3';
+    ELSE
+        OPCUA.lastExecutedSkill := 'TestSkill1';
+    END_IF
+END_IF":
+OPCUA.lastExecutedSkill := 'TestSkill3'; wird gesetzt bei lastSkillIsOne, der auf NOT lastSkillIsOne gesetzt wird, also einfach invertiert wird. Trotzdem muss er auf TRUE sein nach dem Invertieren. Damit das aber Funktioniert, muss rStep1.Q = TRUE sein. Wenn ich dann aus nach rStep1 suche, finde ich "rStep1(CLK := Schritt1);"

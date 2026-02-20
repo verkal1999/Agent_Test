@@ -157,6 +157,10 @@ dp:hasExpressionText a owl:DatatypeProperty ;
     rdfs:range xsd:string ;
     rdfs:subPropertyOf dp:hasSignalSourceAttribute .
 
+dp:hasFBInstanceName a owl:DatatypeProperty ;
+    rdfs:domain ag:class_FBInstance ;
+    rdfs:range xsd:string .
+
 dp:hasGlobalVariableListName a owl:DatatypeProperty ;
     rdfs:domain ag:class_GlobalVariableList ;
     rdfs:range xsd:string .
@@ -337,6 +341,10 @@ ag:op_hasPort a owl:ObjectProperty ;
     rdfs:domain ag:class_FBType ;
     rdfs:range ag:class_Port .
 
+ag:op_implementsMonAct a owl:ObjectProperty ;
+    rdfs:domain ag:class_POU ;
+    rdfs:range ag:class_MonitoringReaction .
+
 ag:op_implementsPort a owl:ObjectProperty ;
     rdfs:comment "Verbindet eine interne Variable eines FBs mit dem Port, den sie repräsentiert" ;
     rdfs:domain ag:class_Variable ;
@@ -345,6 +353,10 @@ ag:op_implementsPort a owl:ObjectProperty ;
 ag:op_implementsSkill a owl:ObjectProperty ;
     rdfs:domain ag:class_POU ;
     rdfs:range ag:class_Skill .
+
+ag:op_implementsSysReact a owl:ObjectProperty ;
+    rdfs:domain ag:class_POU ;
+    rdfs:range ag:class_SystemReaction .
 
 ag:op_instantiatesPort a owl:ObjectProperty ;
     rdfs:domain ag:class_PortInstance ;
@@ -407,156 +419,207 @@ ag:op_usesVariable a owl:ObjectProperty ;
     rdfs:range ag:class_Variable .
 
 ag:FBInst_FB_Automatikbetrieb_F1_pPer a ag:class_FBInstance ;
+    dp:hasFBInstanceName "pPer"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_TP .
 
 ag:FBInst_FB_Automatikbetrieb_F1_rPer a ag:class_FBInstance ;
+    dp:hasFBInstanceName "rPer"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
 
 ag:FBInst_FB_Automatikbetrieb_F1_rStart a ag:class_FBInstance ;
+    dp:hasFBInstanceName "rStart"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
 
 ag:FBInst_FB_Automatikbetrieb_F1_rStep1 a ag:class_FBInstance ;
+    dp:hasFBInstanceName "rStep1"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
 
 ag:FBInst_FB_Automatikbetrieb_F1_rtStoer a ag:class_FBInstance ;
+    dp:hasFBInstanceName "rtStoer"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
 
 ag:FBInst_FB_Automatikbetrieb_F1_tPer a ag:class_FBInstance ;
+    dp:hasFBInstanceName "tPer"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_TON .
 
 ag:FBInst_FB_Automatikbetrieb_F1_tSchritt1 a ag:class_FBInstance ;
+    dp:hasFBInstanceName "tSchritt1"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_TON .
 
 ag:FBInst_FB_Automatikbetrieb_F1_tSchritt2 a ag:class_FBInstance ;
+    dp:hasFBInstanceName "tSchritt2"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_TON .
 
 ag:FBInst_FB_Betriebsarten_RS_A1 a ag:class_FBInstance ;
+    dp:hasFBInstanceName "RS_A1"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_RS .
 
 ag:FBInst_FB_Betriebsarten_RS_A2 a ag:class_FBInstance ;
+    dp:hasFBInstanceName "RS_A2"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_RS .
 
 ag:FBInst_FB_Betriebsarten_RS_A5 a ag:class_FBInstance ;
+    dp:hasFBInstanceName "RS_A5"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_RS .
 
 ag:FBInst_FB_Betriebsarten_RS_A6 a ag:class_FBInstance ;
+    dp:hasFBInstanceName "RS_A6"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_RS .
 
 ag:FBInst_FB_Betriebsarten_RS_AutomaticOperationMode a ag:class_FBInstance ;
+    dp:hasFBInstanceName "RS_AutomaticOperationMode"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_RS .
 
 ag:FBInst_FB_Betriebsarten_RS_CycleEnded a ag:class_FBInstance ;
+    dp:hasFBInstanceName "RS_CycleEnded"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_RS .
 
 ag:FBInst_FB_Betriebsarten_RS_D1 a ag:class_FBInstance ;
+    dp:hasFBInstanceName "RS_D1"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_RS .
 
 ag:FBInst_FB_Betriebsarten_RS_D2 a ag:class_FBInstance ;
+    dp:hasFBInstanceName "RS_D2"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_RS .
 
 ag:FBInst_FB_Betriebsarten_RS_D3 a ag:class_FBInstance ;
+    dp:hasFBInstanceName "RS_D3"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_RS .
 
 ag:FBInst_FB_Betriebsarten_RS_F1 a ag:class_FBInstance ;
+    dp:hasFBInstanceName "RS_F1"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_RS .
 
 ag:FBInst_FB_Betriebsarten_RS_InitialDrive a ag:class_FBInstance ;
+    dp:hasFBInstanceName "RS_InitialDrive"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_RS .
 
 ag:FBInst_FB_Betriebsarten_RS_InitialState a ag:class_FBInstance ;
+    dp:hasFBInstanceName "RS_InitialState"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_RS .
 
 ag:FBInst_FB_Betriebsarten_RS_ManualOperationMode a ag:class_FBInstance ;
+    dp:hasFBInstanceName "RS_ManualOperationMode"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_RS .
 
 ag:FBInst_FB_Betriebsarten_R_TRIG_Automatic a ag:class_FBInstance ;
+    dp:hasFBInstanceName "R_TRIG_Automatic"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
 
 ag:FBInst_FB_Betriebsarten_R_TRIG_CycleEnded a ag:class_FBInstance ;
+    dp:hasFBInstanceName "R_TRIG_CycleEnded"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
 
 ag:FBInst_FB_Betriebsarten_R_TRIG_Init a ag:class_FBInstance ;
+    dp:hasFBInstanceName "R_TRIG_Init"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
 
 ag:FBInst_FB_Betriebsarten_R_TRIG_InitialDrive a ag:class_FBInstance ;
+    dp:hasFBInstanceName "R_TRIG_InitialDrive"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
 
 ag:FBInst_FB_Betriebsarten_R_TRIG_Manual a ag:class_FBInstance ;
+    dp:hasFBInstanceName "R_TRIG_Manual"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
 
 ag:FBInst_FB_Diagnose_D2_rtAck a ag:class_FBInstance ;
+    dp:hasFBInstanceName "rtAck"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
 
 ag:FBInst_FB_Diagnose_D2_rtD3 a ag:class_FBInstance ;
+    dp:hasFBInstanceName "rtD3"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
 
 ag:FBInst_FB_Diagnose_D2_rtFinished a ag:class_FBInstance ;
+    dp:hasFBInstanceName "rtFinished"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
 
 ag:FBInst_FB_Diagnose_D2_rtReq a ag:class_FBInstance ;
+    dp:hasFBInstanceName "rtReq"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
 
 ag:FBInst_FB_Diagnose_D2_tpPulse a ag:class_FBInstance ;
+    dp:hasFBInstanceName "tpPulse"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_TP .
 
 ag:FBInst_FB_InitFahrt_A6_A2_tInit a ag:class_FBInstance ;
+    dp:hasFBInstanceName "tInit"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_TON .
 
 ag:FBInst_FB_Methode1Job_t20s a ag:class_FBInstance ;
+    dp:hasFBInstanceName "t20s"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_TON .
 
 ag:FBInst_FB_Notaus_D1_ton5s a ag:class_FBInstance ;
+    dp:hasFBInstanceName "ton5s"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_TON .
 
 ag:FBInst_FB_ProduktionMitStoerung_D3_pPer a ag:class_FBInstance ;
+    dp:hasFBInstanceName "pPer"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_TP .
 
 ag:FBInst_FB_ProduktionMitStoerung_D3_rPer a ag:class_FBInstance ;
+    dp:hasFBInstanceName "rPer"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
 
 ag:FBInst_FB_ProduktionMitStoerung_D3_rStart a ag:class_FBInstance ;
+    dp:hasFBInstanceName "rStart"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
 
 ag:FBInst_FB_ProduktionMitStoerung_D3_rStep1 a ag:class_FBInstance ;
+    dp:hasFBInstanceName "rStep1"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
 
 ag:FBInst_FB_ProduktionMitStoerung_D3_rtStoer a ag:class_FBInstance ;
+    dp:hasFBInstanceName "rtStoer"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
 
 ag:FBInst_FB_ProduktionMitStoerung_D3_tPer a ag:class_FBInstance ;
+    dp:hasFBInstanceName "tPer"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_TON .
 
 ag:FBInst_FB_ProduktionMitStoerung_D3_tSchritt3 a ag:class_FBInstance ;
+    dp:hasFBInstanceName "tSchritt3"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_TON .
 
 ag:FBInst_FB_ProduktionMitStoerung_D3_tSchritt4 a ag:class_FBInstance ;
+    dp:hasFBInstanceName "tSchritt4"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_TON .
 
 ag:FBInst_MAIN_edgeDone a ag:class_FBInstance ;
+    dp:hasFBInstanceName "edgeDone"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
 
 ag:FBInst_MAIN_edgeF1 a ag:class_FBInstance ;
+    dp:hasFBInstanceName "edgeF1"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:StandardFBType_R_TRIG .
 
 ag:FBInst_MAIN_fbAuto a ag:class_FBInstance ;
+    dp:hasFBInstanceName "fbAuto"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:FBType_FB_Automatikbetrieb_F1 .
 
 ag:FBInst_MAIN_fbBA a ag:class_FBInstance ;
+    dp:hasFBInstanceName "fbBA"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:FBType_FB_Betriebsarten .
 
 ag:FBInst_MAIN_fbDiag a ag:class_FBInstance ;
+    dp:hasFBInstanceName "fbDiag"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:FBType_FB_Diagnose_D2 .
 
 ag:FBInst_MAIN_fbInit a ag:class_FBInstance ;
+    dp:hasFBInstanceName "fbInit"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:FBType_FB_InitFahrt_A6_A2 .
 
 ag:FBInst_MAIN_fbJob a ag:class_FBInstance ;
+    dp:hasFBInstanceName "fbJob"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:FBType_FB_Methode1Job .
 
 ag:FBInst_MAIN_fbNot a ag:class_FBInstance ;
+    dp:hasFBInstanceName "fbNot"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:FBType_FB_Notaus_D1 .
 
 ag:FBInst_MAIN_fbProStoer a ag:class_FBInstance ;
+    dp:hasFBInstanceName "fbProStoer"^^xsd:string ;
     ag:op_isInstanceOfFBType ag:FBType_FB_ProduktionMitStoerung_D3 .
 
 ag:GVL__dot__DiagnoseRequested a ag:class_Variable ;
@@ -1131,9 +1194,13 @@ END_VAR"""^^xsd:string ;
 ag:class_IOChannel a owl:Class ;
     rdfs:comment "Diese Klasse repräsentiert einen Hardwarekanal, also einen physikalischen Ein oder Ausgang, der in der Steuerung adressiert und mit Variablen verbunden werden kann. Ein IOChannel bildet damit die Brücke zwischen der semantischen Logik im Knowledge Graph und der realen Peripherie, etwa Sensoren, Ventile, Motoren oder Signallampen. Im Knowledge Graph wird ein IOChannel häufig genutzt, um Variablen mit Hardwareadressen zu verknüpfen und dadurch nachvollziehbar zu machen, welcher Code welche reale Komponente beeinflusst. Aus PLCopen XML kann ein IOChannel entweder direkt aus Hardwarezuordnungen oder indirekt aus Rohinformationen des Exports rekonstruiert werden, abhängig davon, wie vollständig das Mapping exportiert wurde. Die Klasse ist besonders wertvoll für Analysen, die Skill Ausführung mit physikalischen Effekten verbinden, da so sichtbar wird, welche Ausgänge ein Skill setzt und welche Eingänge er überwacht. Außerdem unterstützt sie Plausibilitätsprüfungen, beispielsweise ob ein Ausgang nur von einem Skill kontrolliert wird oder ob Konflikte zwischen mehreren Bausteinen existieren. Insgesamt macht class_IOChannel den Knowledge Graph hardware nah und damit für reale Automatisierungsszenarien aussagekräftig."@de .
 
+ag:class_MonitoringReaction a owl:Class .
+
 ag:class_SourceLiteral a owl:Class ;
     rdfs:comment "Diese Klasse repräsentiert konstante Literalwerte, die in einem SPS Netzwerk direkt als Eingangswerte verwendet werden, zum Beispiel TRUE, FALSE, 0 oder Zeitkonstanten. Sie wird im Knowledge Graph als spezielle Form einer Signalquelle modelliert, damit Parameterzuweisungen auch dann sauber abgebildet werden können, wenn kein Variablenname existiert. Literale sind in vielen Steuerungslogiken wichtig, etwa um Defaultwerte zu setzen, Zustandsautomaten zu initialisieren oder Zeitparameter für Timer vorzugeben. Aus PLCopen XML lassen sich solche Literale häufig aus Parameterbelegungen erkennen, wenn ein Eingang nicht verdrahtet ist oder explizit mit einem konstanten Wert verbunden wird. Die Klasse ermöglicht es, den Datenfluss vollständig zu rekonstruieren, da sonst ein Teil der Eingänge als undefiniert erscheinen würde. In Skill Analysen helfen SourceLiterals dabei, feste Konfigurationen sichtbar zu machen, zum Beispiel konstante Verfahrzeiten oder feste Betriebsartenparameter. Damit trägt class_SourceLiteral zur Vollständigkeit und Nachvollziehbarkeit der Modellierung bei."@de ;
     rdfs:subClassOf ag:class_SignalSource .
+
+ag:class_SystemReaction a owl:Class .
 
 ag:FBType_FB_Automatikbetrieb_F1 a ag:class_FBType ;
     dp:hasPOUCode """// POU FB_Automatikbetrieb_F1 body
@@ -1709,7 +1776,7 @@ VAR_OUTPUT
 END_VAR
 VAR
     // Steuerung/Handshake intern
-    Busy       : BOOL;
+    Busy       : BOOL := FALSE;
 
     // Flanken + Puls
     rtReq      : R_TRIG;    // steigende Flanke auf Diagnose_gefordert

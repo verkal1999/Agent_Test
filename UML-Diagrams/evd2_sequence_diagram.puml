@@ -1,0 +1,57 @@
+@startuml
+skinparam shadowing false
+title evD2 Sequence - Trigger to Diagnosis and KG Ingestion
+
+actor "PLC Runtime" as PLC
+participant "PLCMonitor (C++)" as PLCMon
+participant "EventBus (C++)" as Bus
+participant "ReactionManager (C++)" as RM
+participant "FailureRecorder (C++)" as FR
+participant "PythonBridge (C++)" as PyBridge
+participant "ExcHChatBotSession (Python)" as Session
+participant "ChatBot (python/msrguard/chatbot_core.py)" as Bot
+participant "EvD2PathTracingTool" as D2Tool
+participant "d2_trace_analysis.py" as D2Trace
+database "KnowledgeGraph TTL" as KG
+participant "CommandForceFactory (C++)" as Factory
+participant "KGIngestionForce (C++)" as KGForce
+participant "ExcHUiObserver / Streamlit UI" as UI
+
+PLC -> PLCMon : OPCUA.TriggerD2 := TRUE\\n(optional LastGEMMAStateBeforeFailure update)
+PLCMon -> Bus : publish(evD2, payload + plcSnapshot)
+Bus -> RM : dispatch(evD2)
+Bus -> UI : notify incoming incident
+
+RM -> FR : capture snapshot + correlation + context
+RM -> PyBridge : run_agent(event_json)
+PyBridge -> Session : analyze_event(event)
+Session -> Bot : execute tool plan
+Bot -> D2Tool : run(trigger_var="OPCUA.TriggerD2", state_name="D2", ...)
+D2Tool -> D2Trace : run_unified_set_and_condition_trace(...)
+D2Trace -> KG : SPARQL/graph traversal (POUs, calls, variables, ports)
+KG --> D2Trace : triples + metadata
+D2Trace --> D2Tool : traced paths + requirements
+D2Tool --> Bot : structured evD2 result JSON
+Bot --> Session : answer + debug payload
+Session --> PyBridge : agent_result
+PyBridge --> RM : diagnosis + proposed actions
+
+opt Action execution and persistence
+  RM -> Factory : create forces from plan/actions
+  Factory --> RM : ICommandForce instances
+  RM -> KGForce : execute(ingest event/result)
+  KGForce -> KG : append OccuredFailure/ExecutedAction triples
+end
+
+RM -> UI : publish final result/status
+UI --> PLC : operator-visible recommendation/trace
+
+opt Follow-up variable trace in chat (example rStep1.Q)
+  UI -> Session : user asks "trace rStep1.Q"
+  Session -> Bot : variable_trace("rStep1.Q")
+  Bot -> KG : query class_PortInstance + dp:hasExpressionText
+  KG --> Bot : PortInstance context (FB instance/type/POU)
+  Bot --> Session : variable trace answer
+end
+
+@enduml

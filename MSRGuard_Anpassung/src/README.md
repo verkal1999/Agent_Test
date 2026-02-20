@@ -1,14 +1,24 @@
-# src/
+# src
 
-C++ runtime implementation:
+Implementierungen des C++-Runtime-Systems.
 
-- **Entry Point** – Wires the Python runtime, configures the PLC monitor, subscribes to triggers, and starts the main loop.
-- **OPC UA PLC Monitor** – Secure client sessions (Sign&Encrypt), subscriptions, reads/writes, and method calls.
-- **Event Bus** – Prioritized publish/subscribe for system events.
-- **Reaction Manager** – Orchestrates monitoring actions vs. system reactions; can consult the KG bridge.
-- **Forces (Commands)** – Concrete operations such as CSV logging, KG ingestion, PLC/monitoring actions; created by a `CommandForceFactory`.
-- **Failure Recorder** – Consolidates the latest snapshot, decisions, and context; triggers ingestion at terminal outcomes.
-- **Time Blogger** – Measures end-to-end latencies per correlation and writes CSVs to `logs/time/`.
-- **Utilities** – Snapshot builders, JSON helpers, NodeId formatting, and small helpers used across modules.
-
-> Build configuration lives in the root `CMakeLists.txt` and `CMakePresets.json`.
+## Dateien und Verantwortung
+- `main.cpp`: Einstiegspunkt, Initialisierung und Start des Runtime-Loops.
+- `AgentStartCoordinator.cpp`: Startkoordination zwischen Monitor, Eventbus und Agent-Komponenten.
+- `EventBus.cpp`: Publish/Subscribe-Dispatch fuer Events.
+- `ReactionManager.cpp`: Verarbeitet Events und steuert die Auswahl/Ausfuehrung von Reaktionen.
+- `CommandForceFactory.cpp`: Erzeugt konkrete CommandForces fuer Monitoring/System/PLC/KG.
+- `MonActionForce.cpp`: Ausfuehrung von Monitoring-Aktionen.
+- `SystemReactionForce.cpp`: Ausfuehrung von Systemreaktionen.
+- `PLCCommandForce.cpp`: PLC-bezogene Kommandos (z. B. write/call).
+- `KGIngestionForce.cpp`: Stoesst die KG-Ingestion mit Ereignisdaten an.
+- `WriteCsvForce.cpp`: Schreibt strukturierte Ergebnisse in CSV.
+- `PLCMonitor.cpp`: OPC-UA-Verbindung, Subscription und Trigger-Erkennung.
+- `PythonRuntime.cpp`: Initialisiert/verwaltet das eingebettete Python-Runtime-Environment.
+- `PythonBridge.cpp`: Schnittstelle fuer den Aufruf von Python-Agentlogik.
+- `ExcHUiObserver.cpp`: Observer, der Informationen in Richtung UI/Chat aufbereitet.
+- `FailureRecorder.cpp`: Persistiert Incident-Kontext, Snapshot und Entscheidungen.
+- `InventorySnapShotUtils.cpp`: Hilfsmethoden fuer Snapshot-Aufbereitung.
+- `PlanJsonUtils.cpp`: JSON-Parsing fuer Reaktionsplan-Daten.
+- `TimeBlogger.cpp`: Latenz- und Zeitmessung ueber den Ablauf.
+- `README.md`: Diese Dokumentation.

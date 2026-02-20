@@ -1,0 +1,97 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam shadowing false
+title MA_Python_Agent - Project Class Diagram (Consolidated)
+
+class "KnowledgeGraph\\n(TTL/JSON Artefacts)" as KG
+
+package "Pipelines.IngestionPipeline" {
+  class PipelineConfig
+  class PipelineContext
+  abstract class Step
+  class Pipeline
+  class PLCOpenXMLParser
+  class ProgramMapping
+  class IoHardwareAddress
+  class KGConfig
+  class KGLoader
+  class KGManager
+
+  Pipeline *-- Step
+  Pipeline --> PipelineContext
+  PipelineContext --> PipelineConfig
+  PLCOpenXMLParser ..> ProgramMapping
+  PLCOpenXMLParser ..> IoHardwareAddress
+  KGLoader --> KGConfig
+  KGLoader --> KG : writes base/filled KG
+  KGManager --> KG : enriches/validates
+}
+
+package "Python Agent (msrguard)" {
+  class ChatBot
+  class ToolRegistry
+  abstract class BaseAgentTool
+  class VariableTraceTool
+  class GraphInvestigateTool
+  class EvD2PathTracingTool
+  class ExcHChatBotSession
+  class IncidentContext
+  class D2TraceAnalysis <<module>>
+  class Tracer
+  class FbdNode
+
+  ChatBot --> ToolRegistry
+  ToolRegistry o-- BaseAgentTool
+  BaseAgentTool <|-- VariableTraceTool
+  BaseAgentTool <|-- GraphInvestigateTool
+  BaseAgentTool <|-- EvD2PathTracingTool
+  ExcHChatBotSession --> ChatBot
+  EvD2PathTracingTool ..> IncidentContext
+  EvD2PathTracingTool ..> D2TraceAnalysis
+  D2TraceAnalysis *-- Tracer
+  D2TraceAnalysis *-- FbdNode
+  VariableTraceTool --> KG : SPARQL read (Variable + PortInstance)
+  GraphInvestigateTool --> KG : SPARQL + code evidence search
+}
+
+package "C++ Runtime (MSRGuard_Anpassung)" {
+  class AgentStartCoordinator
+  class PLCMonitor
+  class EventBus
+  class ReactionManager
+  class CommandForceFactory
+  interface ICommandForce
+  class MonActionForce
+  class PLCCommandForce
+  class SystemReactionForce
+  class KGIngestionForce
+  class WriteCsvForce
+  class FailureRecorder
+  class TimeBlogger
+  class PythonBridge
+  class PythonRuntime
+  class ExcHUiObserver
+
+  AgentStartCoordinator --> PLCMonitor
+  AgentStartCoordinator --> ReactionManager
+  PLCMonitor --> EventBus : publish trigger events
+  ReactionManager --> EventBus : subscribe/consume
+  ReactionManager --> CommandForceFactory
+  CommandForceFactory --> ICommandForce
+  ICommandForce <|.. MonActionForce
+  ICommandForce <|.. PLCCommandForce
+  ICommandForce <|.. SystemReactionForce
+  ICommandForce <|.. KGIngestionForce
+  ICommandForce <|.. WriteCsvForce
+  ReactionManager --> FailureRecorder
+  ReactionManager --> TimeBlogger
+  ReactionManager --> PythonBridge
+  PythonBridge --> PythonRuntime
+  ExcHUiObserver ..> EventBus
+}
+
+PythonBridge ..> ExcHChatBotSession : invoke diagnosis/chat flow
+KGIngestionForce --> KG : append OccuredFailure/event triples
+
+@enduml

@@ -1,5 +1,9 @@
-# tools/
+# tools
 
-Helper utilities for local development and testing.
+Entwicklungs- und Testwerkzeuge rund um die Runtime.
 
-- **ua_test_server/** – Minimal OPC UA server you can run locally to develop client logic without a PLC. See its README for usage.
+## Unterordner
+- `ua_test_server/`: Lokaler OPC-UA-Testserver fuer Entwicklung ohne physische SPS.
+
+## Datei
+- `README.md`: Diese Uebersicht.

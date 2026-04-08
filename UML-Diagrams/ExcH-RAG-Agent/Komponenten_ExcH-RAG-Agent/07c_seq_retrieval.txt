@@ -1,0 +1,19 @@
+Sequenzdiagramm: Initiale Anfrage des ExcH-RAG-Agenten, Teil 3 von 6
+
+Titel:
+Retrieval
+
+Zweck:
+Dieses Teilsequenzdiagramm zeigt die eigentliche Kontextauswahl des RAG-Agenten.
+
+Ablauf:
+
+1. SimpleRagSession erfragt beim RagIncidentContext die initiale Standardfrage.
+2. Danach liefert der Kontext compact_event_context() und runtime_context_note().
+3. Aus der ersten Frage und top_k wird eine RetrievalQuery erzeugt.
+4. SimpleRagIndex durchsucht die vorhandenen Dokumentsegmente.
+5. TokenScorer bewertet die Relevanz jedes relevanten Segments.
+6. Die bestbewerteten Treffer werden in einem RetrievalResultSet gebuendelt.
+
+Interpretation:
+Diese Teilgrafik isoliert den eigentlichen Retrieval-Schritt und macht die nachvollziehbare Ranking-Logik sichtbar.

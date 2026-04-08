@@ -1,0 +1,39 @@
+@startuml
+
+skinparam shadowing false
+skinparam responseMessageBelowArrow true
+skinparam sequenceMessageAlign center
+hide footbox
+autonumber
+
+title ExcH-RAG-Agent - Initiale Anfrage\nTeil 5 von 6: Modellaufruf
+
+control "GroundedAnswerGenerator" as Generator
+control "ModelSelectionPolicy" as Policy
+entity "ModelProfile" as Profile
+entity "PromptRequest" as Prompt
+control "FoundationModelGateway" as Gateway
+entity "ModelResponse" as Response
+
+Generator -> Policy : select_profile("initial_diagnosis")
+activate Generator
+activate Policy
+create Profile
+Policy -> Profile : create(name,\ncost_class,\ncontext_window)
+Profile --> Generator : ModelProfile
+deactivate Policy
+
+create Prompt
+Generator -> Prompt : create(system_prompt,\nuser_prompt)
+
+Generator -> Gateway : invoke(prompt)
+activate Gateway
+Gateway -> Profile : nutze Modellprofil
+
+create Response
+Gateway -> Response : create(answer,\nfinish_reason)
+Response --> Generator : ModelResponse
+deactivate Gateway
+deactivate Generator
+
+@enduml

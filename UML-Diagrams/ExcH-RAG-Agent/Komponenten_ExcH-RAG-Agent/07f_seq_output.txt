@@ -1,0 +1,18 @@
+Sequenzdiagramm: Initiale Anfrage des ExcH-RAG-Agenten, Teil 6 von 6
+
+Titel:
+Ergebnis und Ausgabe
+
+Zweck:
+Dieses Teilsequenzdiagramm zeigt den letzten Abschnitt des Erstaufrufs: Validierung der Modellantwort, Speicherung in der Sitzung und Ausgabe an die nutzende Instanz.
+
+Ablauf:
+
+1. GroundedAnswerGenerator ueberfuehrt die Modellantwort in ein GenerationResult.
+2. GuardrailPolicy validiert dieses Ergebnis.
+3. Das validierte GenerationResult wird an die SimpleRagSession zurueckgegeben.
+4. Die Session speichert den ersten Interaktionsschritt als ChatTurn.
+5. Die UI gibt die automatisch erzeugte Erstfrage und die erste Diagnoseantwort aus.
+
+Interpretation:
+Diese Teilgrafik zeigt den kontrollierten Abschluss des RAG-Pfads mit Validierung, Sitzungsverlauf und Ausgabe.

@@ -1,0 +1,20 @@
+Sequenzdiagramm: Initiale Anfrage des ExcH-KG-Agenten, Teil 1 von 6
+
+Titel:
+Pipeline-Vorbereitung
+
+Zweck:
+Dieses Teilsequenzdiagramm zeigt nur die vorgeschaltete Artefaktaufbereitung vor der eigentlichen Diagnose. Die Darstellung ist bewusst klein gehalten, damit der gemeinsame Ingestion-Kontext und die Schrittfolge auf eine A4-Seite passen.
+
+Ablauf:
+
+1. ExcHAgentUI startet die Pipeline ueber Pipeline.run(ctx).
+2. Die Pipeline erzeugt einen gemeinsamen PipelineContext fuer alle Zwischenartefakte.
+3. ExportPLCopenXMLStep exportiert die PLCOpenXML und hinterlegt sie im Kontext.
+4. BuildProgramIOMappingStep erzeugt ProgramMapping- und GVL-Artefakte.
+5. BuildIOMappingsStep erzeugt I/O- und Hardware-Bezuege.
+6. ArtifactQualityGate validiert den PipelineContext.
+7. Die Pipeline gibt den gefuellten PipelineContext an die UI zurueck.
+
+Interpretation:
+Diese Teilgrafik isoliert die technische Vorbereitungsphase, damit der eigentliche Analysepfad spaeter lesbarer bleibt.

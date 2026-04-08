@@ -1,0 +1,54 @@
+@startuml
+
+skinparam shadowing false
+skinparam responseMessageBelowArrow true
+skinparam sequenceMessageAlign center
+hide footbox
+autonumber
+
+title ExcH-KG-Agent - Initiale Anfrage\nTeil 6 von 6: Ausgabe und Protokollierung
+
+actor "Nutzende\nInstanz" as User
+boundary "ExcHAgentUI" as UI
+control "ExcHChatBotSession" as Session
+entity "ResponseEnvelope" as Envelope
+control "OutputGuardrail" as Guard
+entity "EscalationDecision" as Esc
+entity "SessionTurn" as Turn
+entity "SessionMemory" as Memory
+entity "AuditTrailEntry" as Audit
+
+Session --> UI : diagnosis draft + tool results
+activate UI
+
+create Envelope
+UI -> Envelope : create diagnosis +\nnext_steps + proposed_actions
+
+UI -> Guard : check(Envelope)
+activate Guard
+create Esc
+Guard -> Esc : create(requires_human_review,\nreason)
+Esc --> UI : decision
+deactivate Guard
+
+create Turn
+Session -> Turn : create(user_msg,\nassistant_msg,\ntool_trace)
+Session -> Memory : append(SessionTurn)
+
+create Audit
+UI -> Audit : create(kind="initial_analysis", data)
+
+alt requires_human_review = true
+  UI --> User : Diagnose + Eskalationshinweis
+else direkte Ausgabe zulaessig
+  UI --> User : Diagnose + naechste Schritte
+end
+deactivate UI
+
+note right of Envelope
+StructuredToolResult und
+FollowUpQuestion koennen
+Teil des ResponseEnvelope sein.
+end note
+
+@enduml

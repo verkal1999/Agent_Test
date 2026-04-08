@@ -1,0 +1,19 @@
+Sequenzdiagramm: Initiale Anfrage des ExcH-RAG-Agenten, Teil 4 von 6
+
+Titel:
+Kontextbuendelung und Guardrails
+
+Zweck:
+Dieses Teilsequenzdiagramm zeigt den Uebergang vom Retrieval-Ergebnis zur kontrollierten Antwortvorbereitung.
+
+Ablauf:
+
+1. SimpleRagSession erzeugt einen GenerationRequest aus Frage und Zusatzkontext.
+2. Danach baut die Session ein GroundedContextBundle aus Event-Kontext und Retrieval-Treffern auf.
+3. Die einzelnen Treffer werden als RetrievedContextBlock-Instanzen in das Bundle uebernommen.
+4. Die Session uebergibt Request und Bundle an den GroundedAnswerGenerator.
+5. GuardrailPolicy begrenzt den Request vor dem Modellaufruf.
+6. AnswerContract liefert die formale Zielstruktur fuer die spaetere Antwort.
+
+Interpretation:
+Diese Teilgrafik zeigt die zentrale Kontrollidee des RAG-Agenten vor dem eigentlichen Modellaufruf.

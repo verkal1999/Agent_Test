@@ -1,0 +1,39 @@
+@startuml
+
+skinparam shadowing false
+skinparam responseMessageBelowArrow true
+skinparam sequenceMessageAlign center
+hide footbox
+autonumber
+
+title ExcH-KG-Agent - Initiale Anfrage\nTeil 3 von 6: Kontext- und Sitzungsaufbau
+
+actor "Nutzende\nInstanz" as User
+collections "RuntimeEvent" as Event
+boundary "ExcHAgentUI" as UI
+control "ContextAssembler" as Assembler
+entity "IncidentContext" as Ctx
+control "ExcHChatBotSession" as Session
+entity "SessionMemory" as Memory
+
+User -> UI : start_analysis(event)
+activate UI
+UI -> Event : lese Fehlerereignis
+
+UI -> Assembler : from_event(event)
+activate Assembler
+create Ctx
+Assembler -> Ctx : create IncidentContext\n+ RuntimeSnapshot\n+ GraphContextRef
+Assembler --> UI : ctx
+deactivate Assembler
+
+create Session
+UI -> Session : create(bot, ctx)
+activate Session
+create Memory
+Session -> Memory : create bootstrap_plan = None,\nturns = []
+Session --> UI : Sitzung bereit
+deactivate Session
+deactivate UI
+
+@enduml

@@ -1,0 +1,44 @@
+@startuml
+
+skinparam shadowing false
+skinparam responseMessageBelowArrow true
+skinparam sequenceMessageAlign center
+hide footbox
+autonumber
+
+title ExcH-RAG-Agent - Initiale Anfrage\nTeil 4 von 6: Kontextbuendelung und Guardrails
+
+control "SimpleRagSession" as Session
+entity "GenerationRequest" as GenReq
+entity "GroundedContextBundle" as Bundle
+entity "RetrievedContextBlock" as Block
+control "GroundedAnswerGenerator" as Generator
+control "GuardrailPolicy" as Guard
+entity "AnswerContract" as Contract
+
+create GenReq
+Session -> GenReq : create(question,\nextra_context)
+activate Session
+
+create Bundle
+Session -> Bundle : create(event_context,\nretrieved_chunks)
+
+create Block
+Session -> Block : create(rank, kind,\nname, score, text)
+Session -> Bundle : add RetrievedContextBlock[]
+
+Session -> Generator : generate(req, bundle)
+activate Generator
+Generator -> Guard : enforce(req)
+activate Guard
+Guard --> Generator : guarded req
+deactivate Guard
+
+Generator -> Contract : lese required_sections
+activate Contract
+Contract --> Generator : Antwortstruktur
+deactivate Contract
+deactivate Generator
+deactivate Session
+
+@enduml

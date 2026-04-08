@@ -1,0 +1,40 @@
+@startuml
+
+skinparam shadowing false
+skinparam responseMessageBelowArrow true
+skinparam sequenceMessageAlign center
+hide footbox
+autonumber
+
+title ExcH-RAG-Agent - Initiale Anfrage\nTeil 6 von 6: Ergebnis und Ausgabe
+
+actor "Nutzende\nInstanz" as User
+control "GroundedAnswerGenerator" as Generator
+control "GuardrailPolicy" as Guard
+entity "GenerationResult" as Result
+control "SimpleRagSession" as Session
+entity "ChatTurn" as Turn
+boundary "RagAgentUI" as UI
+
+create Result
+Generator -> Result : create(answer,\nuncertainty_notes)
+activate Generator
+Generator -> Guard : validate(result)
+activate Guard
+Guard --> Generator : ok / Unsicherheit markiert
+deactivate Guard
+
+Generator --> Session : GenerationResult
+deactivate Generator
+activate Session
+
+create Turn
+Session -> Turn : create(role="user",\ntext, answer)
+Session --> UI : erste Diagnose + retrieval debug
+deactivate Session
+activate UI
+
+UI --> User : auto-generierte Erstfrage\n+ erste Diagnoseantwort
+deactivate UI
+
+@enduml

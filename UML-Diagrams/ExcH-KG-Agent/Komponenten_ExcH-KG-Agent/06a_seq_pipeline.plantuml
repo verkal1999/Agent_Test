@@ -1,0 +1,54 @@
+@startuml
+
+skinparam shadowing false
+skinparam responseMessageBelowArrow true
+skinparam sequenceMessageAlign center
+hide footbox
+autonumber
+
+title ExcH-KG-Agent - Initiale Anfrage\nTeil 1 von 6: Pipeline-Vorbereitung
+
+boundary "ExcHAgentUI" as UI
+control "Pipeline" as Pipeline
+entity "PipelineContext" as Ctx
+control "ExportPLCopenXMLStep" as ExportStep
+control "BuildProgramIOMappingStep" as ProgStep
+control "BuildIOMappingsStep" as IoStep
+control "ArtifactQualityGate" as Gate
+
+UI -> Pipeline : run(ctx)
+activate Pipeline
+create Ctx
+Pipeline -> Ctx : create artifacts = {}
+
+Pipeline -> ExportStep : run(Ctx)
+activate ExportStep
+ExportStep -> Ctx : set("plcopen_xml", ...)
+ExportStep --> Pipeline : Export abgeschlossen
+deactivate ExportStep
+
+Pipeline -> ProgStep : run(Ctx)
+activate ProgStep
+ProgStep -> Ctx : set("program_mapping", ...)\nset("gvl", ...)
+ProgStep --> Pipeline : Mapping-Artefakte bereit
+deactivate ProgStep
+
+Pipeline -> IoStep : run(Ctx)
+activate IoStep
+IoStep -> Ctx : set("io_mappings", ...)
+IoStep --> Pipeline : Hardware-Bezuege bereit
+deactivate IoStep
+
+Pipeline -> Gate : validate(Ctx)
+activate Gate
+Gate --> Pipeline : Artefakte freigegeben
+deactivate Gate
+Pipeline --> UI : PipelineContext bereit
+deactivate Pipeline
+
+note right of Ctx
+Alle Ingestion-Schritte arbeiten
+auf demselben gemeinsamen Kontext.
+end note
+
+@enduml

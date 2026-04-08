@@ -1,0 +1,73 @@
+Sequenzdiagramm: Initiale Anfrage des ExcH-KG-Agenten
+
+Zweck:
+Dieses Sequenzdiagramm zeigt, wie die Klasseninstanzen aus den fünf KG-Komponenten bei der ersten Analyseanfrage zusammenwirken. Modelliert ist bewusst der typische Erstaufruf aus der UI heraus, nicht eine spaetere Folgefrage innerhalb derselben Sitzung.
+
+Wichtige Modellierungsentscheidung:
+Die vorgeschaltete Pipeline- und KG-Aktualisierung ist als optionale Phase dargestellt. Das passt zur Architektur, weil die UI diese Aktualisierung vor der eigentlichen Diagnose anstossen kann, die erste Anfrage aber auch auf einer bereits vorhandenen Wissensbasis ausgefuehrt werden kann.
+
+Ablauf:
+
+1. Die nutzende Instanz startet in ExcHAgentUI die initiale Analyse eines RuntimeEvent.
+   Die UI bildet damit den operativen Einstiegspunkt des Systems.
+
+2. Optional startet die UI zuerst die Artefakt- und Ingestion-Pipeline.
+   Dabei wird ein gemeinsamer PipelineContext aufgebaut, auf dem die einzelnen Schritte nacheinander arbeiten.
+
+3. ExportPLCopenXMLStep exportiert die PLCOpenXML aus dem Engineering-Kontext.
+   Dadurch wird die statische Programmstruktur fuer die weitere Verarbeitung verfuegbar.
+
+4. BuildProgramIOMappingStep erzeugt ProgramMapping- und GVL-Artefakte.
+   Damit werden Programmschnittstellen und globale Variablen fuer den spaeteren KG-Aufbau explizit vorbereitet.
+
+5. BuildIOMappingsStep erzeugt IoHardwareAddress-Bezuege.
+   So koennen spaetere Diagnosepfade nicht nur softwareseitig, sondern bis zu I/O-Endpunkten verfolgt werden.
+
+6. ArtifactQualityGate validiert den PipelineContext.
+   Erst nach dieser Freigabe werden die erzeugten Artefakte weiter in Richtung Wissensgraph uebernommen.
+
+7. KGLoader ueberfuehrt die vorbereiteten Artefakte in den KGStore.
+   Das repraesentiert den eigentlichen semantischen Befuellungsschritt des ExcH-KG-Agenten.
+
+8. KGManager laedt, analysiert und speichert den Graphen erneut.
+   In dieser Phase wird die Wissensbasis nicht nur geladen, sondern diagnostisch angereichert und auf Konsistenz geprueft.
+
+9. ContextAssembler verdichtet das eingehende RuntimeEvent zu einem IncidentContext.
+   In diesem Objekt werden Laufzeitbeobachtungen, Strukturhinweise und der Verweis auf die KG-Quelle zusammengefuehrt.
+
+10. ExcHChatBotSession wird fuer genau diesen Fehlerfall erzeugt und mit einer leeren SessionMemory initialisiert.
+    Dadurch entsteht eine fortsetzbare Analysesitzung, an die spaetere Rueckfragen anschliessen koennen.
+
+11. Die Session fordert ueber ensure_bootstrap_plan() einen ersten Analyseplan vom Planner an.
+    Das resultierende AnalysisPlan-Objekt repraesentiert den geplanten Mehrschrittpfad der Erstdiagnose.
+
+12. Die Session laesst die geplanten Werkzeuge ueber die ToolRegistry ausfuehren.
+    Im Diagramm sind vier typische Erstwerkzeuge gezeigt:
+    KGQueryTool fuer semantische Beziehungen im KG,
+    StructureCodeAnalysisTool fuer POU- und Codekontext,
+    VariableSignalAnalysisTool fuer Variablen- und Portbeziehungen,
+    PathReconstructionTool fuer moegliche Fehler- und Signalpfade.
+
+13. Die jeweiligen Werkzeugresultate werden im ToolResultBundle gesammelt.
+    Dieses Buendel macht die spaetere Synthese nachvollziehbar, weil die Antwort nicht auf einem Einzelaufruf, sondern auf aggregierten Analyseergebnissen basiert.
+
+14. FoundationModelAdapter synthetisiert aus IncidentContext, AnalysisPlan und ToolResultBundle einen sprachlichen Diagnoseentwurf.
+    Das Foundation-Modell arbeitet hier also nicht frei, sondern auf einer bereits verdichteten Wissensbasis.
+
+15. Die Session speichert Bootstrap-Informationen und Werkzeugspuren in der SessionMemory.
+    Danach gibt sie den Diagnoseentwurf samt Tool-Ergebnissen an die UI zurueck.
+
+16. Die UI ueberfuehrt diesen Entwurf in ein ResponseEnvelope.
+    Dabei koennen StructuredToolResult-Eintraege fuer Nachvollziehbarkeit und, falls noetig, eine FollowUpQuestion fuer Human-in-the-Loop-Unterstuetzung erzeugt werden.
+
+17. OutputGuardrail prueft die Ausgabe und erzeugt eine EscalationDecision.
+    Damit wird entschieden, ob die Antwort direkt ausgegeben werden darf oder ob menschliche Pruefung erforderlich ist.
+
+18. Die Session protokolliert den ersten Verlaufsschritt als SessionTurn und die UI erzeugt einen AuditTrailEntry.
+    Dadurch bleibt sowohl der sitzungsbezogene als auch der revisionsbezogene Verlauf nachvollziehbar.
+
+19. Abschliessend rendert die UI die Antwort fuer die nutzende Instanz.
+    Je nach EscalationDecision geschieht dies entweder als direkte Diagnoseunterstuetzung oder mit explizitem Hinweis auf notwendige menschliche Pruefung.
+
+Interpretation fuer die Masterarbeit:
+Das Diagramm macht sichtbar, dass der ExcH-KG-Agent die initiale Anfrage nicht linear beantwortet. Vor der Ausgabe werden Artefakte vorbereitet, ein semantischer Wissensspeicher genutzt, ein mehrschrittiger Analyseplan aufgebaut, mehrere spezialisierte Werkzeuge ausgefuehrt und das Ergebnis schliesslich ueber Guardrails begrenzt.

@@ -1,0 +1,19 @@
+Sequenzdiagramm: Initiale Anfrage des ExcH-KG-Agenten, Teil 2 von 6
+
+Titel:
+KG-Befuellung und Anreicherung
+
+Zweck:
+Dieses Teilsequenzdiagramm zeigt den Uebergang von vorbereiteten Ingestion-Artefakten zu einer nutzbaren Wissensbasis. Im Fokus stehen KGLoader, KGManager und KGStore.
+
+Ablauf:
+
+1. Die UI uebergibt die vorbereiteten Artefakte an den KGLoader.
+2. KGLoader uebernimmt Programme, GVLs und I/O-Bezuege in den KGStore.
+3. Danach speichert KGLoader den erzeugten Graph-Zwischenstand.
+4. Anschliessend laedt KGManager den Graphen erneut.
+5. KGManager analysiert ungenutzte oder auffaellige Elemente und erzeugt Zusatzwissen.
+6. Abschliessend persistiert KGManager den angereicherten Graphen erneut im KGStore.
+
+Interpretation:
+Diese Teilgrafik trennt den Wissensaufbau sauber von der spaeteren Anfragebearbeitung.

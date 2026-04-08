@@ -1,0 +1,19 @@
+Sequenzdiagramm: Initiale Anfrage des ExcH-KG-Agenten, Teil 3 von 6
+
+Titel:
+Kontext- und Sitzungsaufbau
+
+Zweck:
+Dieses Teilsequenzdiagramm zeigt, wie aus einem eingehenden Fehlerereignis ein IncidentContext und danach eine fortsetzbare Sitzung entstehen.
+
+Ablauf:
+
+1. Die nutzende Instanz startet die Analyse ueber ExcHAgentUI.
+2. Die UI uebergibt das RuntimeEvent an den ContextAssembler.
+3. ContextAssembler verdichtet das Event zu einem IncidentContext.
+4. Die UI erzeugt auf Basis dieses Kontexts eine ExcHChatBotSession.
+5. Die Session initialisiert eine SessionMemory fuer Bootstrap-Plan und Verlauf.
+6. Nach diesem Schritt ist die operative Analysesitzung vorbereitet.
+
+Interpretation:
+Diese Teilgrafik trennt Ereignisverdichtung und spaetere Analyse bewusst voneinander.

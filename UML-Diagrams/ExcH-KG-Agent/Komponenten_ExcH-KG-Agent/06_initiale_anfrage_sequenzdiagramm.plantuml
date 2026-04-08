@@ -1,0 +1,223 @@
+@startuml
+
+skinparam shadowing false
+skinparam responseMessageBelowArrow true
+skinparam sequenceMessageAlign center
+hide footbox
+autonumber
+
+title ExcH-KG-Agent - Initiale Anfrage
+
+actor "Nutzende\nInstanz" as User
+collections "RuntimeEvent" as Event
+
+box "Interaktions- und Ausgabe-Komponente" #EAF3FB
+  boundary "ExcHAgentUI" as UI
+  control "OutputGuardrail" as Guard
+  entity "ResponseEnvelope" as Envelope
+  entity "StructuredToolResult" as Structured
+  entity "FollowUpQuestion" as FollowUp
+  entity "EscalationDecision" as Esc
+  entity "AuditTrailEntry" as Audit
+end box
+
+box "Artefakt- und Ingestion-Komponente" #F4F6F7
+  control "Pipeline" as Pipeline
+  entity "PipelineContext" as PipeCtx
+  control "ExportPLCopenXMLStep" as ExportStep
+  control "BuildProgramIOMappingStep" as ProgStep
+  control "BuildIOMappingsStep" as IoStep
+  control "ArtifactQualityGate" as ArtGate
+end box
+
+box "Ontologie- und Wissensgraph-Komponente" #FFF3CD
+  control "KGLoader" as Loader
+  control "KGManager" as Manager
+  database "KGStore" as Store
+end box
+
+box "Kontext- und Sitzungs-Komponente" #E8F5E9
+  control "ContextAssembler" as Assembler
+  entity "IncidentContext" as Ctx
+  entity "SessionMemory" as Memory
+  entity "SessionTurn" as Turn
+  control "ExcHChatBotSession" as Session
+end box
+
+box "Modell-, Planner- und Werkzeug-Komponente" #FDEDEC
+  control "Planner" as Planner
+  entity "AnalysisPlan" as Plan
+  control "ToolRegistry" as Registry
+  control "KGQueryTool" as KGTool
+  control "StructureCodeAnalysisTool" as StructTool
+  control "VariableSignalAnalysisTool" as SignalTool
+  control "PathReconstructionTool" as PathTool
+  entity "ToolResultBundle" as Results
+  control "FoundationModelAdapter" as FM
+end box
+
+User -> UI : start_analysis(event)
+activate UI
+UI -> Event : lese Fehlerereignis
+
+opt Pipeline und Wissensbasis vor Erstanalyse aktualisieren
+  UI -> Pipeline : run(PipelineContext)
+  activate Pipeline
+  create PipeCtx
+  Pipeline -> PipeCtx : create artifacts = {}
+  Pipeline -> ExportStep : run(PipeCtx)
+  activate ExportStep
+  ExportStep --> Pipeline : PLCOpenXML bereit
+  deactivate ExportStep
+  Pipeline -> ProgStep : run(PipeCtx)
+  activate ProgStep
+  ProgStep --> Pipeline : ProgramMapping / GVL bereit
+  deactivate ProgStep
+  Pipeline -> IoStep : run(PipeCtx)
+  activate IoStep
+  IoStep --> Pipeline : IoHardwareAddress bereit
+  deactivate IoStep
+  Pipeline -> ArtGate : validate(PipeCtx)
+  activate ArtGate
+  ArtGate --> Pipeline : Artefakte freigegeben
+  deactivate ArtGate
+  Pipeline --> UI : PipelineContext bereit
+  deactivate Pipeline
+
+  UI -> Loader : ingest Artefakte aus PipeCtx
+  activate Loader
+  Loader -> Store : befuellt Graph
+  Loader -> Store : save()
+  deactivate Loader
+  UI -> Manager : load()
+  activate Manager
+  Manager -> Store : lade Graph
+  UI -> Manager : analyze_unused_elements()
+  Manager -> Store : analysiere / erweitere
+  UI -> Manager : generate_reports()
+  Manager -> Store : save(output_path)
+  deactivate Manager
+end
+
+UI -> Assembler : from_event(event)
+activate Assembler
+create Ctx
+Assembler -> Ctx : create IncidentContext\n+ RuntimeSnapshot\n+ GraphContextRef
+Assembler --> UI : ctx
+deactivate Assembler
+
+create Session
+UI -> Session : create(bot, ctx)
+activate Session
+create Memory
+Session -> Memory : bootstrap_plan = None,\nturns = []
+
+UI -> Session : ensure_bootstrap_plan()
+Session -> Planner : plan(ctx)
+activate Planner
+create Plan
+Planner -> Plan : create goal + PlanStep[]
+Planner --> Session : AnalysisPlan
+deactivate Planner
+
+create Results
+Session -> Results : create empty result bundle
+
+Session -> Registry : execute("KGQueryTool", ctx)
+activate Registry
+Registry -> KGTool : run(...)
+activate KGTool
+KGTool -> Store : query semantische Beziehungen
+Store --> KGTool : KG-Treffer
+KGTool --> Registry : tool result
+Registry --> Session : result
+deactivate KGTool
+deactivate Registry
+Session -> Results : add(KGQueryTool)
+
+Session -> Registry : execute("StructureCodeAnalysisTool", ctx)
+activate Registry
+Registry -> StructTool : run(...)
+activate StructTool
+StructTool -> Store : hole POU- und Codekontext
+Store --> StructTool : Codebelege
+StructTool --> Registry : tool result
+Registry --> Session : result
+deactivate StructTool
+deactivate Registry
+Session -> Results : add(StructureCodeAnalysisTool)
+
+Session -> Registry : execute("VariableSignalAnalysisTool", ctx)
+activate Registry
+Registry -> SignalTool : run(...)
+activate SignalTool
+SignalTool -> Store : hole Variablen- und Portbeziehungen
+Store --> SignalTool : Signalbelege
+SignalTool --> Registry : tool result
+Registry --> Session : result
+deactivate SignalTool
+deactivate Registry
+Session -> Results : add(VariableSignalAnalysisTool)
+
+Session -> Registry : execute("PathReconstructionTool", ctx)
+activate Registry
+Registry -> PathTool : run(...)
+activate PathTool
+PathTool -> Store : rekonstruiere Fehlerpfade
+Store --> PathTool : Pfadbelege
+PathTool --> Registry : tool result
+Registry --> Session : result
+deactivate PathTool
+deactivate Registry
+Session -> Results : add(PathReconstructionTool)
+
+Session -> FM : synthesize(ctx, plan, results)
+activate FM
+FM --> Session : diagnosis draft
+deactivate FM
+Session -> Memory : speichere bootstrap_plan\nund Werkzeugspuren
+
+Session --> UI : diagnosis draft + tool results
+deactivate Session
+
+create Envelope
+UI -> Envelope : create diagnosis +\nnext_steps + proposed_actions
+create Structured
+UI -> Structured : create(tool_name, payload)
+UI -> Envelope : add StructuredToolResult[]
+
+opt fehlender Kontext oder Unsicherheit
+  create FollowUp
+  UI -> FollowUp : create(text, priority)
+  UI -> Envelope : add FollowUpQuestion
+end
+
+UI -> Guard : check(Envelope)
+activate Guard
+create Esc
+Guard -> Esc : create(requires_human_review,\nreason)
+Esc --> UI : EscalationDecision
+deactivate Guard
+
+create Turn
+Session -> Turn : create(user_msg,\nassistant_msg,\ntool_trace)
+Session -> Memory : append(SessionTurn)
+
+create Audit
+UI -> Audit : create(kind="initial_analysis", data)
+
+alt requires_human_review = true
+  UI --> User : Diagnose + Eskalationshinweis
+else direkte Ausgabe zulaessig
+  UI --> User : Diagnose + naechste Schritte
+end
+deactivate UI
+
+note right of Planner
+Die konkrete Reihenfolge der Werkzeuge
+kann je nach Fehlerfall variieren.
+Das Diagramm zeigt einen typischen
+Initialplan fuer die erste Anfrage.
+end note
+
+@enduml

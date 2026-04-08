@@ -1,0 +1,39 @@
+@startuml
+
+skinparam shadowing false
+skinparam responseMessageBelowArrow true
+skinparam sequenceMessageAlign center
+hide footbox
+autonumber
+
+title ExcH-RAG-Agent - Initiale Anfrage\nTeil 2 von 6: Artefaktaufbereitung
+
+control "RagSessionBuilder" as Builder
+entity "ArtifactCatalog" as Catalog
+control "PLCOpenXmlSource" as XmlSource
+control "XmlChunker" as Chunker
+entity "DocumentCorpus" as Corpus
+control "SimpleRagIndex" as Index
+
+create Catalog
+Builder -> Catalog : create(xml_path,\ndocument_type="PLCOpenXML")
+activate Builder
+
+Builder -> XmlSource : load_text(xml_path)
+activate XmlSource
+XmlSource --> Builder : xml_text
+deactivate XmlSource
+
+Builder -> Chunker : chunk_text(xml_text, xml_path)
+activate Chunker
+Chunker --> Builder : RagChunk[]
+deactivate Chunker
+
+create Corpus
+Builder -> Corpus : add(chunks)
+
+Builder -> Index : create(chunks)
+Index --> Builder : Index bereit
+deactivate Builder
+
+@enduml

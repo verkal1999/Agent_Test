@@ -1,0 +1,19 @@
+Sequenzdiagramm: Initiale Anfrage des ExcH-KG-Agenten, Teil 6 von 6
+
+Titel:
+Ausgabe und Protokollierung
+
+Zweck:
+Dieses Teilsequenzdiagramm zeigt den letzten Abschnitt der initialen Anfrage: Antwortaufbereitung, Guardrail-Pruefung, Sitzungsprotokollierung und Ausgabe an die nutzende Instanz.
+
+Ablauf:
+
+1. Die Session liefert den Diagnoseentwurf samt Werkzeugspuren an die UI zurueck.
+2. Die UI ueberfuehrt den Entwurf in ein ResponseEnvelope.
+3. OutputGuardrail prueft die Ausgabe und erzeugt eine EscalationDecision.
+4. Die Session legt einen SessionTurn in der SessionMemory ab.
+5. Parallel erzeugt die UI einen AuditTrailEntry.
+6. Abschliessend rendert die UI die Diagnose fuer die nutzende Instanz.
+
+Interpretation:
+Diese Teilgrafik macht sichtbar, dass der KG-Agent seine Antwort nicht ungeprueft ausgibt, sondern in Guardrails, Sitzungsverlauf und Auditierung einbettet.

@@ -1,0 +1,18 @@
+Sequenzdiagramm: Initiale Anfrage des ExcH-RAG-Agenten, Teil 2 von 6
+
+Titel:
+Artefaktaufbereitung
+
+Zweck:
+Dieses Teilsequenzdiagramm zeigt die Umwandlung der PLCOpenXML in eine retrieval-faehige Dokumentbasis.
+
+Ablauf:
+
+1. RagSessionBuilder erzeugt ein ArtifactCatalog fuer die PLCOpenXML-Quelle.
+2. PLCOpenXmlSource laedt den XML-Inhalt.
+3. XmlChunker zerlegt den XML-Text in einzelne RagChunk-Segmente.
+4. Die Segmente werden in einem DocumentCorpus gesammelt.
+5. Anschliessend wird daraus ein SimpleRagIndex aufgebaut.
+
+Interpretation:
+Diese Teilgrafik macht die dokumentenbasierte Vorbereitung des RAG-Agenten sichtbar, noch bevor eine Suchanfrage ausgefuehrt wird.

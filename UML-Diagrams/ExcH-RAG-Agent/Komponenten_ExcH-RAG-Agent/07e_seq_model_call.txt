@@ -1,0 +1,18 @@
+Sequenzdiagramm: Initiale Anfrage des ExcH-RAG-Agenten, Teil 5 von 6
+
+Titel:
+Modellaufruf
+
+Zweck:
+Dieses Teilsequenzdiagramm zeigt den eigentlichen Aufruf der Modellkomponente.
+
+Ablauf:
+
+1. GroundedAnswerGenerator fordert bei der ModelSelectionPolicy ein passendes Profil fuer die initiale Diagnose an.
+2. Die ModelSelectionPolicy erzeugt ein ModelProfile.
+3. Danach baut der Generator einen PromptRequest aus System- und Nutzkontext.
+4. FoundationModelGateway fuehrt den eigentlichen Modellaufruf aus.
+5. Das Ergebnis wird als ModelResponse an den Generator zurueckgegeben.
+
+Interpretation:
+Diese Teilgrafik trennt Modellwahl, Promptbildung und Modellaufruf sauber von Retrieval- und UI-Logik.

@@ -1,0 +1,66 @@
+Sequenzdiagramm: Initiale Anfrage des ExcH-RAG-Agenten
+
+Zweck:
+Dieses Sequenzdiagramm beschreibt den typischen Erstaufruf des ExcH-RAG-Agenten. Gezeigt wird, wie die Klasseninstanzen aus den sechs RAG-Komponenten bei der ersten Diagnosefrage zusammenarbeiten, vom eingehenden RuntimeEvent bis zur ersten ausgegebenen Antwort.
+
+Wichtige Modellierungsentscheidung:
+Die optionale Pipeline-Ausfuehrung ist wieder als vorgeschaltete Phase modelliert. Das ist sinnvoll, weil die UI vor der eigentlichen Anfrage bei Bedarf zuerst die XML-Quelle aktualisieren kann, der eigentliche RAG-Pfad aber auch auf bereits vorhandenen Artefakten lauffaehig bleibt.
+
+Ablauf:
+
+1. Die nutzende Instanz startet in RagAgentUI die Analyse eines RuntimeEvent.
+   Die UI bildet damit die Einstiegsschicht fuer den gesamten Erstaufruf.
+
+2. Optional fuehrt die UI vorab die vorgeschaltete Pipeline aus.
+   Das Ergebnis dieser Phase ist vor allem ein aktualisierter PLCOpenXML-Pfad, der in das Event bzw. in die weitere Konfiguration uebernommen wird.
+
+3. RagAgentUI delegiert den Sitzungsaufbau an RagSessionBuilder.
+   Damit wird die Ueberfuehrung vom Rohereignis in eine lauffaehige RAG-Sitzung explizit als eigener Bauschritt modelliert.
+
+4. ContextInterpreter verdichtet das RuntimeEvent zu einem RagIncidentContext und trennt dabei den Snapshot aus dem Event heraus.
+   Dadurch liegen Laufzeitkontext und strukturierte Eventinformationen bereits in einer fuer die spaetere Analyse geeigneten Form vor.
+
+5. ArtifactCatalog beschreibt anschliessend, welche PLCOpenXML-Quelle verarbeitet werden soll.
+   Das macht die statische Wissensbasis des RAG-Agenten explizit.
+
+6. PLCOpenXmlSource laedt den XML-Inhalt und XmlChunker zerlegt ihn in retrieval-faehige RagChunk-Segmente.
+   Diese Transformation ist wesentlich, weil der RAG-Agent nicht auf einem Wissensgraphen, sondern auf dokumentbasierten Segmenten arbeitet.
+
+7. Die erzeugten Segmente werden in einem DocumentCorpus gesammelt und danach von SimpleRagIndex indexiert.
+   Damit ist die durchsuchbare Dokumentbasis fuer die erste Anfrage vorbereitet.
+
+8. RagSessionBuilder erzeugt aus Kontext, Index und Konfiguration eine SimpleRagSession.
+   Ab diesem Punkt liegt eine konkrete, fortsetzbare Sitzung fuer den aktuellen Fehlerfall vor.
+
+9. Die UI startet ueber run_initial_analysis() die erste Analyse innerhalb dieser Sitzung.
+   Die erste Frage wird dabei nicht manuell eingegeben, sondern aus dem Fehlerkontext abgeleitet.
+
+10. SimpleRagSession erfragt beim RagIncidentContext nacheinander default_question(), compact_event_context() und runtime_context_note().
+    Daraus entsteht ein initialer GenerationRequest, der sowohl die Diagnosefrage als auch den zusaetzlichen Laufzeitkontext enthaelt.
+
+11. Fuer den Wissensabruf erzeugt die Session eine RetrievalQuery und ruft SimpleRagIndex.search(question, top_k) auf.
+    Innerhalb des Index bewertet TokenScorer die Relevanz der vorhandenen Dokumentsegmente fuer die aktuelle Frage.
+
+12. Das Ergebnis des Abrufs liegt als RetrievalResultSet vor.
+    Die relevantesten Treffer werden anschliessend als RetrievedContextBlock-Instanzen in ein GroundedContextBundle ueberfuehrt.
+
+13. GroundedAnswerGenerator uebernimmt nun die eigentliche Antworterzeugung.
+    Vor dem Modellaufruf begrenzt GuardrailPolicy den GenerationRequest und AnswerContract gibt die erwartete Antwortstruktur vor.
+
+14. ModelSelectionPolicy waehlt ein passendes ModelProfile fuer die Erstdiagnose aus.
+    Anschliessend wird aus System- und Nutzkontext ein PromptRequest aufgebaut.
+
+15. FoundationModelGateway fuehrt den eigentlichen Modellaufruf aus und liefert ein ModelResponse zurueck.
+    Damit bleibt das Foundation-Modell als austauschbare technische Zugriffsschicht gekapselt.
+
+16. GroundedAnswerGenerator ueberfuehrt die Modellantwort in ein GenerationResult und laesst dieses nochmals durch GuardrailPolicy validieren.
+    So wird sichergestellt, dass die erste Antwort inhaltlich begrenzt und Unsicherheit explizit gemacht wird.
+
+17. SimpleRagSession speichert das Ergebnis als ersten ChatTurn.
+    Damit ist der initiale Dialogschritt nachvollziehbar und die Sitzung fuer Folgefragen vorbereitet.
+
+18. Die UI gibt der nutzenden Instanz schliesslich sowohl die automatisch erzeugte Erstfrage als auch die erste Diagnoseantwort aus.
+    Der Erstaufruf endet damit in einer kontrollierten, retrieval-gestuetzten Antwort statt in einer freien Modellantwort.
+
+Interpretation fuer die Masterarbeit:
+Das Diagramm macht deutlich, dass der ExcH-RAG-Agent trotz seines einfacheren Aufbaus mehrere klar trennbare Verarbeitungsschritte besitzt: Kontextverdichtung, Dokumentaufbereitung, Retrieval, generative Antworterzeugung und Guardrails. Gerade diese Schrittfolge ist wichtig, um den Unterschied zum wissensgraphgestuetzten ExcH-KG-Agenten sauber herauszuarbeiten.

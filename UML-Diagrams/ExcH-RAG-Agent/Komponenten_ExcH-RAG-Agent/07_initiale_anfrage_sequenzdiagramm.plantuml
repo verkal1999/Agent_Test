@@ -1,0 +1,177 @@
+@startuml
+
+skinparam shadowing false
+skinparam responseMessageBelowArrow true
+skinparam sequenceMessageAlign center
+hide footbox
+autonumber
+
+title ExcH-RAG-Agent - Initiale Anfrage
+
+actor "Nutzende\nInstanz" as User
+collections "RuntimeEvent" as Event
+
+box "Interaktions- und Sitzungs-Komponente" #EAF3FB
+  boundary "RagAgentUI" as UI
+  control "RagSessionBuilder" as Builder
+  control "SimpleRagSession" as Session
+  entity "ChatTurn" as Turn
+end box
+
+box "Kontext-Komponente" #E8F5E9
+  control "ContextInterpreter" as CtxInt
+  entity "RagIncidentContext" as Ctx
+end box
+
+box "Artefakt- und Dokumenten-Komponente" #F4F6F7
+  entity "ArtifactCatalog" as Catalog
+  control "PLCOpenXmlSource" as XmlSource
+  control "XmlChunker" as Chunker
+  entity "DocumentCorpus" as Corpus
+end box
+
+box "Retrieval-Komponente" #FFF3CD
+  entity "RetrievalQuery" as Query
+  control "SimpleRagIndex" as Index
+  control "TokenScorer" as Scorer
+  entity "RetrievalResultSet" as ResultSet
+  entity "RetrievedContextBlock" as Block
+end box
+
+box "Generierungs- und Leitplanken-Komponente" #FDEDEC
+  entity "GenerationRequest" as GenReq
+  entity "GroundedContextBundle" as Bundle
+  control "GroundedAnswerGenerator" as Generator
+  control "GuardrailPolicy" as Guard
+  entity "AnswerContract" as Contract
+  entity "GenerationResult" as GenResult
+end box
+
+box "Foundation-Modell-Komponente" #F9F3E6
+  control "ModelSelectionPolicy" as Policy
+  entity "ModelProfile" as Profile
+  entity "PromptRequest" as Prompt
+  control "FoundationModelGateway" as Gateway
+  entity "ModelResponse" as Response
+end box
+
+User -> UI : start_analysis(event)
+activate UI
+UI -> Event : lese Fehlerereignis
+
+opt PipelineConfig.enabled
+  UI -> UI : run_pipeline(cfg.pipeline, event)
+  UI -> Event : payload.plcopen_xml_path aktualisieren
+end
+
+UI -> Builder : build_session_from_input(event,\nxml_path, model, temperature, top_k)
+activate Builder
+Builder -> CtxInt : from_event(event)
+activate CtxInt
+CtxInt -> CtxInt : extract_snapshot(event)
+create Ctx
+CtxInt -> Ctx : create RagIncidentContext\n+ RuntimeSnapshot
+CtxInt --> Builder : ctx
+deactivate CtxInt
+
+create Catalog
+Builder -> Catalog : create(xml_path,\ndocument_type="PLCOpenXML")
+Builder -> XmlSource : load_text(xml_path)
+activate XmlSource
+XmlSource --> Builder : xml_text
+deactivate XmlSource
+Builder -> Chunker : chunk_text(xml_text, xml_path)
+activate Chunker
+Chunker --> Builder : RagChunk[]
+deactivate Chunker
+create Corpus
+Builder -> Corpus : add(chunks)
+Builder -> Index : create(chunks)
+
+create Session
+Builder -> Session : create(ctx, index, config)
+Builder --> UI : SimpleRagSession
+deactivate Builder
+
+UI -> Session : run_initial_analysis()
+activate Session
+Session -> Ctx : default_question()
+Ctx --> Session : initiale Diagnosefrage
+Session -> Ctx : compact_event_context()
+Ctx --> Session : kompakter Event-Kontext
+Session -> Ctx : runtime_context_note()
+Ctx --> Session : Laufzeit- und Snapshot-Hinweise
+
+create GenReq
+Session -> GenReq : create(question,\nextra_context)
+
+create Query
+Session -> Query : create(question, top_k)
+Session -> Index : search(question, top_k)
+activate Index
+loop fuer jedes relevante Dokumentsegment
+  Index -> Scorer : score(query, chunk)
+  activate Scorer
+  Scorer --> Index : Relevanzwert
+  deactivate Scorer
+end
+create ResultSet
+Index -> ResultSet : create ranked hits
+ResultSet --> Session : RetrievalResultSet
+deactivate Index
+
+create Bundle
+Session -> Bundle : create(event_context,\nretrieved_chunks)
+create Block
+Session -> Block : create(rank, kind,\nname, score, text)
+Session -> Bundle : add RetrievedContextBlock[]
+
+Session -> Generator : generate(req, bundle)
+activate Generator
+Generator -> Guard : enforce(req)
+activate Guard
+Guard --> Generator : guarded req
+deactivate Guard
+Generator -> Contract : lese required_sections
+activate Contract
+Contract --> Generator : Antwortstruktur
+deactivate Contract
+Generator -> Policy : select_profile("initial_diagnosis")
+activate Policy
+create Profile
+Policy -> Profile : create(name,\ncost_class,\ncontext_window)
+Profile --> Generator : ModelProfile
+deactivate Policy
+create Prompt
+Generator -> Prompt : create(system_prompt,\nuser_prompt)
+Generator -> Gateway : invoke(prompt)
+activate Gateway
+Gateway -> Profile : nutze Modellprofil
+create Response
+Gateway -> Response : create(answer,\nfinish_reason)
+Response --> Generator : ModelResponse
+deactivate Gateway
+create GenResult
+Generator -> GenResult : create(answer,\nuncertainty_notes)
+Generator -> Guard : validate(result)
+activate Guard
+Guard --> Generator : ok / Unsicherheit markiert
+deactivate Guard
+Generator --> Session : GenerationResult
+deactivate Generator
+
+create Turn
+Session -> Turn : create(role="user",\ntext, answer)
+Session --> UI : erste Diagnose + retrieval debug
+deactivate Session
+UI --> User : auto-generierte Erstfrage\n+ erste Diagnoseantwort
+deactivate UI
+
+note right of Generator
+Die erste Antwort bleibt strikt
+an Event-Kontext und Retrieval-Treffer
+gebunden. Guardrails und AnswerContract
+begrenzen Form und Inhalt.
+end note
+
+@enduml

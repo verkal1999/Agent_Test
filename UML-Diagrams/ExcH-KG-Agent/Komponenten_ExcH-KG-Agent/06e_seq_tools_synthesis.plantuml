@@ -1,0 +1,70 @@
+@startuml
+
+skinparam shadowing false
+skinparam responseMessageBelowArrow true
+skinparam sequenceMessageAlign center
+hide footbox
+autonumber
+
+title ExcH-KG-Agent - Initiale Anfrage\nTeil 5 von 6: Werkzeugausfuehrung und Synthese
+
+control "ExcHChatBotSession" as Session
+control "ToolRegistry" as Registry
+control "KGQueryTool" as KGTool
+control "StructureCodeAnalysisTool" as StructTool
+control "VariableSignalAnalysisTool" as SignalTool
+control "PathReconstructionTool" as PathTool
+entity "ToolResultBundle" as Results
+control "FoundationModelAdapter" as FM
+
+create Results
+Session -> Results : create empty result bundle
+activate Session
+
+Session -> Registry : execute("KGQueryTool", args)
+activate Registry
+Registry -> KGTool : run(...)
+activate KGTool
+KGTool --> Registry : semantische Treffer
+deactivate KGTool
+Registry --> Session : tool result
+deactivate Registry
+Session -> Results : add(KGQueryTool)
+
+Session -> Registry : execute("StructureCodeAnalysisTool", args)
+activate Registry
+Registry -> StructTool : run(...)
+activate StructTool
+StructTool --> Registry : Code- und POU-Kontext
+deactivate StructTool
+Registry --> Session : tool result
+deactivate Registry
+Session -> Results : add(StructureCodeAnalysisTool)
+
+Session -> Registry : execute("VariableSignalAnalysisTool", args)
+activate Registry
+Registry -> SignalTool : run(...)
+activate SignalTool
+SignalTool --> Registry : Variablen- und Portbelege
+deactivate SignalTool
+Registry --> Session : tool result
+deactivate Registry
+Session -> Results : add(VariableSignalAnalysisTool)
+
+Session -> Registry : execute("PathReconstructionTool", args)
+activate Registry
+Registry -> PathTool : run(...)
+activate PathTool
+PathTool --> Registry : Fehlerpfade
+deactivate PathTool
+Registry --> Session : tool result
+deactivate Registry
+Session -> Results : add(PathReconstructionTool)
+
+Session -> FM : synthesize(ctx, plan, results)
+activate FM
+FM --> Session : diagnosis draft
+deactivate FM
+deactivate Session
+
+@enduml

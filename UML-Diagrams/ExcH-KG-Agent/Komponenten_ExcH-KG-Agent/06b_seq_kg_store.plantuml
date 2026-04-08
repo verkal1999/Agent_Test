@@ -1,0 +1,42 @@
+@startuml
+
+skinparam shadowing false
+skinparam responseMessageBelowArrow true
+skinparam sequenceMessageAlign center
+hide footbox
+autonumber
+
+title ExcH-KG-Agent - Initiale Anfrage\nTeil 2 von 6: KG-Befuellung und Anreicherung
+
+boundary "ExcHAgentUI" as UI
+control "KGLoader" as Loader
+control "KGManager" as Manager
+database "KGStore" as Store
+
+UI -> Loader : ingest Artefakte aus\nPipelineContext
+activate Loader
+Loader -> Store : build_gvl_index_from_objects()
+Loader -> Store : ingest_programs_from_mapping_json()
+Loader -> Store : ingest_io_mappings()
+Loader -> Store : ingest_gvl_globals()
+Loader -> Store : save()
+Loader --> UI : Graph-Basis erstellt
+deactivate Loader
+
+UI -> Manager : load()
+activate Manager
+Manager -> Store : lade RDF-Graph
+Store --> Manager : graph
+
+UI -> Manager : analyze_unused_elements()
+Manager -> Store : analysiere und erweitere
+
+UI -> Manager : generate_reports()
+Manager -> Store : erzeuge Zusatzwissen
+
+UI -> Manager : save(output_path)
+Manager -> Store : persistiere Graph
+Manager --> UI : KG einsatzbereit
+deactivate Manager
+
+@enduml

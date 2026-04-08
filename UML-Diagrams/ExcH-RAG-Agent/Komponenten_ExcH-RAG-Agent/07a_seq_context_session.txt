@@ -1,0 +1,19 @@
+Sequenzdiagramm: Initiale Anfrage des ExcH-RAG-Agenten, Teil 1 von 6
+
+Titel:
+Sitzungs- und Kontextaufbau
+
+Zweck:
+Dieses Teilsequenzdiagramm zeigt den Einstieg in den Erstaufruf des RAG-Agenten. Im Mittelpunkt stehen UI, Sitzungsaufbau und die Verdichtung des Rohereignisses zu einem nutzbaren Kontext.
+
+Ablauf:
+
+1. Die nutzende Instanz startet die Analyse ueber RagAgentUI.
+2. Optional fuehrt die UI zuerst eine Pipeline zur Aktualisierung des XML-Pfads aus.
+3. Danach delegiert die UI den Sitzungsaufbau an RagSessionBuilder.
+4. RagSessionBuilder ruft ContextInterpreter.from_event(event) auf.
+5. ContextInterpreter extrahiert den Snapshot und erzeugt einen RagIncidentContext.
+6. Auf Basis dieses Kontexts entsteht eine SimpleRagSession.
+
+Interpretation:
+Diese Teilgrafik zeigt, dass auch der RAG-Agent vor dem Retrieval zuerst einen kontrollierten Diagnosekontext aufbaut.

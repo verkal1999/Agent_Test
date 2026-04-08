@@ -1,0 +1,18 @@
+Sequenzdiagramm: Initiale Anfrage des ExcH-KG-Agenten, Teil 4 von 6
+
+Titel:
+Bootstrap-Planung
+
+Zweck:
+Dieses Teilsequenzdiagramm isoliert die Planungslogik der ersten Anfrage. Dadurch bleibt sichtbar, dass der KG-Agent seine Analyse nicht direkt mit einer Antwort beginnt, sondern zuerst einen strukturierten Mehrschrittplan erzeugt.
+
+Ablauf:
+
+1. Die UI fordert ueber ensure_bootstrap_plan() einen initialen Analysepfad von der Session an.
+2. Die Session delegiert die Planung an den Planner.
+3. Der Planner erzeugt ein AnalysisPlan-Objekt mit Ziel und PlanStep-Folge.
+4. Die Session speichert diesen Bootstrap-Plan in der SessionMemory.
+5. Der initiale Analyseplan wird an die UI zurueckgegeben.
+
+Interpretation:
+Diese Teilgrafik macht den Planungscharakter des KG-Agenten sichtbar und grenzt ihn vom linearen RAG-Pfad ab.

@@ -1,0 +1,20 @@
+Sequenzdiagramm: Initiale Anfrage des ExcH-KG-Agenten, Teil 5 von 6
+
+Titel:
+Werkzeugausfuehrung und Synthese
+
+Zweck:
+Dieses Teilsequenzdiagramm zeigt den eigentlichen Analysekern des KG-Agenten: ToolRegistry, spezialisierte Werkzeuge und die anschliessende sprachliche Synthese.
+
+Ablauf:
+
+1. Die Session erzeugt ein leeres ToolResultBundle.
+2. Ueber die ToolRegistry wird zuerst das KGQueryTool ausgefuehrt.
+3. Danach folgt das StructureCodeAnalysisTool fuer POU- und Codekontext.
+4. Anschliessend liefert das VariableSignalAnalysisTool Variablen- und Portbelege.
+5. Das PathReconstructionTool rekonstruiert moegliche Fehler- oder Signalpfade.
+6. Jedes Ergebnis wird in das ToolResultBundle uebernommen.
+7. FoundationModelAdapter synthetisiert daraus einen Diagnoseentwurf.
+
+Interpretation:
+Diese Teilgrafik zeigt den agentischen Kern des Systems in kompakter Form: mehrere spezialisierte Werkzeuge statt eines einzelnen Abrufs.

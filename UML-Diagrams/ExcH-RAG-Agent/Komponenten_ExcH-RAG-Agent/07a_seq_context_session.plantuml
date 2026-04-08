@@ -1,0 +1,44 @@
+@startuml
+
+skinparam shadowing false
+skinparam responseMessageBelowArrow true
+skinparam sequenceMessageAlign center
+hide footbox
+autonumber
+
+title ExcH-RAG-Agent - Initiale Anfrage\nTeil 1 von 6: Sitzungs- und Kontextaufbau
+
+actor "Nutzende\nInstanz" as User
+collections "RuntimeEvent" as Event
+boundary "RagAgentUI" as UI
+control "RagSessionBuilder" as Builder
+control "ContextInterpreter" as CtxInt
+entity "RagIncidentContext" as Ctx
+control "SimpleRagSession" as Session
+
+User -> UI : start_analysis(event)
+activate UI
+UI -> Event : lese Fehlerereignis
+
+opt PipelineConfig.enabled
+  UI -> UI : run_pipeline(cfg.pipeline, event)
+  UI -> Event : payload.plcopen_xml_path aktualisieren
+end
+
+UI -> Builder : build_session_from_input(event,\nxml_path, model, temperature, top_k)
+activate Builder
+Builder -> CtxInt : from_event(event)
+activate CtxInt
+CtxInt -> CtxInt : extract_snapshot(event)
+create Ctx
+CtxInt -> Ctx : create RagIncidentContext\n+ RuntimeSnapshot
+CtxInt --> Builder : ctx
+deactivate CtxInt
+
+create Session
+Builder -> Session : create(ctx, config)
+Builder --> UI : Session bereit
+deactivate Builder
+deactivate UI
+
+@enduml

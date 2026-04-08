@@ -1,5 +1,4 @@
 @startuml
-title ExcH-KG-Agent - Interaktions- und Ausgabe-Komponente
 
 skinparam shadowing false
 skinparam classAttributeIconSize 0
@@ -56,16 +55,6 @@ package "Interaktions- und Ausgabe-Komponente" {
   OutputGuardrail ..> ResponseEnvelope : prueft
   OutputGuardrail --> EscalationDecision : erzeugt
   ExcHAgentUI o-- AuditTrailEntry
-  SessionResumeRequest ..> ExcHAgentUI : fuehrt zu Folgeanalyse
+  ExcHAgentUI ..> SessionResumeRequest : verarbeitet
 }
-
-note right of OutputGuardrail
-Kap. 3.4.3:
-Die Ausgabeseite ist die Stelle,
-an der Nachvollziehbarkeit,
-menschliche Aufsicht,
-Eingriffsgrenzen und Eskalation
-praktisch wirksam werden.
-end note
-
 @enduml

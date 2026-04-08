@@ -1,10 +1,58 @@
 Komponente: Kontext-Komponente
 
 Zweck:
-Die Kontext-Komponente ueberfuehrt ein konkretes Laufzeitereignis in einen strukturierten Diagnosekontext. Dabei werden beobachtete Laufzeitwerte und rein strukturelle Browse-Hinweise bewusst getrennt.
+Die Kontext-Komponente ueberfuehrt ein konkretes Fehlerereignis in einen strukturierten Diagnosekontext. Sie trennt dabei beobachtete Laufzeitwerte bewusst von rein strukturellen Hinweisen und schafft so die Arbeitsgrundlage fuer Retrieval und Antworterzeugung.
 
-Diagrammidee:
-Das Diagramm zeigt den Weg vom Rohereignis ueber einen Interpreter hin zu einem `RagIncidentContext`. Der Kontext verweist auf einen aufbereiteten Snapshot mit beobachteten Variablenwerten und Strukturhinweisen.
+Klassen im Diagramm:
 
-Bezug zum Prototyp:
-Die zentrale Klasse ist `RagIncidentContext`. Das Diagramm ergaenzt sie um die konzeptionell mitgedachten Klassen fuer Snapshot und Kontextaufbereitung, die im Text von Kapitel 3.4.2 fachlich beschrieben werden.
+RuntimeEvent
+Aufgabe:
+RuntimeEvent repraesentiert das eingehende Laufzeitereignis mit seinem Payload.
+Methoden/Attribute:
+Im Diagramm ist nur das Attribut payload modelliert. Es traegt die Rohdaten des Fehlerfalls, wie Event-Metadaten, Snapshot-Werte und weitere Kontextinformationen.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse steht fuer den Startpunkt der Runtime-Unterstuetzung. Ohne diese strukturierte Eingangsebene koennte der Agent keinen konkreten Fehlerfall analysieren.
+
+ContextInterpreter
+Aufgabe:
+ContextInterpreter uebernimmt die Verdichtung des Rohereignisses in einen diagnostisch nutzbaren Kontext.
+Methoden/Attribute:
+- from_event(event): Erzeugt aus dem Rohereignis einen RagIncidentContext.
+- extract_snapshot(event): Trennt Snapshot-Daten aus dem Event heraus und ueberfuehrt sie in eine kompaktere Struktur.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse repraesentiert die im Kapitel beschriebene Vorstrukturierung des Fehlerkontexts. Sie macht Prompt-Chaining auf einfacher Ebene sichtbar, weil das Rohereignis nicht direkt in die spaetere Generierung uebergeht.
+
+RagIncidentContext
+Aufgabe:
+RagIncidentContext ist die zentrale Kontextklasse des RAG-Agenten.
+Methoden/Attribute:
+- compact_event_context(): Verdichtet das Ereignis zu einer kuerzeren, weiterverwendbaren Kontextdarstellung.
+- runtime_context_note(): Erzeugt eine textuelle Interpretation des Laufzeit- und Snapshot-Kontexts.
+- default_question(): Baut aus dem Fehlerfall eine Standardfrage fuer die erste Analyse.
+Die Attribute halten Korrelation, Prozessbezug, Fehlerzusammenfassung, Trigger-Event, letzten Skill und XML-Bezug zusammen.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse ist das konkrete Gegenstueck zu der in Kapitel 3.4.2 geforderten Kontextverdichtung. Sie stellt sicher, dass spaetere Diagnoseaussagen auf einem nachvollziehbar aufbereiteten Fehlerkontext beruhen.
+
+RuntimeSnapshot
+Aufgabe:
+RuntimeSnapshot fasst die aus dem Ereignis extrahierten Laufzeitbeobachtungen zusammen.
+Methoden/Attribute:
+Die Attribute vars und rows sammeln beobachtete Variablenwerte sowie Browse-Hinweise aus dem Snapshot. Eigene Methoden sind nicht modelliert.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse zeigt, dass Laufzeitkontext nicht nur aus einem Text besteht, sondern aus beobachteten Signalen und Strukturinformationen.
+
+ObservedValue
+Aufgabe:
+ObservedValue repraesentiert einen beobachteten Laufzeitwert aus dem Snapshot.
+Methoden/Attribute:
+Die Attribute id, type und value halten Name, Datentyp und beobachteten Wert fest. Eigene Methoden sind nicht vorgesehen.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse macht den Bezug zur realen Laufzeitdiagnose deutlich. Der Agent arbeitet damit nicht nur auf Dokumenten, sondern auf konkreten Beobachtungen aus dem Fehlerzeitpunkt.
+
+BrowseHint
+Aufgabe:
+BrowseHint repraesentiert eine Struktur- oder Typinformation aus dem OPC-UA-Adressraum.
+Methoden/Attribute:
+Die Attribute id, node_class und type beschreiben den gefundenen Knoten, ohne ihn als aktuellen Prozesswert zu behandeln.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse bildet die fachlich wichtige Trennung zwischen beobachtetem Zustand und rein strukturellem Hinweis ab. Genau diese Trennung wird in Kapitel 3.4.2 explizit gefordert.

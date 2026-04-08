@@ -1,5 +1,4 @@
 @startuml
-title ExcH-RAG-Agent - Interaktions- und Sitzungs-Komponente
 
 skinparam shadowing false
 skinparam classAttributeIconSize 0
@@ -18,7 +17,7 @@ package "Interaktions- und Sitzungs-Komponente" {
     +config: str
   }
 
-  class RagConfig <<dataclass>> {
+  class SimpleRagConfig <<dataclass>> {
     +xml_path: str
     +model: str
     +temperature: float
@@ -50,20 +49,12 @@ package "Interaktions- und Sitzungs-Komponente" {
   }
 
   UiConfig *-- PipelineConfig
-  UiConfig *-- RagConfig
+  UiConfig *-- SimpleRagConfig
   RagAgentUI ..> UiConfig : laedt
   RagAgentUI ..> RagSessionBuilder : startet
   RagAgentUI --> SimpleRagSession : nutzt
   RagSessionBuilder --> SimpleRagSession : erzeugt
   SimpleRagSession o-- ChatTurn
 }
-
-note right of RagAgentUI
-Kap. 3.4.2:
-Die Komponente macht den Agenten
-fuer eine nutzende Instanz zugaenglich
-und verwaltet die Analyse in einer
-fortfuehrbaren Sitzung.
-end note
 
 @enduml

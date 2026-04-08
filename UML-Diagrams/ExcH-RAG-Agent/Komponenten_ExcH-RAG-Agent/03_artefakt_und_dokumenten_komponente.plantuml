@@ -1,5 +1,4 @@
 @startuml
-title ExcH-RAG-Agent - Artefakt- und Dokumenten-Komponente
 
 skinparam shadowing false
 skinparam classAttributeIconSize 0
@@ -41,16 +40,5 @@ package "Artefakt- und Dokumenten-Komponente" {
   XmlChunker --> DocumentCorpus : fuellt
   DocumentCorpus o-- RagChunk
 }
-
-note right of XmlChunker
-Kap. 3.4.2:
-Statische Steuerungsartefakte werden
-in retrieval-faehige Dokumentsegmente
-ueberfuehrt, ohne bereits einen
-Wissensgraphen aufzubauen.
-
-Prototypischer Kern:
-PLCOpenXmlSource + XmlChunker + RagChunk
-end note
 
 @enduml

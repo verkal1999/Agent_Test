@@ -1,10 +1,54 @@
 Komponente: Retrieval-Komponente
 
 Zweck:
-Die Retrieval-Komponente waehlt aus den vorbereiteten Dokumentsegmenten diejenigen Ausschnitte aus, die fuer den aktuellen Fehlerkontext am relevantesten sind. Dabei steht Nachvollziehbarkeit vor maximaler Komplexitaet.
+Die Retrieval-Komponente waehlt aus der vorbereiteten Dokumentbasis genau diejenigen Ausschnitte aus, die fuer den aktuellen Fehlerkontext am relevantesten sind. Dabei ist die Logik bewusst einfach und nachvollziehbar gehalten.
 
-Diagrammidee:
-Eine Anfrage wird als `RetrievalQuery` modelliert, ein Scorer bewertet die Dokumentsegmente, und der Index liefert geordnete Treffer zurueck. Dadurch wird sichtbar, dass die Komponente nicht nur Kontext beschafft, sondern auch eine kontrollierte Eingrenzung des Antwortkontexts vornimmt.
+Klassen im Diagramm:
 
-Bezug zum Prototyp:
-Die Klasse `SimpleRagIndex` aus `simple_rag_agent.py` ist hier die zentrale technische Referenz.
+RetrievalQuery
+Aufgabe:
+RetrievalQuery repraesentiert die Suchanfrage an die Dokumentbasis.
+Methoden/Attribute:
+Die Attribute question und top_k halten die inhaltliche Frage und die Anzahl der gewuenschten Treffer fest. Eigene Methoden sind nicht modelliert.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse zeigt, dass der Abruf nicht ungerichtet erfolgt, sondern aus einem konkreten Diagnoseanliegen und einem klar begrenzten Suchraum besteht.
+
+RagChunk
+Aufgabe:
+RagChunk ist in diesem Diagramm der durchsuchte Dokumentbaustein, auf den das Ranking angewendet wird.
+Methoden/Attribute:
+Die Attribute chunk_id, kind, name und text beschreiben Inhalt und Herkunft des Dokuments. Eigene Methoden sind hier nicht weiter hervorgehoben.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse macht deutlich, dass die Retrieval-Komponente auf explizit vorbereiteten Kontextsegmenten arbeitet und nicht auf einem diffusen Volltext.
+
+TokenScorer
+Aufgabe:
+TokenScorer bewertet, wie gut eine Suchanfrage zu einem Dokumentsegment passt.
+Methoden/Attribute:
+- score(query, chunk): Berechnet einen Relevanzwert fuer ein Segment in Bezug auf die Anfrage.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse repraesentiert das transparente Ranking-Verfahren, das Kapitel 3.4.2 fuer den einfachen ExcH-RAG-Agenten beschreibt.
+
+RetrievalHit
+Aufgabe:
+RetrievalHit repraesentiert einen einzelnen Suchtreffer.
+Methoden/Attribute:
+Die Attribute rank, score und overlap zeigen, wie gut der Treffer passt und welche Textueberschneidungen ihn begruenden. Eigene Methoden sind nicht modelliert.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse foerdert Nachvollziehbarkeit, weil sie sichtbar macht, warum ein Segment spaeter in die Antwortgenerierung eingeht.
+
+RetrievalResultSet
+Aufgabe:
+RetrievalResultSet fasst mehrere Treffer zu einem Ergebnisbuendel zusammen.
+Methoden/Attribute:
+Das Attribut hits speichert die Liste der relevanten Treffer. Weitere Logik ist im Diagramm nicht modelliert.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse zeigt, dass die Kontextauswahl nicht auf einen einzelnen Textausschnitt reduziert ist, sondern als strukturierte Treffermenge vorliegt.
+
+SimpleRagIndex
+Aufgabe:
+SimpleRagIndex ist die zentrale Suchstruktur der Retrieval-Komponente.
+Methoden/Attribute:
+- search(question, k): Sucht zu einer Frage die relevantesten Dokumentsegmente und liefert das Ergebnis als RetrievalResultSet zurueck.
+Sinn im Rahmen der Masterarbeit:
+Diese Klasse verkoerpert den eigentlichen Retrieval-Schritt des RAG-Agenten. Sie ist absichtlich einfacher gehalten als ein semantischer oder vektorbasierter Abruf und passt damit zur Vergleichsarchitektur des ExcH-RAG-Agenten.

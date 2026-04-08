@@ -1,10 +1,48 @@
 Komponente: Artefakt- und Dokumenten-Komponente
 
 Zweck:
-Diese Komponente bereitet statische Steuerungsartefakte so auf, dass sie spaeter fuer den Wissensabruf genutzt werden koennen. Im Mittelpunkt steht die PLCOpenXML als strukturierter Dokumentkontext.
+Diese Komponente bereitet statische Steuerungsartefakte so auf, dass sie spaeter fuer den Wissensabruf nutzbar werden. Im ExcH-RAG-Agenten geschieht das noch ohne Aufbau eines eigenen Wissensgraphen.
 
-Diagrammidee:
-Die XML-Quelle wird geladen, durch einen Chunker in fachlich sinnvolle Segmente zerlegt und als Dokumentkorpus bereitgestellt. Die Klasse `RagChunk` repraesentiert genau jene retrieval-faehigen Dokumentsegmente, von denen Kapitel 3.4.2 spricht.
+Klassen im Diagramm:
 
-Bezug zum Prototyp:
-Die Diagrammstruktur folgt direkt den Klassen `PLCOpenXmlSource`, `XmlChunker` und `RagChunk` aus `simple_rag_agent.py`.
+ArtifactCatalog
+Aufgabe:
+ArtifactCatalog beschreibt, welche Artefaktquelle verarbeitet wird und um welchen Dokumenttyp es sich handelt.
+Methoden/Attribute:
+Die Attribute xml_path und document_type halten den Verweis auf das Artefakt und seine Einordnung. Eigene Methoden sind nicht modelliert.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse macht sichtbar, dass der RAG-Agent mit einer klar definierten statischen Wissensbasis arbeitet und nicht mit beliebigen unstrukturierten Dateien.
+
+PLCOpenXmlSource
+Aufgabe:
+PLCOpenXmlSource ist die technische Quelle fuer die PLCOpenXML.
+Methoden/Attribute:
+- load_text(xml_path): Laedt den Inhalt der XML-Datei als Text und stellt ihn der weiteren Verarbeitung zur Verfuegung.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse repraesentiert den dokumentenbasierten Startpunkt des RAG-Agenten. Sie macht deutlich, dass der Agent auf exportierten Steuerungsartefakten aufsetzt.
+
+XmlChunker
+Aufgabe:
+XmlChunker zerlegt die PLCOpenXML in kleinere, fachlich sinnvoll abgegrenzte Segmente.
+Methoden/Attribute:
+- chunk_text(text, xml_path): Zerlegt den XML-Text in retrieval-faehige Ausschnitte, zum Beispiel fuer POUs, GVLs, Datentypen, Transitionen oder Aktionen.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse bildet direkt die in Kapitel 3.4.2 beschriebene Transformation statischer Steuerungsartefakte in retrieval-faehige Dokumentsegmente ab.
+
+RagChunk
+Aufgabe:
+RagChunk repraesentiert ein einzelnes Dokumentsegment.
+Methoden/Attribute:
+- preview(): Erzeugt eine kurze Vorschau des Segments fuer Debug- oder UI-Zwecke.
+Die Attribute chunk_id, kind, name, text und metadata beschreiben das Segment inhaltlich und technisch.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse ist das zentrale Datenobjekt des dokumentenbasierten Wissensabrufs. Sie macht die Begrenzung des RAG-Agenten auf segmentierte Dokumente explizit.
+
+DocumentCorpus
+Aufgabe:
+DocumentCorpus fasst die erzeugten Segmente zu einer durchsuchbaren Dokumentbasis zusammen.
+Methoden/Attribute:
+- add(chunk): Fuegt ein weiteres Segment dem Korpus hinzu.
+Das Attribut chunks speichert die Sammlung der Dokumentsegmente.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse verdeutlicht, dass die Artefaktaufbereitung nicht beim einzelnen Chunk endet, sondern in eine zusammenhaengende Wissensbasis fuer das spaetere Retrieval uebergeht.

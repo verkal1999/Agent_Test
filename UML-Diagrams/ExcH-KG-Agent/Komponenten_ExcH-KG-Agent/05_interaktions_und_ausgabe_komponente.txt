@@ -1,10 +1,72 @@
 Komponente: Interaktions- und Ausgabe-Komponente
 
 Zweck:
-Die Interaktions- und Ausgabe-Komponente stellt Ergebnisse, Rueckfragen und Zwischenschritte fuer eine nutzende Instanz bereit. Gleichzeitig ist sie die Stelle, an der Guardrails, Eskalation und revisionsfaehige Nachvollziehbarkeit praktisch sichtbar werden.
+Diese Komponente stellt die Ergebnisse der KG- und werkzeuggestuetzten Analyse fuer eine nutzende Instanz bereit. Gleichzeitig ist sie die Stelle, an der Nachvollziehbarkeit, menschliche Aufsicht, Guardrails und Eskalation praktisch wirksam werden.
 
-Diagrammidee:
-Das Diagramm kombiniert Ergebnisobjekte, Folgefragen, Guardrails und Audit-Trail in einer Ausgabeschicht. Damit wird die Rolle dieser Komponente als kontrollierte Schnittstelle zwischen Agent und Mensch deutlich.
+Klassen im Diagramm:
 
-Bezug zum Prototyp:
-Die UI-Rolle orientiert sich an `excH_kg_agent_ui.py`. Ergebnis-, Guardrail- und Audit-Klassen sind bewusst konzeptionell modelliert, weil Kapitel 3.4.3 genau diese Funktionen beschreibt, auch wenn sie im Prototyp teilweise verteilt umgesetzt sind.
+ExcHAgentUI
+Aufgabe:
+ExcHAgentUI bildet die operative Benutzungsoberflaeche des KG-Agenten.
+Methoden/Attribute:
+- streamlit_main(): Startet die UI-Logik.
+- start_analysis(event): Stoesst aus einem Event heraus eine Analyse an.
+- run_pipeline(cfg, event): Kann bei Bedarf eine vorgelagerte Pipeline starten oder integrieren.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse macht den Agenten fuer Nutzende zugreifbar und verbindet Runtime-Ereignisse mit der wissensbasierten Analyse.
+
+ResponseEnvelope
+Aufgabe:
+ResponseEnvelope ist das zentrale Ausgabeobjekt der Analyse.
+Methoden/Attribute:
+Die Attribute diagnosis, next_steps und proposed_actions halten die eigentliche Antwort, naechste Schritte und vorgeschlagene Handlungen zusammen. Eigene Methoden sind nicht modelliert.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse zeigt, dass die Ausgabe des Agenten nicht nur aus Freitext besteht, sondern aus einer strukturierten Diagnoseunterstuetzung.
+
+StructuredToolResult
+Aufgabe:
+StructuredToolResult repraesentiert ein einzelnes Werkzeugergebnis in ausgabefaehiger Form.
+Methoden/Attribute:
+Die Attribute tool_name und payload beschreiben, welches Werkzeug welche Daten geliefert hat. Eigene Methoden sind nicht vorgesehen.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse foerdert Nachvollziehbarkeit, weil Zwischenschritte der Analyse sichtbar und nachvollziehbar bleiben.
+
+FollowUpQuestion
+Aufgabe:
+FollowUpQuestion repraesentiert eine moegliche Rueckfrage oder Vertiefungsfrage an die nutzende Instanz.
+Methoden/Attribute:
+Die Attribute text und priority beschreiben Inhalt und Prioritaet der Folgefrage. Weitere Methoden sind nicht modelliert.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse macht den Human-in-the-Loop-Gedanken explizit. Der Agent soll nicht nur Antworten liefern, sondern bei Unsicherheit oder Unvollstaendigkeit gezielt Rueckfragen anstossen.
+
+OutputGuardrail
+Aufgabe:
+OutputGuardrail prueft, ob eine Ausgabe innerhalb der zulaessigen Grenzen bleibt.
+Methoden/Attribute:
+- check(response): Bewertet eine Antwort und leitet daraus eine Eskalationsentscheidung ab.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse repraesentiert die in Kapitel 3.4.3 geforderten Guardrails auf der Ausgabeseite. Sie begrenzt, was der Agent direkt als Handlungsvorschlag oder Diagnose freigibt.
+
+EscalationDecision
+Aufgabe:
+EscalationDecision repraesentiert das Ergebnis einer Guardrail- oder Eskalationspruefung.
+Methoden/Attribute:
+Die Attribute requires_human_review und reason halten fest, ob menschliche Pruefung erforderlich ist und warum. Eigene Methoden sind nicht modelliert.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse macht menschliche Aufsicht als expliziten Architekturbaustein sichtbar.
+
+AuditTrailEntry
+Aufgabe:
+AuditTrailEntry dokumentiert einen protokollierten Schritt der Analyse oder Interaktion.
+Methoden/Attribute:
+Die Attribute timestamp_utc, kind und data halten Zeitpunkt, Ereignistyp und Zusatzdaten fest. Eigene Methoden sind nicht vorgesehen.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse unterstuetzt revisionsfaehige Nachvollziehbarkeit und spaetere Auswertung des Agentenverhaltens.
+
+SessionResumeRequest
+Aufgabe:
+SessionResumeRequest repraesentiert eine neue Anfrage, die an eine bestehende Sitzung anknuepft.
+Methoden/Attribute:
+Die Attribute user_msg und reuse_session beschreiben die Folgeeingabe und ob dieselbe Sitzung fortgesetzt werden soll.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse zeigt, dass die Interaktionsschicht nicht nur Abschlussausgaben erzeugt, sondern auch einen fortlaufenden Dialog- und Analysezusammenhang verwaltet.

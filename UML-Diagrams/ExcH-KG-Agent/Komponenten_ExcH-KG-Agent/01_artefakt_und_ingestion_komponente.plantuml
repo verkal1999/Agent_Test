@@ -1,5 +1,4 @@
 @startuml
-title ExcH-KG-Agent - Artefakt- und Ingestion-Komponente
 
 skinparam shadowing false
 skinparam classAttributeIconSize 0
@@ -74,19 +73,10 @@ package "Artefakt- und Ingestion-Komponente" {
   Pipeline *-- Step
   Pipeline --> PipelineContext : arbeitet auf
   Pipeline --> ArtifactQualityGate : validiert ueber
-  PipelineContext ..> PLCOpenXMLParserWithHW : haelt Parser
+  PipelineContext o-- PLCOpenXMLParserWithHW : haelt Parser
   PLCOpenXMLParserWithHW ..> ProgramMapping : erzeugt
   PLCOpenXMLParserWithHW ..> GVL : erzeugt
   PLCOpenXMLParserWithHW ..> IoHardwareAddress : erzeugt
 }
-
-note right of Pipeline
-Kap. 3.4.3:
-Die Artefaktaufbereitung wird in
-mehrere Transformationsschritte zerlegt.
-Damit werden Prompt-Chaining,
-Routing und technische Guardrails
-in der Ingestion sichtbar.
-end note
 
 @enduml

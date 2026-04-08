@@ -1,5 +1,4 @@
 @startuml
-title ExcH-RAG-Agent - Kontext-Komponente
 
 skinparam shadowing false
 skinparam classAttributeIconSize 0
@@ -53,15 +52,5 @@ package "Kontext-Komponente" {
   RuntimeSnapshot *-- ObservedValue
   RuntimeSnapshot *-- BrowseHint
 }
-
-note right of RagIncidentContext
-Kap. 3.4.2 betont:
-- Trennung von Beobachtung und Strukturhinweis
-- Verdichtung des Fehlerkontexts
-- Aufbau eines Diagnosekontexts
-
-Prototypischer Kern:
-RagIncidentContext
-end note
 
 @enduml

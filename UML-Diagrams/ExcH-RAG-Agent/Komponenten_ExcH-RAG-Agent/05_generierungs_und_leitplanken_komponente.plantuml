@@ -1,5 +1,4 @@
 @startuml
-title ExcH-RAG-Agent - Generierungs- und Leitplanken-Komponente
 
 skinparam shadowing false
 skinparam classAttributeIconSize 0
@@ -51,13 +50,5 @@ package "Generierungs- und Leitplanken-Komponente" {
   GroundedAnswerGenerator ..> GroundedContextBundle : nutzt
   GroundedAnswerGenerator --> GenerationResult : erzeugt
 }
-
-note right of GuardrailPolicy
-Kap. 3.4.2 fordert:
-- nur auf Basis des Kontexts antworten
-- Beobachtung, Struktur und Schluss trennen
-- Unsicherheit offen benennen
-- keine unbelegten Ursachen erfinden
-end note
 
 @enduml

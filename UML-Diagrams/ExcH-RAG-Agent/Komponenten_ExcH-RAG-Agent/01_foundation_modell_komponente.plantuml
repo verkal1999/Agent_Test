@@ -1,5 +1,4 @@
 @startuml
-title ExcH-RAG-Agent - Foundation-Modell-Komponente
 
 skinparam shadowing false
 skinparam classAttributeIconSize 0
@@ -43,16 +42,5 @@ package "Foundation-Modell-Komponente" {
   FoundationModelGateway ..> PromptRequest : verarbeitet
   FoundationModelGateway --> ModelResponse : erzeugt
 }
-
-note right of FoundationModelGateway
-Konzeptioneller Fokus aus Kap. 3.4.2:
-- austauschbare Modellbasis
-- abgestufte Modellnutzung
-- spaeterer Modellvergleich
-
-Prototypischer Bezug:
-get_llm_invoke(...) + LLM-Aufruf
-innerhalb von SimpleRagAgent
-end note
 
 @enduml

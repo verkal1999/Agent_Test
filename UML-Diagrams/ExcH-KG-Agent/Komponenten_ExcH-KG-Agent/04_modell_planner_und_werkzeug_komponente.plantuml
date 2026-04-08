@@ -1,5 +1,4 @@
 @startuml
-title ExcH-KG-Agent - Modell-, Planner- und Werkzeug-Komponente
 
 skinparam shadowing false
 skinparam classAttributeIconSize 0
@@ -59,24 +58,5 @@ package "Modell-, Planner- und Werkzeug-Komponente" {
   FoundationModelAdapter ..> ToolResultBundle : nutzt
   Planner --> FoundationModelAdapter : uebergibt Ergebnisse an
 }
-
-note right of Planner
-Kap. 3.4.3:
-Hier liegt der agentische Kern.
-Der Planner waehlt Analysepfade,
-koordiniert Werkzeuge und uebergibt
-deren Ergebnisse an das
-Foundation-Modell zur sprachlichen
-Aufbereitung.
-end note
-
-note bottom of BaseAgentTool
-Die vier Werkzeugtypen entsprechen
-direkt den in Kapitel 3.4.3
-genannten Analyseformen:
-KG-Abfrage, Struktur- und Codeanalyse,
-Variablen- und Signalanalyse,
-Pfadrekonstruktion.
-end note
 
 @enduml

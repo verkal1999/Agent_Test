@@ -1,10 +1,111 @@
 Komponente: Artefakt- und Ingestion-Komponente
 
 Zweck:
-Diese Komponente erschliesst das technische Quellenmaterial des ExcH-KG-Agenten. Sie nimmt Engineering-Artefakte auf, normalisiert sie und ueberfuehrt sie in eine strukturierte Wissensbasis.
+Diese Komponente erschliesst das technische Quellenmaterial des ExcH-KG-Agenten. Sie nimmt Engineering-Artefakte aus der Steuerungswelt auf, normalisiert sie technisch und ueberfuehrt sie in eine strukturierte Wissensbasis fuer die spaetere Semantisierung.
 
-Diagrammidee:
-Der Schwerpunkt liegt auf der Pipeline-Orchestrierung, den einzelnen Verarbeitungsschritten und dem Parser fuer PLCopenXML und Hardware-Mappings. Zusaetzlich ist ein Quality-Gate aufgenommen, um die im Kapitel beschriebenen Guardrails der Artefaktaufbereitung sichtbar zu machen.
+Klassen im Diagramm:
 
-Bezug zum Prototyp:
-Die Diagrammstruktur orientiert sich direkt an `ingestion_pipeline.py`, `plcopen_withHW.py` und den Datamodellen der Ingestion-Pipeline.
+PipelineConfig
+Aufgabe:
+PipelineConfig beschreibt die zentrale Konfiguration der Ingestion-Pipeline.
+Methoden/Attribute:
+Die Attribute project_dir, sln_path, kg_cleaned_path, kg_after_loader_path und kg_final_path definieren Eingabe- und Ausgabepfade. Eigene Methoden sind im Diagramm nicht modelliert.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse macht sichtbar, dass der Aufbau der Wissensbasis reproduzierbar konfiguriert ist. Das ist wichtig, weil der ExcH-KG-Agent auf einem kontrollierten Transformationsprozess basiert.
+
+PipelineContext
+Aufgabe:
+PipelineContext haelt den aktuellen Arbeitszustand der Pipeline.
+Methoden/Attribute:
+- set(key, value): Hinterlegt ein Artefakt oder Zwischenergebnis im Kontext.
+- get(key): Liest ein zuvor abgelegtes Zwischenergebnis wieder aus.
+Das Attribut artifacts sammelt die Zwischenstaende der Verarbeitung.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse repraesentiert die technische Grundlage fuer einen mehrstufigen, nachvollziehbaren Ingestion-Prozess.
+
+Pipeline
+Aufgabe:
+Pipeline orchestriert die einzelnen Verarbeitungsschritte.
+Methoden/Attribute:
+- run(ctx): Fuehrt die hinterlegten Schritte nacheinander auf dem gemeinsamen Kontext aus.
+Das Attribut steps beschreibt die Schrittfolge.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse macht das in Kapitel 3.4.3 beschriebene Prompt-Chaining und die schrittweise Artefaktaufbereitung auf Implementierungsebene sichtbar.
+
+Step
+Aufgabe:
+Step ist die abstrakte Basisklasse aller Ingestion-Schritte.
+Methoden/Attribute:
+- outputs(ctx): Beschreibt, welche Artefakte ein Schritt erzeugt.
+- should_skip(ctx, force): Entscheidet, ob ein Schritt uebersprungen werden darf.
+- run(ctx): Fuehrt die eigentliche Fachlogik des Schritts aus.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse strukturiert die Ingestion in kontrollierbare Einzelschritte. Dadurch bleiben Transformationen reproduzierbar und auditierbar.
+
+ExportPLCopenXMLStep
+Aufgabe:
+Diese Spezialisierung exportiert die PLCOpenXML aus dem Projektkontext.
+Methoden/Attribute:
+Die konkrete Fachlogik liegt in der Implementierung von run(ctx), auch wenn sie im Diagramm nicht erneut ausgeschrieben wird.
+Sinn im Rahmen der Masterarbeit:
+Der Schritt erzeugt die wichtigste strukturierte Ausgangsbasis fuer den weiteren KG-Aufbau.
+
+BuildProgramIOMappingStep
+Aufgabe:
+Diese Spezialisierung erzeugt eine strukturierte Abbildung von Programmen, Ports und I/O-Zuordnungen.
+Methoden/Attribute:
+Die operative Logik liegt in run(ctx), das die entsprechenden Mapping-Artefakte erzeugt.
+Sinn im Rahmen der Masterarbeit:
+Der Schritt ist wichtig, weil der ExcH-KG-Agent spaeter nicht nur Programme kennen muss, sondern auch ihre Verdrahtungs- und Schnittstellenstruktur.
+
+BuildIOMappingsStep
+Aufgabe:
+Diese Spezialisierung erzeugt Hardware- und Kanalzuordnungen.
+Methoden/Attribute:
+Die konkrete Verarbeitung wird ueber run(ctx) angestossen, auch wenn die Methode im Diagramm nicht erneut ausformuliert ist.
+Sinn im Rahmen der Masterarbeit:
+Der Schritt schafft die Voraussetzung dafuer, dass spaetere Diagnosepfade bis zu Hardware-Endpunkten oder I/O-Kanaelen verfolgt werden koennen.
+
+PLCOpenXMLParserWithHW
+Aufgabe:
+PLCOpenXMLParserWithHW ist der zentrale Parser fuer Projektstruktur, PLCOpenXML und Hardware-Mappings.
+Methoden/Attribute:
+- scan_project_and_write_objects_json(): Scannt das Projekt und erzeugt eine strukturierte Objektrepraesentation.
+- export_plcopen_xml(): Exportiert die PLCOpenXML.
+- build_program_io_mapping(): Baut Program- und Port-Mappings auf.
+- build_gvl_globals(): Extrahiert globale Variablenlisten.
+- build_io_mappings(): Erzeugt I/O- und Hardware-Zuordnungen.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse repraesentiert den Uebergang von rohen Steuerungsartefakten zu einer systematisch auswertbaren Datenbasis. Damit beginnt der ExcH-KG-Agent frueher und tiefer als der RAG-Agent.
+
+ProgramMapping
+Aufgabe:
+ProgramMapping beschreibt ein aufbereitetes Programm mit seinen Ein- und Ausgaengen sowie Unteraufrufen.
+Methoden/Attribute:
+Die Attribute programm_name, inputs, outputs und subcalls halten die fuer den weiteren KG-Aufbau relevanten Strukturinformationen fest. Eigene Methoden sind nicht modelliert.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse macht die Steuerungsstruktur als explizites Datenobjekt verfuegbar und erleichtert spaetere Semantisierung und Analyse.
+
+GVL
+Aufgabe:
+GVL repraesentiert eine globale Variablenliste.
+Methoden/Attribute:
+Die Attribute name und globals beschreiben den Namen der Liste und ihre enthaltenen Variablen. Eigene Methoden sind nicht vorgesehen.
+Sinn im Rahmen der Masterarbeit:
+Globale Variablen sind fuer Steuerungsdiagnosen oft zentral. Die Klasse stellt sicher, dass solche global verteilten Signale spaeter im Wissensgraphen verknuepfbar bleiben.
+
+IoHardwareAddress
+Aufgabe:
+IoHardwareAddress repraesentiert einen konkreten Hardware- oder Kanalbezug.
+Methoden/Attribute:
+Die Attribute plc_path, channel_label und direction halten den wichtigsten Bezug zwischen Steuerungsvariable und Hardwarekanal fest. Weitere Details sind im eigentlichen Datamodell moeglich.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse ist wesentlich fuer den spaeteren Nachweis, ob ein Signalpfad nur softwareseitig bleibt oder bis zu realen I/O-Endpunkten reicht.
+
+ArtifactQualityGate
+Aufgabe:
+ArtifactQualityGate prueft, ob die erzeugten Artefakte fuer die weitere Verarbeitung geeignet sind.
+Methoden/Attribute:
+- validate(ctx): Bewertet die technische Verwendbarkeit des aktuellen Pipeline-Kontexts.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse repraesentiert die im Konzept beschriebenen Guardrails der Ingestion. Nicht jede Quelle darf ungeprueft in die Wissensbasis uebernommen werden.

@@ -1,10 +1,68 @@
 Komponente: Interaktions- und Sitzungs-Komponente
 
 Zweck:
-Die Interaktions- und Sitzungs-Komponente bindet den RAG-Agenten an eine nutzende Instanz an und organisiert die Analyse als fortsetzbare Sitzung. Sie bildet damit die operative Einfuehrungsschicht des Agenten.
+Diese Komponente bindet den ExcH-RAG-Agenten an eine nutzende Instanz an und organisiert die Analyse in einer nachvollziehbaren Sitzung. Sie bildet damit die operative Einstiegsschicht des Agenten.
 
-Diagrammidee:
-Das Diagramm zeigt die UI-Konfiguration, den Session-Aufbau und die Speicherung einzelner Chat-Turns in einer Sitzung. So wird sichtbar, wie initiale Analyse, Rueckfragen und Folgeanfragen organisatorisch zusammengehalten werden.
+Klassen im Diagramm:
 
-Bezug zum Prototyp:
-Die Klassen `RagAgentUI`, `RagSessionBuilder` und `SimpleRagSession` stammen direkt aus der vorhandenen RAG-Implementierung und den bestehenden UML-Slides.
+UiConfig
+Aufgabe:
+UiConfig haelt die zentrale Konfiguration der Benutzungsschicht.
+Methoden/Attribute:
+Im Diagramm ist insbesondere openai_api_key_file modelliert. Eigene operative Methoden sind nicht vorgesehen.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse zeigt, dass der Agent ueber eine klar konfigurierbare Oberflaeche eingebunden wird und nicht als loses Skript ohne Integrationsschicht existiert.
+
+PipelineConfig
+Aufgabe:
+PipelineConfig beschreibt die optionale vorgeschaltete Artefaktaufbereitung, die vor einer Sitzung angestossen werden kann.
+Methoden/Attribute:
+Die Attribute enabled, runner und config geben an, ob eine Pipeline genutzt wird und wie sie aufgerufen wird. Eigene Methoden sind nicht modelliert.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse macht sichtbar, dass der Agent in bestehende technische Vorverarbeitungsablaeufe eingebettet werden kann, ohne diese zu ersetzen.
+
+SimpleRagConfig
+Aufgabe:
+SimpleRagConfig beschreibt die agentenspezifischen Laufparameter der Sitzung.
+Methoden/Attribute:
+Die Attribute xml_path, model, temperature und top_k legen Dokumentquelle, Modellwahl und Suchparameter fest. Eigene Methoden sind nicht vorgesehen.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse verbindet die Benutzungsschicht mit den konzeptionellen Stellhebeln des ExcH-RAG-Agenten: Dokumentbasis, Modellbasis und Retrieval-Tiefe.
+
+RagAgentUI
+Aufgabe:
+RagAgentUI bildet die eigentliche Interaktionsoberflaeche.
+Methoden/Attribute:
+- streamlit_main(): Startet die Oberflaechenlogik.
+- start_analysis(event): Stoesst aus einem eingehenden Event eine Analyse an.
+- run_pipeline(cfg, event): Startet optional eine vorgeschaltete Artefakt- oder Ingestion-Pipeline.
+- write_out_json(blob): Schreibt Analyseergebnisse in eine Ausgabedatei.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse repraesentiert die Stelle, an der der Agent fuer Nutzende greifbar wird. Sie macht den ExcH-RAG-Agenten zu einer kontrollierbaren Assistenzinstanz.
+
+RagSessionBuilder
+Aufgabe:
+RagSessionBuilder erzeugt aus einem Eingabeobjekt eine vollstaendige Analyse-Sitzung.
+Methoden/Attribute:
+- build_session_from_input(...): Baut Kontext, Agent und Session zu einem lauffaehigen Sitzungsobjekt zusammen.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse steht fuer den Uebergang von einem einzelnen Fehlerereignis zu einer fortsetzbaren Analyseinstanz.
+
+SimpleRagSession
+Aufgabe:
+SimpleRagSession verwaltet den Verlauf einer konkreten RAG-Sitzung.
+Methoden/Attribute:
+- build_default_prompt(): Erzeugt die initiale Standardfrage samt Kontext.
+- run_initial_analysis(debug): Fuehrt die erste Analyse des Fehlerfalls aus.
+- ask(user_msg, debug): Verarbeitet Folgefragen innerhalb derselben Sitzung.
+Das Attribut history speichert die bisherigen Interaktionen.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse macht den in Kapitel 3.4.2 beschriebenen Sitzungscharakter explizit. Der Agent bleibt damit nicht auf eine einmalige Antwort beschraenkt.
+
+ChatTurn
+Aufgabe:
+ChatTurn repraesentiert einen einzelnen Schritt im Sitzungsverlauf.
+Methoden/Attribute:
+Die Attribute role, text und answer halten fest, wer gesprochen hat, welche Eingabe gemacht wurde und welche Antwort dazu gehoert. Eigene Methoden sind nicht modelliert.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse foerdert Nachvollziehbarkeit und Wiederaufnahme der Analyse, weil einzelne Interaktionsschritte sauber dokumentiert bleiben.

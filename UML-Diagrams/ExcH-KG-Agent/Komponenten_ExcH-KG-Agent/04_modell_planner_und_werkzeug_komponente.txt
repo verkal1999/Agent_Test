@@ -1,10 +1,97 @@
 Komponente: Modell-, Planner- und Werkzeug-Komponente
 
 Zweck:
-Diese Komponente bildet den eigentlichen agentischen Kern des ExcH-KG-Agenten. Sie waehlt Analysepfade, orchestriert spezialisierte Werkzeuge und uebergibt die aggregierten Ergebnisse an das Foundation-Modell zur sprachlichen Aufbereitung.
+Diese Komponente bildet den agentischen Kern des ExcH-KG-Agenten. Sie waehlt Analysepfade, orchestriert spezialisierte Werkzeuge und uebergibt deren Ergebnisse an ein Foundation-Modell zur sprachlichen Aufbereitung.
 
-Diagrammidee:
-Der Planner erzeugt einen Analyseplan, die Registry verwaltet die Werkzeuge, und das Foundation-Modell synthetisiert aus Teilergebnissen eine Antwort. Damit wird die in Kapitel 3.4.3 hervorgehobene Mehrschrittverarbeitung als Klassengeruest sichtbar.
+Klassen im Diagramm:
 
-Bezug zum Prototyp:
-Das Diagramm verdichtet die technische Struktur aus `chatbot_core.py` und `excH_chatbot.py`. Die dort konkret vorhandenen Tool-Klassen werden hier auf die vier fachlichen Werkzeuggruppen aus Kapitel 3.4.3 abgebildet.
+Planner
+Aufgabe:
+Planner steuert den gesamten Analyseablauf.
+Methoden/Attribute:
+- plan(ctx): Erzeugt aus dem aktuellen Fehlerkontext einen ersten Analyseplan.
+- replan(ctx, partial_results): Passt den Analyseplan an, wenn Zwischenergebnisse einen erweiterten oder veraenderten Suchraum verlangen.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse repraesentiert die in Kapitel 3.4.3 zentrale Planungslogik des wissensintensiveren Agenten. Sie unterscheidet den KG-Agenten klar vom linearen RAG-Pfad.
+
+AnalysisPlan
+Aufgabe:
+AnalysisPlan repraesentiert einen konkreten Analyseplan.
+Methoden/Attribute:
+Die Attribute goal und steps beschreiben das Analyseziel und die dazupassende Folge einzelner Teilschritte. Eigene Methoden sind nicht modelliert.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse macht Mehrschrittverarbeitung explizit und damit nachvollziehbar.
+
+PlanStep
+Aufgabe:
+PlanStep beschreibt einen einzelnen Schritt innerhalb des Analyseplans.
+Methoden/Attribute:
+Die Attribute tool_name und purpose halten fest, welches Werkzeug fuer welchen Zweck genutzt werden soll.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse zerlegt komplexe Diagnosepfade in einzelne begruendbare Werkzeugschritte.
+
+ToolRegistry
+Aufgabe:
+ToolRegistry verwaltet die verfuegbaren Werkzeuge und erlaubt ihren gezielten Aufruf.
+Methoden/Attribute:
+- register(tool): Registriert ein Werkzeug in der Registry.
+- execute(tool_name, args): Fuehrt ein benanntes Werkzeug mit gegebenen Argumenten aus.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse repraesentiert den Tool-Use-Gedanken des ExcH-KG-Agenten. Sie macht spezialisierte Analysewerkzeuge zu austauschbaren, aber kontrolliert nutzbaren Bausteinen.
+
+BaseAgentTool
+Aufgabe:
+BaseAgentTool ist die abstrakte Basisklasse aller Analysewerkzeuge.
+Methoden/Attribute:
+- run(**kwargs): Definiert die allgemeine Ausfuehrungsschnittstelle fuer ein Werkzeug.
+Die Attribute name und description beschreiben Werkzeugidentitaet und Zweck.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse schafft eine einheitliche Form fuer unterschiedliche Analysewerkzeuge und foerdert so Erweiterbarkeit und Nachvollziehbarkeit.
+
+KGQueryTool
+Aufgabe:
+KGQueryTool repraesentiert die gezielte Abfrage semantischer Informationen aus dem Wissensgraphen.
+Methoden/Attribute:
+Die operative Logik liegt in der spezialisierten run-Implementierung.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse steht fuer den wissensbasierten Zugriff auf explizit semantisierte Steuerungsbeziehungen.
+
+StructureCodeAnalysisTool
+Aufgabe:
+StructureCodeAnalysisTool analysiert Programme, POUs, Aufrufbeziehungen und Codekontext.
+Methoden/Attribute:
+Die fachliche Logik wird ueber die spezialisierte run-Implementierung eingebracht.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse verbindet semantisches Wissen mit konkreten Struktur- und Codebelegen aus der Steuerungswelt.
+
+VariableSignalAnalysisTool
+Aufgabe:
+VariableSignalAnalysisTool fokussiert auf Variablen, Portbindungen und Signalzusammenhaenge.
+Methoden/Attribute:
+Die eigentliche Fachlogik wird durch die jeweilige run-Implementierung des Werkzeugs abgebildet.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse unterstuetzt die Analyse von Signalursachen und Wirkzusammenhaengen, was fuer Exception-Handling in SPS-Logik zentral ist.
+
+PathReconstructionTool
+Aufgabe:
+PathReconstructionTool rekonstruiert moegliche Signal- oder Fehlerpfade.
+Methoden/Attribute:
+Die konkrete Rekonstruktionslogik liegt in der spezialisierten run-Ausfuehrung.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse repraesentiert die besondere Analysetiefe des KG-Agenten, naemlich den Rueckschluss auf mehrstufige Signalpfade und Ursachenketten.
+
+ToolResultBundle
+Aufgabe:
+ToolResultBundle fasst die Ergebnisse mehrerer Werkzeuge zusammen.
+Methoden/Attribute:
+Das Attribut results speichert die Teilergebnisse in strukturierter Form. Eigene Methoden sind im Diagramm nicht dargestellt.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse zeigt, dass der KG-Agent seine Antwort nicht aus einem Einzelaufruf, sondern aus aggregierten, spezialisierten Analyseergebnissen bildet.
+
+FoundationModelAdapter
+Aufgabe:
+FoundationModelAdapter ueberfuehrt Werkzeugergebnisse in eine sprachlich formulierte Antwort.
+Methoden/Attribute:
+- synthesize(ctx, plan, results): Fasst Kontext, Analyseplan und Werkzeugergebnisse zu einer finalen sprachlichen Ausgabe zusammen.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse macht sichtbar, dass das Foundation-Modell im KG-Agenten nicht isoliert arbeitet, sondern auf einer bereits durch Werkzeuge verdichteten Wissensgrundlage aufsetzt.

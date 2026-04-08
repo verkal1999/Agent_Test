@@ -1,10 +1,88 @@
 Komponente: Kontext- und Sitzungs-Komponente
 
 Zweck:
-Die Kontext- und Sitzungs-Komponente ueberfuehrt einen konkreten Fehlerfall in einen strukturierten Diagnosekontext und verwaltet diesen in einer zustandsbehafteten Sitzung weiter.
+Diese Komponente ueberfuehrt einen konkreten Fehlerfall in einen strukturierten Diagnosekontext und verwaltet diesen gemeinsam mit dem Agenten in einer fortfuehrbaren Sitzung. Sie verbindet dabei Laufzeitereignis, Snapshot-Informationen und den Verweis auf die Wissensbasis.
 
-Diagrammidee:
-Das Diagramm trennt Rohereignis, Incident-Kontext, Snapshot, Graph-Referenz und Sitzungsspeicher. Dadurch wird deutlich, dass diese Komponente den KG noch nicht inhaltlich auswertet, sondern den Analysekontext fuer spaetere Werkzeugaufrufe vorbereitet und zusammenhaelt.
+Klassen im Diagramm:
 
-Bezug zum Prototyp:
-Die Klassen `IncidentContext` und `ExcHChatBotSession` stammen direkt aus `excH_chatbot.py`. Snapshot-, Graph- und Session-Memory-Klassen machen die im Kapitel beschriebene fachliche Rolle expliziter.
+RuntimeEvent
+Aufgabe:
+RuntimeEvent repraesentiert das eingehende Fehler- oder Diagnoseereignis.
+Methoden/Attribute:
+Das Attribut payload traegt die Rohinformationen des Events. Eigene operative Methoden sind nicht modelliert.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse bildet den Startpunkt der Runtime-Unterstuetzung des ExcH-KG-Agenten.
+
+ContextAssembler
+Aufgabe:
+ContextAssembler bereitet das Rohereignis zu einem strukturierten IncidentContext auf.
+Methoden/Attribute:
+- from_event(event): Erzeugt aus dem eingehenden Event den formalen Diagnosekontext.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse repraesentiert die im Konzept geforderte Verdichtung des Fehlerfalls, bevor Planner und Werkzeuge aktiv werden.
+
+IncidentContext
+Aufgabe:
+IncidentContext ist die zentrale Kontextklasse des KG-Agenten.
+Methoden/Attribute:
+- from_input(obj): Baut aus einem Eingabeobjekt einen vollstaendigen IncidentContext auf.
+Die Attribute halten Korrelation, Prozessbezug, Fehlerzusammenfassung, Trigger-Event, letzten Skill, letzten GEMMA-Zustand und Trigger-Informationen zusammen. Der KG-Pfad wird ueber das aggregierte GraphContextRef-Objekt bereitgestellt.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse ist das konkrete Bindeglied zwischen Laufzeitumgebung und wissensbasierter Analyse. Sie schafft die Grundlage fuer spaetere Werkzeugaufrufe und Rueckfragen.
+
+RuntimeSnapshot
+Aufgabe:
+RuntimeSnapshot fasst beobachtete Laufzeitwerte und Strukturhinweise aus dem Fehlerzeitpunkt zusammen.
+Methoden/Attribute:
+Die Attribute vars und rows sammeln Signalbeobachtungen und Browse-Informationen. Eigene Methoden sind im Diagramm nicht vorgesehen.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse macht sichtbar, dass die Diagnose nicht nur auf statischem Wissen, sondern auf konkreten Beobachtungen aus dem Betrieb basiert.
+
+ObservedSignal
+Aufgabe:
+ObservedSignal repraesentiert einen einzelnen beobachteten Wert aus dem Snapshot.
+Methoden/Attribute:
+Die Attribute id, type und value beschreiben Signalname, Datentyp und aktuellen Wert. Weitere Logik ist nicht modelliert.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse steht fuer den realen Laufzeitbezug der Diagnose.
+
+BrowseNode
+Aufgabe:
+BrowseNode repraesentiert einen im Adressraum gefundenen Strukturknoten.
+Methoden/Attribute:
+Die Attribute id, node_class und type beschreiben den gefundenen Knoten. Eigene Methoden sind nicht vorgesehen.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse bildet strukturierende Hinweise ab, die spaeter mit dem KG und dem Steuerungskontext zusammengefuehrt werden koennen.
+
+GraphContextRef
+Aufgabe:
+GraphContextRef beschreibt den Verweis vom Fehlerkontext auf die relevante Wissensbasis.
+Methoden/Attribute:
+Die Attribute kg_ttl_path und focus_entities halten fest, welche KG-Quelle genutzt wird und welche Entitaeten gerade besonders relevant sind.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse macht sichtbar, dass der Agent nicht im leeren Raum arbeitet, sondern seinen Fehlerkontext an einen konkreten Wissensspeicher bindet.
+
+SessionMemory
+Aufgabe:
+SessionMemory verwaltet den sitzungsbezogenen Verlauf der Analyse.
+Methoden/Attribute:
+Die Attribute bootstrap_plan und turns speichern initiale Analyseplanung und den bisherigen Sitzungsverlauf. Eigene Methoden sind im Diagramm nicht modelliert.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse unterstuetzt die in Kapitel 3.4.3 geforderte zustandsbehaftete Analyse ueber mehrere Rueckfragen hinweg.
+
+SessionTurn
+Aufgabe:
+SessionTurn repraesentiert einen einzelnen Schritt im Sitzungsverlauf.
+Methoden/Attribute:
+Die Attribute user_msg, assistant_msg und tool_trace halten Anfrage, Antwort und Werkzeugspuren fest. Eigene Methoden sind nicht vorgesehen.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse dient Nachvollziehbarkeit und spaeterer Rekonstruktion des Analyseverlaufs.
+
+ExcHChatBotSession
+Aufgabe:
+ExcHChatBotSession ist die operative Sitzungsinstanz des KG-Agenten.
+Methoden/Attribute:
+- ensure_bootstrap_plan(): Stellt sicher, dass ein initialer Diagnose- oder Analyseplan vorhanden ist.
+- ask(user_msg, debug, include_bootstrap): Fuehrt eine Anfrage innerhalb der bestehenden Sitzung aus.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse steht fuer die praktische Umsetzung einer fortfuehrbaren Diagnoseassistenz, die Kontext, Zwischenergebnisse und Folgefragen zusammenhaelt.

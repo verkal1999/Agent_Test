@@ -1,10 +1,63 @@
 Komponente: Generierungs- und Leitplanken-Komponente
 
 Zweck:
-Diese Komponente erzeugt die eigentliche Diagnoseantwort, begrenzt sie aber zugleich durch klare Leitplanken. Sie ist damit der Punkt, an dem der RAG-Agent von reinem Wissensabruf zu kontrollierter fachlicher Assistenz uebergeht.
+Diese Komponente erzeugt die eigentliche Diagnoseantwort des ExcH-RAG-Agenten, begrenzt sie aber zugleich durch klare fachliche und sicherheitsbezogene Leitplanken. Sie ist damit der Uebergang vom reinen Wissensabruf zur kontrollierten Assistenz.
 
-Diagrammidee:
-Die Generierung arbeitet mit einem gebuendelten Kontext, einer expliziten Guardrail-Policy und einem Antwortvertrag fuer die Struktur der Ausgabe. Das macht sichtbar, dass Leitplanken hier kein Zusatz, sondern ein fester Bestandteil der Architektur sind.
+Klassen im Diagramm:
 
-Bezug zum Prototyp:
-Im Prototyp steckt diese Logik vor allem im `ask(...)`-Pfad von `SimpleRagAgent`, insbesondere in den Systeminstruktionen und dem Antwortformat.
+GenerationRequest
+Aufgabe:
+GenerationRequest repraesentiert den Eingabeauftrag fuer die Antworterzeugung.
+Methoden/Attribute:
+Die Attribute question und extra_context halten die Frage und den zusaetzlichen Kontext fuer die Generierung fest. Eigene Methoden sind im Diagramm nicht vorgesehen.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse macht sichtbar, dass Antworterzeugung nicht frei erfolgt, sondern an einen klar beschriebenen Generierungsauftrag gekoppelt ist.
+
+RetrievedContextBlock
+Aufgabe:
+RetrievedContextBlock repraesentiert einen einzelnen, bereits ausgewaehlten Kontextausschnitt fuer die Generierung.
+Methoden/Attribute:
+Die Attribute rank, kind, name, score und text beschreiben Herkunft und Relevanz des Blocks. Eigene Methoden sind nicht modelliert.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse zeigt, dass die Generierung auf begruendeten, nachvollziehbaren Kontextstellen basiert und nicht auf beliebigen Annahmen.
+
+GroundedContextBundle
+Aufgabe:
+GroundedContextBundle fasst den gesamten abgesicherten Antwortkontext zusammen.
+Methoden/Attribute:
+Die Attribute event_context und retrieved_chunks kombinieren Laufzeitkontext und Dokumentkontext zu einem gemeinsamen Arbeitskontext fuer die Generierung.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse verkoerpert die fachlich gewollte Verbindung von beobachtetem Fehlerfall und statischem Steuerungskontext.
+
+GuardrailPolicy
+Aufgabe:
+GuardrailPolicy definiert die Regeln, unter denen das Modell antworten darf.
+Methoden/Attribute:
+- enforce(req): Schraenkt den Generierungsauftrag vor dem Modellaufruf auf einen zulaessigen Rahmen ein.
+- validate(result): Prueft das Ergebnis im Hinblick auf die vorgegebenen Leitplanken.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse repraesentiert unmittelbar die in Kapitel 3.4.2 geforderten Guardrails. Sie verhindert, dass der Agent ungesicherte Ursachen oder unbelegte Datenfluesse erfindet.
+
+AnswerContract
+Aufgabe:
+AnswerContract beschreibt die erwartete Struktur einer Antwort.
+Methoden/Attribute:
+Das Attribut required_sections legt fest, welche Antwortteile enthalten sein sollen. Eigene Methoden sind im Diagramm nicht dargestellt.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse macht sichtbar, dass die Antwort nicht nur inhaltlich, sondern auch formal kontrolliert wird. Dadurch werden Vergleichbarkeit und Nachvollziehbarkeit verbessert.
+
+GroundedAnswerGenerator
+Aufgabe:
+GroundedAnswerGenerator fuehrt die eigentliche Antworterzeugung auf Basis eines abgesicherten Kontextbundles durch.
+Methoden/Attribute:
+- generate(req, ctx): Erzeugt aus Generierungsauftrag und Kontextbundle ein inhaltlich begruendetes Ergebnis.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse steht fuer die vorsichtige Diagnoseunterstuetzung des ExcH-RAG-Agenten. Sie verbindet Retrieval-Ergebnisse mit dem Modellaufruf, ohne die Leitplanken zu verlassen.
+
+GenerationResult
+Aufgabe:
+GenerationResult repraesentiert das Ergebnis der abgesicherten Antworterzeugung.
+Methoden/Attribute:
+Die Attribute answer und uncertainty_notes enthalten die eigentliche Antwort sowie explizite Unsicherheitshinweise. Weitere Methoden sind nicht modelliert.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse zeigt, dass Unsicherheit nicht verborgen, sondern explizit Bestandteil der Agentenausgabe sein soll. Genau das ist fuer eine kontrollierbare Runtime-Assistenz wesentlich.

@@ -1,10 +1,54 @@
 Komponente: Foundation-Modell-Komponente
 
 Zweck:
-Diese Komponente kapselt die austauschbare Modellbasis des ExcH-RAG-Agenten. Sie bildet die in Kapitel 3.4.2 geforderte Trennung zwischen Architektur und konkreter Modellwahl ab.
+Diese Komponente kapselt die austauschbare Modellbasis des ExcH-RAG-Agenten. Sie macht sichtbar, dass die Architektur nicht hart an ein einzelnes Foundation-Modell gebunden ist, sondern unterschiedliche Modelle unter denselben fachlichen Randbedingungen genutzt und verglichen werden koennen.
 
-Diagrammidee:
-Das Diagramm zeigt, wie eine Konfiguration ueber eine Auswahlstrategie in ein konkretes Modellprofil ueberfuehrt wird. Das Gateway verarbeitet Prompt-Requests und liefert ein Modell-Ergebnis zurueck.
+Klassen im Diagramm:
 
-Bezug zum Prototyp:
-Im Code ist diese Rolle vor allem ueber `get_llm_invoke(...)` und den LLM-Aufruf in `SimpleRagAgent` sichtbar. Das Diagramm ist deshalb bewusst leicht abstrahiert, damit die austauschbare Modellbasis als eigene Architekturidee erkennbar bleibt.
+RagConfig
+Aufgabe:
+RagConfig haelt die zentrale Modellkonfiguration fuer den RAG-Agenten, insbesondere Modellname und Temperatur.
+Methoden/Attribute:
+Im Diagramm sind keine eigenen Methoden modelliert. Die Klasse dient als Konfigurationsobjekt und traegt die Parameter, mit denen spaeter ein konkreter Modellaufruf vorbereitet wird.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse macht die Modellwahl als expliziten Architekturparameter sichtbar. Das ist wichtig, weil Kapitel 3.4.2 die austauschbare Modellbasis und den spaeteren Modellvergleich als zentrales Merkmal des ExcH-RAG-Agenten beschreibt.
+
+ModelSelectionPolicy
+Aufgabe:
+ModelSelectionPolicy repraesentiert die Regel, nach der fuer eine bestimmte Aufgabenart ein geeignetes Modellprofil ausgewaehlt wird.
+Methoden/Attribute:
+- select_profile(task_kind): Leitet aus der Aufgabenart ein passendes Modellprofil ab, zum Beispiel ein guenstigeres Standardmodell oder ein leistungsfaehigeres Modell fuer komplexere Analysen.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse verdeutlicht die in Kapitel 3.4.2 geforderte abgestufte Modellnutzung. Sie zeigt, dass Modellwahl nicht als Zufall, sondern als bewusste Architekturentscheidung betrachtet wird.
+
+ModelProfile
+Aufgabe:
+ModelProfile beschreibt die Eigenschaften eines ausgewaehlten Modellprofils.
+Methoden/Attribute:
+Die Attribute name, cost_class und context_window beschreiben, welches Modell verwendet wird, wie es wirtschaftlich eingeordnet werden kann und wie viel Kontext es verarbeiten kann. Eigene Methoden sind im Diagramm nicht vorgesehen.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse macht Unterschiede zwischen Modellvarianten transparent und schafft die Grundlage dafuer, Modelle spaeter im Evaluationsrahmen gegeneinander zu vergleichen.
+
+PromptRequest
+Aufgabe:
+PromptRequest fasst den Eingabekontext fuer einen Modellaufruf zusammen.
+Methoden/Attribute:
+Die Attribute system_prompt und user_prompt repraesentieren die beiden zentralen Texte, aus denen der Modellaufruf aufgebaut wird. Eigene Logik ist hier nicht modelliert.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse macht sichtbar, dass die Modellkomponente nicht beliebig arbeitet, sondern ueber klar strukturierte Eingaben angesprochen wird. Das foerdert Nachvollziehbarkeit und Wiederholbarkeit.
+
+FoundationModelGateway
+Aufgabe:
+FoundationModelGateway bildet die technische Zugriffsschicht auf das eigentliche Sprachmodell.
+Methoden/Attribute:
+- invoke(req): Fuehrt den Modellaufruf auf Basis eines vorbereiteten PromptRequest aus und liefert ein Modellresultat zurueck.
+Sinn im Rahmen der Masterarbeit:
+Diese Klasse verkoerpert die eigentliche sprachliche Analyse- und Generierungsfaehigkeit des RAG-Agenten. Gleichzeitig abstrahiert sie das konkrete Modell, sodass die restliche Architektur unveraendert bleiben kann.
+
+ModelResponse
+Aufgabe:
+ModelResponse repraesentiert das Ergebnis eines Modellaufrufs.
+Methoden/Attribute:
+Die Attribute answer und finish_reason zeigen, welche Antwort erzeugt wurde und wie der Aufruf beendet wurde. Weitere operative Methoden sind nicht modelliert.
+Sinn im Rahmen der Masterarbeit:
+Die Klasse macht das Modellresultat als explizites Objekt sichtbar. Dadurch wird deutlich, dass die Modellantwort ein kontrollierbarer Verarbeitungsschritt ist und nicht nur implizit im System verschwindet.

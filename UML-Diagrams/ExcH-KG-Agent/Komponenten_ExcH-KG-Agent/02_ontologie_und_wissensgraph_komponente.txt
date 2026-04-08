@@ -1,10 +1,43 @@
 Komponente: Ontologie- und Wissensgraph-Komponente
 
 Zweck:
-Diese Komponente bildet das semantische Zentrum des ExcH-KG-Agenten. Sie ueberfuehrt die aufgenommenen Artefakte in eine semantisch verknuepfte Wissensrepraesentation und legt diese in einem persistenten Wissensgraphen ab.
+Diese Komponente bildet das semantische Zentrum des ExcH-KG-Agenten. Sie ueberfuehrt die durch die Ingestion vorbereiteten Artefakte in eine semantisch nutzbare Form und legt sie in einem persistenten Wissensgraphen ab.
+
+Wichtige Modellierungsentscheidung:
+Der interne Inhalt des Wissensgraphen wird in diesem Diagramm bewusst nicht als Klassendiagramm gezeigt. Das SPS-Informationsmodell mit Projekten, POUs, Variablen, Ports, Signalquellen und Pfadstrukturen ist inhaltlich ein eigener Gegenstand und soll deshalb separat behandelt werden. In diesem Diagramm wird der KG daher nur als persistente Datenbank dargestellt.
 
 Diagrammidee:
-Das Diagramm kombiniert die im Text beschriebenen Ontologieklassen mit den technischen Services fuer Laden, Analysieren und Persistieren des Graphen. Dadurch wird die fachliche Wissensschicht gemeinsam mit ihrer technischen Operationalisierung sichtbar.
+Das Diagramm konzentriert sich auf die drei technischen Klassen, die den Wissensgraphen praktisch aufbauen, verwalten und nutzen: KGLoader, KGManager und KGStore. Zusaetzlich sind Ontologie-Mappingprofil und semantische Regeln nur noch als Artefakte gezeigt, nicht als Klassen im Graphen selbst.
 
-Bezug zu Kapitel 3.4.3:
-Der Schwerpunkt liegt auf Projekten, POUs, Instanzen, Ports, Variablen, Signalquellen sowie POU-Aufrufen und Parameterzuweisungen. Genau diese Klassen machen den im Kapitel hervorgehobenen Signalfluss auf Graph-Ebene abfragbar.
+Klassen im Diagramm:
+
+KGLoader
+Aufgabe:
+KGLoader uebernimmt den eigentlichen Befuellungsschritt des Wissensgraphen. Er liest die in der Ingestion erzeugten JSON- und Mapping-Artefakte ein und ueberfuehrt sie in RDF-basierte KG-Strukturen.
+Methoden:
+- build_gvl_index_from_objects(): Baut zunaechst einen Index fuer globale Variablenlisten auf, damit spaetere Zuordnungen konsistent erfolgen.
+- ingest_programs_from_mapping_json(): Uebernimmt Programme, Funktionsbausteine, Variablen und Strukturinformationen aus den aufbereiteten Mapping-Dateien in den Graphen.
+- ingest_io_mappings(): Schreibt I/O-Zuordnungen und Hardware-Bezuege in den Graphen.
+- ingest_gvl_globals(): Integriert globale Variablenlisten und deren Inhalte in den Wissensgraphen.
+- save(): Persistiert den aufgebauten Zwischenstand des Graphen.
+Sinn im Rahmen der Masterarbeit:
+KGLoader repraesentiert den Schritt, in dem aus technischen Steuerungsartefakten erstmals maschinell nutzbares, semantisch verknuepfbares Wissen wird. Genau dieser Schritt ist fuer den Unterschied zwischen ExcH-RAG-Agent und ExcH-KG-Agent zentral.
+
+KGManager
+Aufgabe:
+KGManager arbeitet auf dem bereits aufgebauten Wissensgraphen und fuehrt darauf semantische Nachanalysen, Qualitaetspruefungen und Berichtserzeugung aus.
+Methoden:
+- load(): Laedt den Graphen aus einer Turtle-Datei in eine bearbeitbare Graph-Struktur.
+- analyze_unused_elements(): Erkennt ungenutzte Variablen, Ports oder andere Elemente, damit der Graph nicht nur Strukturen abbildet, sondern auch diagnostisch relevante Hinweise enthaelt.
+- generate_reports(): Erzeugt zusaetzliche Konsistenz- und Analyseberichte, die spaeter fuer agentische Abfragen und RAG-gestuetzte Erklaerungen nutzbar sind.
+- save(output_path): Schreibt den angereicherten oder bereinigten Graphen wieder auf den Datentraeger.
+Sinn im Rahmen der Masterarbeit:
+KGManager steht fuer die fachliche Reifung der Wissensbasis. Er macht aus einem nur geladenen Graphen eine belastbare Analysegrundlage, die fuer nachvollziehbare Diagnosepfade und spaetere Werkzeugabfragen genutzt werden kann.
+
+KGStore
+Aufgabe:
+KGStore kapselt den eigentlichen Graphen als technische Wissensbasis, auf die unterschiedliche Werkzeuge und Analysepfade zugreifen koennen.
+Methoden/Attribute:
+Im Diagramm wird vor allem das Attribut graph gezeigt. Es repraesentiert den geladenen RDF-Graphen als zentrale Datenstruktur. Eigene operative Methoden sind hier bewusst nicht ausmodelliert, weil KGStore im Diagramm die Rolle des persistenten Wissenscontainers verkoerpert.
+Sinn im Rahmen der Masterarbeit:
+KGStore macht sichtbar, dass der ExcH-KG-Agent nicht nur Dokumente abruft, sondern auf einen expliziten, persistenten Wissensspeicher zugreift. Das ist die technische Grundlage fuer spaetere KG-Abfragen, Strukturanalysen, Signalpfadrekonstruktionen und nachvollziehbare Diagnoseunterstuetzung.

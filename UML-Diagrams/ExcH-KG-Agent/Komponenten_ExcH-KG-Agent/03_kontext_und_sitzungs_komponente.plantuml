@@ -1,5 +1,4 @@
 @startuml
-title ExcH-KG-Agent - Kontext- und Sitzungs-Komponente
 
 skinparam shadowing false
 skinparam classAttributeIconSize 0
@@ -23,7 +22,6 @@ package "Kontext- und Sitzungs-Komponente" {
     +triggerEvent: str
     +lastSkill: str
     +lastGEMMAStateBeforeFailure: str
-    +kg_ttl_path: str
     +triggerD2: bool
     +from_input(obj): IncidentContext
   }
@@ -76,14 +74,5 @@ package "Kontext- und Sitzungs-Komponente" {
   ExcHChatBotSession *-- SessionMemory
   SessionMemory o-- SessionTurn
 }
-
-note right of ExcHChatBotSession
-Kap. 3.4.3:
-Die Komponente fuehrt einen
-Fehlerfall in einen fortfuehrbaren
-Diagnosekontext ueber und haelt
-diesen ueber mehrere Rueckfragen
-hinweg in einer Sitzung zusammen.
-end note
 
 @enduml

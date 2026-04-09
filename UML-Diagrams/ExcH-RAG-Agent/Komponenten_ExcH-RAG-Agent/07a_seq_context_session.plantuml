@@ -6,37 +6,37 @@ skinparam sequenceMessageAlign center
 hide footbox
 autonumber
 
-title ExcH-RAG-Agent - Initiale Anfrage\nTeil 1 von 6: Sitzungs- und Kontextaufbau
+title ExcH-RAG-Agent - Initiale Anfrage\nTeil 1 von 6:\nSitzungs- und Kontextaufbau
 
 actor "Nutzende\nInstanz" as User
 collections "RuntimeEvent" as Event
-boundary "RagAgentUI" as UI
-control "RagSessionBuilder" as Builder
-control "ContextInterpreter" as CtxInt
-entity "RagIncidentContext" as Ctx
-control "SimpleRagSession" as Session
+boundary "RagAgent\nUI" as UI
+control "RagSession\nBuilder" as Builder
+control "Context\nInterpreter" as CtxInt
+entity "RagIncident\nContext" as Ctx
+control "SimpleRag\nSession" as Session
 
-User -> UI : start_analysis(event)
+User -> UI : start_analysis(\nevent)
 activate UI
 UI -> Event : lese Fehlerereignis
 
 opt PipelineConfig.enabled
-  UI -> UI : run_pipeline(cfg.pipeline, event)
-  UI -> Event : payload.plcopen_xml_path aktualisieren
+  UI -> UI : run_pipeline(\ncfg.pipeline,\nevent)
+  UI -> Event : payload.plcopen_\nxml_path\naktualisieren
 end
 
-UI -> Builder : build_session_from_input(event,\nxml_path, model, temperature, top_k)
+UI -> Builder : build_session_\nfrom_input(\nevent,\nxml_path,\nmodel,\ntemperature,\ntop_k)
 activate Builder
-Builder -> CtxInt : from_event(event)
+Builder -> CtxInt : from_event(\nevent)
 activate CtxInt
-CtxInt -> CtxInt : extract_snapshot(event)
+CtxInt -> CtxInt : extract_\nsnapshot(\nevent)
 create Ctx
-CtxInt -> Ctx : create RagIncidentContext\n+ RuntimeSnapshot
+CtxInt -> Ctx : create\nRagIncidentContext\n+\nRuntimeSnapshot
 CtxInt --> Builder : ctx
 deactivate CtxInt
 
 create Session
-Builder -> Session : create(ctx, config)
+Builder -> Session : create(\nctx,\nconfig)
 Builder --> UI : Session bereit
 deactivate Builder
 deactivate UI

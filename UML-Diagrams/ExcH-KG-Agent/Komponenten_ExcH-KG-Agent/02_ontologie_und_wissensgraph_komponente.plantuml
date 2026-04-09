@@ -30,11 +30,23 @@ package "Ontologie- und Wissensgraph-Komponente" {
     +graph: Graph
   }
 
-  KGLoader --> KGStore : befüllt
-  KGManager --> KGStore : analysiert\nund erweitert
+  KGLoader -[hidden]right-> KGStore
+  KGStore -[hidden]right-> KGManager
+
+  KGLoader --> KGStore : befuellt
+  KGManager --> KGStore : analysiert,\nerweitert und bereinigt
 }
 
-Ontology ..> KGLoader
-KGStore <..> KGDatabase : persistiert / lädt
+Ontology --> KGLoader : liefert\nMappingprofil
+KGStore --> KGDatabase : persistiert / laedt
+
+note bottom of KGStore
+Der Zugriff auf den persistenten
+Wissensgraphen wird bewusst
+ueber den KGStore abstrahiert.
+So bleibt im Diagramm klar,
+welche Klasse die Speicher-
+schnittstelle verkoerpert.
+end note
 
 @enduml

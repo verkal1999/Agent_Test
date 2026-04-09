@@ -6,20 +6,20 @@ skinparam sequenceMessageAlign center
 hide footbox
 autonumber
 
-title ExcH-KG-Agent - Initiale Anfrage\nTeil 4 von 6: Bootstrap-Planung
+title ExcH-KG-Agent - Initiale Anfrage\nTeil 4 von 6:\nBootstrap-Planung
 
-boundary "ExcHAgentUI" as UI
-control "ExcHChatBotSession" as Session
+boundary "ExcHAgent\nUI" as UI
+control "ExcHChatBot\nSession" as Session
 control "Planner" as Planner
-entity "AnalysisPlan" as Plan
-entity "SessionMemory" as Memory
+entity "Analysis\nPlan" as Plan
+entity "Session\nMemory" as Memory
 
-UI -> Session : ensure_bootstrap_plan()
+UI -> Session : ensure_bootstrap_\nplan()
 activate Session
-Session -> Planner : plan(ctx)
+Session -> Planner : plan(\nctx)
 activate Planner
 create Plan
-Planner -> Plan : create goal + PlanStep[]
+Planner -> Plan : create goal\n+\nPlanStep[]
 Planner --> Session : AnalysisPlan
 deactivate Planner
 

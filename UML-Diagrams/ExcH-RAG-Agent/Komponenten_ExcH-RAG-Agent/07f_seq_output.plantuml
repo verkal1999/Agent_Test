@@ -6,20 +6,20 @@ skinparam sequenceMessageAlign center
 hide footbox
 autonumber
 
-title ExcH-RAG-Agent - Initiale Anfrage\nTeil 6 von 6: Ergebnis und Ausgabe
+title ExcH-RAG-Agent - Initiale Anfrage\nTeil 6 von 6:\nErgebnis und Ausgabe
 
 actor "Nutzende\nInstanz" as User
-control "GroundedAnswerGenerator" as Generator
-control "GuardrailPolicy" as Guard
-entity "GenerationResult" as Result
-control "SimpleRagSession" as Session
-entity "ChatTurn" as Turn
-boundary "RagAgentUI" as UI
+control "GroundedAnswer\nGenerator" as Generator
+control "Guardrail\nPolicy" as Guard
+entity "Generation\nResult" as Result
+control "SimpleRag\nSession" as Session
+entity "Chat\nTurn" as Turn
+boundary "RagAgent\nUI" as UI
 
 create Result
-Generator -> Result : create(answer,\nuncertainty_notes)
+Generator -> Result : create(\nanswer,\nuncertainty_\nnotes)
 activate Generator
-Generator -> Guard : validate(result)
+Generator -> Guard : validate(\nresult)
 activate Guard
 Guard --> Generator : ok / Unsicherheit markiert
 deactivate Guard
@@ -29,8 +29,8 @@ deactivate Generator
 activate Session
 
 create Turn
-Session -> Turn : create(role="user",\ntext, answer)
-Session --> UI : erste Diagnose + retrieval debug
+Session -> Turn : create(\nrole="user",\ntext,\nanswer)
+Session --> UI : erste Diagnose\n+\nretrieval\ndebug
 deactivate Session
 activate UI
 

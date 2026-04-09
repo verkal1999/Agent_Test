@@ -6,19 +6,19 @@ skinparam sequenceMessageAlign center
 hide footbox
 autonumber
 
-title ExcH-KG-Agent - Initiale Anfrage\nTeil 2 von 6: KG-Befuellung und Anreicherung
+title ExcH-KG-Agent - Initiale Anfrage\nTeil 2 von 6:\nKG-Befuellung und Anreicherung
 
-boundary "ExcHAgentUI" as UI
-control "KGLoader" as Loader
-control "KGManager" as Manager
-database "KGStore" as Store
+boundary "ExcHAgent\nUI" as UI
+control "KG\nLoader" as Loader
+control "KG\nManager" as Manager
+database "KG\nStore" as Store
 
-UI -> Loader : ingest Artefakte aus\nPipelineContext
+UI -> Loader : ingest Artefakte\naus Pipeline\nContext
 activate Loader
-Loader -> Store : build_gvl_index_from_objects()
-Loader -> Store : ingest_programs_from_mapping_json()
-Loader -> Store : ingest_io_mappings()
-Loader -> Store : ingest_gvl_globals()
+Loader -> Store : build_gvl_index_\nfrom_objects()
+Loader -> Store : ingest_programs_\nfrom_mapping_json()
+Loader -> Store : ingest_io_\nmappings()
+Loader -> Store : ingest_gvl_\nglobals()
 Loader -> Store : save()
 Loader --> UI : Graph-Basis erstellt
 deactivate Loader
@@ -28,13 +28,13 @@ activate Manager
 Manager -> Store : lade RDF-Graph
 Store --> Manager : graph
 
-UI -> Manager : analyze_unused_elements()
+UI -> Manager : analyze_unused_\nelements()
 Manager -> Store : analysiere und erweitere
 
-UI -> Manager : generate_reports()
+UI -> Manager : generate_\nreports()
 Manager -> Store : erzeuge Zusatzwissen
 
-UI -> Manager : save(output_path)
+UI -> Manager : save(\noutput_path)
 Manager -> Store : persistiere Graph
 Manager --> UI : KG einsatzbereit
 deactivate Manager

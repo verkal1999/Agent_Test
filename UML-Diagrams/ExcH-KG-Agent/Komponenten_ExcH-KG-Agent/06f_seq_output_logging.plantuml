@@ -6,49 +6,49 @@ skinparam sequenceMessageAlign center
 hide footbox
 autonumber
 
-title ExcH-KG-Agent - Initiale Anfrage\nTeil 6 von 6: Ausgabe und Protokollierung
+title ExcH-KG-Agent - Initiale Anfrage\nTeil 6 von 6:\nAusgabe und Protokollierung
 
 actor "Nutzende\nInstanz" as User
-boundary "ExcHAgentUI" as UI
-control "ExcHChatBotSession" as Session
-entity "ResponseEnvelope" as Envelope
-control "OutputGuardrail" as Guard
-entity "EscalationDecision" as Esc
-entity "SessionTurn" as Turn
-entity "SessionMemory" as Memory
-entity "AuditTrailEntry" as Audit
+boundary "ExcHAgent\nUI" as UI
+control "ExcHChatBot\nSession" as Session
+entity "Response\nEnvelope" as Envelope
+control "Output\nGuardrail" as Guard
+entity "Escalation\nDecision" as Esc
+entity "Session\nTurn" as Turn
+entity "Session\nMemory" as Memory
+entity "AuditTrail\nEntry" as Audit
 
-Session --> UI : diagnosis draft + tool results
+Session --> UI : diagnosis draft\n+\ntool results
 activate UI
 
 create Envelope
-UI -> Envelope : create diagnosis +\nnext_steps + proposed_actions
+UI -> Envelope : create diagnosis\n+\nnext_steps\n+\nproposed_actions
 
 UI -> Guard : check(Envelope)
 activate Guard
 create Esc
-Guard -> Esc : create(requires_human_review,\nreason)
+Guard -> Esc : create(\nrequires_human_review,\nreason)
 Esc --> UI : decision
 deactivate Guard
 
 create Turn
-Session -> Turn : create(user_msg,\nassistant_msg,\ntool_trace)
+Session -> Turn : create(\nuser_msg,\nassistant_msg,\ntool_trace)
 Session -> Memory : append(SessionTurn)
 
 create Audit
-UI -> Audit : create(kind="initial_analysis", data)
+UI -> Audit : create(\nkind="initial_analysis",\ndata)
 
 alt requires_human_review = true
-  UI --> User : Diagnose + Eskalationshinweis
+  UI --> User : Diagnose \n+\nEskalationshinweis
 else direkte Ausgabe zulaessig
-  UI --> User : Diagnose + naechste Schritte
+  UI --> User : Diagnose \n+\nnaechste Schritte
 end
 deactivate UI
 
 note right of Envelope
 StructuredToolResult und
-FollowUpQuestion koennen
-Teil des ResponseEnvelope sein.
+FollowUpQuestion können
+Teil des Response\nEnvelope sein.
 end note
 
 @enduml

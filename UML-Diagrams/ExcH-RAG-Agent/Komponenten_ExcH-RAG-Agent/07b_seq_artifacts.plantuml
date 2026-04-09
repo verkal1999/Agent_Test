@@ -6,33 +6,33 @@ skinparam sequenceMessageAlign center
 hide footbox
 autonumber
 
-title ExcH-RAG-Agent - Initiale Anfrage\nTeil 2 von 6: Artefaktaufbereitung
+title ExcH-RAG-Agent - Initiale Anfrage\nTeil 2 von 6:\nArtefaktaufbereitung
 
-control "RagSessionBuilder" as Builder
-entity "ArtifactCatalog" as Catalog
-control "PLCOpenXmlSource" as XmlSource
+control "RagSession\nBuilder" as Builder
+entity "Artifact\nCatalog" as Catalog
+control "PLCOpenXml\nSource" as XmlSource
 control "XmlChunker" as Chunker
-entity "DocumentCorpus" as Corpus
-control "SimpleRagIndex" as Index
+entity "Document\nCorpus" as Corpus
+control "SimpleRag\nIndex" as Index
 
 create Catalog
-Builder -> Catalog : create(xml_path,\ndocument_type="PLCOpenXML")
+Builder -> Catalog : create(\nxml_path,\ndocument_type =\n"PLCOpenXML")
 activate Builder
 
-Builder -> XmlSource : load_text(xml_path)
+Builder -> XmlSource : load_text(\nxml_path)
 activate XmlSource
 XmlSource --> Builder : xml_text
 deactivate XmlSource
 
-Builder -> Chunker : chunk_text(xml_text, xml_path)
+Builder -> Chunker : chunk_text(\nxml_text,\nxml_path)
 activate Chunker
 Chunker --> Builder : RagChunk[]
 deactivate Chunker
 
 create Corpus
-Builder -> Corpus : add(chunks)
+Builder -> Corpus : add(\nchunks)
 
-Builder -> Index : create(chunks)
+Builder -> Index : create(\nchunks)
 Index --> Builder : Index bereit
 deactivate Builder
 

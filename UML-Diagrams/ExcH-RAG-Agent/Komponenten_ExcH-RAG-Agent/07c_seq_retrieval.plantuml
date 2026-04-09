@@ -6,39 +6,39 @@ skinparam sequenceMessageAlign center
 hide footbox
 autonumber
 
-title ExcH-RAG-Agent - Initiale Anfrage\nTeil 3 von 6: Retrieval
+title ExcH-RAG-Agent - Initiale Anfrage\nTeil 3 von 6:\nRetrieval
 
-control "SimpleRagSession" as Session
-entity "RagIncidentContext" as Ctx
-entity "RetrievalQuery" as Query
-control "SimpleRagIndex" as Index
-control "TokenScorer" as Scorer
-entity "RetrievalResultSet" as ResultSet
+control "SimpleRag\nSession" as Session
+entity "RagIncident\nContext" as Ctx
+entity "Retrieval\nQuery" as Query
+control "SimpleRag\nIndex" as Index
+control "Token\nScorer" as Scorer
+entity "RetrievalResult\nSet" as ResultSet
 
-Session -> Ctx : default_question()
+Session -> Ctx : default_\nquestion()
 activate Session
 Ctx --> Session : initiale Diagnosefrage
 
-Session -> Ctx : compact_event_context()
+Session -> Ctx : compact_event_\ncontext()
 Ctx --> Session : kompakter Event-Kontext
 
-Session -> Ctx : runtime_context_note()
+Session -> Ctx : runtime_context_\nnote()
 Ctx --> Session : Laufzeit- und Snapshot-Hinweise
 
 create Query
-Session -> Query : create(question, top_k)
-Session -> Index : search(question, top_k)
+Session -> Query : create(\nquestion,\ntop_k)
+Session -> Index : search(\nquestion,\ntop_k)
 activate Index
 
 loop fuer jedes relevante Dokumentsegment
-  Index -> Scorer : score(query, chunk)
+  Index -> Scorer : score(\nquery,\nchunk)
   activate Scorer
   Scorer --> Index : Relevanzwert
   deactivate Scorer
 end
 
 create ResultSet
-Index -> ResultSet : create ranked hits
+Index -> ResultSet : create\nranked hits
 ResultSet --> Session : RetrievalResultSet
 deactivate Index
 deactivate Session

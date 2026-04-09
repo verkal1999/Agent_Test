@@ -6,40 +6,40 @@ skinparam sequenceMessageAlign center
 hide footbox
 autonumber
 
-title ExcH-KG-Agent - Initiale Anfrage\nTeil 1 von 6: Pipeline-Vorbereitung
+title ExcH-KG-Agent - Initiale Anfrage\nTeil 1 von 6:\nPipeline-Vorbereitung
 
-boundary "ExcHAgentUI" as UI
+boundary "ExcHAgent\nUI" as UI
 control "Pipeline" as Pipeline
-entity "PipelineContext" as Ctx
-control "ExportPLCopenXMLStep" as ExportStep
-control "BuildProgramIOMappingStep" as ProgStep
-control "BuildIOMappingsStep" as IoStep
-control "ArtifactQualityGate" as Gate
+entity "Pipeline\nContext" as Ctx
+control "ExportPLCopenXML\nStep" as ExportStep
+control "BuildProgramIO\nMappingStep" as ProgStep
+control "BuildIOMappings\nStep" as IoStep
+control "ArtifactQuality\nGate" as Gate
 
-UI -> Pipeline : run(ctx)
+UI -> Pipeline : run(\nctx)
 activate Pipeline
 create Ctx
 Pipeline -> Ctx : create artifacts = {}
 
-Pipeline -> ExportStep : run(Ctx)
+Pipeline -> ExportStep : run(\nCtx)
 activate ExportStep
 ExportStep -> Ctx : set("plcopen_xml", ...)
 ExportStep --> Pipeline : Export abgeschlossen
 deactivate ExportStep
 
-Pipeline -> ProgStep : run(Ctx)
+Pipeline -> ProgStep : run(\nCtx)
 activate ProgStep
-ProgStep -> Ctx : set("program_mapping", ...)\nset("gvl", ...)
+ProgStep -> Ctx : set("program_\nmapping", ...)\nset("gvl", ...)
 ProgStep --> Pipeline : Mapping-Artefakte bereit
 deactivate ProgStep
 
-Pipeline -> IoStep : run(Ctx)
+Pipeline -> IoStep : run(\nCtx)
 activate IoStep
-IoStep -> Ctx : set("io_mappings", ...)
+IoStep -> Ctx : set("io_\nmappings", ...)
 IoStep --> Pipeline : Hardware-Bezuege bereit
 deactivate IoStep
 
-Pipeline -> Gate : validate(Ctx)
+Pipeline -> Gate : validate(\nCtx)
 activate Gate
 Gate --> Pipeline : Artefakte freigegeben
 deactivate Gate
@@ -47,8 +47,9 @@ Pipeline --> UI : PipelineContext bereit
 deactivate Pipeline
 
 note right of Ctx
-Alle Ingestion-Schritte arbeiten
-auf demselben gemeinsamen Kontext.
+Alle Ingestion-Schritte
+arbeiten auf demselben
+gemeinsamen Kontext.
 end note
 
 @enduml

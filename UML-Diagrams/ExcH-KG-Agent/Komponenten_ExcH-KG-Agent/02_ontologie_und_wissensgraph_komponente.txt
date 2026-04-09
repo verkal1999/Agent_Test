@@ -8,6 +8,7 @@ Der interne Inhalt des Wissensgraphen wird in diesem Diagramm bewusst nicht als 
 
 Diagrammidee:
 Das Diagramm konzentriert sich auf die drei technischen Klassen, die den Wissensgraphen praktisch aufbauen, verwalten und nutzen: KGLoader, KGManager und KGStore. Zusaetzlich sind Ontologie-Mappingprofil und semantische Regeln nur noch als Artefakte gezeigt, nicht als Klassen im Graphen selbst.
+Die Persistenz wird im Diagramm bewusst ueber den KGStore abstrahiert, damit die Rolle der Speicherschnittstelle eindeutig bleibt und die Pfeile visuell klar lesbar sind.
 
 Klassen im Diagramm:
 

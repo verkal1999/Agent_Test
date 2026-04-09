@@ -6,22 +6,22 @@ skinparam sequenceMessageAlign center
 hide footbox
 autonumber
 
-title ExcH-KG-Agent - Initiale Anfrage\nTeil 5 von 6: Werkzeugausfuehrung und Synthese
+title ExcH-KG-Agent - Initiale Anfrage\nTeil 5 von 6:\nWerkzeugausfuehrung und Synthese
 
-control "ExcHChatBotSession" as Session
-control "ToolRegistry" as Registry
-control "KGQueryTool" as KGTool
-control "StructureCodeAnalysisTool" as StructTool
-control "VariableSignalAnalysisTool" as SignalTool
-control "PathReconstructionTool" as PathTool
-entity "ToolResultBundle" as Results
-control "FoundationModelAdapter" as FM
+control "ExcHChatBot\nSession" as Session
+control "Tool\nRegistry" as Registry
+control "KGQuery\nTool" as KGTool
+control "StructureCode\nAnalysisTool" as StructTool
+control "VariableSignal\nAnalysisTool" as SignalTool
+control "PathReconstruction\nTool" as PathTool
+entity "ToolResult\nBundle" as Results
+control "FoundationModel\nAdapter" as FM
 
 create Results
-Session -> Results : create empty result bundle
+Session -> Results : create empty\nresult bundle
 activate Session
 
-Session -> Registry : execute("KGQueryTool", args)
+Session -> Registry : execute(\n"KGQueryTool",\nargs)
 activate Registry
 Registry -> KGTool : run(...)
 activate KGTool
@@ -31,7 +31,7 @@ Registry --> Session : tool result
 deactivate Registry
 Session -> Results : add(KGQueryTool)
 
-Session -> Registry : execute("StructureCodeAnalysisTool", args)
+Session -> Registry : execute(\n"StructureCodeAnalysisTool",\nargs)
 activate Registry
 Registry -> StructTool : run(...)
 activate StructTool
@@ -39,9 +39,9 @@ StructTool --> Registry : Code- und POU-Kontext
 deactivate StructTool
 Registry --> Session : tool result
 deactivate Registry
-Session -> Results : add(StructureCodeAnalysisTool)
+Session -> Results : add(\nStructureCodeAnalysisTool)
 
-Session -> Registry : execute("VariableSignalAnalysisTool", args)
+Session -> Registry : execute(\n"VariableSignalAnalysisTool",\nargs)
 activate Registry
 Registry -> SignalTool : run(...)
 activate SignalTool
@@ -49,9 +49,9 @@ SignalTool --> Registry : Variablen- und Portbelege
 deactivate SignalTool
 Registry --> Session : tool result
 deactivate Registry
-Session -> Results : add(VariableSignalAnalysisTool)
+Session -> Results : add(\nVariableSignalAnalysisTool)
 
-Session -> Registry : execute("PathReconstructionTool", args)
+Session -> Registry : execute(\n"PathReconstructionTool",\nargs)
 activate Registry
 Registry -> PathTool : run(...)
 activate PathTool
@@ -59,9 +59,9 @@ PathTool --> Registry : Fehlerpfade
 deactivate PathTool
 Registry --> Session : tool result
 deactivate Registry
-Session -> Results : add(PathReconstructionTool)
+Session -> Results : add(\nPathReconstructionTool)
 
-Session -> FM : synthesize(ctx, plan, results)
+Session -> FM : synthesize(\nctx,\nplan,\nresults)
 activate FM
 FM --> Session : diagnosis draft
 deactivate FM

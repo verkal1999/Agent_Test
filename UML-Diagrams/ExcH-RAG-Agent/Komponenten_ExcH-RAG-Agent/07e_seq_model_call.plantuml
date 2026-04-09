@@ -6,32 +6,32 @@ skinparam sequenceMessageAlign center
 hide footbox
 autonumber
 
-title ExcH-RAG-Agent - Initiale Anfrage\nTeil 5 von 6: Modellaufruf
+title ExcH-RAG-Agent - Initiale Anfrage\nTeil 5 von 6:\nModellaufruf
 
-control "GroundedAnswerGenerator" as Generator
-control "ModelSelectionPolicy" as Policy
-entity "ModelProfile" as Profile
-entity "PromptRequest" as Prompt
-control "FoundationModelGateway" as Gateway
-entity "ModelResponse" as Response
+control "GroundedAnswer\nGenerator" as Generator
+control "ModelSelection\nPolicy" as Policy
+entity "Model\nProfile" as Profile
+entity "Prompt\nRequest" as Prompt
+control "FoundationModel\nGateway" as Gateway
+entity "Model\nResponse" as Response
 
-Generator -> Policy : select_profile("initial_diagnosis")
+Generator -> Policy : select_profile(\n"initial_diagnosis")
 activate Generator
 activate Policy
 create Profile
-Policy -> Profile : create(name,\ncost_class,\ncontext_window)
+Policy -> Profile : create(\nname,\ncost_class,\ncontext_window)
 Profile --> Generator : ModelProfile
 deactivate Policy
 
 create Prompt
-Generator -> Prompt : create(system_prompt,\nuser_prompt)
+Generator -> Prompt : create(\nsystem_prompt,\nuser_prompt)
 
-Generator -> Gateway : invoke(prompt)
+Generator -> Gateway : invoke(\nprompt)
 activate Gateway
 Gateway -> Profile : nutze Modellprofil
 
 create Response
-Gateway -> Response : create(answer,\nfinish_reason)
+Gateway -> Response : create(\nanswer,\nfinish_reason)
 Response --> Generator : ModelResponse
 deactivate Gateway
 deactivate Generator

@@ -17,6 +17,7 @@ PipelineContext
 Aufgabe:
 PipelineContext haelt den aktuellen Arbeitszustand der Pipeline.
 Methoden/Attribute:
+- cfg: PipelineConfig bindet die feste Laufkonfiguration direkt an den Pipeline-Kontext.
 - set(key, value): Hinterlegt ein Artefakt oder Zwischenergebnis im Kontext.
 - get(key): Liest ein zuvor abgelegtes Zwischenergebnis wieder aus.
 Das Attribut artifacts sammelt die Zwischenstaende der Verarbeitung.

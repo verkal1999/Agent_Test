@@ -16,6 +16,7 @@ package "Artefakt- und Ingestion-Komponente" {
   }
 
   class PipelineContext <<dataclass>> {
+    +cfg: PipelineConfig
     +artifacts: Dict<str, Any>
     +set(key: str, value: Any): None
     +get(key: str): Any
@@ -73,6 +74,7 @@ package "Artefakt- und Ingestion-Komponente" {
   Pipeline *-- Step
   Pipeline --> PipelineContext : arbeitet auf
   Pipeline --> ArtifactQualityGate : validiert über
+  PipelineContext *-- PipelineConfig : nutzt Konfiguration
   PipelineContext o-- PLCOpenXMLParserWithHW : hält Parser
   PLCOpenXMLParserWithHW ..> ProgramMapping : erzeugt
   PLCOpenXMLParserWithHW ..> GVL : erzeugt

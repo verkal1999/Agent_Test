@@ -60,6 +60,30 @@ def _as_text(node: Any) -> str:
     return "" if node is None else str(node)
 
 
+def _safe_int(value: Any, default: int = 0) -> int:
+    if value is None:
+        return default
+    if isinstance(value, bool):
+        return int(value)
+    if isinstance(value, int):
+        return value
+    if isinstance(value, float):
+        try:
+            return int(value)
+        except Exception:
+            return default
+    text = str(value).strip()
+    if not text:
+        return default
+    try:
+        return int(text)
+    except Exception:
+        try:
+            return int(float(text))
+        except Exception:
+            return default
+
+
 def _first(graph: Graph, subj: URIRef, pred: URIRef) -> Optional[Any]:
     return next(graph.objects(subj, pred), None)
 
@@ -1943,7 +1967,7 @@ def build_requirement_tables(analysis: Dict[str, Any]) -> Dict[str, Any]:
     out_paths: List[Dict[str, Any]] = []
     for p in analysis.get("path_reports", []):
         rows = p.get("requirements", [])
-        sorted_rows = sorted(rows, key=lambda r: (str(r.get("path_id", "")), int(r.get("depth", 0))))
+        sorted_rows = sorted(rows, key=lambda r: (str(r.get("path_id", "")), _safe_int(r.get("depth", 0), 0)))
         table_rows = []
         for r in sorted_rows:
             table_rows.append(
@@ -2170,7 +2194,7 @@ def trace_condition_paths_from_pou(
             )
 
         all_rows.extend(rows)
-        sorted_rows = sorted(rows, key=lambda r: (str(r.get("path_id", "")), int(r.get("depth", 0))))
+        sorted_rows = sorted(rows, key=lambda r: (str(r.get("path_id", "")), _safe_int(r.get("depth", 0), 0)))
         table_rows: List[Dict[str, Any]] = []
         for r in sorted_rows:
             table_rows.append(

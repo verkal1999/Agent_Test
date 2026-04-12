@@ -1,0 +1,30 @@
+{
+  "meta": {
+    "started_at_utc": "2026-04-11T07:58:00.516852+00:00",
+    "event_type": "evAgentStart",
+    "correlationId": "evD2-848513419214500",
+    "processName": "ExTechnProcess1",
+    "out_json_path": "D:\\MA_Python_Agent\\MSRGuard_Anpassung\\python\\agent_results\\evD2-848513419214500_result.json"
+  },
+  "transcript": [
+    {
+      "ts_utc": "2026-04-11T07:58:00.517850+00:00",
+      "role": "System",
+      "text": "Unbekannter Fehler wurde erkannt. process=ExTechnProcess1 | KG: no failure modes for skill 'TestSkill3'"
+    },
+    {
+      "ts_utc": "2026-04-11T07:58:00.517850+00:00",
+      "role": "System",
+      "text": "Pipeline wird vor der Analyse ausgeführt. Klicke 'Weiter' um zu starten oder 'Abbrechen'."
+    }
+  ],
+  "events": [
+    {
+      "ts_utc": "2026-04-11T07:58:00.518849+00:00",
+      "kind": "event_autoloaded_path",
+      "data": {
+        "path": "D:\\MA_Python_Agent\\MSRGuard_Anpassung\\python\\agent_results\\evD2-848513419214500_event.json"
+      }
+    }
+  ]
+}

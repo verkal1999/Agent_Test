@@ -1,0 +1,19 @@
+{
+  "_comment": "Preise in USD pro 1.000 Tokens (Stand: April 2026).",
+  "llama-3.3-70b-versatile": {
+    "input_per_1k":  0.00059,
+    "output_per_1k": 0.00079
+  },
+  "llama-3.1-8b-instant": {
+    "input_per_1k":  0.00005,
+    "output_per_1k": 0.00008
+  },
+  "mixtral-8x7b-32768": {
+    "input_per_1k":  0.00024,
+    "output_per_1k": 0.00024
+  },
+  "llama3-70b-8192": {
+    "input_per_1k":  0.00059,
+    "output_per_1k": 0.00079
+  }
+}

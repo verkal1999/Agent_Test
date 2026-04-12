@@ -1,0 +1,36 @@
+@startuml
+hide footbox
+skinparam shadowing false
+skinparam participantPadding 18
+skinparam BoxPadding 10
+
+title Vorgehen bei Fehlern\nLösung durch eine weitere Ressource, Fehlerfall Beispiel 4
+
+participant SPS
+participant "MSRGuard SM1" as MSR1
+participant "FMEA SM1" as FMEA
+participant "SkillOA SM1" as SK
+participant "MSRGuard Plant" as PLANT
+participant "Resource Agent SM2" as SM2
+participant "Resource Agent SG1" as SG1
+
+SPS -> MSR1 : Fehler erkannt,\nFehlerdaten
+MSR1 -> SK : Aufforderung zu Warten
+MSR1 -> FMEA : Anfrage Bedeutung und\nBehandlung
+FMEA --> MSR1 : Keine Routine
+MSR1 -> PLANT : Gibt es etwas auf Systemebene?
+MSR1 -> SK : Ressource fehlerhaft
+
+par Anfrage an alternative Ressourcen
+    PLANT -> SM2 : Anfrage an Ressource,\nUrgent Status
+else
+    PLANT -> SG1 : Anfrage an Ressource,\nUrgent Status
+end
+
+SM2 --> PLANT : Meldet sich bereit
+SG1 --> PLANT : Meldet sich bereit
+PLANT -> SPS : Ausführung Behandlungsplan
+SPS -> PLANT : Rückmeldung
+PLANT -> SK : Weitergabe
+
+@enduml

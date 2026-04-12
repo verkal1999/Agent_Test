@@ -1,0 +1,159 @@
+@startuml eval_kg_class_diagram
+
+set namespaceSeparator none
+
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype ortho
+skinparam dpi 140
+skinparam ranksep 26
+skinparam nodesep 20
+skinparam DefaultFontSize 11
+skinparam packageTitleFontSize 12
+skinparam classFontSize 11
+hide empty members
+left to right direction
+scale max 1700 width
+
+title Evaluationspfad - ExcH KG Agent (flexibel)
+
+package "Eval Orchestrierung" as P_KG_Eval {
+
+  class ModelConfig <<dataclass>> {
+    +provider: str
+    +model: str
+    +temperature: float
+    +planner_provider: Optional[str]
+    +planner_model: Optional[str]
+    +judge_provider: Optional[str]
+    +judge_model: Optional[str]
+  }
+
+  class EvalConfig <<dataclass>> {
+    +agent: str
+    +event_json_path: str
+    +question: str
+    +model: ModelConfig
+    +kg_ttl_path: str
+    +api_key_file: str
+    +ground_truth: Optional[str]
+    +pricing, planner_pricing, judge_pricing: Optional[Dict]
+  }
+
+  class EvalResult <<dataclass>> {
+    +question, effective_question: str
+    +answer, answer_initial: str
+    +answer_auto_followup: str
+    +answer_stages: List[Dict]
+    +requested_question_ignored: bool
+    +root_cause_found: Optional[bool]
+    +judge_verdict: str
+    +t_initial_analysis_s, t_question_s, t_total_s: float
+    +prompt_tokens, completion_tokens, total_tokens: int
+    +cost_usd: float
+  }
+
+  class EvalRunnerKG <<module>> {
+    -_run_kg_eval(cfg: EvalConfig): EvalResult
+    -_run_llm_judge(cfg, result): EvalResult
+    +run_eval(cfg: EvalConfig): EvalResult
+  }
+
+  class KgTurnStrategy <<concept>> {
+    +deterministische Initialanalyse
+    +optionaler zweiter Turn
+    +effective_question = cfg.question | auto follow-up | Folgefrage
+  }
+
+  class JudgeAPI <<api>> {
+    +evaluate(question, ground_truth, answer): JSON
+  }
+
+  EvalConfig *-- ModelConfig
+}
+
+package "Modul chatbot_core" as P_KG_Core {
+
+  class LLMUsage <<dataclass>> {
+    +prompt_tokens, completion_tokens, total_tokens: int
+    +cost_usd: float
+    +add(other: LLMUsage): None
+  }
+
+  class KgCoreAPI <<module>> {
+    +get_llm_invoke(...): Callable
+    +build_bot(...): ChatBot
+  }
+
+  class ToolRegistry {
+    +register(tool): None
+    +execute(tool_name: str, args): Any
+  }
+
+  class ChatBot {
+    +registry: ToolRegistry
+    +llm: Callable
+    +history: List[Dict[str, Any]]
+    +chat(user_msg: str, debug=True): Dict[str, Any]
+  }
+
+  ChatBot *-- ToolRegistry
+}
+
+package "Modul excH_chatbot" as P_KG_Session {
+
+  class IncidentContext <<dataclass>> {
+    +correlationId, processName: str
+    +summary, triggerEvent: str
+    +lastSkill: str
+    +plcSnapshot: Any
+    +kg_ttl_path, project_root: str
+    +triggerD2: Optional[bool]
+    +{static} from_event(event): IncidentContext
+  }
+
+  class KgSessionAPI <<module>> {
+    +run_initial_analysis(session, debug=True): Dict[str, Any]
+  }
+
+  class ExcHChatBotSession {
+    +bot: ChatBot
+    +ctx: IncidentContext
+    +bootstrap_evd2_plan: Optional[Dict[str, Any]]
+    +ensure_bootstrap_plan(): Dict[str, Any]
+    +ask(user_msg: str, debug=True): Dict[str, Any]
+  }
+
+  ExcHChatBotSession *-- ChatBot
+  ExcHChatBotSession *-- IncidentContext
+}
+
+EvalRunnerKG --> EvalConfig : liest cfg
+EvalRunnerKG --> LLMUsage : instanziiert
+EvalRunnerKG --> IncidentContext : from_event()
+EvalRunnerKG --> KgCoreAPI : build_bot()
+EvalRunnerKG --> ExcHChatBotSession : erstellt
+EvalRunnerKG --> KgTurnStrategy : waehlt effektiven Ablauf
+KgTurnStrategy --> KgSessionAPI : run_initial_analysis()
+KgTurnStrategy --> ExcHChatBotSession : optional ask(effective_question)
+EvalRunnerKG --> EvalResult : erzeugt
+EvalRunnerKG --> JudgeAPI : optional bei ground_truth
+JudgeAPI --> EvalResult : root_cause / verdict / summary
+
+KgCoreAPI --> ChatBot : erzeugt
+KgCoreAPI --> ToolRegistry : befuellt
+KgCoreAPI --> LLMUsage : usage_accumulator
+
+KgSessionAPI --> ExcHChatBotSession : analysiert
+ExcHChatBotSession --> ChatBot : delegiert an bot.chat()
+
+note right of KgTurnStrategy
+Das Diagramm bleibt bewusst offen:
+- Heute kann der Runner die UI-Logik emulieren
+  (Initialanalyse + abgeleitete auto follow-up Frage)
+- Fuer spaetere Evals kann derselbe Knoten aber auch
+  cfg.question oder eine echte Folgefrage repraesentieren
+end note
+
+@enduml

@@ -1,0 +1,19 @@
+Dieses Diagramm zeigt den detaillierten, aber bewusst offen gehaltenen Evaluationspfad fuer den ExcH KG Agent.
+
+1. eval_runner liest die EvalConfig fuer einen KG Lauf.
+2. In _run_kg_eval werden zunaechst LLMUsage, IncidentContext, ChatBot und ExcHChatBotSession aufgebaut.
+3. Der KG-Ablauf besitzt eine deterministische Initialanalyse als eigenen Schritt.
+4. Danach kann optional ein zweiter Turn folgen. Dieser zweite Turn kann eine direkt uebernommene Config-Frage, eine agent-spezifisch abgeleitete auto follow-up Frage oder spaeter auch eine echte Folgefrage sein.
+5. Deshalb arbeitet der Runner intern mit einer effective_question, die nicht zwingend identisch mit cfg.question sein muss.
+6. Das Ergebnis kann als gestaffelte Antwort gespeichert werden, zum Beispiel in answer_initial, answer_auto_followup und answer_stages.
+7. Wenn ground_truth vorhanden ist, wird das Ergebnis optional noch durch einen Judge bewertet.
+8. Aus Antwort, Zeiten, Token-Tracking und Judge-Ergebnis wird das EvalResult erzeugt.
+
+Was der Agent intern macht:
+- Die ExcHChatBotSession kapselt den ChatBot und den IncidentContext.
+- Die deterministische Initialanalyse kommt aus excH_chatbot und ist von spaeteren Chat-Turns getrennt modelliert.
+- Der ChatBot besitzt die ToolRegistry und kann ueber bot.chat(...) die tool-gestuetzte Analyse ausfuehren.
+
+Warum das Diagramm bewusst offener formuliert ist:
+- Der aktuelle Code kann UI-nahe Spezialfaelle abbilden.
+- Gleichzeitig soll das Diagramm nicht nur den heutigen Sonderfall erklaeren, sondern auch spaetere Evaluationslaeufe fuer andere Fragen oder Folgefragen tragen.

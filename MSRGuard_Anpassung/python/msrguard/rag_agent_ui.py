@@ -49,6 +49,7 @@ class PipelineConfig:
 @dataclass
 class RagConfig:
     xml_path: str = ""
+    provider: str = "openai"
     model: str = "gpt-4o-mini"
     temperature: float = 0.0
     top_k: int = 6
@@ -124,6 +125,7 @@ def load_ui_config() -> UiConfig:
     c_raw = raw.get("rag") if isinstance(raw.get("rag"), dict) else {}
     rag = RagConfig(
         xml_path=str(c_raw.get("xml_path", "")),
+        provider=str(c_raw.get("provider", RagConfig.provider)),
         model=str(c_raw.get("model", RagConfig.model)),
         temperature=float(c_raw.get("temperature", RagConfig.temperature)),
         top_k=int(c_raw.get("top_k", RagConfig.top_k)),
@@ -136,21 +138,33 @@ def load_ui_config() -> UiConfig:
     )
 
 
-def try_set_openai_key_from_file(path_str: str) -> Optional[str]:
-    if os.environ.get("OPENAI_API_KEY"):
+def try_set_openai_key_from_file(path_str: str, provider: str = "openai") -> Optional[str]:
+    _PROVIDER_ENV = {
+        "openai": "OPENAI_API_KEY",
+        "anthropic": "ANTHROPIC_API_KEY",
+        "azure_openai": "AZURE_OPENAI_API_KEY",
+        "google": "GOOGLE_API_KEY",
+        "groq": "GROQ_API_KEY",
+    }
+    _provider = (provider or "openai").lower().strip()
+    if _provider == "ollama":
+        return None  # kein API-Key nötig
+
+    env_var = _PROVIDER_ENV.get(_provider, "OPENAI_API_KEY")
+    if os.environ.get(env_var):
         return None
     if not path_str:
-        return "OPENAI_API_KEY fehlt und openai_api_key_file ist leer."
+        return f"{env_var} fehlt und api_key_file ist leer."
 
     p = Path(path_str).expanduser()
     if not p.exists():
-        return f"openai_api_key_file existiert nicht: {p}"
+        return f"api_key_file existiert nicht: {p}"
 
     key = p.read_text(encoding="utf-8").strip()
     if not key:
-        return f"openai_api_key_file ist leer: {p}"
+        return f"api_key_file ist leer: {p}"
 
-    os.environ["OPENAI_API_KEY"] = key
+    os.environ[env_var] = key
     return None
 
 
@@ -555,7 +569,7 @@ def streamlit_main() -> None:
         st.session_state["analysis_started"] = True
         log_ui_event("analysis_started", {"pipeline_enabled": bool(st.session_state.get("pipeline_enabled"))})
 
-        err = try_set_openai_key_from_file(cfg.openai_api_key_file)
+        err = try_set_openai_key_from_file(cfg.openai_api_key_file, provider=cfg.rag.provider)
         if err:
             add_message("System", f"RAG-Agent Key Hinweis: {err}")
 
@@ -586,6 +600,7 @@ def streamlit_main() -> None:
                         event,
                         xml_path=cfg.rag.xml_path,
                         pipeline_config_path=cfg.pipeline.config,
+                        provider=cfg.rag.provider,
                         openai_model=cfg.rag.model,
                         openai_temperature=cfg.rag.temperature,
                         top_k=cfg.rag.top_k,

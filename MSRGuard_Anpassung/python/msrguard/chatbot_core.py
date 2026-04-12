@@ -39,6 +39,31 @@ def _normalize_ws(s: str) -> str:
     return re.sub(r"\s+", " ", s).strip()
 
 
+def _safe_int(value: Any, default: int = 0) -> int:
+    if value is None:
+        return default
+    if isinstance(value, bool):
+        return int(value)
+    if isinstance(value, int):
+        return value
+    if isinstance(value, float):
+        try:
+            return int(value)
+        except Exception:
+            return default
+
+    text = str(value).strip()
+    if not text:
+        return default
+    try:
+        return int(text)
+    except Exception:
+        try:
+            return int(float(text))
+        except Exception:
+            return default
+
+
 def enforce_select_only(query: str, max_limit: int = 200) -> str:
     q = query.strip()
     q_u = _normalize_ws(q).upper()
@@ -56,7 +81,7 @@ def enforce_select_only(query: str, max_limit: int = 200) -> str:
 
     m = re.search(r"\bLIMIT\s+(\d+)\b", q_u)
     if m:
-        lim = int(m.group(1))
+        lim = _safe_int(m.group(1), max_limit)
         if lim > max_limit:
             q = re.sub(r"(?i)\bLIMIT\s+\d+\b", f"LIMIT {max_limit}", q)
     else:
@@ -344,23 +369,138 @@ def classify_checkable_sensors(snapshot: SensorSnapshot, sig: RoutineSignature) 
 
 
 # ----------------------------
-# LLM Wrapper (OpenAI via LangChain)
+# LLM Wrapper (Multi-Provider)
 # ----------------------------
 
-def get_llm_invoke(model: str = "gpt-4o-mini", temperature: float = 0) -> Callable[[str, str], str]:
-    try:
-        from langchain_openai import ChatOpenAI
-        from langchain_core.messages import SystemMessage, HumanMessage
-    except Exception as e:
-        raise RuntimeError(
-            "Bitte installiere: pip install -U langchain-openai langchain-core"
-        ) from e
+_PROVIDER_ENV_VARS: Dict[str, str] = {
+    "openai": "OPENAI_API_KEY",
+    "anthropic": "ANTHROPIC_API_KEY",
+    "azure_openai": "AZURE_OPENAI_API_KEY",
+    "google": "GOOGLE_API_KEY",
+    "groq": "GROQ_API_KEY",
+}
 
-    llm = ChatOpenAI(model=model, temperature=temperature, max_tokens=1200)
+_PROVIDER_INSTALL_HINTS: Dict[str, str] = {
+    "openai": "pip install -U langchain-openai langchain-core",
+    "anthropic": "pip install -U langchain-anthropic",
+    "azure_openai": "pip install -U langchain-openai",
+    "ollama": "pip install -U langchain-ollama",
+    "google": "pip install -U langchain-google-genai",
+    "groq": "pip install -U langchain-groq",
+}
+
+
+@dataclass
+class LLMUsage:
+    """Token- und Kostentracking für einen einzelnen LLM-Aufruf."""
+    prompt_tokens: int = 0
+    completion_tokens: int = 0
+    total_tokens: int = 0
+    cost_usd: float = 0.0
+
+    def add(self, other: "LLMUsage") -> None:
+        self.prompt_tokens += other.prompt_tokens
+        self.completion_tokens += other.completion_tokens
+        self.total_tokens += other.total_tokens
+        self.cost_usd += other.cost_usd
+
+    def as_dict(self) -> Dict[str, Any]:
+        return {
+            "prompt_tokens": self.prompt_tokens,
+            "completion_tokens": self.completion_tokens,
+            "total_tokens": self.total_tokens,
+            "cost_usd": round(self.cost_usd, 6),
+        }
+
+
+def get_llm_invoke(
+    model: str = "gpt-4o-mini",
+    temperature: float = 0,
+    provider: str = "openai",
+    usage_accumulator: Optional["LLMUsage"] = None,
+    pricing: Optional[Dict[str, float]] = None,
+) -> Callable[[str, str], str]:
+    """Return a (system: str, user: str) -> str callable for the requested provider.
+
+    Supported providers: openai, anthropic, azure_openai, ollama, google, groq
+
+    If usage_accumulator is provided, token usage and cost are accumulated into it.
+    pricing must be {"input_per_1k": ..., "output_per_1k": ...} in USD.
+    """
+    try:
+        from langchain_core.messages import SystemMessage, HumanMessage
+    except ImportError as e:
+        raise RuntimeError("pip install -U langchain-core") from e
+
+    provider = (provider or "openai").lower().strip()
+
+    if provider == "openai":
+        try:
+            from langchain_openai import ChatOpenAI
+        except ImportError as e:
+            raise RuntimeError(_PROVIDER_INSTALL_HINTS["openai"]) from e
+        llm = ChatOpenAI(model=model, temperature=temperature, max_tokens=1200)
+
+    elif provider == "anthropic":
+        try:
+            from langchain_anthropic import ChatAnthropic
+        except ImportError as e:
+            raise RuntimeError(_PROVIDER_INSTALL_HINTS["anthropic"]) from e
+        llm = ChatAnthropic(model=model, temperature=temperature, max_tokens=1200)
+
+    elif provider == "azure_openai":
+        try:
+            from langchain_openai import AzureChatOpenAI
+        except ImportError as e:
+            raise RuntimeError(_PROVIDER_INSTALL_HINTS["azure_openai"]) from e
+        llm = AzureChatOpenAI(azure_deployment=model, temperature=temperature, max_tokens=1200)
+
+    elif provider == "ollama":
+        try:
+            from langchain_ollama import ChatOllama
+        except ImportError as e:
+            raise RuntimeError(_PROVIDER_INSTALL_HINTS["ollama"]) from e
+        llm = ChatOllama(model=model, temperature=temperature)
+
+    elif provider == "google":
+        try:
+            from langchain_google_genai import ChatGoogleGenerativeAI
+        except ImportError as e:
+            raise RuntimeError(_PROVIDER_INSTALL_HINTS["google"]) from e
+        llm = ChatGoogleGenerativeAI(model=model, temperature=temperature)
+
+    elif provider == "groq":
+        try:
+            from langchain_groq import ChatGroq
+        except ImportError as e:
+            raise RuntimeError(_PROVIDER_INSTALL_HINTS["groq"]) from e
+        llm = ChatGroq(model=model, temperature=temperature, max_tokens=1200)
+
+    else:
+        raise ValueError(
+            f"Unbekannter LLM-Provider: '{provider}'. "
+            "Erlaubt: openai, anthropic, azure_openai, ollama, google, groq"
+        )
 
     def _invoke(system: str, user: str) -> str:
         msgs = [SystemMessage(content=system), HumanMessage(content=user)]
-        return llm.invoke(msgs).content
+        response = llm.invoke(msgs)
+        if usage_accumulator is not None:
+            try:
+                u = response.usage_metadata or {}
+                p = _safe_int(u.get("input_tokens", 0), 0)
+                c = _safe_int(u.get("output_tokens", 0), 0)
+                usage_accumulator.prompt_tokens += p
+                usage_accumulator.completion_tokens += c
+                usage_accumulator.total_tokens += p + c
+                if pricing:
+                    usage_accumulator.cost_usd += (
+                        p / 1000 * pricing.get("input_per_1k", 0.0)
+                        + c / 1000 * pricing.get("output_per_1k", 0.0)
+                    )
+            except Exception:
+                pass
+        return response.content
 
     return _invoke
 
@@ -530,6 +670,90 @@ class VariableTraceTool(BaseAgentTool):
         return sparql_select_raw(q, max_rows=30)
 
 
+class PLCSnapshotSearchTool(BaseAgentTool):
+    name = "plc_snapshot_search"
+    description = "Durchsucht den aktuellen plcSnapshot nach beobachteten Laufzeitwerten und Browse-Knoten."
+    usage_guide = (
+        "Wenn fuer eine Folgefrage ein beobachteter Runtime-Wert zum Diagnosezeitpunkt gebraucht wird "
+        "(z. B. Timer, Trigger, Flags oder aktuelle Snapshot-Werte)."
+    )
+
+    def __init__(self, plc_snapshot: Any):
+        self.snapshot = plc_snapshot if isinstance(plc_snapshot, dict) else {}
+
+    @staticmethod
+    def _matches(name: str, query: str, *, exact: bool) -> bool:
+        lhs = str(name or "").strip().lower()
+        rhs = str(query or "").strip().lower()
+        if not lhs or not rhs:
+            return False
+        if exact:
+            return lhs == rhs or lhs.endswith("." + rhs)
+        return rhs in lhs
+
+    def run(
+        self,
+        *,
+        name_contains: str = "",
+        exact_name: str = "",
+        include_rows: bool = False,
+        max_hits: int = 20,
+        **kwargs,
+    ) -> Dict[str, Any]:
+        vars_list = self.snapshot.get("vars")
+        rows_list = self.snapshot.get("rows")
+        if not isinstance(vars_list, list) and not isinstance(rows_list, list):
+            return {"error": "Kein plcSnapshot im aktuellen Incident verfuegbar."}
+
+        query = str(exact_name or name_contains or "").strip()
+        if not query:
+            return {"error": "Bitte 'exact_name' oder 'name_contains' angeben."}
+
+        limit = max(1, _safe_int(max_hits, 20))
+        vars_out: List[Dict[str, Any]] = []
+        rows_out: List[Dict[str, Any]] = []
+
+        for item in vars_list if isinstance(vars_list, list) else []:
+            if not isinstance(item, dict):
+                continue
+            var_id = str(item.get("id", "") or "")
+            if not self._matches(var_id, query, exact=bool(exact_name)):
+                continue
+            vars_out.append(
+                {
+                    "id": var_id,
+                    "type": str(item.get("t", "") or ""),
+                    "value": item.get("v"),
+                }
+            )
+            if len(vars_out) >= limit:
+                break
+
+        if include_rows:
+            for item in rows_list if isinstance(rows_list, list) else []:
+                if not isinstance(item, dict):
+                    continue
+                row_id = str(item.get("id", "") or "")
+                if not self._matches(row_id, query, exact=bool(exact_name)):
+                    continue
+                rows_out.append(
+                    {
+                        "id": row_id,
+                        "nodeClass": str(item.get("nodeClass", "") or ""),
+                        "type": str(item.get("t", "") or ""),
+                    }
+                )
+                if len(rows_out) >= limit:
+                    break
+
+        return {
+            "query": query,
+            "vars": vars_out,
+            "rows": rows_out,
+            "snapshot_available": True,
+        }
+
+
 class ExceptionAnalysisTool(BaseAgentTool):
     name = "exception_prep"
     description = "Analysiert einen Snapshot gegen Routine-Signaturen."
@@ -621,9 +845,12 @@ def build_vector_index(kg_store: KGStore, tool_registry: ToolRegistry):
     if not docs:
         return None
 
-    embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
-    vs = FAISS.from_documents(docs, embeddings)
-    return vs
+    try:
+        embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+        vs = FAISS.from_documents(docs, embeddings)
+        return vs
+    except Exception:
+        return None
 
 
 class SemanticSearchTool(BaseAgentTool):
@@ -1986,8 +2213,9 @@ class EvD2PathTracingTool(BaseAgentTool):
 
         toggle_hints: List[Dict[str, Any]] = []
         rx_toggle = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_\.]*)\s*:=\s*NOT\s+\1\s*;\s*$", flags=re.I)
+        chosen_line_no = _safe_int(chosen.get("line_no", 0), 0)
         for idx, ln in enumerate(code.splitlines(), start=1):
-            if idx >= int(chosen.get("line_no", 0)):
+            if idx >= chosen_line_no:
                 break
             m = rx_toggle.match(ln.strip())
             if not m:
@@ -2049,7 +2277,7 @@ class EvD2PathTracingTool(BaseAgentTool):
         later_assigns = [
             a
             for a in assigns
-            if int(a.get("line_no", 0)) > int(chosen.get("line_no", 0))
+            if _safe_int(a.get("line_no", 0), 0) > chosen_line_no
             and self._normalize_skill_literal(a.get("rhs", "")).lower() != skill.lower()
         ]
         for la in later_assigns:
@@ -2298,12 +2526,22 @@ class EvD2PathTracingTool(BaseAgentTool):
                 }
             )
 
-        evaluations.sort(key=lambda e: (not e.get("possible", False), -int(e.get("score", 0)), str(e.get("state_path", ""))))
+        evaluations.sort(
+            key=lambda e: (
+                not e.get("possible", False),
+                -_safe_int(e.get("score", 0), 0),
+                str(e.get("state_path", "")),
+            )
+        )
         possible_paths = [e["state_path"] for e in evaluations if e.get("possible")]
         best_paths: List[str] = []
         if possible_paths:
-            best_score = max(int(e.get("score", 0)) for e in evaluations if e.get("possible"))
-            best_paths = [e["state_path"] for e in evaluations if e.get("possible") and int(e.get("score", 0)) == best_score]
+            best_score = max(_safe_int(e.get("score", 0), 0) for e in evaluations if e.get("possible"))
+            best_paths = [
+                e["state_path"]
+                for e in evaluations
+                if e.get("possible") and _safe_int(e.get("score", 0), 0) == best_score
+            ]
 
         return {
             "skill_requirements": skill_reqs,
@@ -2372,7 +2610,7 @@ class EvD2PathTracingTool(BaseAgentTool):
                 )
             compact_rows.sort(
                 key=lambda x: (
-                    int(x.get("depth", 9999)) if str(x.get("depth", "")).isdigit() else 9999,
+                    _safe_int(x.get("depth", 9999), 9999),
                     str(x.get("token", "")),
                 )
             )
@@ -2507,10 +2745,7 @@ class EvD2PathTracingTool(BaseAgentTool):
                 typ = str(r.get("Typ", "")).strip()
                 reason = str(r.get("Herleitung", "")).strip()
                 source = str(r.get("Quelle", "")).strip()
-                try:
-                    depth = int(r.get("Tiefe", 9999))
-                except Exception:
-                    depth = 9999
+                depth = _safe_int(r.get("Tiefe", 9999), 9999)
 
                 typ_l = typ.lower()
                 reason_l = reason.lower()
@@ -2630,18 +2865,18 @@ class EvD2PathTracingTool(BaseAgentTool):
                 if prev is None:
                     best_by_token[tok] = c
                     continue
-                if int(c.get("_score", 0)) > int(prev.get("_score", 0)):
+                if _safe_int(c.get("_score", 0), 0) > _safe_int(prev.get("_score", 0), 0):
                     best_by_token[tok] = c
-                elif int(c.get("_score", 0)) == int(prev.get("_score", 0)):
-                    if int(c.get("depth", 9999)) < int(prev.get("depth", 9999)):
+                elif _safe_int(c.get("_score", 0), 0) == _safe_int(prev.get("_score", 0), 0):
+                    if _safe_int(c.get("depth", 9999), 9999) < _safe_int(prev.get("depth", 9999), 9999):
                         best_by_token[tok] = c
 
             out = list(best_by_token.values())
             out.sort(
                 key=lambda x: (
                     _phase_rank(str(x.get("phase", "t0"))),
-                    int(x.get("depth", 9999)),
-                    -int(x.get("_score", 0)),
+                    _safe_int(x.get("depth", 9999), 9999),
+                    -_safe_int(x.get("_score", 0), 0),
                     str(x.get("token", "")),
                 )
             )
@@ -3029,10 +3264,18 @@ class DeterministicPathSearchTool(EvD2PathTracingTool):
 # ----------------------------
 
 class ChatBot:
-    def __init__(self, registry: ToolRegistry, llm_invoke_fn: Callable):
+    def __init__(
+        self,
+        registry: ToolRegistry,
+        llm_invoke_fn: Callable,
+        planner_llm_invoke_fn: Optional[Callable] = None,
+    ):
         self.registry = registry
         self.llm = llm_invoke_fn
+        # Falls nicht angegeben, nutzt der Planner dasselbe Modell wie die Synthese
+        self._planner_llm = planner_llm_invoke_fn if planner_llm_invoke_fn is not None else llm_invoke_fn
         self.history: List[Dict[str, Any]] = []
+        self.sticky_context: Dict[str, Any] = {}
 
     @staticmethod
     def _extract_current_user_question(user_msg: str) -> str:
@@ -3069,9 +3312,9 @@ class ChatBot:
 
     @staticmethod
     def _question_wants_root_cause(question: str, *, first_turn: bool) -> bool:
-        if first_turn:
-            return True
         q = (question or "").lower()
+        if first_turn and not q.strip():
+            return True
         keys = [
             "root-cause",
             "root cause",
@@ -3161,8 +3404,16 @@ class ChatBot:
             lines.append(f"{i}. A: {prev_ans}")
         return "\n".join(lines)
 
+    def remember_turn(self, user_msg: str, resp: Dict[str, Any]) -> None:
+        self.history.append({"user": user_msg, "resp": resp})
+
+    def set_sticky_context(self, sticky_context: Any) -> None:
+        self.sticky_context = sticky_context if isinstance(sticky_context, dict) else {}
+
     def _augment_plan_for_followup(self, plan: Dict[str, Any], question: str) -> Dict[str, Any]:
         if not isinstance(plan, dict):
+            return plan
+        if str(plan.get("ask_user", "") or plan.get("clarification_question", "")).strip():
             return plan
         steps = plan.get("steps")
         if not isinstance(steps, list):
@@ -3191,8 +3442,20 @@ class ChatBot:
         focus_symbols = self._extract_focus_symbols(question)
         target = focus_symbols[0] if focus_symbols else self._extract_symbol_from_question(question)
         existing_tools = {str(s.get("tool", "")) for s in steps if isinstance(s, dict)}
+        question_l = question.lower()
+        wants_runtime_value = any(
+            k in question_l
+            for k in ["snapshot", "runtime", "laufzeit", "aktuell", "wert", "beobachtet", "timer", "plcsnapshot"]
+        )
 
         prepend_steps: List[Dict[str, Any]] = []
+        if target and wants_runtime_value and "plc_snapshot_search" not in existing_tools:
+            prepend_steps.append(
+                {
+                    "tool": "plc_snapshot_search",
+                    "args": {"name_contains": target, "include_rows": False, "max_hits": 12},
+                }
+            )
         if target and "search_variables" not in existing_tools:
             prepend_steps.append({"tool": "search_variables", "args": {"name_contains": target}})
         if target and "variable_trace" not in existing_tools:
@@ -3230,6 +3493,8 @@ class ChatBot:
 
     def _prefer_evd2_path_trace_plan(self, plan: Dict[str, Any], question: str) -> Dict[str, Any]:
         if not isinstance(plan, dict):
+            return plan
+        if str(plan.get("ask_user", "") or plan.get("clarification_question", "")).strip():
             return plan
         steps = plan.get("steps")
         if not isinstance(steps, list) or not steps:
@@ -3320,6 +3585,20 @@ ROOT-CAUSE STRATEGIE (Fixpoint-Search):
 - Wenn bereits POU + Variable/Bedingung bekannt sind und du einen deterministischen Signal-/Hardwarepfad willst, nutze 'deterministic_path_search'.
 - Bei evD2-Analysen zuerst nur 'deterministic_path_search' mit `preset="evd2_bootstrap"` planen (Single-Source-Analyse), nicht mehrere evd2_* Tools parallel.
 
+FOLGEFRAGEN:
+- Nutze fuer Folgefragen zuerst die bisherige Chat-Historie und fruehere Tool-Ergebnisse.
+- Plane fuer schmale Folgefragen lieber kleine, gezielte Tools als erneut einen kompletten evD2-Bootstrap.
+- Auf den plcSnapshot nur bei Bedarf zugreifen; dafuer ist 'plc_snapshot_search' da.
+
+UNSICHERHEIT / RUECKFRAGEN:
+- Wenn die Frage mehrdeutig ist oder ohne weitere Eingrenzung kein sinnvoller Tool-Plan moeglich ist, stelle eine Rueckfrage.
+- Gib dann KEINE steps aus, sondern JSON in dieser Form:
+  {{"ask_user": "Deine gezielte Rueckfrage"}}
+
+RE-PLANNING NACH TOOL-FEHLERN:
+- Wenn bisherige Tool-Ergebnisse Fehler oder Luecken zeigen, nutze diese Informationen aktiv fuer einen neuen, angepassten Plan.
+- Wiederhole denselben gescheiterten Plan nicht blind.
+
 Heuristiken:
 {chr(10).join(heuristics)}
 - Wenn nach mehreren Tool Aufrufen keine Treffer kommen, nutze string_triple_search(term) als letzten Fallback
@@ -3335,28 +3614,197 @@ Ausgabeformat (NUR JSON):
 }}
 """
 
-    def _is_result_empty(self, results: Dict[str, Any]) -> bool:
-        if not results:
+    @staticmethod
+    def _extract_clarification_question(plan: Dict[str, Any]) -> str:
+        if not isinstance(plan, dict):
+            return ""
+        return str(plan.get("ask_user", "") or plan.get("clarification_question", "") or "").strip()
+
+    @staticmethod
+    def _tool_result_has_payload(value: Any) -> bool:
+        if isinstance(value, list):
+            return len(value) > 0
+        if isinstance(value, dict):
+            if "error" in value:
+                return False
+            for v in value.values():
+                if isinstance(v, list) and len(v) > 0:
+                    return True
+                if isinstance(v, dict) and v:
+                    return True
+                if v not in (None, "", [], {}, False):
+                    return True
+            return False
+        return value not in (None, "", [], {}, False)
+
+    def _has_useful_results(self, results: Dict[str, Any]) -> bool:
+        if not isinstance(results, dict) or not results:
+            return False
+        return any(self._tool_result_has_payload(v) for v in results.values())
+
+    @staticmethod
+    def _tool_result_has_error(value: Any) -> bool:
+        return isinstance(value, dict) and "error" in value
+
+    def _has_tool_errors(self, results: Dict[str, Any]) -> bool:
+        if not isinstance(results, dict):
+            return False
+        return any(self._tool_result_has_error(v) for v in results.values())
+
+    def _needs_replan(self, results: Dict[str, Any]) -> bool:
+        if not isinstance(results, dict) or not results:
             return True
-        for val in results.values():
-            if isinstance(val, dict) and "error" in val:
-                return False
-            if isinstance(val, list) and len(val) > 0:
-                return False
-            if val:
-                return False
-        return True
+        if self._has_tool_errors(results):
+            return True
+        return not self._has_useful_results(results)
+
+    def _tool_failure_summary(self, results: Dict[str, Any]) -> str:
+        if not isinstance(results, dict):
+            return ""
+        lines: List[str] = []
+        for step_name, value in results.items():
+            if isinstance(value, dict) and "error" in value:
+                lines.append(f"- {step_name}: {value.get('error')}")
+                continue
+            if isinstance(value, dict):
+                nested = self._tool_failure_summary(value)
+                if nested:
+                    for line in nested.splitlines():
+                        lines.append(f"- {step_name}.{line.lstrip('- ').strip()}")
+        return "\n".join(lines)
+
+    def _build_retry_hint(self, results: Dict[str, Any]) -> str:
+        if not isinstance(results, dict) or not results:
+            return "Keine Tool-Ergebnisse vorhanden. Plane breiter."
+        if self._has_tool_errors(results):
+            return (
+                "Mindestens ein Tool ist fehlgeschlagen. "
+                "Nutze die Fehlermeldungen und vorhandene Teiltreffer fuer einen angepassten Plan.\n"
+                + self._tool_failure_summary(results)
+            ).strip()
+        return "Die bisherigen Tool-Ergebnisse waren leer oder nicht verwertbar. Plane gezielter oder breiter nach."
+
+    @staticmethod
+    def _json_preview(data: Any, max_chars: int = 12000) -> str:
+        try:
+            text = json.dumps(data, ensure_ascii=False, indent=2)
+        except Exception:
+            text = str(data)
+        return text[:max_chars]
+
+    def _recent_turn_channels(self, max_turns: int = 3) -> Dict[str, Any]:
+        if not self.history:
+            return {}
+
+        tail = self.history[-max_turns:]
+        turn_summaries: List[Dict[str, Any]] = []
+        for entry in tail:
+            if not isinstance(entry, dict):
+                continue
+            resp = entry.get("resp") if isinstance(entry.get("resp"), dict) else {}
+            tool_results = resp.get("tool_results") if isinstance(resp.get("tool_results"), dict) else {}
+            plan = resp.get("plan")
+
+            successful_steps: List[str] = []
+            failed_steps: List[Dict[str, str]] = []
+            for step_name, value in tool_results.items():
+                if isinstance(value, dict) and "error" in value:
+                    failed_steps.append(
+                        {
+                            "step": str(step_name),
+                            "error": self._short_text(value.get("error", ""), max_chars=220),
+                        }
+                    )
+                    continue
+                if self._tool_result_has_payload(value):
+                    successful_steps.append(str(step_name))
+
+            turn_summary: Dict[str, Any] = {
+                "question": self._short_text(
+                    self._extract_current_user_question(str(entry.get("user", ""))),
+                    max_chars=220,
+                ),
+                "answer_summary": self._short_text(resp.get("answer", ""), max_chars=320),
+            }
+            if successful_steps:
+                turn_summary["successful_steps"] = successful_steps[:4]
+            if failed_steps:
+                turn_summary["failed_steps"] = failed_steps[:3]
+            if isinstance(plan, dict) and isinstance(plan.get("attempts"), list):
+                turn_summary["replanned"] = True
+            turn_summaries.append(turn_summary)
+
+        return {"recent_turns": turn_summaries}
+
+    def _build_persistent_context_block(self) -> str:
+        sections: List[str] = []
+        if self.sticky_context:
+            sections.append(
+                "Persistenter Analysekontext (JSON):\n"
+                + self._json_preview(self.sticky_context, max_chars=9000)
+            )
+
+        turn_channels = self._recent_turn_channels(max_turns=3)
+        recent_turns = turn_channels.get("recent_turns") if isinstance(turn_channels, dict) else None
+        if isinstance(recent_turns, list) and recent_turns:
+            sections.append(
+                "Kanalisierte Zwischenergebnisse (JSON):\n"
+                + self._json_preview(turn_channels, max_chars=5000)
+            )
+        return "\n\n".join(sections)
+
+    def _build_planner_input(
+        self,
+        *,
+        current_question: str,
+        original_user_msg: str,
+        first_turn: bool,
+        wants_chain: bool,
+        wants_root: bool,
+        extra_context: str = "",
+        prior_plan: Optional[Dict[str, Any]] = None,
+        prior_results: Optional[Dict[str, Any]] = None,
+    ) -> str:
+        question_text = current_question if current_question else original_user_msg
+        sections: List[str] = [f"Aktuelle Userfrage:\n{question_text}"]
+
+        persistent_context = self._build_persistent_context_block()
+        if persistent_context:
+            sections.append(persistent_context)
+
+        if extra_context:
+            sections.append(f"Zusatzkontext:\n{extra_context}")
+
+        if not first_turn and not (wants_chain and not wants_root):
+            sections.append("Vorherige kurze Historie:\n" + self._recent_history_text(max_turns=2))
+
+        if prior_plan:
+            sections.append("Vorheriger Plan (JSON):\n" + self._json_preview(prior_plan, max_chars=4000))
+        if prior_results:
+            sections.append("Bisherige Tool-Ergebnisse (JSON):\n" + self._json_preview(prior_results, max_chars=12000))
+
+        return "\n\n".join(sections)
 
     def _planner(self, user_msg: str, retry_hint: str = "") -> Dict[str, Any]:
         system = self._get_dynamic_planner_prompt(retry_hint=retry_hint)
-        raw = self.llm(system, user_msg)
+        raw = self._planner_llm(system, user_msg)
+        # Attempt 1: strip code fences and parse directly
         try:
             plan = json.loads(strip_code_fences(raw))
-            if not isinstance(plan, dict) or "steps" not in plan:
-                return {"error": "Invalid plan JSON", "raw": raw}
-            return plan
+            if isinstance(plan, dict) and ("steps" in plan or self._extract_clarification_question(plan)):
+                return plan
         except Exception:
-            return {"error": "Planner JSON parse failed", "raw": raw}
+            pass
+        # Attempt 2: extract first {...} block from raw text (handles preamble text)
+        m = re.search(r"\{[\s\S]*\}", raw)
+        if m:
+            try:
+                plan = json.loads(m.group(0))
+                if isinstance(plan, dict) and ("steps" in plan or self._extract_clarification_question(plan)):
+                    return plan
+            except Exception:
+                pass
+        return {"error": "Planner JSON parse failed", "raw": raw}
 
     def _execute_plan(self, plan: Dict[str, Any]) -> Dict[str, Any]:
         out: Dict[str, Any] = {}
@@ -3372,41 +3820,91 @@ Ausgabeformat (NUR JSON):
             out[f"step_{i+1}:{tool_name}"] = self.registry.execute(tool_name, args)
         return out
 
-    def chat(self, user_msg: str, debug: bool = True) -> Dict[str, Any]:
+    def _prepare_plan_for_execution(self, plan: Dict[str, Any], current_question: str, *, wants_root: bool) -> Dict[str, Any]:
+        if not isinstance(plan, dict):
+            return plan
+        if self._extract_clarification_question(plan):
+            return plan
+        prepared = self._augment_plan_for_followup(plan, current_question)
+        if wants_root:
+            prepared = self._prefer_evd2_path_trace_plan(prepared, current_question)
+        return prepared
+
+    @staticmethod
+    def _combine_tool_result_attempts(attempts: List[Dict[str, Any]]) -> Dict[str, Any]:
+        if not attempts:
+            return {}
+        if len(attempts) == 1:
+            return attempts[0]
+        return {f"attempt_{idx}": attempt for idx, attempt in enumerate(attempts, start=1)}
+
+    def chat(self, user_msg: str, debug: bool = True, extra_context: str = "") -> Dict[str, Any]:
         current_question = self._extract_current_user_question(user_msg)
         first_turn = len(self.history) == 0
         wants_root = self._question_wants_root_cause(current_question, first_turn=first_turn)
         wants_chain = self._question_wants_chain(current_question)
+        planner_input = self._build_planner_input(
+            current_question=current_question,
+            original_user_msg=user_msg,
+            first_turn=first_turn,
+            wants_chain=wants_chain,
+            wants_root=wants_root,
+            extra_context=extra_context,
+        )
 
-        planner_input = current_question if current_question else user_msg
-        if not first_turn and not (wants_chain and not wants_root):
-            planner_input = (
-                "Aktuelle Userfrage:\n"
-                f"{current_question}\n\n"
-                "Vorherige kurze Historie:\n"
-                f"{self._recent_history_text(max_turns=2)}"
+        raw_plan = self._planner(planner_input)
+        if "error" in raw_plan:
+            return {"answer": f"Planner error: {raw_plan.get('error')}", "plan": raw_plan, "tool_results": {}}
+
+        clarification = self._extract_clarification_question(raw_plan)
+        if clarification:
+            resp = {"answer": clarification, "plan": raw_plan if debug else None, "tool_results": {}}
+            self.remember_turn(user_msg, resp)
+            return resp
+
+        plan = self._prepare_plan_for_execution(raw_plan, current_question, wants_root=wants_root)
+
+        attempt_plans: List[Dict[str, Any]] = [plan]
+        attempt_results: List[Dict[str, Any]] = []
+
+        max_replans = 2
+        for _ in range(max_replans + 1):
+            tool_results = self._execute_plan(plan)
+            attempt_results.append(tool_results)
+
+            if not self._needs_replan(tool_results):
+                break
+
+            retry_input = self._build_planner_input(
+                current_question=current_question,
+                original_user_msg=user_msg,
+                first_turn=first_turn,
+                wants_chain=wants_chain,
+                wants_root=wants_root,
+                extra_context=extra_context,
+                prior_plan=plan,
+                prior_results=tool_results,
             )
+            retry_plan = self._planner(retry_input, retry_hint=self._build_retry_hint(tool_results))
+            if "error" in retry_plan:
+                break
 
-        # 1) Plan
-        plan = self._planner(planner_input)
-        if "error" in plan:
-            return {"answer": f"Planner error: {plan.get('error')}", "plan": plan, "tool_results": {}}
-        plan = self._augment_plan_for_followup(plan, current_question)
-        if wants_root:
-            plan = self._prefer_evd2_path_trace_plan(plan, current_question)
+            clarification = self._extract_clarification_question(retry_plan)
+            if clarification:
+                debug_plan = retry_plan if debug else None
+                debug_results = self._combine_tool_result_attempts(attempt_results) if debug else {}
+                resp = {"answer": clarification, "plan": debug_plan, "tool_results": debug_results}
+                self.remember_turn(user_msg, resp)
+                return resp
 
-        # 2) Execute
-        tool_results = self._execute_plan(plan)
+            prepared_retry_plan = self._prepare_plan_for_execution(retry_plan, current_question, wants_root=wants_root)
+            if self._json_preview(prepared_retry_plan, max_chars=8000) == self._json_preview(plan, max_chars=8000):
+                break
+            plan = prepared_retry_plan
+            attempt_plans.append(plan)
 
-        # 3) Smart retry: wenn alles leer ist -> general_search/string fallback
-        if self._is_result_empty(tool_results):
-            retry_plan = self._planner(planner_input, retry_hint="No results from first tool plan. Try broader search.")
-            if "error" not in retry_plan:
-                retry_plan = self._augment_plan_for_followup(retry_plan, current_question)
-                if wants_root:
-                    retry_plan = self._prefer_evd2_path_trace_plan(retry_plan, current_question)
-                tool_results = self._execute_plan(retry_plan)
-                plan = retry_plan
+        tool_results = self._combine_tool_result_attempts(attempt_results)
+        effective_plan: Dict[str, Any] = plan if len(attempt_plans) == 1 else {"attempts": attempt_plans}
 
         # 4) Final answer synthesis
         system = (
@@ -3416,7 +3914,9 @@ Ausgabeformat (NUR JSON):
             "Wiederhole keine generischen Standardabschnitte, wenn sie nicht explizit gefragt sind. "
             "Nutze nur Fakten aus Tool-Ergebnissen; keine erfundenen Ketten oder Variablenwege. "
             "Verweise explizit auf Tool-Ergebnisse (POU-Namen, Variablen, Ports, Snippets, Zeilennummern). "
-            "Wenn etwas im KG nicht gefunden wird, sage das klar und nenne den naechsten konkreten Debug-Schritt."
+            "Wenn etwas im KG nicht gefunden wird, sage das klar und nenne den naechsten konkreten Debug-Schritt. "
+            "Wenn Tool-Aufrufe fehlgeschlagen sind, erwaehne das kurz und sachlich. "
+            "Wenn die vorhandenen Fakten fuer eine belastbare Antwort nicht reichen, stelle eine gezielte Rueckfrage statt zu halluzinieren."
         )
 
         history_ctx = self._recent_history_text(max_turns=3)
@@ -3452,16 +3952,24 @@ Ausgabeformat (NUR JSON):
                 "Keine Standard-Wiederholung aus vorherigen Antworten."
             )
 
+        failure_summary = self._tool_failure_summary(tool_results)
+        persistent_context_block = self._build_persistent_context_block()
+        extra_context_block = f"Zusatzkontext:\n{extra_context}\n\n" if extra_context else ""
+        sticky_block = f"{persistent_context_block}\n\n" if persistent_context_block else ""
+        failure_block = f"Tool-Fehler:\n{failure_summary}\n\n" if failure_summary else ""
         user = (
             f"Aktuelle Frage:\n{current_question}\n\n"
+            f"{sticky_block}"
             f"Vorherige Turns (Kurzkontext):\n{history_ctx}\n\n"
+            f"{extra_context_block}"
+            f"{failure_block}"
             f"Tool-Ergebnisse (JSON):\n{json.dumps(tool_results, ensure_ascii=False, indent=2)[:16000]}\n\n"
             f"{answer_format}\n"
         )
         answer = self.llm(system, user)
 
-        resp = {"answer": answer, "plan": plan if debug else None, "tool_results": tool_results if debug else None}
-        self.history.append({"user": user_msg, "resp": resp})
+        resp = {"answer": answer, "plan": effective_plan if debug else None, "tool_results": tool_results if debug else None}
+        self.remember_turn(user_msg, resp)
         return resp
 
 # ----------------------------
@@ -3473,11 +3981,27 @@ def build_bot(
     kg_ttl_path: str,
     openai_model: str = "gpt-4o-mini",
     openai_temperature: float = 0,
+    provider: str = "openai",
+    planner_model: Optional[str] = None,
+    planner_provider: Optional[str] = None,
+    usage_accumulator: Optional["LLMUsage"] = None,
+    pricing: Optional[Dict[str, float]] = None,
+    planner_pricing: Optional[Dict[str, float]] = None,
     routine_index_dir: Optional[str] = None,
     enable_rag: bool = True,
+    plc_snapshot: Any = None,
 ) -> ChatBot:
-    if not os.environ.get("OPENAI_API_KEY"):
-        raise RuntimeError("OPENAI_API_KEY ist nicht gesetzt (ENV).")
+    """Baut einen ChatBot mit optional getrennten Modellen für Planner und Synthese.
+
+    planner_model / planner_provider: falls abweichend vom Synthese-Modell.
+    usage_accumulator: LLMUsage-Objekt, in das Tokens kumuliert werden.
+    pricing / planner_pricing: {"input_per_1k": ..., "output_per_1k": ...} in USD.
+    """
+    _provider = (provider or "openai").lower().strip()
+    if _provider not in ("ollama",):
+        env_var = _PROVIDER_ENV_VARS.get(_provider, "OPENAI_API_KEY")
+        if not os.environ.get(env_var):
+            raise RuntimeError(f"{env_var} ist nicht gesetzt (ENV).")
 
     ttl = Path(kg_ttl_path).expanduser().resolve()
     if not ttl.exists():
@@ -3501,7 +4025,31 @@ def build_bot(
         routine_index = RoutineIndex.build_from_kg(kg_store)
         routine_index.save(str(idx_path))
 
-    llm_invoke = get_llm_invoke(model=openai_model, temperature=openai_temperature)
+    llm_invoke = get_llm_invoke(
+        model=openai_model,
+        temperature=openai_temperature,
+        provider=_provider,
+        usage_accumulator=usage_accumulator,
+        pricing=pricing,
+    )
+
+    # Planner-Modell (optional abweichend)
+    _planner_provider = (planner_provider or _provider).lower().strip()
+    _planner_model = planner_model or openai_model
+    if planner_provider or planner_model:
+        if _planner_provider not in ("ollama",):
+            env_var_p = _PROVIDER_ENV_VARS.get(_planner_provider, "OPENAI_API_KEY")
+            if not os.environ.get(env_var_p):
+                raise RuntimeError(f"Planner: {env_var_p} ist nicht gesetzt (ENV).")
+        planner_invoke = get_llm_invoke(
+            model=_planner_model,
+            temperature=openai_temperature,
+            provider=_planner_provider,
+            usage_accumulator=usage_accumulator,
+            pricing=planner_pricing,
+        )
+    else:
+        planner_invoke = None  # ChatBot fällt auf llm_invoke zurück
 
     registry = ToolRegistry()
     registry.register(ListProgramsTool())
@@ -3515,6 +4063,7 @@ def build_bot(
     registry.register(PouCodeTool())
     registry.register(SearchVariablesTool())
     registry.register(VariableTraceTool())
+    registry.register(PLCSnapshotSearchTool(plc_snapshot))
     registry.register(GeneralSearchTool())
     registry.register(GraphInvestigateTool())
     registry.register(StringTripleSearchTool(kg_store))
@@ -3526,6 +4075,6 @@ def build_bot(
         if vs is not None:
             registry.register(SemanticSearchTool(vs))
 
-    return ChatBot(registry, llm_invoke)
+    return ChatBot(registry, llm_invoke, planner_llm_invoke_fn=planner_invoke)
 
 

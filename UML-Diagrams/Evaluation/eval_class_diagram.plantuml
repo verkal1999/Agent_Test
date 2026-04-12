@@ -1,0 +1,140 @@
+@startuml eval_class_diagram
+
+set namespaceSeparator none
+allowmixing
+
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype ortho
+skinparam dpi 140
+skinparam ranksep 30
+skinparam nodesep 24
+skinparam DefaultFontSize 11
+skinparam packageTitleFontSize 12
+skinparam classFontSize 11
+hide empty members
+left to right direction
+scale max 1500 width
+
+title Evaluationsaufbau - flexibler Black-Box-Ueberblick
+
+rectangle "Config JSON" as ConfigJson
+rectangle "Event JSON" as EventJson
+rectangle "API Key Datei" as ApiKeyFile
+rectangle "Pricing JSON" as PricingJson
+rectangle "KG TTL" as KgTtl
+rectangle "PLCOpen XML" as PlcXml
+rectangle "Pipeline Config" as PipelineConfig
+rectangle "Result JSON" as ResultJson
+
+package "Eval Orchestrierung" {
+  class ModelConfig <<dataclass>> {
+    +provider: str
+    +model: str
+    +temperature: float
+    +planner_provider: Optional[str]
+    +planner_model: Optional[str]
+    +judge_provider: Optional[str]
+    +judge_model: Optional[str]
+  }
+
+  class EvalConfig <<dataclass>> {
+    +agent: str
+    +event_json_path: str
+    +question: str
+    +model: ModelConfig
+    +kg_ttl_path, xml_path: str
+    +pipeline_config, api_key_file: str
+    +test_id, ground_truth: str
+    +pricing, planner_pricing, judge_pricing: Optional[Dict]
+    +top_k: int
+    +results_dir, out_json: str
+    +{static} from_json_file(path: str): EvalConfig
+  }
+
+  class EvalResult <<dataclass>> {
+    +question, effective_question: str
+    +answer, answer_initial: str
+    +answer_auto_followup: str
+    +answer_stages: List[Dict]
+    +requested_question_ignored: bool
+    +t_initial_analysis_s, t_question_s, t_total_s: float
+    +prompt_tokens, completion_tokens, total_tokens: int
+    +cost_usd: float
+    +judge_verdict, judge_summary: str
+    +save(path: str): None
+  }
+
+  class EvalRunnerAPI <<module>> {
+    +run_eval(cfg: EvalConfig): EvalResult
+    -_run_llm_judge(cfg, result): EvalResult
+  }
+
+  class TurnStrategy <<concept>> {
+    +cfg.question direkt verwenden
+    +oder effective_question ableiten
+    +optionale Initialanalyse
+    +optionaler zweiter Turn / Folgefrage
+  }
+
+  EvalConfig *-- ModelConfig
+}
+
+package "ExcH KG Agent (Black Box)" {
+  class KgAgentAPI <<api>> {
+    +run_initial_analysis(...): Dict
+    +ask(question): Dict
+  }
+}
+
+package "ExcH RAG Agent (Black Box)" {
+  class RagAgentAPI <<api>> {
+    +run_initial_analysis(...): Dict
+    +ask(question): Dict
+  }
+}
+
+package "LLM Judge (optional)" {
+  class JudgeAPI <<api>> {
+    +evaluate(question, ground_truth, answer): JSON
+  }
+}
+
+ConfigJson --> EvalConfig : from_json_file()
+PricingJson --> EvalConfig : pricing / planner / judge
+EvalConfig --> EvalRunnerAPI : cfg
+EventJson --> EvalRunnerAPI : Testevent
+ApiKeyFile --> EvalRunnerAPI : _set_api_key()
+
+EvalRunnerAPI --> TurnStrategy : waehlt Ablauf
+EvalRunnerAPI --> KgAgentAPI : falls agent = kg
+EvalRunnerAPI --> RagAgentAPI : falls agent = rag
+
+EvalConfig --> KgAgentAPI : model, kg_ttl_path
+EvalConfig --> RagAgentAPI : model, xml_path, top_k
+TurnStrategy --> KgAgentAPI : Initialanalyse / Folgefrage
+TurnStrategy --> RagAgentAPI : Initialanalyse / Folgefrage
+
+KgTtl --> KgAgentAPI : Wissensbasis
+PlcXml --> RagAgentAPI : statischer Kontext
+PipelineConfig --> RagAgentAPI : XML-Aufloesung
+
+EvalRunnerAPI --> JudgeAPI : optional bei ground_truth
+JudgeAPI --> EvalResult : verdict / summary / interpretation
+KgAgentAPI --> EvalResult : answer, usage, staged output, Zeiten
+RagAgentAPI --> EvalResult : answer, usage, staged output, Zeiten
+EvalRunnerAPI --> EvalResult : erzeugt / anreichert
+EvalResult --> ResultJson : save()
+
+note right of TurnStrategy
+cfg.question ist ein Eingangswert,
+aber nicht zwingend die effektiv gestellte Frage.
+Je nach Agent und Eval-Modus kann der Runner:
+- die Config-Frage direkt stellen
+- sie bewusst ignorieren
+- daraus oder aus dem Kontext eine effective_question ableiten
+- nach der Initialanalyse noch eine Folgefrage starten
+end note
+
+@enduml

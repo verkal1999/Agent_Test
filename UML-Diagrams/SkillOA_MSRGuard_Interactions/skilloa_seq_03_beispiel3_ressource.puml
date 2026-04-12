@@ -1,0 +1,30 @@
+@startuml
+hide footbox
+skinparam shadowing false
+skinparam participantPadding 18
+skinparam BoxPadding 10
+
+title Vorgehen bei Fehlern\nLösung durch eine weitere Ressource bei Beispiel 3
+
+participant SPS
+participant "MSRGuard SM1" as MSR1
+participant "FMEA SM1" as FMEA
+participant "SkillOA SM1" as SK
+participant "MSRGuard Plant" as PLANT
+participant "Product Agent" as PROD
+participant "Resource Agent SG1" as SG1
+
+SPS -> MSR1 : Fehler erkannt,\nFehlerdaten
+MSR1 -> SK : Aufforderung zu Warten
+MSR1 -> FMEA : Anfrage Bedeutung und\nBehandlung
+FMEA --> MSR1 : Keine Routinen vorhanden,\naber Ursache gefunden
+MSR1 -> SK : Ressource nicht fehlerhaft
+MSR1 -> PLANT : Gibt es Lösungen auf Systemebene\nbei fehlerhaftem Material?
+PLANT -> PROD : Nein,\nProdukt kann nicht gefertigt werden
+PLANT -> SK : Ressource fehlerhaft,\nUrsache
+PLANT -> SG1 : Anfrage an Ressource zum\nAbtransport, Status Urgent
+SG1 --> PLANT : Ressource bereit
+PLANT -> SPS : Ausführen Behandlungsplan\n(Abtransport)
+SPS -> PLANT : Rückmeldung
+
+@enduml

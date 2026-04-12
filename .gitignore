@@ -14,6 +14,13 @@ plcrex_venv39/
 .DS_Store
 .idea/
 .vscode/
+.claude/
+.claude-flow/
+Optional[str]
+Trigger-Pfad
+str
+CLAUDE.md
+.mcp.json
 
 # Logs
 logs/

@@ -1,1 +1,0 @@
-getHWAddr_extracted.py einbauen in plcopen_parser.py

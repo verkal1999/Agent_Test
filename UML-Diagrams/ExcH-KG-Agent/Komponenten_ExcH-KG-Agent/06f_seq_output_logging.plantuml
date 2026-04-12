@@ -10,13 +10,13 @@ title ExcH-KG-Agent - Initiale Anfrage\nTeil 6 von 6:\nAusgabe und Protokollieru
 
 actor "Nutzende\nInstanz" as User
 boundary "ExcHAgent\nUI" as UI
-control "ExcHChatBot\nSession" as Session
+control "ExcH\nChatBot\nSession" as Session
 entity "Response\nEnvelope" as Envelope
 control "Output\nGuardrail" as Guard
 entity "Escalation\nDecision" as Esc
 entity "Session\nTurn" as Turn
 entity "Session\nMemory" as Memory
-entity "AuditTrail\nEntry" as Audit
+entity "Audit\nTrail\nEntry" as Audit
 
 Session --> UI : diagnosis draft\n+\ntool results
 activate UI
@@ -41,14 +41,14 @@ UI -> Audit : create(\nkind="initial_analysis",\ndata)
 alt requires_human_review = true
   UI --> User : Diagnose \n+\nEskalationshinweis
 else direkte Ausgabe zulaessig
-  UI --> User : Diagnose \n+\nnaechste Schritte
+  UI --> User : Diagnose \n+\nnächste Schritte
 end
 deactivate UI
 
 note right of Envelope
 StructuredToolResult und
 FollowUpQuestion können
-Teil des Response\nEnvelope sein.
+Teil des ResponseEnvelope sein.
 end note
 
 @enduml

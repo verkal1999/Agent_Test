@@ -1,0 +1,23 @@
+@startuml
+hide footbox
+skinparam shadowing false
+skinparam participantPadding 20
+skinparam BoxPadding 10
+
+title Vorgehen bei Fehlern\nLösung von der Ressource selbst möglich
+
+participant SPS
+participant "MSRGuard SM1" as MSR1
+participant "FMEA SM1" as FMEA
+participant "SkillOA SM1" as SK
+
+SPS -> MSR1 : Fehler erkannt,\nFehlerdaten
+MSR1 -> SK : Aufforderung zu Warten
+MSR1 -> FMEA : Anfrage Bedeutung und\nBehandlung
+FMEA --> MSR1 : Fehlerbehebungsprozesse\nbzw. -Routinen
+MSR1 -> SPS : Ausführung\nFehlerbehebung
+SPS -> MSR1 : Rückmeldung
+MSR1 -> FMEA : Einbau des geschehenen Fehlers\nund der Fehlerbehebung
+MSR1 -> SK : Weitergabe und Freigabe Start
+
+@enduml

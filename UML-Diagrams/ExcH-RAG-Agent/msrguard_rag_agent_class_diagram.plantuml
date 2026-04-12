@@ -7,7 +7,7 @@ skinparam dpi 180
 skinparam ranksep 80
 skinparam nodesep 70
 skinparam DefaultFontSize 14
-left to right direction
+top to bottom direction
 
 package "rag_agent_ui" {
   class RagAgentUI <<module>> {

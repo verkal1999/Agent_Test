@@ -1,0 +1,20 @@
+Dieses Diagramm zeigt den detaillierten, aber bewusst offen gehaltenen Evaluationspfad fuer den ExcH RAG Agent.
+
+1. eval_runner liest die EvalConfig fuer einen RAG Lauf.
+2. In _run_rag_eval wird zuerst ein LLMUsage Objekt fuer Token- und Kostentracking angelegt.
+3. Danach ruft eval_runner build_session_from_input(...) aus simple_rag_agent auf.
+4. build_session_from_input loest den XML Pfad auf, erzeugt den RagIncidentContext, baut den SimpleRagAgent und kapselt alles in einer SimpleRagSession.
+5. Die Initialanalyse besitzt einen eigenen Prompt-Pfad: ueber default_question(), runtime_context_note() und build_default_prompt() wird der erste Analyseprompt zusammengesetzt.
+6. Danach kann optional ein weiterer Turn folgen, zum Beispiel fuer eine explizite Nutzerfrage oder spaetere Folgefrage.
+7. Deshalb arbeitet auch der RAG-Pfad mit einer effective_question, die nicht zwingend identisch mit cfg.question sein muss.
+8. Wenn ground_truth vorhanden ist, wird das Ergebnis optional noch durch einen Judge bewertet.
+9. Aus Antwort, staged output, Zeiten, Token-Tracking und Judge-Ergebnis wird das EvalResult erzeugt.
+
+Was der RAG Agent intern macht:
+- Die Session haelt den Konversationszustand und delegiert an den Agenten.
+- Der Agent kombiniert Eventkontext und per Retrieval gefundene XML Chunks fuer die Antwort.
+- Die Initialanalyse nutzt denselben Agenten, aber mit einem agent-seitig aufgebauten Standardprompt.
+
+Warum das Diagramm bewusst offener formuliert ist:
+- Der aktuelle Eval-Modus kann nur die UI-Initialanalyse emulieren oder spaeter erweitert werden.
+- Das Diagramm soll deshalb nicht nur den heutigen Sonderfall zeigen, sondern auch kuenftige Evaluationslaeufe mit freien Fragen und Folgefragen sauber tragen.

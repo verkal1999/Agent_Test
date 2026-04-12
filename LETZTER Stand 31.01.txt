@@ -1,3 +1,0 @@
-- Skill-Connection zwischen FMEA und PLC-Ontologie aufbauen
-    - Wenn bekannt ist, welcher Skill auf welcher Ressource mit welchen Sensoren ausgeführt wird (SkillOAs, ist Merging auf Skills möglich)
-- 

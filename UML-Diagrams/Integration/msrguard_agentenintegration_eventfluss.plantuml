@@ -1,0 +1,93 @@
+@startuml
+
+skinparam shadowing false
+skinparam responseMessageBelowArrow true
+skinparam sequenceMessageAlign center
+skinparam ParticipantPadding 20
+hide footbox
+autonumber
+
+title MSRGuard - Agentenintegration ueber EventBus und Observer
+
+actor "SPS / OPC UA" as PLC
+participant "PLCMonitor" as Mon
+participant "EventBus" as Bus
+participant "ReactionManager\n(ReactiveObserver)" as RM
+participant "FailureRecorder\n(ReactiveObserver)" as FR
+participant "AgentStartCoordinator\n(ReactiveObserver)" as ASC
+participant "ExcHUiObserver\n(ReactiveObserver)" as UIO
+participant "Python-Agent-UI\n(excH_kg_agent_ui.py /\nrag_agent_ui.py)" as AgentUI
+
+PLC -> Mon : TriggerD2 wird aktiv
+Mon -> Bus : post(evD2, D2Snapshot)
+
+Bus -> RM : onEvent(evD2)
+activate RM
+RM -> RM : KG-Abgleich,\nWinner-Filter,\nSystemReaction-Pruefung
+
+alt eindeutiger Failure Mode
+  RM -> Bus : post(evGotFM / evMonAct... / evSysReact...)
+  note right of RM
+    Der deterministische Standardpfad
+    von MSRGuard bleibt unveraendert.
+    Der Agentenpfad wird nicht aktiviert.
+  end note
+else unbekannter oder mehrdeutiger Failure Mode
+  RM -> Bus : post(evUnknownFM, UnknownFMAck)
+  RM -> RM : speichert Fallback-Plan\nund wartet auf evAgentDone
+end
+deactivate RM
+
+Bus -> FR : onEvent(evD2)
+activate FR
+FR -> FR : speichert Snapshot\nzur correlationId
+deactivate FR
+
+Bus -> FR : onEvent(evUnknownFM)
+activate FR
+FR -> Bus : post(evIngestionPlanned)
+FR -> Bus : post(evIngestionDone, IngestionDoneAck)
+deactivate FR
+
+Bus -> ASC : onEvent(evUnknownFM)
+Bus -> ASC : onEvent(evIngestionDone)
+activate ASC
+ASC -> ASC : korreliert beide Events\nueber correlationId
+ASC -> Bus : post(evAgentStart, AgentStartAck)
+deactivate ASC
+
+Bus -> UIO : onEvent(evAgentStart)
+activate UIO
+UIO -> AgentUI : schreibt event.json\nund startet Python-UI
+note right of UIO
+  Die konkrete Agenten-UI wird aktuell
+  in main.cpp ueber kAgentUiScript
+  statisch ausgewaehlt.
+end note
+
+AgentUI -> Bus : post(evAgentDone | evAgentAbort | evAgentFail)
+deactivate UIO
+
+Bus -> RM : onEvent(evAgentDone | evAgentAbort | evAgentFail)
+activate RM
+alt evAgentDone und continue = true
+  RM -> RM : fuehrt gespeicherten\nFallback-Plan aus\n(Pulse DiagnoseFinished)
+else evAgentAbort oder evAgentFail
+  RM -> RM : verwirft Pending-Fallback
+end
+deactivate RM
+
+note over Bus
+  Der EventBus ist das Subject des Observer-Patterns.
+  ReactionManager, FailureRecorder, AgentStartCoordinator
+  und ExcHUiObserver fungieren als Observer.
+end note
+
+note over ASC
+  Der AgentStartCoordinator startet den Agenten
+  nicht direkt. Er erzeugt lediglich evAgentStart,
+  sobald evUnknownFM und evIngestionDone
+  fuer dieselbe correlationId vorliegen.
+end note
+
+@enduml

@@ -1,0 +1,171 @@
+@startuml eval_rag_class_diagram
+
+set namespaceSeparator none
+
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype ortho
+skinparam dpi 140
+skinparam ranksep 26
+skinparam nodesep 20
+skinparam DefaultFontSize 11
+skinparam packageTitleFontSize 12
+skinparam classFontSize 11
+hide empty members
+top to bottom direction
+scale max 1700 width
+
+title Evaluationspfad - ExcH RAG Agent (flexibel)
+
+package "Eval Orchestrierung" as P_RAG_Eval {
+
+  class ModelConfig <<dataclass>> {
+    +provider: str
+    +model: str
+    +temperature: float
+    +judge_provider: Optional[str]
+    +judge_model: Optional[str]
+  }
+
+  class EvalConfig <<dataclass>> {
+    +agent: str
+    +event_json_path: str
+    +question: str
+    +model: ModelConfig
+    +xml_path, pipeline_config: str
+    +ground_truth: Optional[str]
+    +top_k: int
+    +pricing, judge_pricing: Optional[Dict]
+  }
+
+  class EvalResult <<dataclass>> {
+    +question, effective_question: str
+    +answer, answer_initial: str
+    +answer_stages: List[Dict]
+    +requested_question_ignored: bool
+    +judge_verdict: str
+    +t_initial_analysis_s, t_question_s, t_total_s: float
+    +prompt_tokens, completion_tokens, total_tokens: int
+    +cost_usd: float
+  }
+
+  class EvalRunnerRAG <<module>> {
+    -_run_rag_eval(cfg: EvalConfig): EvalResult
+    -_run_llm_judge(cfg, result): EvalResult
+    +run_eval(cfg: EvalConfig): EvalResult
+  }
+
+  class RagTurnStrategy <<concept>> {
+    +Initialanalyse ueber Default-Prompt
+    +optional weiterer Turn
+    +effective_question = Default-Frage | cfg.question | Folgefrage
+  }
+
+  class JudgeAPI <<api>> {
+    +evaluate(question, ground_truth, answer): JSON
+  }
+
+  EvalConfig *-- ModelConfig
+}
+
+package "Modul chatbot_core" as P_RAG_LLM {
+
+  class LLMUsage <<dataclass>> {
+    +prompt_tokens, completion_tokens, total_tokens: int
+    +cost_usd: float
+    +add(other: LLMUsage): None
+  }
+
+  class LlmFactory <<module>> {
+    +get_llm_invoke(...): Callable
+  }
+}
+
+package "Modul simple_rag_agent" as P_RAG_Agent {
+
+  class RagIncidentContext <<dataclass>> {
+    +correlationId, processName: str
+    +summary, triggerEvent: str
+    +lastSkill: str
+    +xml_path, project_root: str
+    +runtime_context_note(): str
+    +default_question(): str
+    +{static} from_input(obj, xml_path): RagIncidentContext
+  }
+
+  class RagChunk <<dataclass>> {
+    +chunk_id: str
+    +kind: str
+    +name: str
+  }
+
+  class PLCOpenXmlSource {
+    +load_text(xml_path: str): str
+  }
+
+  class XmlChunker {
+    +chunk_text(xml_text: str, xml_path: str): List[RagChunk]
+  }
+
+  class SimpleRagIndex {
+    +search(query: str, k: int): List[Dict[str, Any]]
+  }
+
+  class SimpleRagAgent {
+    +llm: Callable
+    +xml_path: str
+    +top_k: int
+    +index: SimpleRagIndex
+    +ask(question: str, ctx: RagIncidentContext, extra_context=""): Dict[str, Any]
+  }
+
+  class SimpleRagSession {
+    +agent: SimpleRagAgent
+    +ctx: RagIncidentContext
+    +history: List[Dict[str, Any]]
+    +build_default_prompt(): Dict[str, str]
+    +ask(user_msg: str, debug=True): Dict[str, Any]
+    +run_initial_analysis(debug=True): Dict[str, Any]
+  }
+
+  class RagSessionAPI <<module>> {
+    +build_session_from_input(...): SimpleRagSession
+  }
+
+  SimpleRagSession *-- SimpleRagAgent
+  SimpleRagSession *-- RagIncidentContext
+  SimpleRagAgent *-- SimpleRagIndex
+}
+
+EvalRunnerRAG --> EvalConfig : liest cfg
+EvalRunnerRAG --> LLMUsage : instanziiert
+EvalRunnerRAG --> RagSessionAPI : build_session_from_input()
+EvalRunnerRAG --> RagTurnStrategy : waehlt effektiven Ablauf
+RagTurnStrategy --> SimpleRagSession : run_initial_analysis()
+RagTurnStrategy --> SimpleRagSession : optional ask(effective_question)
+EvalRunnerRAG --> EvalResult : erzeugt
+EvalRunnerRAG --> JudgeAPI : optional bei ground_truth
+JudgeAPI --> EvalResult : verdict / summary / interpretation
+
+RagSessionAPI --> RagIncidentContext : from_input()
+RagSessionAPI --> SimpleRagAgent : erzeugt
+RagSessionAPI --> SimpleRagSession : erzeugt
+
+SimpleRagSession --> RagIncidentContext : build_default_prompt()
+SimpleRagSession --> SimpleRagAgent : delegiert ask()
+SimpleRagAgent --> LlmFactory : get_llm_invoke()
+SimpleRagAgent --> PLCOpenXmlSource : load_text()
+SimpleRagAgent --> XmlChunker : chunk_text()
+XmlChunker --> RagChunk : erzeugt
+SimpleRagIndex --> RagChunk : verwaltet
+
+note right of RagTurnStrategy
+Aktuell kann der Eval-Runner die UI-Initialanalyse emulieren.
+Das Diagramm bleibt absichtlich offener:
+- nur Initialanalyse
+- Initialanalyse plus explizite Nutzerfrage
+- Initialanalyse plus spaetere Folgefrage
+end note
+
+@enduml

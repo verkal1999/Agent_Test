@@ -9,6 +9,7 @@ UML-Diagrams/
 ├── project_class_diagram.puml          # Gesamtueberblick Klassen (C++, Python, Ingestion)
 ├── ExcH-KG-Agent/                      # Diagramme fuer den KG-basierten ExcH-Agenten
 ├── ExcH-RAG-Agent/                     # Diagramme fuer den einfachen RAG-Agenten
+├── Integration/                        # Integrationsdiagramme zwischen MSRGuard und Agenten
 └── Use_Cases/                          # Use-Case-Diagramme nach Engineering- und Runtime-Szenarien
 ```
 
@@ -65,6 +66,16 @@ Diagramme fuer den einfachen, XML-basierten RAG-Agenten.
 | `04_retrieval_komponente.plantuml` | SimpleRagIndex und lexikalisches Retrieval |
 | `05_generierungs_und_leitplanken_komponente.plantuml` | Promptaufbau, LLM-Aufruf und Guardrails |
 | `06_interaktions_und_sitzungs_komponente.plantuml` | SimpleRagSession, Chat und UI |
+
+---
+
+## Integration (`Integration/`)
+
+Diagramme fuer die technische Integration der Agenten in den ereignisbasierten MSRGuard-Laufzeitpfad.
+
+| Datei | Inhalt |
+| --- | --- |
+| `msrguard_agentenintegration_eventfluss.plantuml` | Sequenzdiagramm des implementierten EventBus-Pfads von `evD2` ueber `evUnknownFM` und `evIngestionDone` bis zum Agentenstart und Ruecklauf |
 
 ---
 

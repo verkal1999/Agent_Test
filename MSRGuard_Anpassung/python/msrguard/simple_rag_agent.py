@@ -7,9 +7,9 @@ import xml.etree.ElementTree as ET
 from collections import Counter
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
-from .chatbot_core import get_llm_invoke
+from .chatbot_core import get_llm_invoke, LLMUsage
 
 
 def _as_dict(x: Any) -> Dict[str, Any]:
@@ -201,9 +201,14 @@ class RagIncidentContext:
             "Nutze die PLCOpenXML als statischen Programmkontext und den Event-/Snapshot-Kontext als beobachteten Laufzeitkontext. "
             "Die Werte in plcSnapshot.vars sind ueber OPC UA gelesene Variablenwerte zum Diagnosezeitpunkt. "
             "Ordne diese Werte moeglichst passenden Variablen, POU, GVL, DUT oder Funktionsbausteinen in der PLCOpenXML zu. "
+            "Rekonstruiere nach Moeglichkeit den Signalpfad rueckwaerts vom sichtbaren Fehler oder Trigger bis zur urspruenglichen Ursache. "
+            "Benenne dabei die beteiligten POUs, Variablen, Timer, Trigger oder Zwischensignale in kausaler Reihenfolge. "
+            "Wenn sich eine eigentliche Root Cause von einer direkten Trigger-Bedingung unterscheiden laesst, nenne beides getrennt: "
+            "1) unmittelbare Ausloesebedingung, 2) urspruengliche Ursache im Signalpfad. "
             "Erklaere eine technisch plausible Ursache, nenne die wichtigsten beteiligten Variablen oder Programmteile und gib eine vorsichtige Empfehlung, "
             "wie man den Fehler eingrenzen oder beheben koennte. Wenn der Kontext nicht reicht, sage klar, was fehlt."
         )
+
 
 
 @dataclass
@@ -404,11 +409,20 @@ class SimpleRagAgent:
         xml_path: str,
         openai_model: str = "gpt-4o-mini",
         openai_temperature: float = 0.0,
+        provider: str = "openai",
         top_k: int = 6,
+        usage_accumulator: Optional[LLMUsage] = None,
+        pricing: Optional[Dict[str, float]] = None,
     ):
         self.xml_path = str(Path(xml_path).expanduser().resolve())
         self.top_k = max(1, int(top_k))
-        self.llm = get_llm_invoke(model=openai_model, temperature=openai_temperature)
+        self.llm = get_llm_invoke(
+            model=openai_model,
+            temperature=openai_temperature,
+            provider=provider,
+            usage_accumulator=usage_accumulator,
+            pricing=pricing,
+        )
 
         source = PLCOpenXmlSource()
         xml_text = source.load_text(self.xml_path)
@@ -565,9 +579,12 @@ def build_session_from_input(
     *,
     xml_path: str = "",
     pipeline_config_path: str = "",
+    provider: str = "openai",
     openai_model: str = "gpt-4o-mini",
     openai_temperature: float = 0.0,
     top_k: int = 6,
+    usage_accumulator: Optional[LLMUsage] = None,
+    pricing: Optional[Dict[str, float]] = None,
 ) -> SimpleRagSession:
     resolved_xml = _resolve_xml_path(
         obj,
@@ -577,8 +594,11 @@ def build_session_from_input(
     ctx = RagIncidentContext.from_input(obj, xml_path=resolved_xml)
     agent = SimpleRagAgent(
         xml_path=resolved_xml,
+        provider=provider,
         openai_model=openai_model,
         openai_temperature=openai_temperature,
         top_k=top_k,
+        usage_accumulator=usage_accumulator,
+        pricing=pricing,
     )
     return SimpleRagSession(agent=agent, ctx=ctx)

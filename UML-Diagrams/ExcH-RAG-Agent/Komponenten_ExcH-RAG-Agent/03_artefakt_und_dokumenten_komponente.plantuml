@@ -4,6 +4,7 @@ skinparam shadowing false
 skinparam classAttributeIconSize 0
 skinparam packageStyle rectangle
 skinparam linetype ortho
+'left to right direction
 top to bottom direction
 
 package "Artefakt- und Dokumenten-Komponente" {

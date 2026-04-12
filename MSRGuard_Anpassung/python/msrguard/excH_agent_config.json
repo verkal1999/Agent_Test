@@ -10,7 +10,10 @@
   },
 
   "chatbot": {
+    "provider": "openai",
     "model": "gpt-4o-mini",
-    "temperature": 0
+    "temperature": 0,
+    "planner_provider": null,
+    "planner_model": null
   }
 }

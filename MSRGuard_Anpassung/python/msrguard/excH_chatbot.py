@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import os
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from collections import Counter
 from typing import Any, Dict, Optional, List, Set, Tuple
 
@@ -799,11 +799,203 @@ def build_initial_prompt(ctx: IncidentContext, diagnoseplan: Optional[Dict[str, 
     return prompt
 
 
+def _build_chat_context_summary(ctx: IncidentContext) -> str:
+    summary: Dict[str, Any] = {
+        "correlationId": ctx.correlationId,
+        "processName": ctx.processName,
+        "summary": ctx.summary,
+        "triggerEvent": ctx.triggerEvent,
+        "lastSkill": ctx.lastSkill,
+        "lastGEMMAStateBeforeFailure": ctx.lastGEMMAStateBeforeFailure,
+        "triggerD2": ctx.triggerD2,
+        "has_plcSnapshot": bool(ctx.plcSnapshot),
+    }
+    return json.dumps(summary, ensure_ascii=False, indent=2)
+
+
+def _short_json_text(value: Any, max_chars: int = 700) -> str:
+    text = "" if value is None else str(value).strip()
+    if len(text) <= max_chars:
+        return text
+    return text[:max_chars] + " ..."
+
+
+def _summarize_state_fit_evaluations(point3: Dict[str, Any], max_items: int = 3) -> List[Dict[str, Any]]:
+    fit = _as_dict(point3.get("state_fit"))
+    evaluations = fit.get("path_evaluations") if isinstance(fit.get("path_evaluations"), list) else []
+    out: List[Dict[str, Any]] = []
+
+    for ev in evaluations[:max_items]:
+        if not isinstance(ev, dict):
+            continue
+        conflicts_raw = ev.get("conflicts") if isinstance(ev.get("conflicts"), list) else []
+        conflicts = [str(x).strip() for x in conflicts_raw if str(x).strip()]
+        hw_raw = ev.get("hardware_addresses") if isinstance(ev.get("hardware_addresses"), list) else []
+        hardware_addresses = [str(x).strip() for x in hw_raw if str(x).strip()]
+
+        out.append(
+            {
+                "state_path": str(ev.get("state_path", "") or ""),
+                "possible": bool(ev.get("possible")),
+                "score": ev.get("score", 0),
+                "has_default_terminator": bool(ev.get("has_default_terminator")),
+                "hardware_addresses": hardware_addresses[:3],
+                "conflicts": conflicts[:2],
+            }
+        )
+    return out
+
+
+def _build_sticky_planner_context(
+    ctx: IncidentContext,
+    diagnoseplan: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    incident: Dict[str, Any] = {
+        "correlationId": ctx.correlationId,
+        "processName": ctx.processName,
+        "summary": ctx.summary,
+        "triggerEvent": ctx.triggerEvent,
+        "lastSkill": ctx.lastSkill,
+        "lastGEMMAStateBeforeFailure": ctx.lastGEMMAStateBeforeFailure,
+        "triggerD2": ctx.triggerD2,
+        "has_plcSnapshot": bool(ctx.plcSnapshot),
+    }
+
+    sticky: Dict[str, Any] = {
+        "schema_version": "planner_sticky_context_v1",
+        "incident": incident,
+        "summary_for_planner": [
+            f"Trigger-Event: {ctx.triggerEvent or '-'}",
+            f"Prozess: {ctx.processName or '-'}",
+            f"Letzter Skill: {ctx.lastSkill or '-'}",
+            f"Letzter GEMMA-State: {ctx.lastGEMMAStateBeforeFailure or '-'}",
+        ],
+    }
+
+    if not isinstance(diagnoseplan, dict):
+        return sticky
+
+    if diagnoseplan.get("error"):
+        sticky["bootstrap"] = {"status": "error", "error": str(diagnoseplan.get("error", "") or "")}
+        sticky["summary_for_planner"].append(
+            f"Bootstrap-Analyse fehlgeschlagen: {str(diagnoseplan.get('error', '') or '').strip() or '-'}"
+        )
+        return sticky
+
+    compact = _as_dict(diagnoseplan.get("compact"))
+    path_trace = _as_dict(diagnoseplan.get("path_trace"))
+    point1 = _as_dict(path_trace.get("point_1_trigger_setter"))
+    point3 = _as_dict(path_trace.get("point_3_path_trace"))
+    causal = _build_causal_sequence_summary(point1, point3)
+    anchor = _as_dict(causal.get("anchor"))
+    chain = causal.get("chain") if isinstance(causal.get("chain"), list) else []
+    bridges = causal.get("bridges") if isinstance(causal.get("bridges"), list) else []
+    rows = _collect_trigger_path_rows(point1, max_rows_per_path=120)
+    periodicity_evidence = _extract_periodicity_evidence(rows, max_items=8)
+    chain_summary = _as_dict(_as_dict(point1.get("condition_chain")).get("summary"))
+    fit = _as_dict(point3.get("state_fit"))
+    best_paths = fit.get("best_paths") if isinstance(fit.get("best_paths"), list) else []
+    summarized_evaluations = _summarize_state_fit_evaluations(point3, max_items=3)
+
+    sticky["bootstrap"] = {
+        "pipeline": str(diagnoseplan.get("pipeline", "") or ""),
+        "status": str(compact.get("status", "") or "ok"),
+        "missing_tools": compact.get("missing_tools", []) if isinstance(compact.get("missing_tools"), list) else [],
+        "compact": compact,
+    }
+    sticky["channels"] = {
+        "upstream_anchor": {
+            "token": str(anchor.get("token", "") or ""),
+            "value": str(anchor.get("value", "") or ""),
+            "pou": str(anchor.get("pou", "") or ""),
+            "assignment": str(anchor.get("assignment", "") or anchor.get("source", "") or ""),
+            "reason": str(anchor.get("reason", "") or ""),
+        },
+        "causal_chain": {
+            "ordered_tokens": [str(x) for x in chain if str(x).strip()],
+            "assignment_bridges": bridges[:8],
+        },
+        "trigger": {
+            "trigger_var": str(point1.get("trigger_var", "") or "OPCUA.TriggerD2"),
+            "setter_pou": str(point1.get("pou_name", "") or ""),
+            "condition_expr": str(point1.get("condition_expr", "") or ""),
+            "snippet_true": _short_json_text(point1.get("snippet_true", ""), max_chars=900),
+        },
+        "state_path": {
+            "selected_state_path": str(point3.get("selected_state_path", "") or ""),
+            "best_paths": [str(x) for x in best_paths[:3]],
+            "skill_expr": str(_as_dict(point3.get("skill_trace")).get("skill_expr", "") or ""),
+            "top_path_evaluations": summarized_evaluations,
+        },
+        "periodicity": {
+            "evidence": periodicity_evidence,
+            "software_likely": chain_summary.get("software_likely"),
+            "has_hardware_address": chain_summary.get("has_hardware_address"),
+            "origin_assessment": str(chain_summary.get("origin_assessment", "") or ""),
+        },
+    }
+
+    summary_lines = sticky.get("summary_for_planner")
+    if isinstance(summary_lines, list):
+        if anchor:
+            summary_lines.append(
+                "Upstream-Anker: "
+                f"{anchor.get('token', '?')}={anchor.get('value', '?')} in {anchor.get('pou', '?')}"
+            )
+        if chain:
+            summary_lines.append("Fehlerkette: " + " -> ".join(str(x) for x in chain if str(x).strip()))
+        setter_pou = str(point1.get("pou_name", "") or "")
+        condition_expr = str(point1.get("condition_expr", "") or "")
+        if setter_pou:
+            line = f"Trigger-Setter: OPCUA.TriggerD2 in {setter_pou}"
+            if condition_expr:
+                line += f" bei Bedingung {condition_expr}"
+            summary_lines.append(line)
+        if summarized_evaluations:
+            top = summarized_evaluations[0]
+            top_path = str(top.get("state_path", "") or "")
+            if top_path:
+                summary_lines.append(
+                    f"Top-State-Path: {top_path} | possible={bool(top.get('possible'))} | score={top.get('score', 0)}"
+                )
+        if periodicity_evidence:
+            summary_lines.append(f"Periodizitaets-Hinweise vorhanden: {len(periodicity_evidence)}")
+
+    return sticky
+
+
 class ExcHChatBotSession:
     def __init__(self, bot: Any, ctx: IncidentContext):
         self.bot = bot
         self.ctx = ctx
         self.bootstrap_evd2_plan: Optional[Dict[str, Any]] = None
+        self.sticky_planner_context: Dict[str, Any] = {}
+        self._refresh_sticky_planner_context()
+
+    def _refresh_sticky_planner_context(self, diagnoseplan: Optional[Dict[str, Any]] = None) -> None:
+        self.sticky_planner_context = _build_sticky_planner_context(self.ctx, diagnoseplan=diagnoseplan)
+        if hasattr(self.bot, "set_sticky_context"):
+            try:
+                self.bot.set_sticky_context(self.sticky_planner_context)
+            except Exception:
+                pass
+
+    def _build_session_extra_context(self, *, include_bootstrap: bool = False) -> str:
+        sections: List[str] = []
+        if not hasattr(self.bot, "set_sticky_context"):
+            sections.append(_build_chat_context_summary(self.ctx))
+            if self.sticky_planner_context:
+                sections.append(
+                    "Persistenter Analysekontext (JSON):\n"
+                    + json.dumps(self.sticky_planner_context, ensure_ascii=False, indent=2)[:12000]
+                )
+        if include_bootstrap:
+            bootstrap = self.ensure_bootstrap_plan()
+            sections.append(
+                "EvD2DiagnosisTool Ergebnis (JSON):\n"
+                + json.dumps(bootstrap, ensure_ascii=False, indent=2)
+            )
+        return "\n\n".join(s for s in sections if s.strip())
 
     def ensure_bootstrap_plan(self) -> Dict[str, Any]:
         """
@@ -817,10 +1009,16 @@ class ExcHChatBotSession:
             self.bootstrap_evd2_plan = build_evd2_diagnoseplan(self)
         except Exception as e:
             self.bootstrap_evd2_plan = {"error": str(e)}
+        self._refresh_sticky_planner_context(self.bootstrap_evd2_plan)
         return self.bootstrap_evd2_plan
 
     def ask(self, user_msg: str, debug: bool = True, *, include_bootstrap: bool = False) -> Dict[str, Any]:
-        if _should_build_evd2_plan(self.ctx) and _question_wants_prevention_suggestions(user_msg):
+        can_use_cached_prevention_path = (
+            _should_build_evd2_plan(self.ctx)
+            and _question_wants_prevention_suggestions(user_msg)
+            and (self.bootstrap_evd2_plan is not None or not self.bot.history)
+        )
+        if can_use_cached_prevention_path:
             diagnoseplan = self.ensure_bootstrap_plan()
             if isinstance(diagnoseplan, dict):
                 base_analysis = _render_initial_evd2_answer(self.ctx, diagnoseplan)
@@ -879,23 +1077,11 @@ class ExcHChatBotSession:
                         "step_3:derived_requirement_paths": diagnoseplan.get("requirement_paths", {}),
                         "step_4:llm_prevention_suggestions": suggestion_block,
                     }
+                self.bot.remember_turn(user_msg, response)
                 return response
 
-        ctx_blob = asdict(self.ctx)
-        wrapped = (
-            "Incident Kontext (JSON):\n"
-            + json.dumps(ctx_blob, ensure_ascii=False, indent=2)
-        )
-
-        if include_bootstrap:
-            bootstrap = self.ensure_bootstrap_plan()
-            wrapped += (
-                "\n\nEvD2DiagnosisTool Ergebnis (JSON):\n"
-                + json.dumps(bootstrap, ensure_ascii=False, indent=2)
-            )
-
-        wrapped += "\n\nUser Frage:\n" + user_msg
-        return self.bot.chat(wrapped, debug=debug)
+        extra_context = self._build_session_extra_context(include_bootstrap=include_bootstrap)
+        return self.bot.chat(user_msg, debug=debug, extra_context=extra_context)
 
 
 def build_session_from_input(obj: Dict[str, Any]) -> ExcHChatBotSession:
@@ -906,7 +1092,7 @@ def build_session_from_input(obj: Dict[str, Any]) -> ExcHChatBotSession:
         raise RuntimeError("Kein KG TTL Pfad gefunden. Setze payload.kg_ttl_path ODER ENV MSRGUARD_KG_TTL.")
 
     from msrguard.chatbot_core import build_bot
-    bot = build_bot(kg_ttl_path=kg_path)
+    bot = build_bot(kg_ttl_path=kg_path, plc_snapshot=ctx.plcSnapshot)
     return ExcHChatBotSession(bot=bot, ctx=ctx)
 
 
@@ -1181,6 +1367,7 @@ def run_initial_analysis(session: ExcHChatBotSession, debug: bool = True) -> Dic
                     "step_2:derived_core": diagnoseplan.get("core", {}),
                     "step_3:derived_requirement_paths": diagnoseplan.get("requirement_paths", {}),
                 }
+            session.bot.remember_turn("Bitte fuehre eine initiale Vorfallanalyse durch.", result)
             return result
 
     prompt = build_initial_prompt(session.ctx, diagnoseplan=diagnoseplan)

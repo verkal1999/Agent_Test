@@ -48,8 +48,11 @@ class PipelineConfig:
 
 @dataclass
 class ChatbotConfig:
-    model: str = "gpt-4o-mini"
+    provider: str = "groq"
+    model: str = "llama-3.3-70b-versatile"
     temperature: float = 0.0
+    planner_provider: Optional[str] = None
+    planner_model: Optional[str] = None
 
 
 @dataclass
@@ -121,8 +124,11 @@ def load_ui_config() -> UiConfig:
 
     c_raw = raw.get("chatbot") if isinstance(raw.get("chatbot"), dict) else {}
     chatbot = ChatbotConfig(
+        provider=str(c_raw.get("provider", ChatbotConfig.provider)),
         model=str(c_raw.get("model", ChatbotConfig.model)),
         temperature=float(c_raw.get("temperature", ChatbotConfig.temperature)),
+        planner_provider=c_raw.get("planner_provider") or None,
+        planner_model=c_raw.get("planner_model") or None,
     )
 
     return UiConfig(
@@ -132,21 +138,33 @@ def load_ui_config() -> UiConfig:
     )
 
 
-def try_set_openai_key_from_file(path_str: str) -> Optional[str]:
-    if os.environ.get("OPENAI_API_KEY"):
+def try_set_openai_key_from_file(path_str: str, provider: str = "openai") -> Optional[str]:
+    _PROVIDER_ENV = {
+        "openai": "OPENAI_API_KEY",
+        "anthropic": "ANTHROPIC_API_KEY",
+        "azure_openai": "AZURE_OPENAI_API_KEY",
+        "google": "GOOGLE_API_KEY",
+        "groq": "GROQ_API_KEY",
+    }
+    _provider = (provider or "openai").lower().strip()
+    if _provider == "ollama":
+        return None  # kein API-Key nötig
+
+    env_var = _PROVIDER_ENV.get(_provider, "OPENAI_API_KEY")
+    if os.environ.get(env_var):
         return None
     if not path_str:
-        return "OPENAI_API_KEY fehlt und openai_api_key_file ist leer."
+        return f"{env_var} fehlt und api_key_file ist leer."
 
     p = Path(path_str).expanduser()
     if not p.exists():
-        return f"openai_api_key_file existiert nicht: {p}"
+        return f"api_key_file existiert nicht: {p}"
 
     key = p.read_text(encoding="utf-8").strip()
     if not key:
-        return f"openai_api_key_file ist leer: {p}"
+        return f"api_key_file ist leer: {p}"
 
-    os.environ["OPENAI_API_KEY"] = key
+    os.environ[env_var] = key
     return None
 
 
@@ -570,7 +588,7 @@ def streamlit_main() -> None:
         st.session_state["analysis_started"] = True
         log_ui_event("analysis_started", {"pipeline_enabled": bool(st.session_state.get("pipeline_enabled"))})
 
-        err = try_set_openai_key_from_file(cfg.openai_api_key_file)
+        err = try_set_openai_key_from_file(cfg.openai_api_key_file, provider=cfg.chatbot.provider)
         if err:
             add_message("System", f"ChatBot Key Hinweis: {err}")
 
@@ -615,8 +633,12 @@ def streamlit_main() -> None:
 
                     bot = build_bot(
                         kg_ttl_path=str(kg_path),
+                        provider=cfg.chatbot.provider,
                         openai_model=cfg.chatbot.model,
                         openai_temperature=cfg.chatbot.temperature,
+                        planner_provider=cfg.chatbot.planner_provider,
+                        planner_model=cfg.chatbot.planner_model,
+                        plc_snapshot=ctx.plcSnapshot,
                     )
                     session = ExcHChatBotSession(bot=bot, ctx=ctx)
                     st.session_state["chatbot_session"] = session

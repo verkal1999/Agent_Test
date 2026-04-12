@@ -11,39 +11,39 @@ title ExcH-KG-Agent - Initiale Anfrage\nTeil 1 von 6:\nPipeline-Vorbereitung
 boundary "ExcHAgent\nUI" as UI
 control "Pipeline" as Pipeline
 entity "Pipeline\nContext" as Ctx
-control "ExportPLCopenXML\nStep" as ExportStep
-control "BuildProgramIO\nMappingStep" as ProgStep
-control "BuildIOMappings\nStep" as IoStep
-control "ArtifactQuality\nGate" as Gate
+control "Export\nPLCopenXML\nStep" as ExportStep
+control "Build\nProgramIO\nMappingStep" as ProgStep
+control "Build\nIOMappings\nStep" as IoStep
+control "Artifact\nQuality\nGate" as Gate
 
-UI -> Pipeline : run(\nctx)
+UI -> Pipeline : run(Ctx)
 activate Pipeline
 create Ctx
 Pipeline -> Ctx : create artifacts = {}
 
-Pipeline -> ExportStep : run(\nCtx)
+Pipeline -> ExportStep : run(Ctx)
 activate ExportStep
 ExportStep -> Ctx : set("plcopen_xml", ...)
 ExportStep --> Pipeline : Export abgeschlossen
 deactivate ExportStep
 
-Pipeline -> ProgStep : run(\nCtx)
+Pipeline -> ProgStep : run(Ctx)
 activate ProgStep
-ProgStep -> Ctx : set("program_\nmapping", ...)\nset("gvl", ...)
+ProgStep -> Ctx : set("program_mapping", ...)\nset("gvl", ...)
 ProgStep --> Pipeline : Mapping-Artefakte bereit
 deactivate ProgStep
 
-Pipeline -> IoStep : run(\nCtx)
+Pipeline -> IoStep : run(Ctx)
 activate IoStep
-IoStep -> Ctx : set("io_\nmappings", ...)
+IoStep -> Ctx : set("io_mappings", ...)
 IoStep --> Pipeline : Hardware-Bezuege bereit
 deactivate IoStep
 
-Pipeline -> Gate : validate(\nCtx)
+Pipeline -> Gate : validate(Ctx)
 activate Gate
 Gate --> Pipeline : Artefakte freigegeben
 deactivate Gate
-Pipeline --> UI : PipelineContext bereit
+Pipeline --> UI : Pipeline\nContext\nbereit
 deactivate Pipeline
 
 note right of Ctx

@@ -13,12 +13,12 @@ control "KG\nLoader" as Loader
 control "KG\nManager" as Manager
 database "KG\nStore" as Store
 
-UI -> Loader : ingest Artefakte\naus Pipeline\nContext
+UI -> Loader : ingest Artefakte aus Pipeline Context
 activate Loader
-Loader -> Store : build_gvl_index_\nfrom_objects()
-Loader -> Store : ingest_programs_\nfrom_mapping_json()
-Loader -> Store : ingest_io_\nmappings()
-Loader -> Store : ingest_gvl_\nglobals()
+Loader -> Store : build_gvl_index_from_objects()
+Loader -> Store : ingest_programs_from_mapping_json()
+Loader -> Store : ingest_io_mappings()
+Loader -> Store : ingest_gvl_globals()
 Loader -> Store : save()
 Loader --> UI : Graph-Basis erstellt
 deactivate Loader
@@ -28,13 +28,13 @@ activate Manager
 Manager -> Store : lade RDF-Graph
 Store --> Manager : graph
 
-UI -> Manager : analyze_unused_\nelements()
+UI -> Manager : analyze_unused_elements()
 Manager -> Store : analysiere und erweitere
 
-UI -> Manager : generate_\nreports()
+UI -> Manager : generate_reports()
 Manager -> Store : erzeuge Zusatzwissen
 
-UI -> Manager : save(\noutput_path)
+UI -> Manager : save(output_path)
 Manager -> Store : persistiere Graph
 Manager --> UI : KG einsatzbereit
 deactivate Manager

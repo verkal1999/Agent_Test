@@ -19,6 +19,9 @@ Makefile
 
 # Visual Studio Code benutzerspezifische Einstellungen
 .vscode/
+.claude-flow/
+.claude/
+settings.json
 
 # Visual Studio Projektdateien
 .vs/

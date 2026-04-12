@@ -9,7 +9,8 @@
   },
   "rag": {
     "xml_path": "",
-    "model": "gpt-4o-mini",
+    "provider": "groq",
+    "model": "llama-3.3-70b-versatile",
     "temperature": 0,
     "top_k": 6
   }

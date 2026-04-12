@@ -1,0 +1,11 @@
+{
+  "_comment": "Preise in USD pro 1.000 Tokens (Stand: April 2026). Bitte aktuell halten.",
+  "claude-sonnet-4-6": {
+    "input_per_1k":  0.003,
+    "output_per_1k": 0.015
+  },
+  "claude-haiku-4-5-20251001": {
+    "input_per_1k":  0.0008,
+    "output_per_1k": 0.004
+  }
+}

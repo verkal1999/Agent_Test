@@ -1,0 +1,18 @@
+Dieses Diagramm zeigt den allgemeinen Evaluationsaufbau als flexiblen Black-Box-Ueberblick.
+
+1. Aus der Config JSON wird eine EvalConfig erzeugt.
+2. Das Event JSON und die EvalConfig gehen in die Orchestrierung in eval_runner.
+3. eval_runner setzt die benoetigten API Keys und entscheidet anhand von cfg.agent, welcher Agent genutzt wird.
+4. Eine agent-spezifische TurnStrategy entscheidet, ob nur eine Initialanalyse laeuft, ob cfg.question direkt gestellt wird oder ob stattdessen eine effective_question aus Kontext oder UI-Emulation abgeleitet wird.
+5. Dadurch bleibt der Ablauf offen fuer Initialanalysen, Folgefragen und spaetere freie Nutzerfragen.
+6. Der jeweils ausgewaehlte Agent liefert Antwort, staged output, Nutzungsdaten und Zeitmessungen zurueck.
+7. Wenn ground_truth vorhanden ist, kann ein optionaler LLM-Judge das Ergebnis zusaetzlich bewerten.
+8. eval_runner baut daraus ein EvalResult und speichert dieses als Result JSON.
+
+Warum die Agenten hier als Black Box gezeigt werden:
+- Das Diagramm soll den Gesamtfluss zeigen, nicht die internen Klassen der Agenten.
+- Dadurch sieht man sofort, welche Daten in die Evaluation hinein- und wieder herausfliessen.
+
+Warum die TurnStrategy explizit enthalten ist:
+- Die Config-Frage ist nicht immer identisch mit der effektiv gestellten Frage.
+- Genau dort werden spaetere Erweiterungen fuer Folgefragen, UI-Emulation oder agent-spezifische Prompt-Ableitungen sauber aufgehangen.

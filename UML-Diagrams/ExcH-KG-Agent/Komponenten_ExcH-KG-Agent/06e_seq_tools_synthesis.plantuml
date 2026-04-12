@@ -8,17 +8,17 @@ autonumber
 
 title ExcH-KG-Agent - Initiale Anfrage\nTeil 5 von 6:\nWerkzeugausfuehrung und Synthese
 
-control "ExcHChatBot\nSession" as Session
+control "ExcH\nChatBot\nSession" as Session
 control "Tool\nRegistry" as Registry
 control "KGQuery\nTool" as KGTool
 control "StructureCode\nAnalysisTool" as StructTool
-control "VariableSignal\nAnalysisTool" as SignalTool
-control "PathReconstruction\nTool" as PathTool
-entity "ToolResult\nBundle" as Results
-control "FoundationModel\nAdapter" as FM
+control "Variable\nSignal\nAnalysisTool" as SignalTool
+control "Path\nReconstruction\nTool" as PathTool
+entity "Tool\nResult\nBundle" as Results
+control "Foundation\nModel\nAdapter" as FM
 
 create Results
-Session -> Results : create empty\nresult bundle
+Session -> Results : create empty result bundle
 activate Session
 
 Session -> Registry : execute(\n"KGQueryTool",\nargs)
@@ -39,7 +39,7 @@ StructTool --> Registry : Code- und POU-Kontext
 deactivate StructTool
 Registry --> Session : tool result
 deactivate Registry
-Session -> Results : add(\nStructureCodeAnalysisTool)
+Session -> Results : add(StructureCodeAnalysisTool)
 
 Session -> Registry : execute(\n"VariableSignalAnalysisTool",\nargs)
 activate Registry
@@ -49,7 +49,7 @@ SignalTool --> Registry : Variablen- und Portbelege
 deactivate SignalTool
 Registry --> Session : tool result
 deactivate Registry
-Session -> Results : add(\nVariableSignalAnalysisTool)
+Session -> Results : add(VariableSignalAnalysisTool)
 
 Session -> Registry : execute(\n"PathReconstructionTool",\nargs)
 activate Registry
@@ -59,9 +59,9 @@ PathTool --> Registry : Fehlerpfade
 deactivate PathTool
 Registry --> Session : tool result
 deactivate Registry
-Session -> Results : add(\nPathReconstructionTool)
+Session -> Results : add(PathReconstructionTool)
 
-Session -> FM : synthesize(\nctx,\nplan,\nresults)
+Session -> FM : synthesize(ctx,plan,results)
 activate FM
 FM --> Session : diagnosis draft
 deactivate FM

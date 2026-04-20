@@ -1,0 +1,31 @@
+{
+  "test_id": "TC-003",
+  "agent": "kg",
+
+  "event_json_path": "MSRGuard_Anpassung/python/agent_results/evD2-665098719018800_event.json",
+  "question": "Warum trat das Fehlerbild 'KG: no failure modes for skill VSG_AS_CompressorControl' auf? Was hat VSG_ErrorDetected ausgeloest und welche POUs oder Variablen sind beteiligt?",
+  "ground_truth": "Die Fehler wird aufgrund von einem fehlenden Werkstück an GVL.HRL_LS_aussen erzeugt. Das ist eine Variable, die einen Sensor repräsentiert. Eine korrekte Fehleranalyse identifiziert diese Ursache und sagt, dass entweder der Sensor kaputt ist oder das Werkstück entnfernt wurde uund schlägt Maßnahmen der Hardware-Überprüfung vor. Wenn der Agent noch erkennt, dass er sich in einer Simulation befindet, ist das im Ergebnis besonders hervorzuheben.",
+
+  "model": {
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-6",
+    "temperature": 0.0,
+    "planner_provider": null,
+    "planner_model": null
+  },
+
+  "kg_ttl_path": "D:\\MA_Python_Agent\\MSRGuard_Anpassung\\KGs\\TestSIM_filled.ttl",
+  "xml_path": "F:\\MA\\Implementierung_Sim_MA\\TwinCAT Simulator ST2\\export.xml",
+  "api_key_file": "C:\\Users\\Alexander Verkhov\\Desktop\\Anthropic API Key.txt",
+  "pipeline_config": "D:\\MA_Python_Agent\\Pipelines\\IngestionPipeline\\config_ingestion2.json",
+
+  "pricing": {
+    "input_per_1k": 0.003,
+    "output_per_1k": 0.015
+  },
+  "planner_pricing": null,
+  "top_k": 6,
+
+  "results_dir": "Evaluation/results",
+  "out_json": ""
+}

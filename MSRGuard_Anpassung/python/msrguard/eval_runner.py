@@ -395,7 +395,11 @@ def _kg_auto_followup_prompt() -> str:
     )
 
 
-def _build_kg_ui_emulation_answer(initial_answer: str, auto_followup_answer: str) -> str:
+def _build_kg_ui_emulation_answer(
+    initial_answer: str,
+    auto_followup_answer: str,
+    label: str = "Pfad-Erklärung + Vermeidungsmaßnahmen",
+) -> str:
     parts: List[str] = []
     first = str(initial_answer or "").strip()
     second = str(auto_followup_answer or "").strip()
@@ -403,23 +407,30 @@ def _build_kg_ui_emulation_answer(initial_answer: str, auto_followup_answer: str
     if first:
         parts.append(first)
     if second:
-        parts.append("System\n\nAutomatische Folgeanalyse wird gestartet (Pfad-Erklärung + Vermeidungsmaßnahmen).")
-        parts.append(
-            "Automatische Folgeanalyse (Pfad-Erklärung + Vermeidungsmaßnahmen):\n\n"
-            + second
-        )
+        parts.append(f"System\n\nAutomatische Folgeanalyse wird gestartet ({label}).")
+        parts.append(f"Automatische Folgeanalyse ({label}):\n\n" + second)
     return "\n\n".join(parts).strip()
 
 
-def _build_rag_ui_emulation_answer(default_question: str, initial_answer: str) -> str:
+def _build_rag_ui_emulation_answer(
+    default_question: str,
+    initial_answer: str,
+    followup_answer: str = "",
+) -> str:
     parts: List[str] = []
     question = str(default_question or "").strip()
     answer = str(initial_answer or "").strip()
+    followup = str(followup_answer or "").strip()
 
     if question:
         parts.append("User\n\n" + question)
     if answer:
         parts.append("Assistant\n\n" + answer)
+    if followup:
+        parts.append("System\n\nAutomatische Folgeanalyse wird gestartet (Fehlerpfad + Vermeidungsmaßnahmen).")
+        parts.append(
+            "Automatische Folgeanalyse (Fehlerpfad + Vermeidungsmaßnahmen):\n\n" + followup
+        )
     return "\n\n".join(parts).strip()
 
 
@@ -430,7 +441,7 @@ def _build_rag_ui_emulation_answer(default_question: str, initial_answer: str) -
 def _run_kg_eval(cfg: EvalConfig) -> EvalResult:
     _ensure_python_root()
     from msrguard.chatbot_core import build_bot, LLMUsage
-    from msrguard.excH_chatbot import IncidentContext, ExcHChatBotSession, run_initial_analysis
+    from msrguard.excH_chatbot import IncidentContext, ExcHChatBotSession, run_initial_analysis, build_auto_followup_request
 
     event = _load_json(cfg.event_json_path)
     ctx = IncidentContext.from_event(event)
@@ -469,12 +480,14 @@ def _run_kg_eval(cfg: EvalConfig) -> EvalResult:
     initial_answer = initial_resp.get("answer", "") if isinstance(initial_resp, dict) else str(initial_resp)
 
     t1 = time.monotonic()
-    auto_followup_prompt = _kg_auto_followup_prompt()
+    followup_req = build_auto_followup_request(session)
+    auto_followup_prompt = str(followup_req.get("prompt") or "") or _kg_auto_followup_prompt()
+    auto_followup_label = str(followup_req.get("label") or "Pfad-Erklärung + Vermeidungsmaßnahmen")
     resp = session.ask(auto_followup_prompt, debug=False)
     t_question = time.monotonic() - t1
 
     auto_followup_answer = resp.get("answer", "") if isinstance(resp, dict) else str(resp)
-    answer = _build_kg_ui_emulation_answer(initial_answer, auto_followup_answer)
+    answer = _build_kg_ui_emulation_answer(initial_answer, auto_followup_answer, auto_followup_label)
     answer_stages: List[Dict[str, str]] = []
     if initial_answer.strip():
         answer_stages.append(
@@ -490,7 +503,7 @@ def _run_kg_eval(cfg: EvalConfig) -> EvalResult:
             "stage": "auto_followup_notice",
             "role": "system",
             "label": "System",
-            "text": "Automatische Folgeanalyse wird gestartet (Pfad-Erklärung + Vermeidungsmaßnahmen).",
+            "text": f"Automatische Folgeanalyse wird gestartet ({auto_followup_label}).",
         }
     )
     if auto_followup_answer.strip():
@@ -498,7 +511,7 @@ def _run_kg_eval(cfg: EvalConfig) -> EvalResult:
             {
                 "stage": "auto_followup",
                 "role": "assistant",
-                "label": "Automatische Folgeanalyse (Pfad-Erklärung + Vermeidungsmaßnahmen)",
+                "label": f"Automatische Folgeanalyse ({auto_followup_label})",
                 "text": auto_followup_answer.strip(),
             }
         )
@@ -527,7 +540,7 @@ def _run_kg_eval(cfg: EvalConfig) -> EvalResult:
         answer_stages=answer_stages,
         notes=_append_note(
             "",
-            "KG-UI-Emulation aktiv: konfigurierte Frage wurde ignoriert; stattdessen Initialanalyse + automatische Folgeanalyse ausgeführt.",
+            f"KG-UI-Emulation aktiv: konfigurierte Frage wurde ignoriert; stattdessen Initialanalyse + automatische Folgeanalyse ({auto_followup_label}) ausgeführt.",
         ),
     )
 
@@ -561,7 +574,14 @@ def _run_rag_eval(cfg: EvalConfig) -> EvalResult:
 
     default_question = init_res.get("default_question", "") if isinstance(init_res, dict) else ""
     initial_answer = init_res.get("answer", "") if isinstance(init_res, dict) else str(init_res)
-    answer = _build_rag_ui_emulation_answer(default_question, initial_answer)
+
+    t1 = time.monotonic()
+    followup_prompt = session.ctx.followup_question()
+    followup_resp = session.ask(followup_prompt, debug=False)
+    t_followup = time.monotonic() - t1
+    followup_answer = followup_resp.get("answer", "") if isinstance(followup_resp, dict) else str(followup_resp)
+
+    answer = _build_rag_ui_emulation_answer(default_question, initial_answer, followup_answer)
 
     answer_stages: List[Dict[str, str]] = []
     if str(default_question or "").strip():
@@ -582,6 +602,23 @@ def _run_rag_eval(cfg: EvalConfig) -> EvalResult:
                 "text": str(initial_answer).strip(),
             }
         )
+    answer_stages.append(
+        {
+            "stage": "auto_followup_notice",
+            "role": "system",
+            "label": "System",
+            "text": "Automatische Folgeanalyse wird gestartet (Fehlerpfad + Vermeidungsmaßnahmen).",
+        }
+    )
+    if str(followup_answer or "").strip():
+        answer_stages.append(
+            {
+                "stage": "auto_followup",
+                "role": "assistant",
+                "label": "Automatische Folgeanalyse (Fehlerpfad + Vermeidungsmaßnahmen)",
+                "text": str(followup_answer).strip(),
+            }
+        )
 
     return EvalResult(
         test_id=cfg.test_id,
@@ -594,8 +631,8 @@ def _run_rag_eval(cfg: EvalConfig) -> EvalResult:
         answer=answer,
         ground_truth=cfg.ground_truth,
         t_initial_analysis_s=round(t_initial, 3),
-        t_question_s=0.0,
-        t_total_s=round(t_initial, 3),
+        t_question_s=round(t_followup, 3),
+        t_total_s=round(t_initial + t_followup, 3),
         prompt_tokens=usage.prompt_tokens,
         completion_tokens=usage.completion_tokens,
         total_tokens=usage.total_tokens,
@@ -603,10 +640,11 @@ def _run_rag_eval(cfg: EvalConfig) -> EvalResult:
         requested_question_ignored=True,
         effective_question=str(default_question or ""),
         answer_initial=str(initial_answer or ""),
+        answer_auto_followup=str(followup_answer or ""),
         answer_stages=answer_stages,
         notes=_append_note(
             "",
-            "RAG-UI-Emulation aktiv: konfigurierte Frage wurde ignoriert; stattdessen nur die automatische Initialanalyse des RAG-Agenten ausgeführt.",
+            "RAG-UI-Emulation aktiv: konfigurierte Frage wurde ignoriert; stattdessen Initialanalyse + automatische Folgeanalyse (Fehlerpfad + Vermeidungsmaßnahmen) ausgeführt.",
         ),
     )
 

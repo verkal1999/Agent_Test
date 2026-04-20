@@ -209,6 +209,16 @@ class RagIncidentContext:
             "wie man den Fehler eingrenzen oder beheben koennte. Wenn der Kontext nicht reicht, sage klar, was fehlt."
         )
 
+    def followup_question(self) -> str:
+        return (
+            "Bitte erklaere jetzt den Fehlerpfad aus der Initialanalyse im Detail. "
+            "Fokus: Benenne die beteiligten POUs, Variablen und Signalpfade aus der PLCOpenXML in kausaler Reihenfolge "
+            "und zeige, wie sie zum beobachteten Fehlerbild gefuehrt haben. "
+            "Danach nenne konkrete Vermeidungsmassnahmen, priorisiert nach Wirksamkeit, "
+            "und begruende sie ausschliesslich mit der Evidenz aus der PLCOpenXML und den beobachteten Laufzeitwerten. "
+            "Keine Annahmen ohne Beleg aus dem gegebenen Kontext."
+        )
+
 
 
 @dataclass
@@ -546,7 +556,7 @@ class SimpleRagSession:
 
     def build_default_prompt(self) -> Dict[str, str]:
         compact = self.ctx.compact_event_context()
-        compact_json = _shorten_json(compact, max_chars=3200)
+        compact_json = _shorten_json(compact, max_chars=50000)
         question = self.ctx.default_question()
         context_note = self.ctx.runtime_context_note()
         extra_context = context_note + "\n\nEvent-/Snapshot-Kontext (JSON):\n" + compact_json

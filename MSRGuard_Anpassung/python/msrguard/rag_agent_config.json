@@ -12,7 +12,7 @@
     "provider": "openai",
     "model": "gpt-4o-mini",
     "temperature": 0,
-    "top_k": 6
+    "top_k": 12
   }
 }
 

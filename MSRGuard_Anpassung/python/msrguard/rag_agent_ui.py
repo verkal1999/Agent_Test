@@ -316,6 +316,10 @@ def streamlit_main() -> None:
             st.session_state["last_rag_debug"] = {"summary": None, "retrieved_chunks": None, "debug": None}
         if "last_result_blob" not in st.session_state:
             st.session_state["last_result_blob"] = None
+        if "pending_rag_followup_prompt" not in st.session_state:
+            st.session_state["pending_rag_followup_prompt"] = ""
+        if "rag_auto_followup_done" not in st.session_state:
+            st.session_state["rag_auto_followup_done"] = False
 
     def flush_chat_log() -> None:
         path = (st.session_state.get("chat_log_path") or "").strip()
@@ -391,7 +395,41 @@ def streamlit_main() -> None:
             )
 
     def run_pending_auto_followup_if_needed() -> None:
-        return
+        prompt = str(st.session_state.get("pending_rag_followup_prompt") or "").strip()
+        if not prompt:
+            return
+
+        session = st.session_state.get("rag_session")
+        if session is None:
+            st.session_state["pending_rag_followup_prompt"] = ""
+            st.session_state["rag_auto_followup_done"] = False
+            return
+
+        with st.chat_message("assistant", avatar=BOT_AVATAR):
+            with st.spinner("Automatische Folgeanalyse läuft..."):
+                try:
+                    res = session.ask(prompt, debug=True)
+                    retrieved_chunks = res.get("retrieved_chunks") if isinstance(res, dict) else None
+                    st.session_state["last_rag_debug"] = {
+                        "summary": st.session_state["last_rag_debug"].get("summary"),
+                        "retrieved_chunks": retrieved_chunks,
+                        "debug": res.get("debug") if isinstance(res, dict) else None,
+                    }
+                    answer = res.get("answer") if isinstance(res, dict) else None
+                    add_message(
+                        "Assistant",
+                        "Automatische Folgeanalyse (Fehlerpfad + Vermeidungsmaßnahmen):\n\n"
+                        + (answer or _json_or_str(res)),
+                    )
+                    st.session_state["rag_auto_followup_done"] = True
+                    log_ui_event("rag_auto_followup_done", {"ok": True})
+                except Exception as e:
+                    add_message("System", f"Auto-Folgeanalyse Fehler: {e}")
+                    st.session_state["rag_auto_followup_done"] = False
+                    log_ui_event("rag_auto_followup_done", {"ok": False, "error": str(e)})
+
+        st.session_state["pending_rag_followup_prompt"] = ""
+        st.rerun()
 
     def import_handle_event():
         ensure_python_root_on_sys_path()
@@ -629,6 +667,14 @@ def streamlit_main() -> None:
                         "rag_initial_question_done",
                         {"retrieved_chunk_count": len(retrieved_chunks or [])},
                     )
+                    followup_prompt = session.ctx.followup_question()
+                    st.session_state["pending_rag_followup_prompt"] = followup_prompt
+                    st.session_state["rag_auto_followup_done"] = False
+                    add_message(
+                        "System",
+                        "Automatische Folgeanalyse wird gestartet (Fehlerpfad + Vermeidungsmaßnahmen).",
+                    )
+                    log_ui_event("rag_auto_followup_queued", {})
                 except Exception as e:
                     st.session_state["rag_session"] = None
                     st.session_state["rag_last_error"] = str(e)
@@ -800,6 +846,7 @@ def streamlit_main() -> None:
             )
 
         render_chat()
+        run_pending_auto_followup_if_needed()
 
         chatbot_ready = st.session_state.get("rag_session") is not None
         user_msg = st.chat_input("Frage an den RAG-Agent...", disabled=not chatbot_ready)

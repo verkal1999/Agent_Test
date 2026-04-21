@@ -1,7 +1,12 @@
 # ChatBotRoutinen
 
-Vorgebaute Routinen-Indizes fuer den Chatbot, um schneller aehnliche Ablaufmuster zu finden.
+This folder is part of the `MA_Python_Agent` master's thesis repository. It stores routine-index JSON files used by the chatbot tooling to reuse recurring diagnosis patterns more efficiently.
 
-## Dateien und Verantwortung
-- `Test2_filled_routine_index.json`: Routinenindex basierend auf `Test2_filled.ttl`.
-- `TestEvents_routine_index.json`: Routinenindex basierend auf `TestEvents.ttl`.
+## What this folder contains
+
+- `Test2_filled_routine_index.json`: routine index derived from `Test2_filled.ttl`
+- `TestEvents_routine_index.json`: routine index derived from `TestEvents.ttl`
+
+## Current status
+
+These files are support artifacts for the KG-based chatbot workflow. They are generated data, not hand-written source code.

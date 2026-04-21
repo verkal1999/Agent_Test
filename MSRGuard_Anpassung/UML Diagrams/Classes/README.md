@@ -1,14 +1,19 @@
 # UML Diagrams / Classes
 
-Klassendiagramme fuer zentrale C++-Komponenten.
+This folder is part of the `MA_Python_Agent` master's thesis repository. It stores class-level UML diagrams for selected C++ runtime components.
 
-## Dateien und Verantwortung
-- `class_AckLogger.plantuml`: Struktur des Ack-/Antwort-Loggings.
-- `class_CommandForceFacory1.plantuml`: Factory-Struktur (Variante 1).
-- `class_CommandForceFactory2.plantuml`: Factory-Struktur (Variante 2).
-- `class_EventBus.plantuml`: Beziehungen rund um den EventBus.
-- `class_FailureRecorder.plantuml`: FailureRecorder und zugehoerige Datentypen.
-- `class_PLCMonitor.plantuml`: PLCMonitor-Komponenten und Abhaengigkeiten.
-- `class_ReactionManager1.plantuml`: ReactionManager-Diagramm (Variante 1).
-- `class_ReactionManager2.plantuml`: ReactionManager-Diagramm (Variante 2).
-- `class_TimeBlogger.plantuml`: Klassenbeziehungen fuer Zeit-/CSV-Logging.
+## What this folder contains
+
+- `class_AckLogger.plantuml`: logging-related class structure
+- `class_CommandForceFacory1.plantuml`: first factory-focused class view
+- `class_CommandForceFactory2.plantuml`: second factory-focused class view
+- `class_EventBus.plantuml`: event bus class relationships
+- `class_FailureRecorder.plantuml`: failure recorder classes
+- `class_PLCMonitor.plantuml`: PLC monitor classes and dependencies
+- `class_ReactionManager1.plantuml`: first reaction manager class view
+- `class_ReactionManager2.plantuml`: second reaction manager class view
+- `class_TimeBlogger.plantuml`: timing and CSV logging classes
+
+## Current status
+
+These diagrams are documentation artifacts for the master's thesis and for local architecture communication. They do not affect runtime behavior.

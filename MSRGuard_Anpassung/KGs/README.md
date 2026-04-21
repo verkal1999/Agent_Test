@@ -1,31 +1,39 @@
 # KGs
 
-Knowledge-Graph-Dateien (Turtle/JSON) fuer Tests, Zwischenstaende und Routinenindizes.
+This folder is part of the `MA_Python_Agent` master's thesis repository. It stores local knowledge-graph files and related index artifacts used by the diagnosis agents.
 
-## Dateien und Verantwortung
-- `FMEA_KG.ttl`: Basis-FMEA-KG.
-- `FMEA_KG_augmented_100_trip.ttl`: Augmentierte FMEA-Variante (kleiner Umfang).
-- `FMEA_KG_augmented_500_trip.ttl`: Augmentierte FMEA-Variante (groesserer Umfang).
-- `FMEA_KG_bak.ttl`: Backup der FMEA-Basis.
-- `FMEA_KG_demo.ttl`: Demo-Stand fuer Beispiele.
-- `FMEA_KG_FischertechnikI4.0-Simulator.ttl`: Simulatorspezifische FMEA-Daten.
-- `ParamDiag_Agent.ttl`: Basis-KG fuer ParamDiag-Agent.
-- `ParamDiag_Agent_cleaned.ttl`: Bereinigter ParamDiag-Stand.
-- `ParamDiag_Agent_filled.ttl`: Gefuellte ParamDiag-Variante.
-- `ParamDiag_Agent_filled2.ttl`: Zweite gefuellte ParamDiag-Variante.
-- `ParamDiag_Agent_filled2_with_reports.ttl`: Gefuellte ParamDiag-Variante inklusive Reports.
-- `ParamDiag_Agent_filled3.ttl`: Dritte gefuellte ParamDiag-Variante.
-- `ParamDiag_Agent_populated.ttl`: Populierter ParamDiag-Stand.
-- `SPARQL_findD2_Mapping.txt`: SPARQL-Helferabfrage fuer D2-Mappings.
-- `Test_cleaned.ttl`: Bereinigtes Test-KG.
-- `Test_filled.ttl`: Gefuelltes Test-KG.
-- `Test_filled_vor_Variable_implements_Port (Problem mit Selbstinstanziierung).ttl`: Historischer Problemstand vor Fix.
-- `Test_nachKGLoader.ttl`: Test-KG nach Loader-Schritt.
-- `Test2_filled.ttl`: Zweiter gefuellter Teststand.
-- `Test2_nachKGLoader.ttl`: Zweiter Teststand nach Loader.
-- `TestEvents.ttl`: Event-orientierter Testgraph.
-- `TestEvents_nachKGLoader.ttl`: Event-Testgraph nach Loader.
-- `TestEvents_routine_index.json`: Routinenindex fuer Event-Testgraph.
+## What this folder contains
 
-## Unterordner
-- `ChatBotRoutinen/`: Vorgefertigte Routine-Indizes fuer Chatbot-Analysen.
+### FMEA-related graphs
+
+- files starting with `FMEA_`: FMEA base graphs, demo graphs, and augmented graph variants
+
+### Parameter-diagnosis graphs
+
+- files starting with `ParamDiag_Agent`: different intermediate and enriched graph states for parameter-diagnosis experiments
+
+### Test and evaluation graphs
+
+- files starting with `Test`, `Test2`, `TestEvents`, and `TestSIM`: graph states generated from different PLC/TwinCAT projects used during thesis experiments and evaluation
+
+### Helper artifacts
+
+- `*_routine_index.json`: cached routine indexes for chatbot support
+- `SPARQL_findD2_Mapping.txt`: helper query text used during diagnosis-related graph work
+- `README.md`: this overview
+
+### Subfolder
+
+- `ChatBotRoutinen/`: dedicated routine-index files used by the chatbot tooling
+
+## Naming conventions
+
+Common suffixes indicate processing stages:
+
+- `_cleaned`: cleaned intermediate graph
+- `_nachKGLoader`: graph state right after the loader stage
+- `_filled` or `_populated`: enriched graph after later processing steps
+
+## Current status
+
+This folder mixes long-lived base graphs with generated thesis artifacts. The most relevant graphs for the current evaluation are the `TestEvents*` and `TestSIM*` variants.

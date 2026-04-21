@@ -1,12 +1,17 @@
 # Zusatzdateien
 
-Hilfsdokumente fuer Prompting, Logs und Praesentationen.
+This folder is part of the `MA_Python_Agent` master's thesis repository. It stores supporting files that were useful during prototyping, prompting, debugging, and presentation preparation.
 
-## Dateien und Verantwortung
-- `CHATGPTAngefangenerPROMPT!!!.txt`: Frueher Prompt-Entwurf.
-- `ChatGPT_SysPrompt.txt`: Systemprompt-Variante fuer ChatGPT.
-- `GeminiPrompt.txt`: Prompt-Variante fuer Gemini.
-- `OutputLog.txt`: Protokoll/Log-Ausgaben aus Experimenten.
-- `PLCRexErrortxt.txt`: Fehlerlog fuer PLCRex-nahe Schritte.
-- `Uebersetzung_Bausteine.pptx`: Praesentation zu Bausteinuebersetzungen.
-- `~$Uebersetzung_Bausteine.pptx`: Temporare Office-Datei (Lock/Autosave-Artefakt).
+## What this folder contains
+
+- `CHATGPTAngefangenerPROMPT!!!.txt`: early prompt draft
+- `ChatGPT_SysPrompt.txt`: ChatGPT system-prompt variant
+- `GeminiPrompt.txt`: Gemini-specific prompt draft
+- `OutputLog.txt`: collected experiment output
+- `PLCRexErrortxt.txt`: error notes from PLC reconstruction experiments
+- `Ubersetzung_Bausteine.pptx`: presentation material
+- `~$Ubersetzung_Bausteine.pptx`: temporary Office lock file
+
+## Current status
+
+This folder is documentation and scratch-space material for the thesis process. It is not part of the main runtime or evaluation pipeline.

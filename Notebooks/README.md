@@ -1,34 +1,35 @@
 # Notebooks
 
-Arbeits- und Experimentierumgebung fuer KG-Aufbau, Chatbot-Prototyping und PLC-Analyse.
+This folder is part of the `MA_Python_Agent` master's thesis repository. It contains exploratory notebooks, prototypes, prompt experiments, and ad hoc analysis files used during the development of the thesis.
 
-## Dateien und Verantwortung
-- `1.1Agent_Test.ipynb`: Frueher Testlauf fuer Agentlogik.
-- `ChatBot.ipynb`: Frueher Chatbot-Prototyp.
-- `ChatBot_new.ipynb`: Neuere Chatbot-Variante.
-- `ExceptionHandling_ChatBot_Skeleton.ipynb`: Basisstruktur fuer Exception-Handling-Chatbot.
-- `FMEA_Kopplung.ipynb`: Kopplung von FMEA-Strukturen mit Prozessdaten.
-- `Ingestion_Layer.ipynb`: Prototypen fuer Ingestion-Schritte.
-- `KG_Manager.ipynb`: Notebook-basierte KG-Manager-Experimente.
-- `MSRGuard_ChatBot_Workbench.ipynb`: Workbench fuer Chatbot-Analyse.
-- `MSRGuard_ChatBot_Workbench_patched.ipynb`: Gepatchte Workbench-Variante.
-- `PLCRex_Test.ipynb`: Tests fuer PLC-Rekonstruktion/PLCRex-nahe Logik.
-- `plc_kg_gemini_text2sparql_template.ipynb`: Text2SPARQL-Template mit Gemini-Fokus.
-- `Programming_Agent.ipynb`: Notebook-Agent-Prototyp.
-- `Programming_Agent.py`: Exportierte Python-Variante des Programming-Agent-Notebooks.
-- `Programming_Agent2.ipynb`: Zweite Agent-Prototypvariante.
-- `SkillExtractor.ipynb`: Extraktion von Skills aus Artefakten.
-- `SkillExtractor_Integrated.ipynb`: Integrierte Skill-Extractor-Version.
-- `SPARQL-Abfrage_D2-Aufruferpfad.txt`: SPARQL-Snippets fuer D2-Aufruferpfad.
-- `TestAbfragen.ipynb`: Sammlung von SPARQL-/KG-Testabfragen.
-- `TestAlgorithmus.ipynb`: Aktive Algorithmus-Tests.
-- `TestAlgorithmus_alt.ipynb`: Aeltere Algorithmus-Variante.
-- `css_skill_results.json`: Ergebnisdaten fuer Skill-Auswertung.
+## What this folder contains
 
-## Unterordner
-- `Dateien_SkillExtractor/`: Konfiguration/Katalog fuer Skill-Extraktion.
-- `Generierte_PLCOpenXML/`: Generierte XML-Beispielartefakte.
-- `Zusatzdateien/`: Prompt-/Log-/Praesentationszusatzdateien.
+### Core notebook themes
 
-## Hinweis
-- `__pycache__/` enthaelt nur Python-Bytecode-Artefakte.
+- Chatbot and agent prototyping:
+  `ChatBot.ipynb`, `ChatBot_new.ipynb`, `ExceptionHandling_ChatBot_Skeleton.ipynb`, `MSRGuard_ChatBot_Workbench.ipynb`, `MSRGuard_ChatBot_Workbench_patched.ipynb`
+- KG and ingestion experiments:
+  `FMEA_Kopplung.ipynb`, `Ingestion_Layer.ipynb`, `KG_Manager.ipynb`, `TestAbfragen.ipynb`
+- Algorithm and reconstruction experiments:
+  `PLCRex_Test.ipynb`, `TestAlgorithmus.ipynb`, `TestAlgorithmus_alt.ipynb`
+- Agent-specific notebooks:
+  `1.1Agent_Test.ipynb`, `Programming_Agent.ipynb`, `Programming_Agent2.ipynb`
+- Skill extraction work:
+  `SkillExtractor.ipynb`, `SkillExtractor_Integrated.ipynb`
+
+### Additional files
+
+- `Programming_Agent.py`: Python export of one notebook-based prototype
+- `css_skill_results.json`: auxiliary result data from notebook experiments
+- `plc_kg_gemini_text2sparql_template.ipynb`: prompt/template experiment for text-to-SPARQL
+- `SPARQL-Abfrage_D2-Aufruferpfad.txt`: helper query text related to D2 trace analysis
+
+### Subfolders
+
+- `Dateien_SkillExtractor/`: configuration files for the skill extraction experiments
+- `Generierte_PLCOpenXML/`: generated sample PLCopen XML artifacts
+- `Zusatzdateien/`: prompt drafts, logs, and presentation material
+
+## Current status
+
+This folder is primarily exploratory. The production-oriented code used in the actual thesis evaluation lives in `MSRGuard_Anpassung/`, `Pipelines/`, and `Evaluation/`.

@@ -1,9 +1,11 @@
 # tools
 
-Entwicklungs- und Testwerkzeuge rund um die Runtime.
+This folder is part of the `MA_Python_Agent` master's thesis repository. It stores local development and test utilities related to the adapted MSRGuard runtime.
 
-## Unterordner
-- `ua_test_server/`: Lokaler OPC-UA-Testserver fuer Entwicklung ohne physische SPS.
+## What this folder contains
 
-## Datei
-- `README.md`: Diese Uebersicht.
+- `ua_test_server/`: local OPC UA test server used for integration and connectivity checks without a physical PLC
+
+## Current status
+
+The folder is intentionally small. Most runtime logic lives in `src/`, while this folder contains supporting utilities only.

@@ -1,11 +1,14 @@
 # ua_test_server
 
-Lokaler OPC-UA-Testserver fuer Integrations- und Verbindungstests.
+This folder is part of the `MA_Python_Agent` master's thesis repository. It contains a local secure OPC UA test server used during development and integration testing.
 
-## Dateien und Verantwortung
-- `ua_test_server_secure.cpp`: Implementierung eines sicheren OPC-UA-Testservers (inkl. Zertifikate).
-- `CMakeLists.txt`: Builddefinition fuer den Testserver.
-- `CMakePresets.json`: Vordefinierte Build-/Tool-Presets.
+## What this folder contains
 
-## Unterordner
-- `certs/`: Server-Zertifikat und Schluessel fuer Security-Tests.
+- `ua_test_server_secure.cpp`: secure OPC UA test server implementation
+- `CMakeLists.txt`: build definition for the test server
+- `CMakePresets.json`: build presets
+- `certs/`: local server certificates for security-related tests
+
+## Current status
+
+This is a utility component for testing. It is not part of the main benchmark pipeline, but it helps validate the runtime integration used in the thesis.

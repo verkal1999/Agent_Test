@@ -1,126 +1,88 @@
 # MA_Python_Agent
 
-Dieses Repository enthaelt den Python-Agenten und die zugehoerigen Datenpipelines fuer das MSRGuard-Exception-Handling im Gesamtsystem.
+This repository contains the implementation, experiments, documentation, and evaluation artifacts for a master's thesis on LLM-assisted exception handling and root-cause analysis for PLC/TwinCAT-based systems.
 
-## Ziel des Agenten im Framework
-Der Agent ist die "Human-in-the-loop"-Diagnoseebene fuer den Fall, dass die C++-Runtime keinen eindeutigen Failure Mode bestimmen kann.
+The thesis compares two diagnosis strategies:
 
-Konkret:
-- Die Runtime erkennt einen Fehler-Trigger (insbesondere `evD2` via `OPCUA.TriggerD2`).
-- Wenn KG-Kandidaten fehlen oder mehrdeutig sind, wird nicht blind reagiert, sondern der Agent gestartet.
-- Der Agent rekonstruiert den softwareseitigen Ursachepfad (Setter -> Bedingungen -> Skill-/GEMMA-Kontext), bereitet ihn fuer den Operator auf und liefert ein strukturiertes Ergebnis (`continue`/`abort` + Diagnosekontext) an die Runtime zurueck.
+- a knowledge-graph-driven Exception Handling agent (`ExcH` / KG agent)
+- a simpler PLCOpenXML-based retrieval agent (`RAG` agent)
 
-Damit ist das Hauptziel: **sichere, nachvollziehbare Entscheidungsunterstuetzung statt unkontrollierter Automatik bei unklaren Fehlerlagen**.
+The repository combines runtime integration, knowledge-graph ingestion, thesis experiments, and benchmark results in one place.
 
-## Systemkontext in 30 Sekunden
-1. C++-Runtime (`MSRGuard_Anpassung`) ueberwacht OPC UA und erzeugt Events.
-2. Ingestion-Pipeline (`Pipelines/IngestionPipeline`) baut/aktualisiert den Knowledge Graph (KG) aus TwinCAT-/PLCopen-Artefakten.
-3. Python-Agent (`MSRGuard_Anpassung/python/msrguard`) nutzt den KG fuer Diagnose und Chatbot-Erklaerung.
-4. Streamlit-UI ist die Bedienoberflaeche fuer Analyse, Nachfragen und die finale Continue/Abort-Entscheidung.
+## Repository structure
 
-## End-to-End Ablauf (evD2-Fall)
-Der praktische Lauf im Code sieht so aus:
+- `MSRGuard_Anpassung/`: adapted MSRGuard runtime, Python agent package, local knowledge graphs, certificates, and internal UML diagrams
+- `Pipelines/`: ingestion pipeline that converts TwinCAT and PLCopen artifacts into structured knowledge-graph assets
+- `Evaluation/`: benchmark configurations, pricing tables, generated result JSON files, and thesis comparison tables
+- `Notebooks/`: exploratory notebooks, prototypes, prompt drafts, and helper artifacts used during the thesis
+- `UML-Diagrams/`: project-level PlantUML diagrams for architecture, agents, integration, and use cases
+- `PyLC_Anpassung/`: helper scripts for converting PLCopen XML into Python-like intermediate code during earlier experimentation
+- `PLC2Skill_Dateien/`: external PLC2Skill binary used in supporting experiments
+- `Alte_Pythons/`: historical Python prototypes kept for reference only
+- `scripts/`: small entry-point scripts, including the evaluation wrapper
+- `out/`: generated diagram exports and other transient outputs
 
-1. `PLCMonitor` sieht eine steigende Flanke auf `OPCUA.TriggerD2`.
-2. `main.cpp` erzeugt Snapshot + Korrelation und postet `evD2` auf den `EventBus`.
-3. `ReactionManager` versucht KG-basierte Zuordnung:
-   - bei eindeutigem Winner: direkte Reaktionskette (Monitoring/SystemReaction),
-   - bei 0 oder >1 Winnern: `evUnknownFM` + Fallback-Plan wird nur zwischengespeichert.
-4. `AgentStartCoordinator` emittiert `evAgentStart`, sobald beide Signale fuer den Incident da sind:
-   - `evUnknownFM`
-   - `evIngestionDone`
-5. `ExcHUiObserver` schreibt `<corr>_event.json`, startet `excH_kg_agent_ui.py` und wartet auf `<corr>_result.json`.
-6. UI/Agent-Seite:
-   - optional Pipeline-Lauf,
-   - `excH_kg_agent_core.handle_event(...)` liefert strukturierte Basisdiagnose,
-   - Chatbot initialisiert KG-Tools und startet initiale evD2-Analyse.
-7. Operator entscheidet in der UI "Weiter" oder "Abbrechen":
-   - Ergebnis wird als `out_json` persistiert.
-8. C++ liest das Ergebnis:
-   - `evAgentDone` (Weiter),
-   - `evAgentAbort` (Abbruch),
-   - `evAgentFail` (Fehler beim Agentlauf).
-9. Bei `evAgentDone` wird der vorher geparkte Fallback-Plan (DiagnoseFinished-Puls) kontrolliert ausgefuehrt.
+Local virtual environments and hidden tool folders such as `.venv311/`, `plcrex_venv39/`, `.claude/`, and `.claude-flow/` are workspace support artifacts rather than core thesis deliverables.
 
-## Was der Python-Agent genau macht
-### 1) Input normalisieren
-`excH_chatbot.IncidentContext` extrahiert robust Felder aus Event/Snapshot:
-- `correlationId`, `processName`, `summary`, `triggerEvent`
-- `lastSkill` (u. a. aus `OPCUA.lastExecutedSkill`)
-- `lastGEMMAStateBeforeFailure`
-- `triggerD2` Status
-- KG-Pfad (`kg_ttl_path`)
+## Main architecture
 
-### 2) Deterministische evD2-Kernanalyse
-`build_evd2_diagnoseplan(...)` kombiniert vier Tools:
-- `evd2_diagnoseplan`: Trigger-Setter, GEMMA-Port/Call-Infos, Skill-Setter
-- `evd2_unified_trace`: tiefe Bedingungs-/Wahrheitspfad-Analyse
-- `evd2_requirement_paths`: tabellarische Pfadbedingungen
-- `evd2_path_trace`: zusammengefuehrte Punkt-1/2/3 Hauptanalyse mit Zeitphasen (`t0`, `t-1`, `t-2`)
+At a high level, the repository is organized around one end-to-end diagnosis workflow:
 
-Ergebnis ist ein konsistentes JSON-Buendel (`evd2_compact_v1`) fuer reproduzierbare Erklaerungen.
+1. The adapted MSRGuard runtime monitors PLC and OPC UA signals.
+2. Runtime events and engineering artifacts are prepared for analysis.
+3. The ingestion pipeline builds or refreshes the knowledge graph.
+4. The KG-based or RAG-based Python agent analyzes incidents.
+5. Results are stored as JSON artifacts and reused for evaluation in the thesis.
 
-### 3) LLM-gestuetzte Erklaerung auf Basis harter Fakten
-Der Chatbot plant Toolaufrufe, fuehrt sie aus und formuliert Antworten auf Deutsch.
-Wichtig: Root-Cause-Modus priorisiert `evd2_path_trace`, damit die Antwort auf einer einheitlichen Faktengrundlage bleibt.
+## Key entry points
 
-### 4) Ergebnis zur Runtime
-Die UI schreibt ein Result-JSON mit u. a.:
-- `continue` / `reason`
-- `agent_result`
-- `chatbot_transcript`
-- Pipeline-Status (inkl. stdout/stderr tails)
-- Event-Context
+- Runtime entry point: `MSRGuard_Anpassung/src/main.cpp`
+- KG agent UI: `MSRGuard_Anpassung/python/msrguard/excH_kg_agent_ui.py`
+- RAG agent UI: `MSRGuard_Anpassung/python/msrguard/rag_agent_ui.py`
+- KG agent internals: `MSRGuard_Anpassung/python/msrguard/excH_chatbot.py`
+- Deterministic D2 trace logic: `MSRGuard_Anpassung/python/msrguard/d2_trace_analysis.py`
+- Ingestion runner: `Pipelines/IngestionPipeline/run_ingestion.py`
+- Evaluation wrapper: `scripts/run_eval.py`
 
-## Ingestion-Pipeline (TwinCAT -> KG)
-`Pipelines/IngestionPipeline/ingestion_pipeline.py` orchestriert die Schritte:
+## Evaluation assets
 
-1. Parser initialisieren
-2. Projekt scannen (`*_objects.json`)
-3. PLCopen XML exportieren (`export.xml`)
-4. Program-I/O Mapping bauen
-5. Mapping mit Typen/Code anreichern
-6. Variable-Traces erzeugen
-7. GVL-Globals erzeugen
-8. I/O-HW-Mappings erzeugen
-9. Traces mit HW markieren
-10. KG laden (`kg_loader.py`)
-11. KG semantisch analysieren/anreichern (`kg_manager_new.py`)
+The current thesis evaluation is documented in `Evaluation/`.
 
-Typische KG-Artefakte stehen danach in den konfigurierten TTL-Pfaden (`kg_after_loader_path`, `kg_final_path`).
+- `Evaluation/configs/` stores per-test-case benchmark configurations.
+- `Evaluation/results/` stores generated result JSON files for KG and RAG runs.
+- `Evaluation/pricing/` stores provider pricing tables used for cost reporting.
 
-## Zentrale Verzeichnisse
-- `MSRGuard_Anpassung/`: C++-Runtime + Python-Agent + KGs
-- `MSRGuard_Anpassung/python/msrguard/`: Agent-Kern, Chatbot, evD2-Trace-Logik, UI
-- `Pipelines/IngestionPipeline/`: KG-Aufbaupipeline
-- `UML-Diagrams/`: konsolidierte Architektur- und Sequenzdiagramme
-- `Notebooks/`: Experiment-/Prototyping-Umgebung
+Recent comparison summaries are stored in:
 
-## Relevante Einstiege
-- Runtime: `MSRGuard_Anpassung/src/main.cpp`
-- UI/Agent (KG): `MSRGuard_Anpassung/python/msrguard/excH_kg_agent_ui.py`
-- UI/Agent (RAG): `MSRGuard_Anpassung/python/msrguard/rag_agent_ui.py`
-- Chatbot-Engine: `MSRGuard_Anpassung/python/msrguard/chatbot_core.py`
-- evD2-Trace-Logik: `MSRGuard_Anpassung/python/msrguard/d2_trace_analysis.py`
-- Ingestion-Runner: `Pipelines/IngestionPipeline/run_ingestion.py`
+- `Evaluation/TC-003_TC-004_Vergleichstabellen.md`
 
-## Startbeispiele
-### Ingestion lokal
+## Quick start
+
+Run the ingestion pipeline:
+
 ```powershell
 python Pipelines/IngestionPipeline/run_ingestion.py
 ```
 
-### Agent-UI mit Event-Datei
+Run one evaluation case from the repository root:
+
 ```powershell
-streamlit run MSRGuard_Anpassung/python/msrguard/excH_kg_agent_ui.py -- --event_json_path <pfad_zum_event.json> --out_json <pfad_zum_result.json>
+python scripts/run_eval.py --from-config Evaluation/configs/TC-003_kg_openai.json
 ```
 
-RAG-Agent:
+Start the KG agent UI:
+
 ```powershell
-streamlit run MSRGuard_Anpassung/python/msrguard/rag_agent_ui.py -- --event_json_path <pfad_zum_event.json>
+streamlit run MSRGuard_Anpassung/python/msrguard/excH_kg_agent_ui.py -- --event_json_path <path_to_event.json> --out_json <path_to_result.json>
 ```
 
-## Bekannte Grenzen (Stand im aktuellen Code)
-- `excH_kg_agent_core.py` ist absichtlich MVP-lastig (strukturierte Basisantwort, noch keine tiefe Auto-Aktionsplanung).
-- Teile von `KG_Interface.py` enthalten feste Dateipfade und Legacy-Zugriffe.
-- Die hohe Diagnosequalitaet haengt stark von der Aktualitaet und Vollstaendigkeit des KG aus der Ingestion ab.
+Start the RAG agent UI:
+
+```powershell
+streamlit run MSRGuard_Anpassung/python/msrguard/rag_agent_ui.py -- --event_json_path <path_to_event.json>
+```
+
+## Notes
+
+- This repository mixes production-oriented runtime code, thesis experiments, and exploratory prototypes.
+- Third-party upstream components under `MSRGuard_Anpassung/open62541/` and `MSRGuard_Anpassung/extern/` keep their own upstream documentation and are not rewritten as thesis-specific project docs.

@@ -2,6 +2,14 @@
 
 Basis sind die vorhandenen JSON-Dateien in `Evaluation/results`. Die Gegenueberstellung erfolgt paarweise nach gleichem TestCase sowie gleichem Provider/Modell. Fuer `TC-003/Groq` liegt nur ein KG-Ergebnis vor; deshalb ist die RAG-Spalte dort als nicht verfuegbar markiert.
 
+## Kompakte Gesamtsicht
+
+| Vergleichsgruppe | Kontextbasis | KG-Agent | RAG-Agent | Ressourcenbild | Kernaussage |
+| --- | --- | --- | --- | --- | --- |
+| `config_1` (`TC-001`, `TC-002`) | PLCOpenXML ca. `184 KB` | `5/5` bewertete Laeufe `correct`, Root Cause in `5/5` gefunden | `0/6` `correct`, `5/6` `partially_correct`, Root Cause in `0/6` gefunden | RAG im Mittel nur moderat aufwendiger: ca. `1.33x` Tokens bei aehnlicher Laufzeit | RAG erkennt haeufig beteiligte POUs und Trigger, verfehlt aber systematisch die eigentliche technische Ursache; KG bleibt stabil korrekt. |
+| `config_2` (`TC-003`, `TC-004`) | PLCOpenXML ca. `1.44 MB`, also rund `7.8x` groesser als `config_1` | `3/5` `correct`, `2/5` `partially_correct`, Root Cause in `5/5` gefunden | `0/4` `correct`, `4/4` `incorrect`, Root Cause in `0/4` gefunden | RAG skaliert deutlich schlechter: im Mittel ca. `6.43x` mehr Tokens, zudem hoehere Kosten und Laufzeiten | Mit wachsender Kontextgroesse kippt der RAG-Agent qualitativ deutlich ab; der KG-Agent bleibt auch im groesseren, heterogeneren Kontext robust. |
+| Gesamtbild (`TC-001` bis `TC-004`) | Zwei Konfigurationsgruppen mit klar unterschiedlicher Kontextgroesse und -komplexitaet | `8/10` `correct`, `2/10` `partially_correct`, `0/10` `incorrect`, Root Cause in `10/10` gefunden | `0/10` `correct`, `5/10` `partially_correct`, `5/10` `incorrect`, Root Cause in `0/10` gefunden | KG im Mittel praeziser und zugleich ressourceneffizienter; RAG wird mit groesserem Kontext deutlich teurer | Insgesamt spricht die Evaluation klar fuer den KG-Ansatz: robuster, kausaler und wirtschaftlicher bei wachsender Kontextgroesse. |
+
 ## TC-003 / Anthropic / Claude Sonnet 4.6
 
 | Kriterium | ExcH-/KG-Agent | RAG-Agent |

@@ -1,7 +1,12 @@
 # Dateien_SkillExtractor
 
-Konfigurations- und Katalogdateien fuer Skill-Extraktionslaeufe.
+This folder is part of the `MA_Python_Agent` master's thesis repository. It stores configuration and reference files for the notebook-based skill extraction experiments.
 
-## Dateien und Verantwortung
-- `skills_catalog.json`: Katalog erkannter/erwarteter Skills.
-- `skill_extractor_config.json`: Konfiguration fuer Skill-Extractor-Parameter.
+## What this folder contains
+
+- `skills_catalog.json`: catalog of expected or discovered skills
+- `skill_extractor_config.json`: configuration for the skill extractor workflow
+
+## Current status
+
+These files support thesis experimentation and are mainly consumed from notebooks rather than from the production runtime.

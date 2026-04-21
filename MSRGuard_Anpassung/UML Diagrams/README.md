@@ -1,11 +1,14 @@
 # UML Diagrams
 
-Bestehende UML-Diagramme zur C++-Architektur und Reaktionslogik.
+This folder is part of the `MA_Python_Agent` master's thesis repository. It stores UML diagrams that focus specifically on the adapted MSRGuard runtime.
 
-## Dateien
-- `D1_React.plantuml`: Sequenz-/Ablaufdarstellung fuer D1-Reaktionsfall.
-- `D2_React.plantuml`: Sequenz-/Ablaufdarstellung fuer D2-Reaktionsfall.
+## What this folder contains
 
-## Unterordner
-- `Classes/`: Klassendiagramme einzelner Komponenten.
-- `Patterns/`: Diagramme zu eingesetzten Design Patterns.
+- `D1_React.plantuml`: reaction-flow diagram for the D1 scenario
+- `D2_React.plantuml`: reaction-flow diagram for the D2 scenario
+- `Classes/`: class diagrams for selected runtime components
+- `Patterns/`: diagrams that illustrate the main design patterns used in the runtime
+
+## Relation to the repository-level UML folder
+
+This folder documents the internal MSRGuard adaptation. The broader thesis-level architecture diagrams live in the top-level `UML-Diagrams/` folder.

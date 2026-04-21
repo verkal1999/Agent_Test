@@ -1,11 +1,16 @@
 # Alte_Pythons
 
-Dieser Ordner enthaelt alte Prototypen, die nicht mehr die produktive Pipeline darstellen.
+This folder is part of the `MA_Python_Agent` master's thesis repository. It contains historical Python prototypes that were used before the current ingestion and graph-processing pipeline was consolidated.
 
-## Dateien und Verantwortung
-- `kg_loader_alt.py`: Frueher Loader zum Befuellen eines KG aus Zwischenartefakten.
-- `plcopen_parser_alt.py`: Aeltere Parser-Variante fuer PLCopen/TwinCAT-Dateien.
+## What this folder contains
 
-## Hinweis
-- Die aktiven Versionen liegen unter `Pipelines/IngestionPipeline/`.
-- Aenderungen hier nur fuer Vergleich, Migration oder Debugging historischer Stages.
+- `kg_loader_alt.py`: older knowledge-graph loading logic kept for comparison and migration reference
+- `plcopen_parser_alt.py`: older PLCopen parsing code kept as a fallback reference
+
+## When to use it
+
+Use this folder only when you need to compare the current implementation against earlier thesis-stage experiments.
+
+## Current status
+
+The active implementation lives in `Pipelines/IngestionPipeline/`. Files in `Alte_Pythons/` are not the recommended entry points for current runs or evaluation work.

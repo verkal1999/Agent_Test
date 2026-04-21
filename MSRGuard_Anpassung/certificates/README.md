@@ -1,12 +1,15 @@
 # certificates
 
-Beispielzertifikate fuer OPC-UA-Clientverbindungen.
+This folder is part of the `MA_Python_Agent` master's thesis repository. It stores sample client certificates used for OPC UA test setups.
 
-## Dateien und Verantwortung
-- `client_cert.pem`: Client-Zertifikat im PEM-Format.
-- `client_cert.der`: Client-Zertifikat im DER-Format.
-- `client_key.pem`: Privater Client-Schluessel im PEM-Format.
-- `client_key.der`: Privater Client-Schluessel im DER-Format.
+## What this folder contains
 
-## Hinweis
-- Fuer produktive Nutzung eigene Zertifikate/Keys verwenden.
+- `client_cert.pem`: client certificate in PEM format
+- `client_cert.der`: client certificate in DER format
+- `client_key.pem`: private client key in PEM format
+- `client_key.der`: private client key in DER format
+
+## Notes
+
+- These files are intended for local development and testing.
+- Production deployments should use project-specific certificates and proper key handling.

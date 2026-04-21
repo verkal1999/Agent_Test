@@ -1,24 +1,39 @@
 # src
 
-Implementierungen des C++-Runtime-Systems.
+This folder is part of the `MA_Python_Agent` master's thesis repository. It contains the C++ implementation of the adapted MSRGuard runtime.
 
-## Dateien und Verantwortung
-- `main.cpp`: Einstiegspunkt, Initialisierung und Start des Runtime-Loops.
-- `AgentStartCoordinator.cpp`: Startkoordination zwischen Monitor, Eventbus und Agent-Komponenten.
-- `EventBus.cpp`: Publish/Subscribe-Dispatch fuer Events.
-- `ReactionManager.cpp`: Verarbeitet Events und steuert die Auswahl/Ausfuehrung von Reaktionen.
-- `CommandForceFactory.cpp`: Erzeugt konkrete CommandForces fuer Monitoring/System/PLC/KG.
-- `MonActionForce.cpp`: Ausfuehrung von Monitoring-Aktionen.
-- `SystemReactionForce.cpp`: Ausfuehrung von Systemreaktionen.
-- `PLCCommandForce.cpp`: PLC-bezogene Kommandos (z. B. write/call).
-- `KGIngestionForce.cpp`: Stoesst die KG-Ingestion mit Ereignisdaten an.
-- `WriteCsvForce.cpp`: Schreibt strukturierte Ergebnisse in CSV.
-- `PLCMonitor.cpp`: OPC-UA-Verbindung, Subscription und Trigger-Erkennung.
-- `PythonRuntime.cpp`: Initialisiert/verwaltet das eingebettete Python-Runtime-Environment.
-- `PythonBridge.cpp`: Schnittstelle fuer den Aufruf von Python-Agentlogik.
-- `ExcHUiObserver.cpp`: Observer, der Informationen in Richtung UI/Chat aufbereitet.
-- `FailureRecorder.cpp`: Persistiert Incident-Kontext, Snapshot und Entscheidungen.
-- `InventorySnapShotUtils.cpp`: Hilfsmethoden fuer Snapshot-Aufbereitung.
-- `PlanJsonUtils.cpp`: JSON-Parsing fuer Reaktionsplan-Daten.
-- `TimeBlogger.cpp`: Latenz- und Zeitmessung ueber den Ablauf.
-- `README.md`: Diese Dokumentation.
+## What this folder contains
+
+### Runtime entry and orchestration
+
+- `main.cpp`: runtime entry point and high-level startup flow
+- `AgentStartCoordinator.cpp`: coordinates when the diagnosis agent is allowed to start
+- `ReactionManager.cpp`: central reaction orchestration for runtime events
+- `EventBus.cpp`: publish-subscribe event dispatch
+
+### Concrete reaction and command components
+
+- `CommandForceFactory.cpp`: factory for command-force objects
+- `MonActionForce.cpp`: monitoring action execution
+- `SystemReactionForce.cpp`: system reaction execution
+- `PLCCommandForce.cpp`: PLC-side command execution
+- `KGIngestionForce.cpp`: triggers knowledge-graph ingestion work
+- `WriteCsvForce.cpp`: CSV output support
+
+### PLC, Python, and runtime integration
+
+- `PLCMonitor.cpp`: OPC UA monitoring and trigger detection
+- `PythonRuntime.cpp`: embedded Python runtime management
+- `PythonBridge.cpp`: bridge between C++ runtime and Python diagnosis logic
+- `ExcHUiObserver.cpp`: runtime observer that prepares agent/UI-facing data
+
+### Persistence and helper logic
+
+- `FailureRecorder.cpp`: incident persistence
+- `InventorySnapShotUtils.cpp`: snapshot preparation helpers
+- `PlanJsonUtils.cpp`: plan JSON parsing helpers
+- `TimeBlogger.cpp`: timing and latency logging
+
+## Current role in the thesis
+
+This folder implements the runtime side of the master's thesis setup. It is responsible for detecting incidents, preparing diagnosis input, and handing control over to the Python agents when automated runtime logic reaches an unresolved exception-handling situation.

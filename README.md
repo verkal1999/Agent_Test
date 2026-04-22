@@ -18,7 +18,6 @@ The repository combines runtime integration, knowledge-graph ingestion, thesis e
 - `UML-Diagrams/`: project-level PlantUML diagrams for architecture, agents, integration, and use cases
 - `PyLC_Anpassung/`: helper scripts for converting PLCopen XML into Python-like intermediate code during earlier experimentation
 - `PLC2Skill_Dateien/`: external PLC2Skill binary used in supporting experiments
-- `Alte_Pythons/`: historical Python prototypes kept for reference only
 - `scripts/`: small entry-point scripts, including the evaluation wrapper
 - `out/`: generated diagram exports and other transient outputs
 

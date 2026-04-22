@@ -9,8 +9,8 @@ This folder is part of the `MA_Python_Agent` master's thesis repository. It stor
 - `GeminiPrompt.txt`: Gemini-specific prompt draft
 - `OutputLog.txt`: collected experiment output
 - `PLCRexErrortxt.txt`: error notes from PLC reconstruction experiments
-- `Ubersetzung_Bausteine.pptx`: presentation material
-- `~$Ubersetzung_Bausteine.pptx`: temporary Office lock file
+- `Übersetzung_Bausteine.pptx`: presentation material
+- `~$Übersetzung_Bausteine.pptx`: temporary Office lock file
 
 ## Current status
 

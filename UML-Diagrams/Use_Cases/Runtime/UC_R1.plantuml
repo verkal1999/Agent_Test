@@ -11,8 +11,8 @@ actor "Nutzende\nInstanz" as US
 
 ST -> RT: Fehler erkannt und Fehlerdaten senden
 RT -> KG: Bedeutung und Behandlung abfragen
-KG --> RT: Lokale Behandlungsroutine (Nachstanzen)
+KG -> RT: Lokale Behandlungsroutine (Nachstanzen)
 RT -> ST: Lokale Fehlerbehebung ausführen
-ST --> RT: Rückmeldung zur Fehlerbehebung
-RT --> US: Ressource wieder freigeben und Fehler behandelt melden
+ST -> RT: Rückmeldung zur Fehlerbehebung
+RT -> US: Ressource wieder freigeben und Fehler behandelt melden
 @enduml

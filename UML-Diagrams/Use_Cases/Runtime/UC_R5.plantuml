@@ -11,8 +11,8 @@ actor "Nutzende\nInstanz" as US
 
 ST -> RT: Fehler erkannt und Fehlerdaten senden
 RT -> KG: Bedeutung und Behandlung abfragen
-KG --> RT: Kein passender bekannter Fehler und keine definierte Reaktion
+KG -> RT: Kein passender bekannter Fehler und keine definierte Reaktion
 RT -> RT: Fehler als unbekannt kennzeichnen und Kontext bündeln
-RT --> US: Strukturierte Hinweise zur Fehlersuche bereitstellen
-US --> RT: Rückfragen oder weitere Diagnoseschritte anfordern
+RT -> US: Strukturierte Hinweise zur Fehlersuche bereitstellen
+US -> RT: Rückfragen oder weitere Diagnoseschritte anfordern
 @enduml

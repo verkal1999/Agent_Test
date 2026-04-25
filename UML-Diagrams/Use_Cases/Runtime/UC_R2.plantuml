@@ -12,10 +12,10 @@ actor "Nutzende\nInstanz" as US
 
 ST -> RT: Fehler erkannt und Fehlerdaten senden
 RT -> KG: Bedeutung und Behandlung abfragen
-KG --> RT: Behandlungsplan mit Sperrung
+KG -> RT: Behandlungsplan mit Sperrung
 RT -> ST: Ressource anhalten und Fehler anzeigen
 RT -> SUP: Entfernung des Werkstücks anfordern
-SUP --> RT: Werkstück entfernt
+SUP -> RT: Werkstück entfernt
 RT -> ST: Ressource für weitere Prozesse sperren
-RT --> US: Sperrstatus und Ergebnis bereitstellen
+RT -> US: Sperrstatus und Ergebnis bereitstellen
 @enduml

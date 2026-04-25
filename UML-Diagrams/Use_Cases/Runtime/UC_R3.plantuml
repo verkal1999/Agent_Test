@@ -12,9 +12,9 @@ actor "Nutzende\nInstanz" as US
 
 ST -> RT: Fehler erkannt und Fehlerdaten senden
 RT -> KG: Bedeutung und Behandlung abfragen
-KG --> RT: Behandlungsplan ohne Sperrung, SM1 hat alles richtig gemacht
+KG -> RT: Behandlungsplan ohne Sperrung, SM1 hat alles richtig gemacht
 RT -> ROB: Ausschuss-Transport ausführen
-ROB --> RT: Werkstück entfernt
+ROB -> RT: Werkstück entfernt
 RT -> ST: Ressource für Folgeprozesse freigeben
-RT --> US: Abgeschlossene Behandlung ohne Sperrung und Materialfehler melden
+RT -> US: Abgeschlossene Behandlung ohne Sperrung und Materialfehler melden
 @enduml

@@ -5,8 +5,8 @@ skinparam shadowing false
 
 actor "FMEA-Team" as FMEA
 actor "Prozessingenieur" as PE
-actor "Dokumentenquellen" as DOC
-actor "FMEA-Artefakte" as ART
+rectangle "Dokumentenquellen" <<System>> as DOC
+rectangle "FMEA-Artefakte" <<System>> as ART
 
 rectangle "Exception-Handling-Agent" {
   usecase "Ausnahmewissen aus\nFMEA-Artefakten strukturieren" as UC1

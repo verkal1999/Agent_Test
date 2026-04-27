@@ -1,0 +1,93 @@
+@startuml msrguard_agentenintegration_stufe3_component_diagram
+
+'title Stufe 3 - Operative Integration des ExcH-Agenten in MSRGuard
+
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam linetype ortho
+skinparam wrapWidth 140
+allowmixing
+hide empty fields
+left to right direction
+
+package "MSRGuard Runtime" as MSR {
+  class EventBus #DDEEFF{
+    + subscribe(type, observer, priority)
+    + post(event)
+    + process(maxEvents)
+    +...
+  }
+
+  class ReactionManager #DDEEFF {
+    + onEvent(event)
+    - fetchFailureModeParameters(skillName)
+    - createCommandForceForPlanAndAck(plan, ...)
+    +...
+  }
+
+  class "FailureRecorder" as FailureRecorder #DDEEFF {
+    + subscribeAll()
+    + onEvent(event)
+    - startIngestionWith(params)
+    +...
+  }
+
+  class AgentGate {
+    + set(active)
+    + isActive()
+    + wait_until_inactive_for(timeout)
+  }
+}
+
+package "Integrationsschicht\nStufe 3" as INT {
+  class AgentStartCoordinator {
+    + onEvent(event)
+    - handleUnknownFM(ack)
+    - handleIngestionDone(ack)
+    - tryEmitAgentStartLocked(corr)
+    +...
+  }
+
+  class ExcHUiObserver {
+    + onEvent(event)
+    + setEnabled(enabled)
+    - launchPythonUI_async(ack)
+    +...
+  }
+}
+
+package "Python-Agentenlaufzeit" as PY {
+  class "Python-Agent-UI" as PythonAgentUI {
+    + loadEvent()
+    + launchAgent()
+    + writeResult()
+    +...
+  }
+
+  class "ExcH-KG-Agent" as KGAgent {
+    +...
+  }
+
+  class "ExcH-RAG-Agent" as RAGAgent {
+    +...
+  }
+}
+
+database "FMEA-KG\n+\nSPS-KG" as KG
+
+ReactionManager -- EventBus
+FailureRecorder -- EventBus
+AgentStartCoordinator -- EventBus
+ExcHUiObserver -- EventBus
+
+AgentStartCoordinator -- AgentGate
+ExcHUiObserver --> PythonAgentUI
+
+PythonAgentUI ..> KGAgent
+PythonAgentUI ..> RAGAgent
+
+FailureRecorder --> KG
+KGAgent --> KG
+
+@enduml

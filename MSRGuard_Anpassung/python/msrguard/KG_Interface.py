@@ -1,11 +1,21 @@
 # kg_interface.py
+from __future__ import annotations
+
+import os
+from pathlib import Path
+
 from rdflib import Graph, URIRef, Namespace, Literal
 from rdflib.namespace import RDF, XSD
 from typing import Sequence
 
 class KGInterface:
     def __init__(self):
-        self.ontology_path = r"C:\Users\Alexander Verkhov\OneDrive\Dokumente\MPA\Implementierung_MPA\MSRGuard\src\FMEA_KG.ttl"
+        default_kg_path = (
+            Path(__file__).resolve().parents[2]
+            / "KGs"
+            / "FMEA_KG_FischertechnikI4.0-Simulator.ttl"
+        )
+        self.ontology_path = os.environ.get("MSRGUARD_FMEA_KG_TTL", str(default_kg_path))
         self.ont_iri = "http://www.semanticweb.org/FMEA_VDA_AIAG_2021/"
         self.class_prefix = self.ont_iri + "class_"
         self.op_prefix = self.ont_iri + "op_"
@@ -17,21 +27,67 @@ class KGInterface:
         self.OP = Namespace(self.op_prefix)
         self.DP = Namespace(self.dp_prefix)
 
+    @staticmethod
+    def _sparql_string(value: str) -> str:
+        return str(value or "").replace("\\", "\\\\").replace('"', '\\"')
+
+    def _direct_function_iri(self, runtime_skill_name: str) -> URIRef:
+        base_sep = '' if self.ont_iri.endswith(('#', '/')) else '#'
+        return URIRef(f"{self.ont_iri}{base_sep}{runtime_skill_name}")
+
+    def _resolve_function_iris_for_runtime_skill(self, runtime_skill_name: str) -> list[URIRef]:
+        """Map OPCUA.lastExecutedSkill to FMEA Function IRIs via dp:hasRuntimeSkillName."""
+        runtime_skill_name = str(runtime_skill_name or "").strip()
+        if not runtime_skill_name:
+            return []
+
+        escaped = self._sparql_string(runtime_skill_name)
+        query = f"""
+            PREFIX dp: <{self.dp_prefix}>
+            SELECT DISTINCT ?function
+            WHERE {{
+                ?function dp:hasRuntimeSkillName ?runtimeSkillName .
+                FILTER(STR(?runtimeSkillName) = "{escaped}")
+            }}
+        """
+        function_iris = [URIRef(str(row["function"])) for row in self.graph.query(query)]
+        if function_iris:
+            return sorted(set(function_iris), key=str)
+
+        # Compatibility fallback for older KGs where lastSkillName was already
+        # the FMEA function local name.
+        direct = self._direct_function_iri(runtime_skill_name)
+        if (
+            (direct, RDF.type, self.CL.Function) in self.graph
+            or (direct, RDF.type, self.CL.ProcessFunction) in self.graph
+        ):
+            return [direct]
+        return []
+
     def getFailureModeParameters(self, interruptedSkill: str) -> str:
         """Gibt rows-JSON zurück: [{"potFM","FMParam","t","v"} ...]"""
-        base_sep = '' if self.ont_iri.endswith(('#','/')) else '#'
-        searchSkillIri = self.ont_iri + base_sep + interruptedSkill
+        escaped_skill = self._sparql_string(interruptedSkill)
+        direct_skill_iri = self._direct_function_iri(str(interruptedSkill or "").strip()).n3()
 
         query = f"""
             PREFIX cl: <{self.class_prefix}>
             PREFIX op: <{self.op_prefix}>
             PREFIX dp: <{self.dp_prefix}>
-            SELECT DISTINCT ?potFM ?FMParam
+            SELECT DISTINCT ?potFM ?FMParam ?function
             WHERE {{
                 ?potFM a cl:FailureMode ;
-                       op:preventsFunction <{searchSkillIri}> ;
+                       op:preventsFunction ?function ;
                        dp:hasFailureModeParams ?FMParam .
-                <{searchSkillIri}> a cl:Function .
+                {{
+                    ?function dp:hasRuntimeSkillName ?runtimeSkillName .
+                    FILTER(STR(?runtimeSkillName) = "{escaped_skill}")
+                }}
+                UNION
+                {{
+                    BIND({direct_skill_iri} AS ?function)
+                    ?function a ?functionType .
+                    VALUES ?functionType {{ cl:Function cl:ProcessFunction }}
+                }}
             }}
         """
         res = self.graph.query(query)
@@ -175,8 +231,15 @@ class KGInterface:
             if summary_text:
                 add(ofm, DP.hasOccuredFailureSummary, Literal(summary_text))
 
-            base_sep = '' if self.ont_iri.endswith(('#','/')) else '#'
-            add(ofm, OP.preventedFunction, URIRef(f"{self.ont_iri}{base_sep}{lastSkill}"))
+            function_iris = self._resolve_function_iris_for_runtime_skill(lastSkill)
+            if not function_iris:
+                print(
+                    "[KGInterface] WARN: Kein FMEA Function Mapping fuer "
+                    f"lastSkillName/runtimeSkillName='{lastSkill}' gefunden; "
+                    "op:preventedFunction wird nicht gesetzt."
+                )
+            for function_iri in function_iris:
+                add(ofm, OP.preventedFunction, function_iri)
 
             # Executed SR (optional)
             if Occsr_id:

@@ -204,6 +204,12 @@ ag:op_isSubProgramOf rdf:type owl:ObjectProperty ;
                      rdfs:range ag:class_Program .
 
 
+###  http://www.semanticweb.org/AgentProgramParams/op_isSubSkillOf
+ag:op_isSubSkillOf rdf:type owl:ObjectProperty ;
+                   rdfs:domain ag:class_Skill ;
+                   rdfs:range ag:class_Skill .
+
+
 ###  http://www.semanticweb.org/AgentProgramParams/op_listsGlobalVariable
 ag:op_listsGlobalVariable rdf:type owl:ObjectProperty ;
                           rdfs:domain ag:class_GlobalVariableList ;
@@ -232,6 +238,12 @@ ag:op_usesPort rdf:type owl:ObjectProperty ;
 ag:op_usesVariable rdf:type owl:ObjectProperty ;
                    rdfs:domain ag:class_POU ;
                    rdfs:range ag:class_Variable .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/op_validatedFromHypothesis
+ag:op_validatedFromHypothesis rdf:type owl:ObjectProperty ;
+                              rdfs:domain ag:class_Skill ;
+                              rdfs:range ag:class_SkillImplementationHypothesis .
 
 
 #################################################################
@@ -301,8 +313,22 @@ ag:dp_hasHardwareAddress rdf:type owl:DatatypeProperty ;
                          rdfs:range xsd:string .
 
 
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasHypothesisDescription
+ag:dp_hasHypothesisDescription rdf:type owl:DatatypeProperty ;
+                               rdfs:subPropertyOf ag:dp_hasHypothesisParams ;
+                               rdfs:domain ag:class_SkillImplementationHypothesis ;
+                               rdfs:range xsd:string .
+
+
 ###  http://www.semanticweb.org/AgentProgramParams/dp_hasHypothesisParams
 ag:dp_hasHypothesisParams rdf:type owl:DatatypeProperty ;
+                          rdfs:domain ag:class_SkillImplementationHypothesis ;
+                          rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasHypothesisSource
+ag:dp_hasHypothesisSource rdf:type owl:DatatypeProperty ;
+                          rdfs:subPropertyOf ag:dp_hasHypothesisParams ;
                           rdfs:domain ag:class_SkillImplementationHypothesis ;
                           rdfs:range xsd:string .
 
@@ -404,6 +430,13 @@ ag:dp_hasRationale rdf:type owl:DatatypeProperty ;
                    rdfs:subPropertyOf ag:dp_hasHypothesisParams .
 
 
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasRuntimeSkillName
+ag:dp_hasRuntimeSkillName rdf:type owl:DatatypeProperty ;
+                          rdfs:subPropertyOf ag:dp_hasHypothesisParams ;
+                          rdfs:domain ag:class_SkillImplementationHypothesis ;
+                          rdfs:range xsd:string .
+
+
 ###  http://www.semanticweb.org/AgentProgramParams/dp_hasSignalSourceAttribute
 ag:dp_hasSignalSourceAttribute rdf:type owl:DatatypeProperty .
 
@@ -412,6 +445,20 @@ ag:dp_hasSignalSourceAttribute rdf:type owl:DatatypeProperty .
 ag:dp_hasSkillDescription rdf:type owl:DatatypeProperty ;
                           rdfs:domain ag:class_Skill ;
                           rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasSuggestedFunctionID
+ag:dp_hasSuggestedFunctionID rdf:type owl:DatatypeProperty ;
+                             rdfs:subPropertyOf ag:dp_hasHypothesisParams ;
+                             rdfs:domain ag:class_SkillImplementationHypothesis ;
+                             rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/AgentProgramParams/dp_hasSuggestedParentFunctionID
+ag:dp_hasSuggestedParentFunctionID rdf:type owl:DatatypeProperty ;
+                                   rdfs:subPropertyOf ag:dp_hasHypothesisParams ;
+                                   rdfs:domain ag:class_SkillImplementationHypothesis ;
+                                   rdfs:range xsd:string .
 
 
 ###  http://www.semanticweb.org/AgentProgramParams/dp_hasVariableAttribute

@@ -311,6 +311,16 @@ dp:hasHardwareAddress a owl:DatatypeProperty ;
     rdfs:range xsd:string ;
     rdfs:subPropertyOf owl:topDataProperty .
 
+dp:hasHypothesisDescription a owl:DatatypeProperty ;
+    rdfs:domain ag:class_SkillImplementationHypothesis ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf dp:hasHypothesisParams .
+
+dp:hasHypothesisSource a owl:DatatypeProperty ;
+    rdfs:domain ag:class_SkillImplementationHypothesis ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf dp:hasHypothesisParams .
+
 dp:hasJobMethodName a owl:DatatypeProperty .
 
 dp:hasMethodReturnType a owl:DatatypeProperty .
@@ -379,9 +389,24 @@ dp:hasPortType a owl:DatatypeProperty ;
 dp:hasRationale a owl:DatatypeProperty ;
     rdfs:subPropertyOf dp:hasHypothesisParams .
 
+dp:hasRuntimeSkillName a owl:DatatypeProperty ;
+    rdfs:domain ag:class_SkillImplementationHypothesis ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf dp:hasHypothesisParams .
+
 dp:hasSkillDescription a owl:DatatypeProperty ;
     rdfs:domain ag:class_Skill ;
     rdfs:range xsd:string .
+
+dp:hasSuggestedFunctionID a owl:DatatypeProperty ;
+    rdfs:domain ag:class_SkillImplementationHypothesis ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf dp:hasHypothesisParams .
+
+dp:hasSuggestedParentFunctionID a owl:DatatypeProperty ;
+    rdfs:domain ag:class_SkillImplementationHypothesis ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf dp:hasHypothesisParams .
 
 dp:hasTcRpcEnabled a owl:DatatypeProperty .
 
@@ -568,6 +593,10 @@ ag:op_isSubProgramOf a owl:ObjectProperty ;
     rdfs:domain ag:class_Program ;
     rdfs:range ag:class_Program .
 
+ag:op_isSubSkillOf a owl:ObjectProperty ;
+    rdfs:domain ag:class_Skill ;
+    rdfs:range ag:class_Skill .
+
 ag:op_listsGlobalVariable a owl:ObjectProperty ;
     rdfs:domain ag:class_GlobalVariableList ;
     rdfs:range ag:class_Variable .
@@ -587,6 +616,10 @@ ag:op_usesPort a owl:ObjectProperty ;
 ag:op_usesVariable a owl:ObjectProperty ;
     rdfs:domain ag:class_POU ;
     rdfs:range ag:class_Variable .
+
+ag:op_validatedFromHypothesis a owl:ObjectProperty ;
+    rdfs:domain ag:class_Skill ;
+    rdfs:range ag:class_SkillImplementationHypothesis .
 
 ag:FBInst_AxisControl_Encoder_RS_AxisControl a ag:class_FBInstance ;
     dp:hasFBInstanceName "RS_AxisControl"^^xsd:string ;
@@ -22823,10 +22856,6 @@ ag:class_PortInstance a owl:Class ;
     rdfs:comment "Diese Klasse bildet die konkrete Ausprägung eines Ports innerhalb einer spezifischen Function Block Instanz ab und entspricht damit einem realen Pin in einem FBD Netzwerk. Während class_Port nur den abstrakten Parameter eines Typs beschreibt, ist die PortInstance der tatsächliche Anschluss, der im Netzwerk verdrahtet wird und Signale empfängt oder ausgibt. Im Knowledge Graph wird diese Klasse benötigt, weil Signalverbindungen immer an eine konkrete Instanz gebunden sind und nicht nur an den Typ. Eine PortInstance verweist einerseits auf die zugehörige FBInstance und andererseits auf den Port des zugrunde liegenden FBTypes, wodurch eine eindeutige Zuordnung möglich ist. Aus PLCopen XML ergibt sich dieses Konzept aus Block Pins und deren Verbindungen im FBD, die erst im Kontext der Instanz vollständig spezifiziert sind. PortInstanzen sind besonders wichtig für die Rekonstruktion von Signalflüssen, da Parameterzuweisungen genau diese Knoten als Ziel besitzen. Damit ermöglicht class_PortInstance eine vollständige Analyse, welche Variable oder welches Zwischensignal tatsächlich an welchen Bausteinpin angeschlossen ist."@de ;
     rdfs:subClassOf ag:class_SignalSource .
 
-ag:class_Skill a owl:Class .
-
-ag:class_SkillImplementationHypothesis a owl:Class .
-
 ag:op_hasMethod a owl:ObjectProperty .
 
 ag:FBType_JobMethode_Schablone a ag:class_CustomFBType,
@@ -24519,10 +24548,6 @@ END_VAR"""^^xsd:string ;
         ag:Var_VSG_AS_CompressorControl_jobRunning,
         ag:Var_VSG_AS_CompressorControl_state .
 
-dp:hasHypothesisParams a owl:DatatypeProperty ;
-    rdfs:domain ag:class_SkillImplementationHypothesis ;
-    rdfs:range xsd:string .
-
 ag:FBType_HRL_CB_AS_HorizontalMoveSensors a ag:class_CustomFBType,
         ag:class_FBType ;
     dp:hasJobMethodName "JobMethode_HorizontalMove"^^xsd:string ;
@@ -25799,6 +25824,8 @@ ag:class_Program a owl:Class ;
 ag:class_SignalSource a owl:Class ;
     rdfs:comment "Diese Klasse stellt eine abstrakte Signalquelle dar und dient als gemeinsamer Oberbegriff für unterschiedliche Ursprünge von Werten im FBD Netzwerk. Eine Signalquelle kann beispielsweise eine Variable sein, eine PortInstance eines Bausteins oder ein konstant definierter Literalwert. Im Knowledge Graph ist diese Abstraktion wichtig, weil Parameterzuweisungen immer nach dem gleichen Muster funktionieren, unabhängig davon, ob der Wert aus einer Variable oder aus einer Bausteinausgabe stammt. Dadurch können Signalflüsse einheitlich modelliert und abgefragt werden, ohne für jede Quelle unterschiedliche Datenstrukturen zu benötigen. Aus PLCopen XML entstehen Signalquellen aus Verdrahtungen, die entweder direkt auf Variablen verweisen oder die Ausgänge anderer Bausteine als Quelle verwenden. Die Klasse unterstützt komplexe Analysen wie Abhängigkeitsgraphen, Datenflussverfolgung oder die Ermittlung von Skill Vorbedingungen, da sich jede Eingangsbelegung auf eine SignalSource zurückführen lässt. Insgesamt sorgt class_SignalSource dafür, dass der Knowledge Graph die semantische Struktur des FBD Netzwerks vollständig und flexibel repräsentieren kann."@de .
 
+ag:class_Skill a owl:Class .
+
 dp:hasVariableAttribute a owl:DatatypeProperty ;
     rdfs:subPropertyOf dp:hasSignalSourceAttribute .
 
@@ -26511,6 +26538,8 @@ END_VAR"""^^xsd:string ;
         ag:Var_CompressorControl_bResetCondition,
         ag:Var_CompressorControl_bStartCondition .
 
+ag:class_SkillImplementationHypothesis a owl:Class .
+
 ag:FBType_MBS_DmPD_AS_RotationMove a ag:class_CustomFBType,
         ag:class_FBType ;
     dp:hasJobMethodName "JobMethode_RotationMove"^^xsd:string ;
@@ -26615,6 +26644,10 @@ END_VAR"""^^xsd:string ;
 ag:class_StandardFBType a owl:Class ;
     rdfs:comment "Diese Klasse beschreibt Standard Function Block Typen, die typischerweise aus der SPS Bibliothek oder dem IEC 61131 3 Standard stammen, zum Beispiel RS Speicher, Triggerbausteine oder Zeitfunktionen. Sie wird eingesetzt, um wiederkehrende Basiskomponenten gesondert zu behandeln und nicht mit den projekt spezifischen Skill Bausteinen zu vermischen. StandardFBTypes dienen häufig als Infrastruktur für Zustandsbildung, Flankenerkennung, Zeitverhalten und Zählfunktionen und sind daher in vielen CustomFBTypes als interne Aufrufe enthalten. Im Knowledge Graph ermöglicht diese Klasse eine robuste Erkennung typischer Muster, etwa dass ein Skill durch einen R_TRIG gestartet wird, durch einen RS gehalten wird und durch Timerbedingungen gestoppt wird. Für die Analyse des Signalflusses sind Standardbausteine besonders relevant, weil sie häufig die eigentlichen Zustandswechsel erzwingen, auch wenn sie fachlich nicht als eigener Skill gelten. Aus PLCopen XML werden sie als POUCalls sichtbar, die innerhalb eines Bausteins auf solche Standardtypen verweisen. Die explizite Modellierung als StandardFBType verbessert außerdem das Filtering in Abfragen, sodass sich beispielsweise reine Skill Graphen ohne Bibliothekslogik erzeugen lassen."@de ;
     rdfs:subClassOf ag:class_FBType .
+
+dp:hasHypothesisParams a owl:DatatypeProperty ;
+    rdfs:domain ag:class_SkillImplementationHypothesis ;
+    rdfs:range xsd:string .
 
 ag:class_GlobalVariableList a owl:Class ;
     rdfs:comment "Diese Klasse beschreibt eine globale Variablenliste als Container, der projektweit zugängliche Variablen zusammenfasst. GlobalVariableLists werden in SPS Projekten verwendet, um gemeinsame Signale, Zustände oder Hardwarezuordnungen zentral zu verwalten und in mehreren Programmen oder Function Blocks nutzbar zu machen. Im Knowledge Graph ermöglicht diese Klasse eine klare Gruppierung der globalen Symbolik und erleichtert Abfragen, die sich auf globale Signale beziehen, etwa auf Safety Signale, Betriebsartenflags oder I O Variablen. Aus PLCopen XML wird eine solche Liste typischerweise aus GVL Bereichen abgeleitet, wobei jede enthaltene Variable separat als class_Variable modelliert wird. Die Klasse unterstützt außerdem die Nachvollziehbarkeit, weil sichtbar wird, welche Variablen tatsächlich global sind und welche nur lokal innerhalb eines Bausteins existieren. Für die Dokumentation ist class_GlobalVariableList hilfreich, um globale Schnittstellen der Anlage zu beschreiben und zentrale Signalgruppen systematisch zu erläutern. Außerdem lassen sich hieraus automatisch Listen für Hardwaremapping oder Schnittstellendokumente erzeugen."@de .

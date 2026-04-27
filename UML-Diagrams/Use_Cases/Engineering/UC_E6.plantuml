@@ -12,6 +12,8 @@ actor "Wissensgraph" as KG
 rectangle "Exception-Handling-Agent" {
   usecase "Betriebserkenntnisse in das\nEngineering zurückführen" as UC6
   usecase "Neue Fehlerkontexte und\nReaktionsmuster aufbereiten" as UC6a
+  usecase "Fehlerfälle und Betriebserkenntnisse\nin KG überführen" as UC6b
+  usecase "FMEA-Team Behandlungsvorschläge präsentieren" as UC6c
 }
 
 OP --> UC6
@@ -21,4 +23,6 @@ OPS --> UC6a
 UC6 --> KG
 
 UC6 .> UC6a : <<include>>
+UC6 .> UC6b : <<include>>
+UC6 .> UC6c : <<include>>
 @enduml

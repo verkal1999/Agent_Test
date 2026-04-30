@@ -8,9 +8,9 @@ top to bottom direction
 allowmixing
 
 artifact "Ontologie\n(Mappingprofil,\nRegeln & Vokabular)" as Ontology
-database "Persistent Knowledge Graph" as KGDatabase
+database "Persistent KG" as KGDatabase
 
-package "Ontologie- und Wissensgraph-Komponente" {
+package "         Ontologie- und Wissensgraph-Komponente" {
   class KGLoader {
     +build_gvl_index_from_objects(): None
     +ingest_programs_from_mapping_json(): None
@@ -30,13 +30,13 @@ package "Ontologie- und Wissensgraph-Komponente" {
     +graph: Graph
   }
 
-  KGLoader --> KGStore : befuellt
+  KGLoader --> KGStore : befüllt
   
 }
-KGManager --> KGStore : analysiert\nund erweitert
-Ontology ..> KGLoader
-KGStore --> KGDatabase : persistiert / laedt
-KGLoader ..> KGDatabase : schreibt
-KGManager ..> KGDatabase : liest / schreibt
+KGManager --> KGStore
+Ontology --> KGLoader
+KGStore --> KGDatabase : \npersistiert / lädt
+KGLoader --> KGDatabase 
+KGManager --> KGDatabase : liest / schreibt
 
 @enduml

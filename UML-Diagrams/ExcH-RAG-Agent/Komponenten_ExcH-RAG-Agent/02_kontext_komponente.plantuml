@@ -45,7 +45,7 @@ package "Kontext-Komponente" {
     +type: str
   }
 
-  ContextInterpreter ..> RuntimeEvent : liest
+  ContextInterpreter --> RuntimeEvent : liest
   ContextInterpreter --> RagIncidentContext : verdichtet zu
   ContextInterpreter --> RuntimeSnapshot : extrahiert
   RagIncidentContext o-- RuntimeSnapshot : nutzt

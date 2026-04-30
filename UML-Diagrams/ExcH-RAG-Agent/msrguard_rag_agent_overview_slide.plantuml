@@ -21,7 +21,7 @@ package "rag_agent_ui" {
 
   UiConfig *-- PipelineConfig
   UiConfig *-- RagConfig
-  RagAgentUI ..> UiConfig : loads
+  RagAgentUI --> UiConfig : loads
 }
 
 package "simple_rag_agent" {
@@ -47,8 +47,8 @@ package "simple_rag_agent" {
 
   SimpleRagSession *-- RagIncidentContext
   SimpleRagSession *-- SimpleRagAgent
-  RagSessionBuilder ..> RagIncidentContext : creates
-  RagSessionBuilder ..> SimpleRagSession : returns
+  RagSessionBuilder --> RagIncidentContext : creates
+  RagSessionBuilder --> SimpleRagSession : returns
 }
 
 package "External Inputs" {
@@ -58,13 +58,13 @@ package "External Inputs" {
   class LLMFactory <<external>>
 }
 
-RagAgentUI ..> EventJson : loads event
-RagAgentUI ..> IngestionPipeline : optional refresh
-RagAgentUI ..> RagSessionBuilder : creates session
-RagAgentUI ..> SimpleRagSession : stores in session_state
+RagAgentUI --> EventJson : loads event
+RagAgentUI --> IngestionPipeline : optional refresh
+RagAgentUI --> RagSessionBuilder : creates session
+RagAgentUI --> SimpleRagSession : stores in session_state
 
-SimpleRagAgent ..> ExportXml : reads PLCOpenXML
-SimpleRagAgent ..> LLMFactory : single LLM call
+SimpleRagAgent --> ExportXml : reads PLCOpenXML
+SimpleRagAgent --> LLMFactory : single LLM call
 
 RagAgentUI -[hidden]-> RagIncidentContext
 RagIncidentContext -[hidden]-> ExportXml

@@ -39,7 +39,7 @@ package "Foundation-Modell-Komponente" {
   RagConfig --> ModelSelectionPolicy : parametrisiert
   ModelSelectionPolicy --> ModelProfile : wählt
   FoundationModelGateway --> ModelProfile : nutzt
-  FoundationModelGateway ..> PromptRequest : verarbeitet
+  FoundationModelGateway --> PromptRequest : verarbeitet
   FoundationModelGateway --> ModelResponse : erzeugt
 }
 

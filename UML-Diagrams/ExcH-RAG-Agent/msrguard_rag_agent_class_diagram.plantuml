@@ -38,7 +38,7 @@ package "rag_agent_ui" {
 
   UiConfig *-- PipelineConfig
   UiConfig *-- RagConfig
-  RagAgentUI ..> UiConfig : loads
+  RagAgentUI --> UiConfig : loads
 }
 
 package "simple_rag_agent" {
@@ -98,14 +98,14 @@ package "simple_rag_agent" {
 
   SimpleRagSession *-- SimpleRagAgent
   SimpleRagSession *-- RagIncidentContext
-  SimpleRagAgent ..> PLCOpenXmlSource : loads XML
-  SimpleRagAgent ..> XmlChunker : creates chunks
+  SimpleRagAgent --> PLCOpenXmlSource : loads XML
+  SimpleRagAgent --> XmlChunker : creates chunks
   SimpleRagAgent --> SimpleRagIndex : builds
   SimpleRagIndex --> RagChunk : ranks
-  XmlChunker ..> RagChunk : creates
-  RagSessionBuilder ..> RagIncidentContext : from_input()
-  RagSessionBuilder ..> SimpleRagAgent : constructs
-  RagSessionBuilder ..> SimpleRagSession : returns
+  XmlChunker --> RagChunk : creates
+  RagSessionBuilder --> RagIncidentContext : from_input()
+  RagSessionBuilder --> SimpleRagAgent : constructs
+  RagSessionBuilder --> SimpleRagSession : returns
 }
 
 package "External Inputs" {
@@ -117,17 +117,17 @@ package "External Inputs" {
   }
 }
 
-RagAgentUI ..> RagSessionBuilder : build_session_from_input()
-RagAgentUI ..> SimpleRagSession : stores in session_state
-RagAgentUI ..> PipelineConfig : optional run_pipeline()
-RagAgentUI ..> RagConfig : passes xml/model/top_k
-RagAgentUI ..> EventJson : loads event context
-RagAgentUI ..> IngestionPipeline : optional refresh of export.xml
+RagAgentUI --> RagSessionBuilder : build_session_from_input()
+RagAgentUI --> SimpleRagSession : stores in session_state
+RagAgentUI --> PipelineConfig : optional run_pipeline()
+RagAgentUI --> RagConfig : passes xml/model/top_k
+RagAgentUI --> EventJson : loads event context
+RagAgentUI --> IngestionPipeline : optional refresh of export.xml
 
-RagIncidentContext ..> EventJson : extracts payload
-PLCOpenXmlSource ..> ExportXml : reads
-IngestionPipeline ..> ExportXml : produces / refreshes
-SimpleRagAgent ..> LLMFactory : get_llm_invoke()
+RagIncidentContext --> EventJson : extracts payload
+PLCOpenXmlSource --> ExportXml : reads
+IngestionPipeline --> ExportXml : produces / refreshes
+SimpleRagAgent --> LLMFactory : get_llm_invoke()
 
 RagAgentUI -[hidden]-> RagIncidentContext
 RagIncidentContext -[hidden]-> SimpleRagAgent

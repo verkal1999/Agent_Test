@@ -30,15 +30,15 @@ package "Artefakt- und Ingestion-Komponente" {
   abstract class Step {
     +name: str
     +outputs(ctx: PipelineContext): List<Path>
-    +should_skip(ctx: PipelineContext, force: bool): bool
+    +should_skip(ctx: PipelineContext, ...): bool
     +run(ctx: PipelineContext): None
   }
 
-  class ExportPLCopenXMLStep
-  class BuildProgramIOMappingStep
-  class BuildIOMappingsStep
+  class "Export\nPLCopenXML\nStep" as ExportPLCopenXMLStep
+  class "Build\nProgramIO\nMappingStep" as BuildProgramIOMappingStep
+  class "Build\nIO\nMappingsStep" as BuildIOMappingsStep
 
-  class PLCOpenXMLParserWithHW {
+  class "PLCOpenXMLParser\nWithHW" as PLCOpenXMLParserWithHW {
     +scan_project_and_write_objects_json(): None
     +export_plcopen_xml(): None
     +build_program_io_mapping(): None
@@ -58,13 +58,13 @@ package "Artefakt- und Ingestion-Komponente" {
     +globals: List<GlobalVar>
   }
 
-  class IoHardwareAddress <<dataclass>> {
+  class "IoHardware\nAddress" as IoHardwareAddress <<dataclass>> {
     +plc_path: str
     +channel_label: str
     +direction: str
   }
 
-  class ArtifactQualityGate {
+  class "ArtifactQuality\nGate" as ArtifactQualityGate {
     +validate(ctx: PipelineContext): bool
   }
 
@@ -76,9 +76,9 @@ package "Artefakt- und Ingestion-Komponente" {
   Pipeline --> ArtifactQualityGate : validiert über
   PipelineContext *-- PipelineConfig : nutzt Konfiguration
   PipelineContext o-- PLCOpenXMLParserWithHW : hält Parser
-  PLCOpenXMLParserWithHW ..> ProgramMapping : erzeugt
-  PLCOpenXMLParserWithHW ..> GVL : erzeugt
-  PLCOpenXMLParserWithHW ..> IoHardwareAddress : erzeugt
+  PLCOpenXMLParserWithHW --> ProgramMapping : erzeugt
+  PLCOpenXMLParserWithHW --> GVL : erzeugt
+  PLCOpenXMLParserWithHW --> IoHardwareAddress : erzeugt
 }
 
 @enduml

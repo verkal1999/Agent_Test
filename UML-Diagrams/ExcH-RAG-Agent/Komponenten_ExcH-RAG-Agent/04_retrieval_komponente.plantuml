@@ -39,8 +39,8 @@ package "Retrieval-Komponente" {
 
   SimpleRagIndex o-- RagChunk
   SimpleRagIndex --> TokenScorer : nutzt
-  SimpleRagIndex ..> RetrievalQuery : verarbeitet
-  SimpleRagIndex ..> RetrievalResultSet : erzeugt
+  SimpleRagIndex --> RetrievalQuery : verarbeitet
+  SimpleRagIndex --> RetrievalResultSet : erzeugt
   RetrievalResultSet *-- RetrievalHit
   RetrievalHit --> RagChunk : referenziert
 }

@@ -36,7 +36,7 @@ package "rag_agent_ui" {
 
   UiConfig *-- PipelineConfig
   UiConfig *-- RagConfig
-  RagAgentUI ..> UiConfig : load_ui_config()
+  RagAgentUI --> UiConfig : load_ui_config()
 }
 
 package "simple_rag_agent" {
@@ -55,19 +55,19 @@ package "simple_rag_agent" {
     +ask(user_msg, debug): dict
   }
 
-  RagSessionBuilder ..> RagIncidentContext : from_input()
-  RagSessionBuilder ..> SimpleRagSession : returns
+  RagSessionBuilder --> RagIncidentContext : from_input()
+  RagSessionBuilder --> SimpleRagSession : returns
 }
 
 class EventJson <<artifact>>
 class ResultJson <<artifact>>
 
-RagAgentUI ..> EventJson : loads
-RagAgentUI ..> PipelineConfig : optional run_pipeline()
-RagAgentUI ..> RagConfig : passes xml/model/top_k
-RagAgentUI ..> RagSessionBuilder : import + call
-RagAgentUI ..> SimpleRagSession : run_initial_analysis()
-RagAgentUI ..> ResultJson : writes result
+RagAgentUI --> EventJson : loads
+RagAgentUI --> PipelineConfig : optional run_pipeline()
+RagAgentUI --> RagConfig : passes xml/model/top_k
+RagAgentUI --> RagSessionBuilder : import + call
+RagAgentUI --> SimpleRagSession : run_initial_analysis()
+RagAgentUI --> ResultJson : writes result
 
 RagAgentUI -[hidden]-> RagIncidentContext
 RagIncidentContext -[hidden]-> ResultJson

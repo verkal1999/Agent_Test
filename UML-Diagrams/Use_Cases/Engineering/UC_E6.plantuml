@@ -6,8 +6,8 @@ skinparam shadowing false
 actor "Operator" as OP
 actor "Instandhalter" as IH
 actor "FMEA-Team" as FMEA
-actor "Betriebsdaten /\nFehlerfälle" as OPS
-actor "Wissensgraph" as KG
+rectangle "Betriebsdaten /\nFehlerfälle" <<System>> as OPS
+rectangle "Wissensgraph" <<System>> as KG
 
 rectangle "Exception-Handling-Agent" {
   usecase "Betriebserkenntnisse in das\nEngineering zurückführen" as UC6

@@ -64,7 +64,7 @@ package "Kontext- und Sitzungs-Komponente" {
     +ask(user_msg: str, debug: bool, include_bootstrap: bool): dict
   }
 
-  ContextAssembler ..> RuntimeEvent : liest
+  ContextAssembler --> RuntimeEvent : liest
   ContextAssembler --> IncidentContext : erzeugt
   IncidentContext o-- RuntimeSnapshot
   RuntimeSnapshot *-- ObservedSignal

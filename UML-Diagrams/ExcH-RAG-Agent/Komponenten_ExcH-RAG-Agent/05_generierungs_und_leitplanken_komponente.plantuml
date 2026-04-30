@@ -50,8 +50,8 @@ package "Generierungs- und\nLeitplanken-Komponente" {
   GroundedContextBundle *-down- RetrievedContextBlock
   GroundedAnswerGenerator --> GuardrailPolicy : beachtet
   GroundedAnswerGenerator --> AnswerContract : formatiert nach
-  GroundedAnswerGenerator ..> GenerationRequest : verarbeitet
-  GroundedAnswerGenerator ..> GroundedContextBundle : nutzt
+  GroundedAnswerGenerator --> GenerationRequest : verarbeitet
+  GroundedAnswerGenerator --> GroundedContextBundle : nutzt
   GroundedAnswerGenerator --> GenerationResult : erzeugt
 
   GenerationRequest -[hidden]right-> GroundedAnswerGenerator

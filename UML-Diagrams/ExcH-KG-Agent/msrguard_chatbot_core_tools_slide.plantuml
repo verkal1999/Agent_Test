@@ -47,7 +47,7 @@ package "KG + Similarity" {
 
   SignatureExtractor --> KGStore
   RoutineIndex o-- RoutineSignature
-  RoutineIndex ..> SignatureExtractor : build_from_kg()
+  RoutineIndex --> SignatureExtractor : build_from_kg()
 }
 
 package "Planning + Registry" {
@@ -103,8 +103,8 @@ package "General Tools" {
 
 ExceptionAnalysisTool --> KGStore
 ExceptionAnalysisTool --> RoutineIndex
-ExceptionAnalysisTool ..> RoutineSignature
-ExceptionAnalysisTool ..> SensorSnapshot
+ExceptionAnalysisTool --> RoutineSignature
+ExceptionAnalysisTool --> SensorSnapshot
 StringTripleSearchTool --> KGStore
 
 SensorSnapshot -[hidden]-> BaseAgentTool

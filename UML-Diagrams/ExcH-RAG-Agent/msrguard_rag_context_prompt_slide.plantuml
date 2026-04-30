@@ -23,7 +23,7 @@ package "Context Extraction" {
     +default_question(): str
   }
 
-  RagIncidentContext ..> EventJson : extracts payload
+  RagIncidentContext --> EventJson : extracts payload
 }
 
 package "Prompt + Session" {
@@ -44,9 +44,7 @@ package "Prompt + Session" {
 
 class PlcSnapshotJson <<artifact>>
 
-RagIncidentContext ..> PlcSnapshotJson : interprets vars / rows
-SimpleRagSession ..> RagIncidentContext : builds prompt
-SimpleRagSession ..> SimpleRagAgent : initial analysis
+RagIncidentContext --> PlcSnapshotJson : interprets vars / rows
 
 RagIncidentContext -[hidden]-> SimpleRagAgent
 

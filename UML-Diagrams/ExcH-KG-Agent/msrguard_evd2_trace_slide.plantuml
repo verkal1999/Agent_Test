@@ -32,7 +32,7 @@ package "excH_chatbot" {
   }
 
   ExcHChatBotSession *-- IncidentContext
-  ExcHChatbotFlows ..> ExcHChatBotSession : orchestrates
+  ExcHChatbotFlows --> ExcHChatBotSession : orchestrates
 }
 
 package "chatbot_core" {
@@ -90,12 +90,12 @@ package "d2_trace_analysis" {
 }
 
 ExcHChatBotSession --> ChatBot : delegates
-ExcHChatbotFlows ..> ChatBot : uses registry-backed tools
+ExcHChatbotFlows --> ChatBot : uses registry-backed tools
 
-EvD2DiagnosisTool ..> D2TraceAnalysis : FBD/ST evidence
-EvD2UnifiedTraceTool ..> D2TraceAnalysis : unified trace
-EvD2RequirementPathsTool ..> D2TraceAnalysis : table generation
-EvD2PathTracingTool ..> D2TraceAnalysis : path reconstruction
+EvD2DiagnosisTool --> D2TraceAnalysis : FBD/ST evidence
+EvD2UnifiedTraceTool --> D2TraceAnalysis : unified trace
+EvD2RequirementPathsTool --> D2TraceAnalysis : table generation
+EvD2PathTracingTool --> D2TraceAnalysis : path reconstruction
 
 IncidentContext -[hidden]-> ChatBot
 ChatBot -[hidden]-> D2TraceAnalysis

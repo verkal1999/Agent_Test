@@ -37,9 +37,9 @@ package "simple_rag_agent" {
   }
 
   PLCOpenXmlSource --> XmlChunker : XML text
-  XmlChunker ..> RagChunk : creates
-  SimpleRagAgent ..> PLCOpenXmlSource : load_text()
-  SimpleRagAgent ..> XmlChunker : chunk_text()
+  XmlChunker --> RagChunk : creates
+  SimpleRagAgent --> PLCOpenXmlSource : load_text()
+  SimpleRagAgent --> XmlChunker : chunk_text()
   SimpleRagAgent --> SimpleRagIndex : builds
   SimpleRagIndex --> RagChunk : ranks hits
 }
@@ -51,8 +51,8 @@ package "External Inputs" {
   }
 }
 
-PLCOpenXmlSource ..> ExportXml : reads
-SimpleRagAgent ..> LLMFactory : invokes
+PLCOpenXmlSource --> ExportXml : reads
+SimpleRagAgent --> LLMFactory : invokes
 
 PLCOpenXmlSource -[hidden]-> SimpleRagIndex
 SimpleRagIndex -[hidden]-> LLMFactory

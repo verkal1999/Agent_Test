@@ -26,7 +26,7 @@ package "excH_kg_agent_ui.py" {
 
   UiConfig *-- PipelineConfig
   UiConfig *-- ChatbotConfig
-  ExcHAgentUI ..> UiConfig : loads
+  ExcHAgentUI --> UiConfig : loads
 }
 
 package "excH_kg_agent_core.py" {
@@ -40,7 +40,7 @@ package "excH_kg_agent_core.py" {
     +next_steps: List<str>
   }
 
-  ExcHAgentCore ..> AgentResult : returns
+  ExcHAgentCore --> AgentResult : returns
 }
 
 package "excH_chatbot.py" {
@@ -73,8 +73,8 @@ package "excH_chatbot.py" {
   }
 
   ExcHChatBotSession *-- IncidentContext
-  ExcHChatbotFlows ..> IncidentContext
-  ExcHChatbotFlows ..> ExcHChatBotSession
+  ExcHChatbotFlows --> IncidentContext
+  ExcHChatbotFlows --> ExcHChatBotSession
 }
 
 package "chatbot_core.py" {
@@ -95,16 +95,16 @@ package "Support Modules" {
   class D2TraceAnalysis <<module>>
 }
 
-ExcHAgentUI ..> ExcHAgentCore : handle_event()
-ExcHAgentUI ..> IncidentContext : from_event() / from_input()
-ExcHAgentUI ..> ChatBot : build_bot()
-ExcHAgentUI ..> ExcHChatBotSession : creates
-ExcHAgentUI ..> ExcHChatbotFlows : run_initial_analysis()
+ExcHAgentUI --> ExcHAgentCore : handle_event()
+ExcHAgentUI --> IncidentContext : from_event() / from_input()
+ExcHAgentUI --> ChatBot : build_bot()
+ExcHAgentUI --> ExcHChatBotSession : creates
+ExcHAgentUI --> ExcHChatbotFlows : run_initial_analysis()
 
-IncidentContext ..> AgentResult : optional input
+IncidentContext --> AgentResult : optional input
 ExcHChatBotSession --> ChatBot : delegates
-ExcHChatbotFlows ..> ChatBot : build_bot()
-ExcHChatbotFlows ..> D2TraceAnalysis : bootstrap analysis
+ExcHChatbotFlows --> ChatBot : build_bot()
+ExcHChatbotFlows --> D2TraceAnalysis : bootstrap analysis
 
 ExcHAgentUI -[hidden]-> ExcHAgentCore
 ExcHAgentCore -[hidden]-> IncidentContext

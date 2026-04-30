@@ -55,7 +55,7 @@ package "Modell-, Planner- und Werkzeug-Komponente" {
   BaseAgentTool <|-- VariableSignalAnalysisTool
   BaseAgentTool <|-- PathReconstructionTool
   Planner --> ToolResultBundle : sammelt
-  FoundationModelAdapter ..> ToolResultBundle : nutzt
+  FoundationModelAdapter --> ToolResultBundle : nutzt
   Planner --> FoundationModelAdapter : übergibt Ergebnisse an
 }
 

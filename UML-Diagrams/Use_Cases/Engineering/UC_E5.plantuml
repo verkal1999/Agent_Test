@@ -5,8 +5,8 @@ skinparam shadowing false
 
 actor "FMEA-Team" as FMEA
 actor "Prozessingenieur" as PE
-actor "SPS / Steuerungssystem" as PLC
-actor "Wissensgraph" as KG
+rectangle "SPS / Steuerungssystem" <<System>> as PLC
+rectangle "Wissensgraph" <<System>> as KG
 
 rectangle "Exception-Handling-Agent" {
   usecase "Steuerungsänderungen\nnachverfolgen und mit\nFMEA koppeln" as UC5

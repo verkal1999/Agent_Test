@@ -36,8 +36,8 @@ package "Artefakt- und Dokumenten-Komponente" {
   }
 
   ArtifactCatalog --> PLCOpenXmlSource : verweist auf
-  PLCOpenXmlSource ..> XmlChunker : liefert XML an
-  XmlChunker ..> RagChunk : erzeugt
+  PLCOpenXmlSource --> XmlChunker : liefert XML an
+  XmlChunker --> RagChunk : erzeugt
   XmlChunker --> DocumentCorpus : füllt
   DocumentCorpus o-- RagChunk
 }

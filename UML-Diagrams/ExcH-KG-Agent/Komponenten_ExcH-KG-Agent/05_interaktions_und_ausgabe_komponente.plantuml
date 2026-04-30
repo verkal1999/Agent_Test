@@ -49,12 +49,12 @@ package "Interaktions- und Ausgabe-Komponente" {
     +reuse_session: bool
   }
 
-  ExcHAgentUI ..> ResponseEnvelope : stellt bereit
+  ExcHAgentUI --> ResponseEnvelope : stellt bereit
   ResponseEnvelope o-- StructuredToolResult
   ResponseEnvelope o-- FollowUpQuestion
-  OutputGuardrail ..> ResponseEnvelope : prüft
+  OutputGuardrail --> ResponseEnvelope : prüft
   OutputGuardrail --> EscalationDecision : erzeugt
   ExcHAgentUI o-- AuditTrailEntry
-  ExcHAgentUI ..> SessionResumeRequest : verarbeitet
+  ExcHAgentUI --> SessionResumeRequest : verarbeitet
 }
 @enduml

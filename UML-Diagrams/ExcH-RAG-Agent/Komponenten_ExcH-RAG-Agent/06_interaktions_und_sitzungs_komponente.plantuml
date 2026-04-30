@@ -50,8 +50,8 @@ package "Interaktions- und Sitzungs-Komponente" {
 
   UiConfig *-- PipelineConfig
   UiConfig *-- SimpleRagConfig
-  RagAgentUI ..> UiConfig : lädt
-  RagAgentUI ..> RagSessionBuilder : startet
+  RagAgentUI --> UiConfig : lädt
+  RagAgentUI --> RagSessionBuilder : startet
   RagAgentUI --> SimpleRagSession : nutzt
   RagSessionBuilder --> SimpleRagSession : erzeugt
   SimpleRagSession o-- ChatTurn

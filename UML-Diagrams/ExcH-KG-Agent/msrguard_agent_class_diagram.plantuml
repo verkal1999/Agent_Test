@@ -38,7 +38,7 @@ package "excH_kg_agent_ui.py" {
 
   UiConfig *-- PipelineConfig
   UiConfig *-- ChatbotConfig
-  ExcHAgentUI ..> UiConfig : loads
+  ExcHAgentUI --> UiConfig : loads
 }
 
 package "excH_kg_agent_core.py" {
@@ -55,7 +55,7 @@ package "excH_kg_agent_core.py" {
     +debug: dict
   }
 
-  ExcHAgentCore ..> AgentResult : builds / returns
+  ExcHAgentCore --> AgentResult : builds / returns
 }
 
 package "excH_chatbot.py" {
@@ -91,8 +91,8 @@ package "excH_chatbot.py" {
   }
 
   ExcHChatBotSession *-- IncidentContext
-  ExcHChatbotFlows ..> IncidentContext
-  ExcHChatbotFlows ..> ExcHChatBotSession
+  ExcHChatbotFlows --> IncidentContext
+  ExcHChatbotFlows --> ExcHChatBotSession
 }
 
 package "chatbot_core.py" {
@@ -136,7 +136,7 @@ package "chatbot_core.py" {
 
     SignatureExtractor --> KGStore
     RoutineIndex o-- RoutineSignature
-    RoutineIndex ..> SignatureExtractor : build_from_kg()
+    RoutineIndex --> SignatureExtractor : build_from_kg()
   }
 
   package "Planning + Registry" {
@@ -222,8 +222,8 @@ package "chatbot_core.py" {
 
   ExceptionAnalysisTool --> KGStore
   ExceptionAnalysisTool --> RoutineIndex
-  ExceptionAnalysisTool ..> RoutineSignature
-  ExceptionAnalysisTool ..> SensorSnapshot
+  ExceptionAnalysisTool --> RoutineSignature
+  ExceptionAnalysisTool --> SensorSnapshot
   StringTripleSearchTool --> KGStore
 }
 
@@ -251,19 +251,19 @@ package "d2_trace_analysis.py" {
 
 
 ' Cross-Package Relationships
-ExcHAgentUI ..> ExcHAgentCore : handle_event()
-ExcHAgentUI ..> IncidentContext : from_event() / from_input()
-ExcHAgentUI ..> ChatBot : build_bot()
-ExcHAgentUI ..> ExcHChatBotSession : creates
-ExcHAgentUI ..> ExcHChatbotFlows : run_initial_analysis()
+ExcHAgentUI --> ExcHAgentCore : handle_event()
+ExcHAgentUI --> IncidentContext : from_event() / from_input()
+ExcHAgentUI --> ChatBot : build_bot()
+ExcHAgentUI --> ExcHChatBotSession : creates
+ExcHAgentUI --> ExcHChatbotFlows : run_initial_analysis()
 
-IncidentContext ..> AgentResult : optional input
+IncidentContext --> AgentResult : optional input
 ExcHChatBotSession --> ChatBot : delegates
-ExcHChatbotFlows ..> ChatBot : build_bot()
+ExcHChatbotFlows --> ChatBot : build_bot()
 
-EvD2UnifiedTraceTool ..> D2TraceAnalysis
-EvD2RequirementPathsTool ..> D2TraceAnalysis
-EvD2PathTracingTool ..> D2TraceAnalysis
+EvD2UnifiedTraceTool --> D2TraceAnalysis
+EvD2RequirementPathsTool --> D2TraceAnalysis
+EvD2PathTracingTool --> D2TraceAnalysis
 
 note right of ExcHChatBotSession
 Caches a deterministic evD2 bootstrap plan
